@@ -1,0 +1,204 @@
+<template>
+  <div id="main"
+       @contextmenu="handleContextMenu"
+       @click="handleClick"
+       @dblclick="handleDoubleClick"
+       @mouseleave="showBtnModal=false"
+       >
+    <n-card
+            hoverable
+            embedded
+            size="small"
+            content-style="padding: 0 10px"
+            header-style="height:28px;"
+            :style="getSelectedStyle(props.selected)"
+
+    >
+      <template #header>
+        <n-scrollbar x-scrollable>
+          <div id="left">
+            <n-ellipsis >
+              <span :style="getTitleStyle(props.selected)"  >{{props.snippet.name}}</span>
+              <span id="small">{{props.snippet.desc}}</span>
+            </n-ellipsis>
+          </div>
+
+        </n-scrollbar>
+      </template>
+      <template #header-extra >
+        <div id="right">
+            <n-scrollbar x-scrollable :size="10">
+              <div class="sub">
+                <template v-if="flag">
+                  <n-space :wrap="false">
+                    <tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+                  </n-space>
+                </template>
+                <template v-else>
+                  <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
+                </template>
+              </div>
+            </n-scrollbar>
+        </div>
+      </template>
+      <template v-if="flag">
+        <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
+      </template>
+      <template v-else>
+        <n-space>
+          <tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+        </n-space>
+      </template>
+      <n-ellipsis style="max-width: 98%" :tooltip="false" >
+        <n-code :code="snippet.code" :language="snippet.type"   inline />
+      </n-ellipsis>
+    </n-card>
+
+
+    <template v-if="isShowBtn">
+      <div id="child" >
+        <n-space>
+          <selectable-button  type="warning" tip="编辑" :index="0" @invoke="$emit('editItem',snippet.name)" >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M20.998 6.25A3.25 3.25 0 0 0 17.748 3H6.25A3.25 3.25 0 0 0 3 6.25v11.499a3.25 3.25 0 0 0 3.25 3.25h4.914l.356-1.424l.02-.076H6.25a1.75 1.75 0 0 1-1.75-1.75v-9.25h14.998v2.733c.48-.19.994-.264 1.5-.22V6.25zM6.25 4.5h11.499c.966 0 1.75.783 1.75 1.75V7h-15v-.75c0-.967.784-1.75 1.75-1.75zm12.848 8.169l-5.901 5.901a2.685 2.685 0 0 0-.707 1.248l-.457 1.83c-.2.797.522 1.518 1.318 1.319l1.83-.458a2.685 2.685 0 0 0 1.248-.706L22.33 15.9a2.286 2.286 0 0 0-3.233-3.232z" fill="currentColor"></path></g></svg>
+          </selectable-button>
+          <selectable-button  type="primary" tip="预览代码" :index="1" @invoke="$emit('viewCode',snippet.name)" >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M8.086 18.611l5.996-14.004a1 1 0 0 1 1.878.677l-.04.11l-5.996 14.004a1 1 0 0 1-1.878-.677l.04-.11l5.996-14.004L8.086 18.61zm-5.793-7.318l4-4a1 1 0 0 1 1.497 1.32l-.083.094L4.414 12l3.293 3.293a1 1 0 0 1-1.32 1.498l-.094-.084l-4-4a1 1 0 0 1-.083-1.32l.083-.094l4-4l-4 4zm14-4.001a1 1 0 0 1 1.32-.083l.093.083l4.001 4.001a1 1 0 0 1 .083 1.32l-.083.095l-4.001 3.995a1 1 0 0 1-1.497-1.32l.084-.095L19.584 12l-3.293-3.294a1 1 0 0 1 0-1.414z" fill="currentColor"></path></g></svg>
+          </selectable-button>
+          <selectable-button  type="info" tip="复制" :index="2" @invoke="handleCopy" >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M5.503 4.627L5.5 6.75v10.504a3.25 3.25 0 0 0 3.25 3.25h8.616a2.251 2.251 0 0 1-2.122 1.5H8.75A4.75 4.75 0 0 1 4 17.254V6.75c0-.98.627-1.815 1.503-2.123zM17.75 2A2.25 2.25 0 0 1 20 4.25v13a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-13A2.25 2.25 0 0 1 8.75 2h9zm0 1.5h-9a.75.75 0 0 0-.75.75v13c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75v-13a.75.75 0 0 0-.75-.75z" fill="currentColor"></path></g></svg>
+          </selectable-button>
+          <selectable-button  type="error" tip="删除" :index="3" @invoke="handleDelete">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
+          </selectable-button>
+        </n-space>
+      </div>
+    </template>
+
+  </div>
+</template>
+
+<script setup>
+import {computed, ref} from "vue";
+import Tag from "./Tag.vue";
+import InlaidTag from "./InlaidTag.vue";
+import {
+  focusOnUtoolsInput,
+  handleCopy,
+  handleDeleteConfirm,
+  itemOffsetArray,
+  scrollbarMovedDistance,
+  subItemSelectIndex
+} from "../js/utils/variable.js";
+import { configManager} from "../js/core.js";
+import SelectableButton from "./SelectableButton.vue";
+let showBtnModal = ref(false)
+const props = defineProps(['snippet','selected','index'])
+const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
+const flag = configManager.get('shiftTagPosition')
+const isShowBtn = computed(()=>{
+  if(showBtnModal.value){
+    return true;
+  }
+  return !!(props.selected && subItemSelectIndex.value > -1);
+
+})
+
+const getSelectedStyle =(selected)=>{
+  if(selected){
+    // 保存当前滚动距离
+    itemOffsetArray.value[props.index] = scrollbarMovedDistance.distance;
+    if(focusOnUtoolsInput.value){
+      return ''
+    }
+    return `border: 2px solid ${configManager.getGlobalColor()} !important`;
+  }else{
+    return '';
+  }
+}
+const getTitleStyle = (selected) =>{
+  return {
+    color: selected? configManager.getGlobalColor():(utools.isDarkColors()?'#C0C0C0':'#505050'),
+    fontWeight: 'bold'
+  }
+}
+
+const handleDelete = ()=>{
+  handleDeleteConfirm(props.snippet.name,()=>emit('itemRefresh'))
+}
+
+const handleClick = (e)=>{
+  subItemSelectIndex.value = -1;
+  if(e.ctrlKey || e.metaKey){
+    emit('viewCode',props.snippet.name)
+  }
+  if(props.selected){
+    return;
+  }
+  emit('userClick',props.index)
+}
+const handleContextMenu = ()=>{
+  showBtnModal.value=true;
+  subItemSelectIndex.value = -1;
+  if(!props.selected){
+    emit('userClick',props.index)
+  }
+}
+const handleDoubleClick = ()=>{
+  if(configManager.get("doubleClickPaste")){
+    handleCopy(true)
+  }
+}
+</script>
+
+<style scoped>
+#main{
+  position: relative;
+}
+#child{
+  position: absolute;
+  top:0;
+  left:0;
+  z-index: 1231;
+  height: 100%;
+  width: 96vw;
+  overflow: auto;
+  margin-left: 2vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* 磨砂感背景 */
+  backdrop-filter: saturate(180%) blur(5px)!important;
+  -webkit-backdrop-filter: saturate(180%) blur(5px)!important;
+  /* 磨砂的背景颜色 */
+  background: rgba(228,237,250,.1)!important;
+}
+
+.n-card{
+  width:96vw;
+  margin: 0 2vw 4px 2vw;
+}
+
+
+#left{
+  max-width: 400px;
+}
+#small{
+  margin-left: 10px;
+  font-size: 12px;
+  display:inline-block;
+  color: rgb(124, 123, 123);
+  transform: scale(0.9); /* 用缩放来解决 */
+  transform-origin: 0 0;  /* 左对齐 */
+}
+#right{
+  max-width: 300px;
+  overflow: auto;
+}
+.sub{
+  margin-bottom: 6px;
+}
+.n-code{
+  color: rgb(124, 123, 123);
+}
+
+</style>

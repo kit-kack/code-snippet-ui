@@ -1,0 +1,21 @@
+{
+  "name": "zy0gidc9",
+  "version": "2.0.0",
+  "pluginName": "code-snippet",
+  "description": "管理您的代码片段，支持伪Vim操作方式",
+  "author": "kitkack",
+  "logo": "logo.png",
+  "main": "index.html",
+  "preload": "preload.js",
+  "development": {
+    "main": "http://localhost:3100/",
+    "preload": "preload.js"
+  },
+  "features": [
+    {
+      "code": "code-snippet",
+      "explain": "记录代码片段",
+      "cmds": ["code-snippet","snippet","cs"]
+    }
+  ]
+}

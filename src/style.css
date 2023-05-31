@@ -1,0 +1,36 @@
+@import "./assets/font.css";
+* {
+  scrollbar-base-color: green;
+  scrollbar-track-color: red;
+  scrollbar-arrow-color: blue;
+}
+
+body {
+  margin: 0;
+  padding-top: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#app{
+  width: 100%;
+}
+pre{
+  border: 1px;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-shadow: rgba(50, 50, 105, 0.15) 0 2px 5px 0, rgba(0, 0, 0, 0.05) 0 1px 1px 0;
+}
+code.hljs{
+  font-family: Mono !important;
+}
+.n-color-picker {
+  width: 30px;
+  display: inline-block;
+}
