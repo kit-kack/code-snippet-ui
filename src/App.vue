@@ -94,9 +94,9 @@ const handleCloseCodeView = ()=>{
 onMounted(()=>{
   utools.onPluginEnter(({code,type,payload})=>{
     console.log(`The APP is Starting With [${code}-${type}-${payload}]`)
-    codeSnippetManager.init();
     tagColorManager.init();
     configManager.init();
+    codeSnippetManager.init();
     utools.setSubInput(({text})=>{
       focusOnUtoolsInput.value = true;
       text = text.trim();

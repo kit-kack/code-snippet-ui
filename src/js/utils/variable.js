@@ -140,7 +140,7 @@ function init(list,refreshFunc){
                         }
                     }else{
                         if(subItemSelectIndex.value === -1){
-                            subItemSelectIndex.value = 3;
+                            subItemSelectIndex.value = 4;
                         }else{
                             subItemSelectIndex.value --;
                         }
@@ -179,7 +179,7 @@ function init(list,refreshFunc){
                             utools.shellBeep();
                         }
                     }else{
-                        if(subItemSelectIndex.value === 3){
+                        if(subItemSelectIndex.value === 4){
                             subItemSelectIndex.value = -1;
                         }else{
                             subItemSelectIndex.value ++;
@@ -266,6 +266,15 @@ function init(list,refreshFunc){
             case 'KeyC':
             case 'KeyY':
                 handleCopy()
+                break;
+            case 'KeyT':
+                let index = configManager.getTopList().indexOf(currentName.value)
+                if(index === -1){
+                    configManager.addTopItem(currentName.value);
+                }else{
+                    configManager.delTopItem(index)
+                }
+                refreshFunc()
                 break;
             case 'KeyP':
                 handleCopy(true)

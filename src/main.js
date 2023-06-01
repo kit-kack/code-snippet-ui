@@ -38,9 +38,9 @@ import {
 
 
 // init
-codeSnippetManager.init()
 tagColorManager.init();
 configManager.init();
+codeSnippetManager.init()
 
 // highlight
 hljs.registerAliases(["vue","html"],{languageName:"xml"})

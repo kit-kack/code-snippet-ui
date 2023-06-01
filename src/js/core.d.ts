@@ -13,8 +13,6 @@ export declare interface CodeSnippet{
     tags: Array<string> | undefined,
     // 代码片段 语言类型
     type: string | undefined,
-    // 置顶功能 (数字越大，位置靠前)
-    popular: number | undefined,
     // 高级查询词，存储来提升查询效率
     query: string | undefined
 }
@@ -34,3 +32,4 @@ export declare type ConfigItem =
     | "enabledBeep"                                  // 是否启用Beep声
     | "exitAfterPaste"                               // 粘贴后退出插件
     | "enabledFuzzySymbolQuery"                      //模糊符号查询
+    | "topList"                                      //置顶列表

@@ -1,5 +1,7 @@
 // 全局便利常量和函数
 
+import {deltaE} from "colorjs.io/fn";
+
 const utools = window.utools;
 const setDBItem = utools.dbStorage.setItem
 const getDBItem = utools.dbStorage.getItem
@@ -148,11 +150,26 @@ let funcUtils = {
      * @return {CodeSnippet[]}
      */
     getSortedArray(list){
+        // 筛选出 置顶列表中的片段
+        let topSnippets = [];
+        let topList = configManager.getTopList();
+        list = list.filter(snippet =>{
+            let index = topList.indexOf(snippet.name);
+            if(index === -1){
+                return true;
+            }else{
+                snippet.index = index;
+                topSnippets.push(snippet)
+                return false;
+            }
+        })
+        // 对 topSnippets进行排序
+        topSnippets.sort((a,b)=> a.index - b.index)
         switch (configManager.getSortKey()){
             case 0:   // 创建时间
-                return list;
+                break;
             case 1:   // 最近访问时间
-                return list.sort((a,b)=>{
+                list.sort((a,b)=>{
                     if(a.time == null){
                         return (b.time == null)? a.name.localeCompare(b.name) : 1;
                     }else if(b.time == null){
@@ -167,8 +184,9 @@ let funcUtils = {
                         }
                     }
                 })
+                break;
             case 2:  // 粘贴使用次数
-                return list.sort((a,b)=>{
+                list.sort((a,b)=>{
                     if(a.count == null){
                         return (b.count == null)? a.name.localeCompare(b.name) : 1;
                     }else if(b.count == null){
@@ -183,9 +201,13 @@ let funcUtils = {
                         }
                     }
                 })
+                break;
             default:  // 自然排序
-                return list.sort((a,b)=>a.name.localeCompare(b.name))
+                list.sort((a,b)=>a.name.localeCompare(b.name))
+                break;
         }
+        console.log(topSnippets)
+        return topSnippets.concat(list);
     },
     /**
      *
@@ -290,6 +312,12 @@ let codeSnippetManager = {
             this.codeMap.delete(name)
             // 重新构建 result
             this.rebuild()
+
+            // 处理 topList
+            let index = configManager.getTopList().indexOf(name)
+            if(index !== -1){
+                configManager.delTopItem(index)
+            }
             return true;
         }else{
             return false;
@@ -546,7 +574,24 @@ let configManager = {
     },
     getSortKey(){
         return this.configMap.get("sortKey")?? 0;
+    },
+    getTopList(){
+        return this.configMap.get("topList")??[];
+    },
+    addTopItem(name){
+        let list = this.getTopList();
+        list.push(name)
+        this.configMap.set("topList",list);
+        this.writeToDB();
+        return list.length-1;
+    },
+    delTopItem(index){
+        let list = this.getTopList();
+        list.splice(index,1);
+        this.configMap.set("topList",list);
+        this.writeToDB();
     }
+
 }
 
 

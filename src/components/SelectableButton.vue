@@ -5,6 +5,7 @@
                  @click="emit('invoke')"
                  :type="type"
                  :="getStyle(selected)"
+                 :color="color"
                  @mouseenter="hover = true"
                  @mouseleave="hover = false"
 
@@ -25,7 +26,8 @@ import {configManager} from "../js/core.js";
 const props = defineProps({
   "tip": String,
   "type":String,
-  "index": Number
+  "index": Number,
+  "color": String
 })
 const emit = defineEmits(['invoke'])
 const hover = ref(false)
