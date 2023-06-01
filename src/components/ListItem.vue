@@ -13,10 +13,11 @@
             header-style="height:28px;"
             :style="getSelectedStyle(props.selected)"
     >
-      <div :class="{
-        circle:true,
-        show: configManager.getTopList().includes(snippet.name)
-      }"></div>
+      <div class="circle"
+           :style="{
+              backgroundColor: configManager.getTopList().includes(snippet.name)? configManager.getGlobalColor(): ''
+           }"
+      ></div>
       <template #header>
         <n-scrollbar x-scrollable>
           <div id="left">
@@ -52,10 +53,14 @@
         </n-space>
       </template>
       <n-ellipsis style="max-width: 98%" :tooltip="false" >
-        <n-code :code="snippet.code" :language="snippet.type"   inline />
+        <template v-if="configManager.get('rawLineCode')">
+          <span class="code">{{snippet.code}}</span>
+        </template>
+        <template v-else>
+          <n-code :code="snippet.code" :language="snippet.type"   inline />
+        </template>
       </n-ellipsis>
     </n-card>
-
 
     <template v-if="isShowBtn">
       <div id="child" >
@@ -221,6 +226,9 @@ const handleTop = ()=>{
 .n-code{
   color: rgb(124, 123, 123);
 }
+.code{
+  color: rgb(124, 123, 123);
+}
 
 .circle {
   position: absolute;
@@ -231,9 +239,6 @@ const handleTop = ()=>{
   background-color: transparent;
   border-radius: 50%;
   z-index: 100;
-}
-.show{
-  background-color: #2874f8;
 }
 .n-card:hover .show{
   animation: blink 1s 3 steps(1);

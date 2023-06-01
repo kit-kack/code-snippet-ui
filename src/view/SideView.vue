@@ -29,6 +29,7 @@
           </n-space>
           <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
           <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
+          <config-switch title="行内代码块是否不进行高亮解析" config="rawLineCode" @refresh="emit('refresh')"/>
           <n-tooltip trigger="hover">
             <template #trigger>
               <config-switch title="启用模糊符号查询" config="enabledFuzzySymbolQuery"/>
@@ -41,7 +42,6 @@
             </template>
             亮色和暗色场景下独立保存，互不影响
           </n-tooltip>
-          <n-input/>
         </n-space>
         <n-divider title-placement="center">
           清除自定义标签关联颜色

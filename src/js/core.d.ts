@@ -33,3 +33,4 @@ export declare type ConfigItem =
     | "exitAfterPaste"                               // 粘贴后退出插件
     | "enabledFuzzySymbolQuery"                      //模糊符号查询
     | "topList"                                      //置顶列表
+    | "rawLineCode"                                  // 原始行内代码，不进行高亮
