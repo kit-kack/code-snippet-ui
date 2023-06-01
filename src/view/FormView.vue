@@ -179,6 +179,8 @@ let handleUpdate = ()=>{
         console.log(`after set: ${codeSnippet}`)
         if(props.update){
           keepSelectedStatus.value = true;
+          // 这里清理查询缓存
+          delete codeSnippet.query;
           codeSnippetManager.update(codeSnippet)
         }else{
           keepSelectedStatus.value = null;

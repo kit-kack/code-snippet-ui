@@ -31,11 +31,17 @@
           <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
           <n-tooltip trigger="hover">
             <template #trigger>
+              <config-switch title="启用模糊符号查询" config="enabledFuzzySymbolQuery"/>
+            </template>
+            启用后，你可以使用helloworld来查询到hello-world记录，即模糊掉符号来进行纯粹的字符查询,支持C-f来切换
+          </n-tooltip>
+          <n-tooltip trigger="hover">
+            <template #trigger>
               <color-picker :instance="defaultGlobalColorInstance"/>
             </template>
             亮色和暗色场景下独立保存，互不影响
           </n-tooltip>
-          <color-picker :instance="defaultColorInstance" />
+          <n-input/>
         </n-space>
         <n-divider title-placement="center">
           清除自定义标签关联颜色

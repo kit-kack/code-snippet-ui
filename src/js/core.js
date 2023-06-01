@@ -186,6 +186,22 @@ let funcUtils = {
             default:  // 自然排序
                 return list.sort((a,b)=>a.name.localeCompare(b.name))
         }
+    },
+    /**
+     *
+     * @param {string} name
+     */
+    getFuzzyQueriedValue(name){
+        name = name.trim().toLowerCase();
+        let template = '';
+        for (let char of name) {
+            let ascii = char.charCodeAt(0);
+            if((ascii >=20 && ascii <= 47) || (ascii>=58 && ascii<=64) || (ascii>=91 && ascii<=96) || (ascii>=123 && ascii<=126)){
+                continue;
+            }
+            template+=char;
+        }
+        return template;
     }
 }
 
@@ -325,10 +341,30 @@ let codeSnippetManager = {
          */
         let list = [];
         if(name !== null){
-            name = name.toLowerCase();
-            for (const codeSnippet of this.codeMap.values()) {
-                if(codeSnippet.name.includes(name)){
-                    list.push(codeSnippet)
+            if(configManager.get('enabledFuzzySymbolQuery')){
+                console.log('fuzzy query')
+                // 0. 搜索词需要同样被替换
+                name = funcUtils.getFuzzyQueriedValue(name);
+                console.log(name)
+                for (const codeSnippet of this.codeMap.values()) {
+                    // 1.首先检查 查询缓存
+                    if(codeSnippet.query == null){
+                        // 1.1 不存在查询缓存时生成缓存名
+                        codeSnippet.query = funcUtils.getFuzzyQueriedValue(codeSnippet.name)
+                        setDBItem(CS_CODE_ID+codeSnippet.name,JSON.stringify(codeSnippet))
+                    }
+                    // 2.比较 查询缓存
+                    if(codeSnippet.query.includes(name)){
+                        list.push(codeSnippet)
+                    }
+                }
+            }else{
+                // 0. 搜索词需要同样被替换
+                name = name.trim().toLowerCase();
+                for (const codeSnippet of this.codeMap.values()) {
+                    if(codeSnippet.name.toLowerCase().includes(name)){
+                        list.push(codeSnippet)
+                    }
                 }
             }
         }else{
@@ -470,9 +506,12 @@ let configManager = {
         console.log('configManager init, and size is'+this.configMap.size)
         this.isInited = true;
     },
+    writeToDB(){
+        setDBItem(CS_CONFIG_ID,funcUtils.mapToJson(this.configMap))
+    },
     /**
      *
-     * @param {ConfigItem} config
+     * @param { ConfigItem } config
      * @return {any}
      */
     get(config){
@@ -485,7 +524,7 @@ let configManager = {
      */
     set(config,value){
         this.configMap.set(config,value)
-        setDBItem(CS_CONFIG_ID,funcUtils.mapToJson(this.configMap))
+        this.writeToDB();
     },
     getDefaultColor(){
         return this.configMap.get("defaultColor")??'#707070FF';
@@ -500,11 +539,10 @@ let configManager = {
     setGlobalColor(color){
         if(utools.isDarkColors()){
             this.configMap.set("darkGlobalColor",color);
-            setDBItem(CS_CONFIG_ID,funcUtils.mapToJson(this.configMap))
         }else{
             this.configMap.set("lightGlobalColor",color);
-            setDBItem(CS_CONFIG_ID,funcUtils.mapToJson(this.configMap))
         }
+        this.writeToDB();
     },
     getSortKey(){
         return this.configMap.get("sortKey")?? 0;

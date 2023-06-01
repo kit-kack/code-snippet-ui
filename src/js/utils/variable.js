@@ -230,6 +230,14 @@ function init(list,refreshFunc){
             }else if(e.code === 'KeyR' && currentMode.value === LIST_VIEW){
                 refreshFunc();
                 return;
+            }else if(e.code === 'KeyF' && currentMode.value === LIST_VIEW){
+                if(configManager.get("enabledFuzzySymbolQuery")){
+                    configManager.set("enabledFuzzySymbolQuery",false)
+                    $message.info("退出【模糊符号查询】模式")
+                }else{
+                    configManager.set("enabledFuzzySymbolQuery",true)
+                    $message.success("进入【模糊符号查询】模式")
+                }
             }
         }
 

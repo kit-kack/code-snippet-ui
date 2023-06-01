@@ -7,7 +7,7 @@
             @view-code="handleViewCode"
             @item-refresh="emit('refresh')"
             @edit-item="handleEdit"
-            @user-click="ind=>selectIndex = ind"
+            @user-click="ind => selectIndex = ind"
             v-for="(snippet,index) in list" :selected="handleSelect(index,snippet.name)" :index="index"   v-bind:snippet="snippet" :key="index" />
         <div id="info">
           <p>~共有{{list.length}}条数据~</p>
