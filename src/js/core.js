@@ -356,6 +356,27 @@ let codeSnippetManager = {
             return false;
         }
     },
+    replace(newName,codeSnippet){
+        // 先查询是否存在
+        if(this.codeMap.has(codeSnippet.name)){
+            removeDBItem(CS_CODE_ID+codeSnippet.name)
+            // 处理 topList
+            let index = configManager.getTopList().indexOf(codeSnippet.name);
+            if(index!==-1){
+                configManager.replaceTopItem(index,newName)
+            }
+            // 替换 codeMap
+            this.codeMap.delete(codeSnippet.name)
+            codeSnippet.name = newName;
+            this.codeMap.set(codeSnippet.name,codeSnippet);
+            setDBItem(CS_CODE_ID+codeSnippet.name,JSON.stringify(codeSnippet))
+            this.codeMap.set(codeSnippet.name,codeSnippet)
+            this.rebuild();
+            return true;
+        }else{
+            return false;
+        }
+    },
     /**
      * 满足多种查询要求
      * @param {string | null} name
@@ -588,6 +609,12 @@ let configManager = {
     delTopItem(index){
         let list = this.getTopList();
         list.splice(index,1);
+        this.configMap.set("topList",list);
+        this.writeToDB();
+    },
+    replaceTopItem(index,name){
+        let list = this.getTopList();
+        list.splice(index,1,name)
         this.configMap.set("topList",list);
         this.writeToDB();
     }

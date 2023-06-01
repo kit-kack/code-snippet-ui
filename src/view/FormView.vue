@@ -12,7 +12,7 @@
       <n-form-item
           label="代码片段名" path="name"
       >
-        <n-input v-model:value="codeTemplate.name" clearable :disabled="props.update" />
+        <n-input v-model:value="codeTemplate.name" clearable/>
       </n-form-item>
       <n-form-item
           label="代码描述" path="desc"
@@ -145,11 +145,10 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if(props.update){
+        if(props.update && codeSnippet.name === value){
           return true;
-        }else{
-          return !codeSnippetManager.contain(value)
         }
+        return !codeSnippetManager.contain(value)
       },
       trigger: ["input","blur"]
     }
@@ -170,19 +169,23 @@ let handleUpdate = ()=>{
       if(error!=null && error.length >= 0){
         window.$message.warning("请按要求填写")
       }else{
-        console.log(`before set: ${codeSnippet}`)
-        codeSnippet.name = codeTemplate.name;
         codeSnippet.code = codeTemplate.code;
         codeSnippet.desc = codeTemplate.desc;
         codeSnippet.tags = [...new Set(codeTemplate.tags)];
         codeSnippet.type = codeTemplate.type?? "plaintext";
-        console.log(`after set: ${codeSnippet}`)
+
         if(props.update){
-          keepSelectedStatus.value = true;
-          // 这里清理查询缓存
-          delete codeSnippet.query;
-          codeSnippetManager.update(codeSnippet)
+          if(codeSnippet.name === codeTemplate.name){
+            keepSelectedStatus.value = true;
+            codeSnippetManager.update(codeSnippet)
+          }else{
+            keepSelectedStatus.value = null;
+            // 这里清理查询缓存
+            delete codeSnippet.query;
+            codeSnippetManager.replace(codeTemplate.name,codeSnippet)
+          }
         }else{
+          codeSnippet.name = codeTemplate.name;
           keepSelectedStatus.value = null;
           codeSnippetManager.add(codeSnippet)
         }
