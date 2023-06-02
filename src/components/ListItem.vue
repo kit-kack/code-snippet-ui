@@ -229,9 +229,11 @@ const handleTop = ()=>{
 }
 .n-code{
   color: rgb(124, 123, 123);
+  font-size: 13px;
 }
 .code{
   color: rgb(124, 123, 123);
+  font-size: 13px;
 }
 
 .circle {
