@@ -34,3 +34,5 @@ export declare type ConfigItem =
     | "enabledFuzzySymbolQuery"                      //模糊符号查询
     | "topList"                                      //置顶列表
     | "rawLineCode"                                  // 原始行内代码，不进行高亮
+    | "enabledLiteShow"                              // 支持无UI模式下的显示效果
+    | "noShowForEmptySearch"                         // 对于空的搜索词，是否显示所有数据

@@ -1,12 +1,17 @@
 <template>
-  <n-tooltip trigger="manual" :show="selected || hover" >
+  <n-tooltip trigger="manual"
+             :show="hover || (selected && show)"
+              :keep-alive-on-hover="false"
+             content-style="{point-event:none;"
+             :placement="onlyOne&&!fullScreenShow?(flag? 'right':'left'):'top'"
+  >
     <template #trigger>
       <n-button  circle
-                 @click="emit('invoke')"
+                 @click="operate()"
                  :type="type"
                  :="getStyle(selected)"
                  :color="color"
-                 @mouseenter="hover = true"
+                 @mouseenter="handleMouseEnter"
                  @mouseleave="hover = false"
 
       >
@@ -21,21 +26,52 @@
 
 <script setup>
 import {computed, onMounted, ref} from "vue";
-import {spaceInvokers, subItemSelectIndex} from "../js/utils/variable.js";
+import {fullScreenShow, onlyOne, recoverLiteShow, spaceInvokers, subItemSelectIndex} from "../js/utils/variable.js";
 import {configManager} from "../js/core.js";
+
 const props = defineProps({
   "tip": String,
   "type":String,
   "index": Number,
-  "color": String
+  "color": String,
+  "right": Boolean,
+  "mid": Number,
+  "lite": Boolean   // 支持Lite Show
 })
+const show = ref()
 const emit = defineEmits(['invoke'])
 const hover = ref(false)
-const selected = computed(()=>subItemSelectIndex.value === props.index)
+const flag = ref(false)
+const selected = computed(()=>{
+  if(subItemSelectIndex.value === props.index){
+    if(onlyOne &&  !fullScreenShow.value){
+      show.value = true;
+      setTimeout(()=>{
+        show.value = false
+      },800)
+    }else{
+      show.value = true;
+    }
+    return true;
+  }
+  return false;
+})
+
+const operate = ()=>{
+  if(!(props.lite || fullScreenShow.value)){
+    fullScreenShow.value = true;
+    recoverLiteShow.value = true;
+    utools.setExpendHeight(545)
+  }
+  emit('invoke')
+}
 
 onMounted(()=>{
-  spaceInvokers.value[props.index] = ()=> emit('invoke')
+  spaceInvokers.value[props.index] = ()=> {
+    operate()
+  }
 })
+
 
 const getStyle =(flag) =>{
   if(flag){
@@ -48,8 +84,11 @@ const getStyle =(flag) =>{
     tertiary:true
   }
 }
+const handleMouseEnter = (e)=>{
+  hover.value = true;
+  flag.value = e.clientX > props.mid;
+}
 </script>
 
 <style scoped>
-
 </style>

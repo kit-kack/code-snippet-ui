@@ -11,16 +11,16 @@
           <code-view :name="currentName"  @do-close=" handleCloseCodeView" />
         </template>
         <template v-else-if="currentMode === UPDATE_VIEW">
-          <code-snippet-form update  :name="currentName"  @do-cancel="currentMode = LIST_VIEW" @do-update="handleForm"/>
+          <code-snippet-form update  :name="currentName"  @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
         </template>
         <template v-else>
-          <code-snippet-form   @do-cancel="currentMode = LIST_VIEW" @do-update="handleForm"/>
+          <code-snippet-form   @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
         </template>
         <n-drawer v-model:show="settingActive" :width="370" placement="right">
           <side-view @refresh="dealWithRefresh" />
         </n-drawer>
-        <div id="extra-left" v-if="!focusOnUtoolsInput">
-            <vim-status-bar />
+        <div id="extra-left" v-if="!focusOnUtoolsInput && fullScreenShow">
+          <vim-status-bar />
         </div>
       </n-dialog-provider>
     </n-message-provider>
@@ -33,18 +33,25 @@ import {nextTick, onMounted, ref} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "./js/core.js";
 import {darkTheme} from 'naive-ui'
 import {
-  CODE_VIEW, CREATE_VIEW,
+  CODE_VIEW,
   currentMode,
   currentName,
-  focusOnUtoolsInput, itemOffsetArray, keepSelectedStatus,
-  LIST_VIEW, settingActive,
-  UPDATE_VIEW, utoolsSearchContent,
+  focusOnUtoolsInput,
+  fullScreenShow,
+  handleRecoverLiteShow,
+  itemOffsetArray,
+  keepSelectedStatus,
+  LIST_VIEW,
+  settingActive,
+  UPDATE_VIEW,
+  utoolsSearchContent,
 } from "./js/utils/variable.js";
 import hljs from "highlight.js/lib/common";
 import SideView from "./view/SideView.vue";
 import CodeView from "./view/CodeView.vue";
 import CodeSnippetForm from "./view/FormView.vue";
 import VimStatusBar from "./components/VimStatusBar.vue";
+
 const theme = utools.isDarkColors()? darkTheme:null;
 const refreshStatus = ref(true);
 const themeOverrides = ref({
@@ -66,7 +73,7 @@ const dealWithRefresh = ()=>{
   refreshStatus.value = false;
   themeOverrides.value = {
     Card:{
-      boxShadow:'0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px '+configManager.getGlobalColor()
+      boxShadow:'0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px '+configManager.getGlobalColor(),
     },
     Tabs:{
       tabTextColorActiveLine: configManager.getGlobalColor(),
@@ -83,13 +90,18 @@ const dealWithRefresh = ()=>{
   })
 }
 const handleForm = ()=>{
+  handleRecoverLiteShow()
   currentMode.value = LIST_VIEW;
   dealWithRefresh()
 }
+
 const handleCloseCodeView = ()=>{
+  handleRecoverLiteShow();
   currentMode.value = LIST_VIEW;
   keepSelectedStatus.value = true;
+
 }
+
 
 onMounted(()=>{
   utools.onPluginEnter(({code,type,payload})=>{
@@ -97,6 +109,12 @@ onMounted(()=>{
     tagColorManager.init();
     configManager.init();
     codeSnippetManager.init();
+    if(configManager.get('enabledLiteShow')){
+      fullScreenShow.value = false;
+      if(configManager.get('noShowForEmptySearch')){
+        utools.setExpendHeight(0)
+      }
+    }
     utools.setSubInput(({text})=>{
       focusOnUtoolsInput.value = true;
       text = text.trim();
@@ -105,7 +123,7 @@ onMounted(()=>{
         keepSelectedStatus.value = null;
         itemOffsetArray.value = [];
       }
-    },"搜索代码片段")
+    },"搜索代码片段, 双击Tab键切换UI")
   })
 })
 

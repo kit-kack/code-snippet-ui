@@ -42,6 +42,7 @@ import {codeSnippetManager} from "../js/core.js";
 import {onMounted, ref} from "vue";
 import {calculateTime, scrollCodeInvoker} from "../js/utils/variable.js";
 import {isSupportedLanguage} from "../js/utils/some.js";
+
 const props = defineProps(['name'])
 const emit = defineEmits(['doClose'])
 const scrollBar = ref(null)

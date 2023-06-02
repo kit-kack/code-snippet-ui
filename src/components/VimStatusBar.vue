@@ -22,14 +22,8 @@
 
 <script setup>
 
-import {
-  CODE_VIEW,
-  currentMode,
-  selectIndex,
-  subItemSelectIndex
-} from "../js/utils/variable.js";
+import {CODE_VIEW, currentMode, selectIndex, subItemSelectIndex} from "../js/utils/variable.js";
 import {configManager} from "../js/core.js";
-import {ref} from "vue";
 
 const getBtnStyle = ()=>{
   if(currentMode.value <= CODE_VIEW){

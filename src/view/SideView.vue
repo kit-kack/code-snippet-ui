@@ -28,6 +28,8 @@
                       @update:value="handleSortStrategy"/>
           </n-space>
           <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
+          <config-switch title="是否支持无UI版本的显示策略" config="enabledLiteShow"/>
+          <config-switch title="搜索词为空时，是否不显示数据" config="noShowForEmptySearch"/>
           <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
           <config-switch title="行内代码块是否不进行高亮解析" config="rawLineCode" @refresh="emit('refresh')"/>
           <n-tooltip trigger="hover">
@@ -88,6 +90,7 @@ import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js"
 import ColorPicker from "../components/ColorPicker.vue";
 import Tag from "../components/Tag.vue";
 import {nextTick, ref} from "vue";
+
 const emit = defineEmits(['refresh'])
 const refreshStatus = ref(true)
 const dealWithRefresh = ()=>{

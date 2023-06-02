@@ -7,7 +7,6 @@
 
 body {
   margin: 0;
-  padding-top: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,4 +32,7 @@ code.hljs{
 .n-color-picker {
   width: 30px;
   display: inline-block;
+}
+.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical{
+  right: 1px !important;
 }

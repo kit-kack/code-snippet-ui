@@ -35,12 +35,20 @@ import {
     NRadio,
     NRadioGroup
 } from 'naive-ui'
+import {fullScreenShow} from "./js/utils/variable.js";
 
 
 // init
 tagColorManager.init();
 configManager.init();
 codeSnippetManager.init()
+
+if(configManager.get('enabledLiteShow')){
+    fullScreenShow.value = false;
+    if(configManager.get('noShowForEmptySearch')){
+        utools.setExpendHeight(0)
+    }
+}
 
 // highlight
 hljs.registerAliases(["vue","html"],{languageName:"xml"})

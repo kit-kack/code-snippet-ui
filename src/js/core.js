@@ -206,7 +206,6 @@ let funcUtils = {
                 list.sort((a,b)=>a.name.localeCompare(b.name))
                 break;
         }
-        console.log(topSnippets)
         return topSnippets.concat(list);
     },
     /**

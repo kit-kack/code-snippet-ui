@@ -29,11 +29,23 @@ const keepSelectedStatus = ref(null)   // null false true
 const scrollbarMovedDistance = { distance: 0 }
 // 控制侧边
 const settingActive = ref(false);
+// 控制全屏
+const fullScreenShow = ref(true)
 
+// 控制tip显示
+const onlyOne = ref(false)
+const lastTabTime = ref(0)
+// Lite Show模式下 用来恢复
+const recoverLiteShow = ref(false)
+const recoverLiteHeight = ref(0)
 
-
-
-
+const handleRecoverLiteShow = ()=>{
+    if(recoverLiteShow.value){
+        recoverLiteShow.value = false;
+        fullScreenShow.value = false;
+        utools.setExpendHeight(recoverLiteHeight.value)
+    }
+}
 
 const handleDeleteConfirm = (name,refreshFunc)=>{
     onConfirm.value = true;
@@ -54,6 +66,7 @@ const handleDeleteConfirm = (name,refreshFunc)=>{
         },
         onClose: ()=>{
             onConfirm.value = false;
+            handleRecoverLiteShow()
         },
     })
 }
@@ -87,6 +100,7 @@ const handleCopy = (isPasted)=>{
  */
 function init(list,refreshFunc){
     document.onkeydown = e=>{
+        console.log(e.code)
         // dialog or sideview
         if(settingActive.value){
             // prevent any possible event
@@ -117,17 +131,49 @@ function init(list,refreshFunc){
             return;
         }else if(e.code === 'Tab'){
             e.preventDefault();
-            if(focusOnUtoolsInput.value && selectIndex.value > -1){
-                focusOnUtoolsInput.value = false;
-                utools.subInputBlur();
-            }else{
-                utools.subInputFocus();
+            let gap = e.timeStamp - lastTabTime.value;
+            if(gap < 300){
+                fullScreenShow.value = !fullScreenShow.value;
                 focusOnUtoolsInput.value = true;
+                utools.subInputFocus();
+            }else{
+                if(focusOnUtoolsInput.value && selectIndex.value > -1){
+                    focusOnUtoolsInput.value = false;
+                    utools.subInputBlur();
+                }else{
+                    utools.subInputFocus();
+                    focusOnUtoolsInput.value = true;
+                }
+            }
+            lastTabTime.value = e.timeStamp;
+            return;
+        }
+
+        if(e.ctrlKey || e.metaKey) {
+            if (e.code === 'KeyN') {
+                if(!fullScreenShow.value){
+                    fullScreenShow.value = true;
+                    recoverLiteShow.value = true;
+                    utools.setExpendHeight(545)
+                }
+                currentMode.value = CREATE_VIEW;
+                return;
+            }else if(e.code === 'KeyR' && currentMode.value === LIST_VIEW){
+                refreshFunc();
+                return;
+            }else if(e.code === 'KeyF' && currentMode.value === LIST_VIEW){
+                if(configManager.get("enabledFuzzySymbolQuery")){
+                    configManager.set("enabledFuzzySymbolQuery",false)
+                    $message.info("退出【模糊符号查询】模式")
+                }else{
+                    configManager.set("enabledFuzzySymbolQuery",true)
+                    $message.success("进入【模糊符号查询】模式")
+                }
             }
             return;
         }
         // just for list view
-        if(focusOnUtoolsInput.value  || e.shiftKey || e.altKey || e.ctrlKey || e.metaKey){
+        if(focusOnUtoolsInput.value  || e.shiftKey || e.altKey){
             return;
         }
         if(currentMode.value === LIST_VIEW){
@@ -224,32 +270,24 @@ function init(list,refreshFunc){
         if(settingActive.value){
             return;
         }
-        if(e.ctrlKey || e.metaKey) {
-            if (e.code === 'KeyN' && currentMode.value<=CODE_VIEW) {
-                currentMode.value = CREATE_VIEW;
-                return;
-            }else if(e.code === 'KeyR' && currentMode.value === LIST_VIEW){
-                refreshFunc();
-                return;
-            }else if(e.code === 'KeyF' && currentMode.value === LIST_VIEW){
-                if(configManager.get("enabledFuzzySymbolQuery")){
-                    configManager.set("enabledFuzzySymbolQuery",false)
-                    $message.info("退出【模糊符号查询】模式")
-                }else{
-                    configManager.set("enabledFuzzySymbolQuery",true)
-                    $message.success("进入【模糊符号查询】模式")
-                }
-            }
-        }
-
         if(focusOnUtoolsInput.value  || selectIndex.value < 0 || currentMode.value > CODE_VIEW || onConfirm.value || e.shiftKey || e.altKey ){
             return;
         }
         if(currentMode.value === LIST_VIEW){
             if(e.code === 'KeyV'){
+                if(!fullScreenShow.value){
+                    fullScreenShow.value = true;
+                    recoverLiteShow.value = true;
+                    utools.setExpendHeight(545)
+                }
                 currentMode.value = CODE_VIEW;
                 return;
             }else if(e.code === 'KeyE'){
+                if(!fullScreenShow.value){
+                    fullScreenShow.value = true;
+                    recoverLiteShow.value = true;
+                    utools.setExpendHeight(545)
+                }
                 currentMode.value = UPDATE_VIEW;
                 return;
             }
@@ -260,6 +298,7 @@ function init(list,refreshFunc){
         switch (e.code){
             case 'KeyQ':
                 if(currentMode.value === CODE_VIEW){
+                    handleRecoverLiteShow();
                     currentMode.value = LIST_VIEW;
                     keepSelectedStatus.value = true;
                 }
@@ -299,6 +338,11 @@ function init(list,refreshFunc){
                 break;
             case 'KeyD':
             case 'KeyX':
+                if(!fullScreenShow.value){
+                    fullScreenShow.value = true;
+                    recoverLiteShow.value = true;
+                    utools.setExpendHeight(545)
+                }
                 handleDeleteConfirm(currentName.value,refreshFunc)
                 break;
         }
@@ -348,7 +392,11 @@ const calculateTime =(time)=>{
 function parseSearchWord(searchWord,selectedIndex){
     let array;
     if(searchWord == null || searchWord.length === 0){
-        array = codeSnippetManager.queryForMany(null,null,null)
+        if(configManager.get('noShowForEmptySearch') && !fullScreenShow.value){
+            return [];
+        }else{
+            array = codeSnippetManager.queryForMany(null,null,null)
+        }
     }else{
         const words = searchWord.split(/\s/).filter(v=>v.length>=1)
         let name = null;
@@ -387,6 +435,8 @@ function parseSearchWord(searchWord,selectedIndex){
     subItemSelectIndex.value = -1;
     // 重置
     keepSelectedStatus.value = false;
+    // 控制tip显示策略
+    onlyOne.value =  array.length === 1;
     return array;
 }
 
@@ -409,5 +459,10 @@ export {
     scrollListInvoker,
     scrollCodeInvoker,
     itemOffsetArray,
-    parseSearchWord
+    parseSearchWord,
+    fullScreenShow,
+    onlyOne,
+    recoverLiteShow,
+    recoverLiteHeight,
+    handleRecoverLiteShow
 }
