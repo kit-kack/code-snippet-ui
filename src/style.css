@@ -1,4 +1,3 @@
-@import "./assets/font.css";
 * {
   scrollbar-base-color: green;
   scrollbar-track-color: red;
@@ -27,7 +26,7 @@ pre{
   box-shadow: rgba(50, 50, 105, 0.15) 0 2px 5px 0, rgba(0, 0, 0, 0.05) 0 1px 1px 0;
 }
 code.hljs{
-  font-family: Mono !important;
+  font-family: 'Consolas' !important;
 }
 .n-color-picker {
   width: 30px;

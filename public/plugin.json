@@ -17,8 +17,5 @@
       "explain": "记录代码片段",
       "cmds": ["code-snippet","snippet","cs"]
     }
-  ],
-  "pluginSettings": {
-    "height": 0
-  }
+  ]
 }
