@@ -1,28 +1,26 @@
 <template>
   <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
     <n-message-provider>
-      <n-dialog-provider >
-        <template v-if="currentMode === LIST_VIEW">
-          <template v-if="refreshStatus ">
-            <list-view  @side-show="settingActive = true" @refresh="dealWithRefresh"/>
-          </template>
+      <template v-if="currentMode === LIST_VIEW">
+        <template v-if="refreshStatus ">
+          <list-view  @side-show="settingActive = true" @refresh="dealWithRefresh"/>
         </template>
-        <template v-else-if="currentMode === CODE_VIEW">
-          <code-view :name="currentName"  @do-close=" handleCloseCodeView" />
-        </template>
-        <template v-else-if="currentMode === UPDATE_VIEW">
-          <code-snippet-form update  :name="currentName"  @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
-        </template>
-        <template v-else>
-          <code-snippet-form   @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
-        </template>
-        <n-drawer v-model:show="settingActive" :width="370" placement="right">
-          <side-view @refresh="dealWithRefresh" />
-        </n-drawer>
-        <div id="extra-left" v-if="!focusOnUtoolsInput && fullScreenShow">
-          <vim-status-bar />
-        </div>
-      </n-dialog-provider>
+      </template>
+      <template v-else-if="currentMode === CODE_VIEW">
+        <code-view :name="currentName"  @do-close=" handleCloseCodeView" />
+      </template>
+      <template v-else-if="currentMode === UPDATE_VIEW">
+        <code-snippet-form update  :name="currentName"  @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
+      </template>
+      <template v-else>
+        <code-snippet-form   @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
+      </template>
+      <n-drawer v-model:show="settingActive" :width="370" placement="right">
+        <side-view @refresh="dealWithRefresh" />
+      </n-drawer>
+      <div id="extra-left" v-if="!focusOnUtoolsInput && fullScreenShow">
+        <vim-status-bar />
+      </div>
     </n-message-provider>
   </n-config-provider>
 </template>

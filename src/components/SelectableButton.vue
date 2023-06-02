@@ -81,7 +81,7 @@ const getStyle =(flag) =>{
     }
   }
   return {
-    tertiary:true
+    quaternary:true
   }
 }
 const handleMouseEnter = (e)=>{

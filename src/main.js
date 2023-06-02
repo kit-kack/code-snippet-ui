@@ -13,7 +13,6 @@ import {
     NColorPicker,
     NConfigProvider,
     NDataTable,
-    NDialogProvider,
     NDrawer,
     NEllipsis,
     NForm,
@@ -55,7 +54,7 @@ hljs.registerAliases(["vue","html"],{languageName:"xml"})
 
 const naive = create({
     components:[
-        NMessageProvider,NDialogProvider,NConfigProvider,
+        NMessageProvider,NConfigProvider,
         NSpace,NButton,NTag,
         NTooltip, NDrawer, NResult,NDataTable, NTabPane, NTabs, NFormItem,NForm, NSwitch,NScrollbar,
         NCard,NCode,NEllipsis, NPopover, NColorPicker,NInput,NSelect,NDynamicTags,NAlert,NRadio,

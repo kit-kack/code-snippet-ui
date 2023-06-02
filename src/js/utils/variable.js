@@ -38,7 +38,8 @@ const lastTabTime = ref(0)
 // Lite Show模式下 用来恢复
 const recoverLiteShow = ref(false)
 const recoverLiteHeight = ref(0)
-
+// 删除
+const isDel = ref(false)
 const handleRecoverLiteShow = ()=>{
     if(recoverLiteShow.value){
         recoverLiteShow.value = false;
@@ -46,31 +47,6 @@ const handleRecoverLiteShow = ()=>{
         utools.setExpendHeight(recoverLiteHeight.value)
     }
 }
-
-const handleDeleteConfirm = (name,refreshFunc)=>{
-    onConfirm.value = true;
-     window.$dialog.warning({
-        title:'警告',
-        content:`你确定删除该代码片段【${name}】?`,
-        positiveText:'确定(Enter)',
-        negativeText:'取消(Space)',
-        onPositiveClick: ()=>{
-            onConfirm.value = false;
-            codeSnippetManager.del(name)
-            keepSelectedStatus.value = null;
-            window.$message.success("成功删除")
-            refreshFunc();
-        },
-        onNegativeClick: ()=>{
-            onConfirm.value = false;
-        },
-        onClose: ()=>{
-            onConfirm.value = false;
-            handleRecoverLiteShow()
-        },
-    })
-}
-
 /**
  *
  * @param {boolean | undefined | null} isPasted
@@ -186,15 +162,22 @@ function init(list,refreshFunc){
                             utools.shellBeep();
                         }
                     }else{
-                        if(subItemSelectIndex.value === -1){
-                            subItemSelectIndex.value = 4;
+                        if(isDel.value){
+                            subItemSelectIndex.value = subItemSelectIndex.value === 0? 1:0;
                         }else{
-                            subItemSelectIndex.value --;
+                            if(subItemSelectIndex.value === -1){
+                                subItemSelectIndex.value = 4;
+                            }else{
+                                subItemSelectIndex.value --;
+                            }
                         }
                     }
                     break;
                 case "KeyJ":
                 case "ArrowDown":
+                    if(isDel.value){
+                        isDel.value = false;
+                    }
                     if (selectIndex.value >= list.value.length - 1) { // -1 >= 0-1
                         if(configManager.get("enabledBeep")){
                             utools.shellBeep();
@@ -208,6 +191,9 @@ function init(list,refreshFunc){
                     break;
                 case "KeyK":
                 case "ArrowUp":
+                    if(isDel.value){
+                        isDel.value = false;
+                    }
                     if (selectIndex.value <= 0) {
                         if(configManager.get("enabledBeep")){
                             utools.shellBeep();
@@ -226,10 +212,14 @@ function init(list,refreshFunc){
                             utools.shellBeep();
                         }
                     }else{
-                        if(subItemSelectIndex.value === 4){
-                            subItemSelectIndex.value = -1;
+                        if(isDel.value){
+                            subItemSelectIndex.value = subItemSelectIndex.value === 0? 1:0;
                         }else{
-                            subItemSelectIndex.value ++;
+                            if(subItemSelectIndex.value === 4){
+                                subItemSelectIndex.value = -1;
+                            }else{
+                                subItemSelectIndex.value ++;
+                            }
                         }
                     }
                     break;
@@ -338,12 +328,8 @@ function init(list,refreshFunc){
                 break;
             case 'KeyD':
             case 'KeyX':
-                if(!fullScreenShow.value){
-                    fullScreenShow.value = true;
-                    recoverLiteShow.value = true;
-                    utools.setExpendHeight(545)
-                }
-                handleDeleteConfirm(currentName.value,refreshFunc)
+                subItemSelectIndex.value = 1;
+                isDel.value = true;
                 break;
         }
     }
@@ -447,7 +433,6 @@ export {
     init,
     CODE_VIEW, LIST_VIEW, UPDATE_VIEW, CREATE_VIEW,
     focusOnUtoolsInput,
-    handleDeleteConfirm,
     currentName,
     currentMode,
     selectIndex,
@@ -464,5 +449,6 @@ export {
     onlyOne,
     recoverLiteShow,
     recoverLiteHeight,
-    handleRecoverLiteShow
+    handleRecoverLiteShow,
+    isDel
 }

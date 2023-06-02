@@ -67,7 +67,7 @@
 </template>
 
 <script setup>
-import {useDialog, useMessage} from "naive-ui";
+import {useMessage} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
 import {computed, onBeforeUnmount, onMounted, onUpdated, ref} from "vue";
 import {
@@ -93,7 +93,6 @@ const scrollBar = ref()
 const scroll_top = ref()
 const emit = defineEmits(['sideShow','refresh'])
 window.$message = useMessage();
-window.$dialog = useDialog();
 
 let handleEdit = (name)=>{
   currentName.value = name;
