@@ -235,9 +235,6 @@ function init(list,refreshFunc){
                             currentMode.value = CODE_VIEW;
                             longKeyDown.value = true;
                         }
-                    }else{
-                        // 处理 Vim 操作
-                        spaceInvokers.value[subItemSelectIndex.value]?.()
                     }
                     break;
             }
@@ -306,7 +303,7 @@ function init(list,refreshFunc){
             case 'KeyT':
                 let index = configManager.getTopList().indexOf(currentName.value)
                 if(index === -1){
-                    configManager.addTopItem(currentName.value);
+                    selectIndex.value = configManager.addTopItem(currentName.value);
                 }else{
                     configManager.delTopItem(index)
                 }
@@ -324,12 +321,18 @@ function init(list,refreshFunc){
                     return;
                 }
                 if(currentMode.value === LIST_VIEW){
-                    // 校准位置
-                    if(selectIndex.value > -1 ){
-                        if(itemOffsetArray.value[selectIndex.value] != null){
-                            scrollListInvoker.value?.(itemOffsetArray.value[selectIndex.value])
+                    if(subItemSelectIndex.value === -1){
+                        // 校准位置
+                        if(selectIndex.value > -1 ){
+                            if(itemOffsetArray.value[selectIndex.value] != null){
+                                scrollListInvoker.value?.(itemOffsetArray.value[selectIndex.value])
+                            }
                         }
+                    }else{
+                        // 处理 Vim 操作
+                        spaceInvokers.value[subItemSelectIndex.value]?.()
                     }
+
                 }
                 break;
             case 'KeyD':
