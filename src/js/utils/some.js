@@ -31,10 +31,10 @@ const columns = [
         rowSpan: (data,index) =>{
             switch (index){
                 case 0:
-                    return 4;
-                case 4:
+                    return 5;
+                case 5:
                     return 3;
-                case 7:
+                case 8:
                     return 7;
                 default:
                     return 1;
@@ -65,6 +65,11 @@ const data = [
         type:"主界面",
         feature: "启用/关闭Vim模式，utool输入框失聚焦",
         shortcut:"Tab"
+    },
+    {
+        type: '主界面',
+        feature: "切换完整/列表UI模式",
+        shortcut: "Tab快速双击"
     },
     {
         type: "主界面",

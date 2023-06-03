@@ -15,7 +15,7 @@
       <template v-else>
         <code-snippet-form   @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
       </template>
-      <n-drawer v-model:show="settingActive" :width="370" placement="right">
+      <n-drawer v-model:show="settingActive" :width="380" placement="right">
         <side-view @refresh="dealWithRefresh" />
       </n-drawer>
       <div id="extra-left" v-if="!focusOnUtoolsInput && fullScreenShow">

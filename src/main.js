@@ -32,7 +32,7 @@ import {
     NTabPane,
     NTabs,
     NTag,
-    NTooltip
+    NTooltip,
 } from 'naive-ui'
 import {fullScreenShow, itemOffsetArray, keepSelectedStatus, utoolsSearchContent} from "./js/utils/variable.js";
 
