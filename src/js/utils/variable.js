@@ -69,7 +69,9 @@ const handleCopy = (isPasted)=>{
     if(isPasted){
         utools.hideMainWindow();
         utools.simulateKeyboardTap('v',ctrlKey);
-        utools.outPlugin();
+        if(configManager.get('exitAfterPaste')){
+            utools.outPlugin();
+        }
     }
 }
 

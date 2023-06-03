@@ -82,7 +82,7 @@ utools.onPluginEnter(({code, type, payload})=>{
                 itemOffsetArray.value = [];
             }
         }
-    },"搜索代码片段, 双击Tab键切换UI")
+    },"搜索代码片段, 双击Tab切换UI模式")
 })
 
 const app = createApp(App)
