@@ -52,6 +52,10 @@ const handleRecoverLiteShow = ()=>{
  * @param {boolean | undefined | null} isPasted
  */
 const handleCopy = (isPasted)=>{
+    // 校验
+    if (selectIndex.value < 0){
+        return;
+    }
     // 获取当前文本
     const codeSnippet = codeSnippetManager.get(currentName.value);
     // 更新次数和时间
