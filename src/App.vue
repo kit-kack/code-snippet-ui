@@ -54,14 +54,12 @@ const themeOverrides = ref({
   Card:{
     boxShadow:'0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px '+configManager.getGlobalColor()
   },
-  Tabs:{
-    tabTextColorActiveLine: configManager.getGlobalColor(),
-    tabTextColorHoverLine: configManager.getGlobalColor(),
-    tabTextColorActiveCard: configManager.getGlobalColor(),
-    barColor: configManager.getGlobalColor()
-  },
   Switch:{
     railColorActive: configManager.getGlobalColor()
+  },
+  Tooltip:{
+    color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
+    textColor: utools.isDarkColors()? '#fafafc':'#2a2a2c'
   }
 })
 
@@ -71,14 +69,12 @@ const dealWithRefresh = ()=>{
     Card:{
       boxShadow:'0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px '+configManager.getGlobalColor(),
     },
-    Tabs:{
-      tabTextColorActiveLine: configManager.getGlobalColor(),
-      tabTextColorHoverLine: configManager.getGlobalColor(),
-      tabTextColorActiveCard: configManager.getGlobalColor(),
-      barColor: configManager.getGlobalColor()
-    },
     Switch:{
       railColorActive: configManager.getGlobalColor()
+    },
+    Tooltip:{
+      color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
+      textColor: utools.isDarkColors()? '#fafafc':'#2a2a2c'
     }
   }
   nextTick(()=>{

@@ -18,11 +18,12 @@
               backgroundColor: configManager.getTopList().includes(snippet.name)? configManager.getGlobalColor(): ''
            }"
       ></div>
+      <span class="index" :style="getTitleStyle(props.selected,false)">{{index}}</span>
       <template #header>
         <n-scrollbar x-scrollable>
           <div id="left">
             <n-ellipsis >
-              <span :style="getTitleStyle(props.selected)"  >{{props.snippet.name}}</span>
+              <span :style="getTitleStyle(props.selected,true)"  >{{props.snippet.name}}</span>
               <span id="small">{{props.snippet.desc}}</span>
             </n-ellipsis>
           </div>
@@ -54,10 +55,10 @@
       </template>
       <n-ellipsis style="max-width: 98%" :tooltip="false" >
         <template v-if="configManager.get('rawLineCode')">
-          <span class="code">{{snippet.code}}</span>
+          <span  :style="getCodeStyle()">{{snippet.code}}</span>
         </template>
         <template v-else>
-          <n-code :code="snippet.code" :language="snippet.type"   inline />
+          <n-code :code="snippet.code" :language="snippet.type"   inline :style="getCodeStyle()" />
         </template>
       </n-ellipsis>
     </n-card>
@@ -143,10 +144,16 @@ const getSelectedStyle =(selected)=>{
   }
 
 }
-const getTitleStyle = (selected) =>{
+const getTitleStyle = (selected,flag) =>{
   return {
     color: selected? configManager.getGlobalColor():(utools.isDarkColors()?'#E0E0E0':'#505050'),
-    fontWeight: 'bold'
+    fontWeight: flag?'bold':'normal'
+  }
+}
+const getCodeStyle = () =>{
+  return {
+    fontSize: '12px',
+    color: utools.isDarkColors()? '#696666':'#a4a4a4'
   }
 }
 
@@ -230,25 +237,19 @@ const handleTop = ()=>{
   margin-left: 10px;
   font-size: 12px;
   display:inline-block;
-  color: rgb(124, 123, 123);
+  color: rgb(169, 168, 168);
   transform: scale(0.9); /* 用缩放来解决 */
   transform-origin: 0 0;  /* 左对齐 */
 }
 #right{
   max-width: 300px;
   overflow: auto;
+  margin-right: 5px;
 }
 .sub{
   margin-bottom: 6px;
 }
-.n-code{
-  color: rgb(124, 123, 123);
-  font-size: 13px;
-}
-.code{
-  color: rgb(124, 123, 123);
-  font-size: 13px;
-}
+
 
 .circle {
   position: absolute;
@@ -260,6 +261,15 @@ const handleTop = ()=>{
   border-radius: 50%;
   z-index: 100;
 }
+.index{
+  position: absolute;
+  right: 0;
+  top:-1px;
+  font-size: 10px;
+  transform: scale(0.9); /* 用缩放来解决 */
+  transform-origin: 0 0;  /* 左对齐 */
+}
+
 .n-card:hover .show{
   animation: blink 1s 3 steps(1);
 }
