@@ -39,7 +39,7 @@ import {
   handleRecoverLiteShow,
   keepSelectedStatus,
   LIST_VIEW,
-  settingActive,
+  settingActive, showCodeTip,
   UPDATE_VIEW,
 } from "./js/utils/variable.js";
 import hljs from "highlight.js/lib/common";
@@ -88,6 +88,7 @@ const handleForm = ()=>{
 }
 
 const handleCloseCodeView = ()=>{
+  showCodeTip.value = false;
   handleRecoverLiteShow();
   currentMode.value = LIST_VIEW;
   keepSelectedStatus.value = true;

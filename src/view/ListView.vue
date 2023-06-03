@@ -1,5 +1,5 @@
 <template>
-  <div ref="listRoot">
+  <div>
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" ref="scrollBar">
         <div ref="scroll_top">
@@ -93,7 +93,6 @@ import {configManager} from "../js/core.js";
 const list = computed(()=>parseSearchWord(utoolsSearchContent.value,selectIndex))
 const scrollBar = ref()
 const scroll_top = ref()
-const listRoot = ref()
 const emit = defineEmits(['sideShow','refresh'])
 window.$message = useMessage();
 

@@ -1,52 +1,79 @@
 <template>
 
   <div @contextmenu="emit('doClose')">
-    <n-scrollbar style="max-height: 99vh" x-scrollable trigger="hover" ref="scrollBar">
-      <n-alert :title="snippet.name" type="default">
-        <template #icon>📖</template>
-        描述：{{snippet.desc}} <br/>
-        标签：{{snippet.tags?.join('、')}} <br/>
-        编程语言：{{snippet.type??'plaintext'}}<br/>
-        最近使用时间：{{calculateTime(snippet.time)}}<br/>
-        累计使用次数：{{snippet.count??0}}
-      </n-alert>
-
+    <n-scrollbar style="max-height: 100vh" x-scrollable trigger="hover" ref="scrollBar">
       <template v-if="isSupportedLanguage(snippet.type??'plaintext')">
-        <div id="main" @contextmenu="emit('doClose')">
+        <div @contextmenu="emit('doClose')">
           <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
         </div>
       </template>
       <template v-else>
-        <div id="main" @contextmenu="emit('doClose')">
+        <div @contextmenu="emit('doClose')">
           <highlightjs  autodetect :code="snippet.code" width="100%"/>
         </div>
       </template>
     </n-scrollbar>
     <div id="extra">
-      <n-tooltip trigger="hover" placement="left">
-        <template #trigger>
-          <n-button strong secondary circle type="warning" @click="emit('doClose')">
-            <template #icon>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
-            </template>
-          </n-button>
-        </template>
-        你可以使用按下右键或q来退出页面
-      </n-tooltip>
+      <n-space>
+        <n-popover trigger="hover" :show="hover || showCodeTip" placement="top" :show-arrow="false" style="padding:5px">
+          <template #trigger>
+            <n-button
+                @mouseenter="hover = true"
+                @mouseleave="hover = false"
+                @click="handleClick"
+                quaternary :color="configManager.getGlobalColor()">🚀{{ snippet.type??'plaintext' }}</n-button>
+          </template>
+          <n-list hoverable clickable :show-divider="false"
+            @mouseenter="hover = true"
+                  @mouseleave="hover = false"
+          >
+            <n-list-item style="height: 32px; padding: 0 5px">
+              <div align="center">{{snippet.name}}</div>
+            </n-list-item>
+            <n-list-item style="height: 32px; padding: 0 5px" v-if="snippet.desc != null">
+              <div>{{"📢 "+snippet.desc}}</div>
+            </n-list-item >
+            <n-list-item style="height: 32px; padding: 0 5px" v-if="snippet.tags != null && snippet.tags.length > 0">
+              <div>{{"🚩 "+snippet.tags.join()}}</div>
+            </n-list-item >
+            <n-list-item style="height: 32px; padding: 0 5px">
+              <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0}`}}</div>
+            </n-list-item>
+          </n-list>
+        </n-popover>
+
+        <n-tooltip trigger="hover" placement="left">
+          <template #trigger>
+            <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="emit('doClose')">
+              <template #icon>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
+              </template>
+            </n-button>
+          </template>
+          你可以使用按下右键或q来退出页面
+        </n-tooltip>
+      </n-space>
     </div>
   </div>
 </template>
 
 <script setup>
-import {codeSnippetManager} from "../js/core.js";
+import {codeSnippetManager, configManager} from "../js/core.js";
 import {onMounted, ref} from "vue";
-import {calculateTime, scrollCodeInvoker} from "../js/utils/variable.js";
+import {calculateTime, scrollCodeInvoker, showCodeTip} from "../js/utils/variable.js";
 import {isSupportedLanguage} from "../js/utils/some.js";
 
 const props = defineProps(['name'])
 const emit = defineEmits(['doClose'])
 const scrollBar = ref(null)
 const snippet = codeSnippetManager.get(props.name);
+const hover = ref(false)
+
+
+
+const handleClick = ()=>{
+  $message.info('该提示部分可以由Vim模式下s键控制')
+}
 
 onMounted(()=>{
     scrollCodeInvoker.value = (direction)=>{
@@ -75,5 +102,4 @@ onMounted(()=>{
   right:20px;
   top:90vh;
 }
-
 </style>

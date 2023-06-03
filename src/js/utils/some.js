@@ -35,7 +35,7 @@ const columns = [
                 case 5:
                     return 3;
                 case 8:
-                    return 7;
+                    return 8;
                 default:
                     return 1;
             }
@@ -125,6 +125,10 @@ const data = [
         type: "元素-Vim模式",
         feature: "删除Delete",
         shortcut: "d x"
+    },
+    {
+        feature: "(取消)置顶Top",
+        shortcut: "t"
     }
 ]
 

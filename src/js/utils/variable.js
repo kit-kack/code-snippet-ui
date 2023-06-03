@@ -40,6 +40,9 @@ const recoverLiteShow = ref(false)
 const recoverLiteHeight = ref(0)
 // 删除
 const isDel = ref(false)
+// 提供 Code tip展示
+const showCodeTip = ref(false)
+
 const handleRecoverLiteShow = ()=>{
     if(recoverLiteShow.value){
         recoverLiteShow.value = false;
@@ -340,6 +343,11 @@ function init(list,refreshFunc){
                 subItemSelectIndex.value = 1;
                 isDel.value = true;
                 break;
+            case 'KeyS':
+                if(currentMode.value === CODE_VIEW){
+                    showCodeTip.value = !showCodeTip.value;
+                }
+                break;
         }
     }
 }
@@ -459,5 +467,6 @@ export {
     recoverLiteShow,
     recoverLiteHeight,
     handleRecoverLiteShow,
-    isDel
+    isDel,
+    showCodeTip
 }
