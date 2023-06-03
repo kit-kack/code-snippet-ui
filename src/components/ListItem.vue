@@ -155,7 +155,8 @@ const getTitleStyle = (selected,flag) =>{
 const getCodeStyle = () =>{
   return {
     fontSize: '12px',
-    color: utools.isDarkColors()? '#696666':'#a4a4a4'
+    color: utools.isDarkColors()? '#696666':'#a4a4a4',
+    fontFamily: "'Consolas' !important"
   }
 }
 
