@@ -1,17 +1,18 @@
-* {
-  scrollbar-base-color: green;
-  scrollbar-track-color: red;
-  scrollbar-arrow-color: blue;
+*{
+  padding: 0;
+  margin: 0;
 }
 
 body {
   margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  overflow-x: hidden;
-  overflow-y: auto;
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
+  /*width: 100vw;*/
+  background-color: transparent;
+
+  /*overflow-x: hidden;*/
+  /*overflow-y: hidden;*/
 }
 
 #app{

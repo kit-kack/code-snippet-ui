@@ -1,7 +1,5 @@
 // 全局便利常量和函数
 
-import {deltaE} from "colorjs.io/fn";
-
 const utools = window.utools;
 const setDBItem = utools.dbStorage.setItem
 const getDBItem = utools.dbStorage.getItem

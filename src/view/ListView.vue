@@ -71,7 +71,7 @@
 <script setup>
 import {useMessage} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
-import {computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, onUpdated, ref} from "vue";
 import {
   CODE_VIEW,
   CREATE_VIEW,
@@ -115,35 +115,11 @@ const handleViewCode = (name)=>{
   currentMode.value = CODE_VIEW;
 }
 
-watch(fullScreenShow,(value)=>{
-  if(value){
-    utools.setExpendHeight(545)
-  }else{
-    if(scroll_top.value == null){
-      utools.setExpendHeight(0)
-      recoverLiteHeight.value = 0;
-    }else{
-      let offset = scroll_top.value.offsetHeight;
-      if(offset == null){
-        utools.setExpendHeight(0)
-        recoverLiteHeight.value = 0;
-      }else if(offset > 535){
-        utools.setExpendHeight(545)
-        recoverLiteHeight.value = 545;
-      }else{
-        utools.setExpendHeight(offset+6)
-        recoverLiteHeight.value = offset+6;
-      }
-    }
-  }
-})
 
 
 onMounted(()=>{
-  fullScreenShow.value = true;
-  nextTick(()=>{
-    fullScreenShow.value = false;
-  })
+  console.log('mounted')
+  handleAppHeight();
   window.addEventListener("scroll", handleScroll, true);
   init(list,()=>emit('refresh'))
   scrollListInvoker.value = (direction)=>{
@@ -166,7 +142,7 @@ onMounted(()=>{
     }
   }
 })
-onUpdated(()=>{
+const handleAppHeight = ()=>{
   if(fullScreenShow.value){
     utools.setExpendHeight(545)
   }else{
@@ -187,6 +163,11 @@ onUpdated(()=>{
       }
     }
   }
+}
+
+onUpdated(()=>{
+  console.log('update listview')
+  handleAppHeight()
 })
 
 onBeforeUnmount(()=>{

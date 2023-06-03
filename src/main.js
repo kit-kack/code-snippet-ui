@@ -7,6 +7,7 @@ import {codeSnippetManager, configManager, tagColorManager} from "./js/core.js";
 import hljs from "highlight.js/lib/common";
 import {
     create,
+    NAlert,
     NButton,
     NCard,
     NCode,
@@ -14,41 +15,31 @@ import {
     NConfigProvider,
     NDataTable,
     NDrawer,
+    NDynamicTags,
     NEllipsis,
     NForm,
     NFormItem,
+    NInput,
     NMessageProvider,
     NPopover,
+    NRadio,
+    NRadioGroup,
     NResult,
     NScrollbar,
+    NSelect,
     NSpace,
     NSwitch,
     NTabPane,
     NTabs,
     NTag,
-    NInput,
-    NSelect,
-    NTooltip,
-    NDynamicTags,
-    NAlert,
-    NRadio,
-    NRadioGroup
+    NTooltip
 } from 'naive-ui'
-import {fullScreenShow} from "./js/utils/variable.js";
-
+import {fullScreenShow, itemOffsetArray, keepSelectedStatus, utoolsSearchContent} from "./js/utils/variable.js";
 
 // init
 tagColorManager.init();
 configManager.init();
 codeSnippetManager.init()
-
-if(configManager.get('enabledLiteShow')){
-    fullScreenShow.value = false;
-    if(configManager.get('noShowForEmptySearch')){
-        utools.setExpendHeight(0)
-    }
-}
-
 // highlight
 hljs.registerAliases(["vue","html"],{languageName:"xml"})
 
@@ -63,9 +54,41 @@ const naive = create({
 })
 
 
+utools.onPluginEnter(({code, type, payload})=>{
+    console.log('Welcome to use this app')
+    console.log('Your code_type_payload is ['+code+'_'+type+'_'+payload+']')
+    if(configManager.get('enabledLiteShow')){
+        fullScreenShow.value = false;
+        console.log('lite show')
+        if(configManager.get('noShowForEmptySearch')){
+            utools.setExpendHeight(0)
+            console.log('lite mini show')
+        }
+    }else{
+        console.log('normal show')
+        utools.setExpendHeight(545)
+    }
+    console.log('fullScreenShow: '+fullScreenShow.value)
+    utools.setSubInput(({text}) =>{
+        text = text.trim();
+        if(text.length === 0){
+            utoolsSearchContent.value = null;
+            console.log('search empty')
+        }else{
+            if(utoolsSearchContent.value !== text){
+                console.log('search: '+text)
+                utoolsSearchContent.value = text;
+                keepSelectedStatus.value = null;
+                itemOffsetArray.value = [];
+            }
+        }
+    },"搜索代码片段, 双击Tab键切换UI")
+})
 
 const app = createApp(App)
 app.use(hljsVuePlugin)
 app.use(naive)
 app.mount('#app')
+
+
 

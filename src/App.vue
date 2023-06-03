@@ -1,36 +1,34 @@
 <template>
-  <div ref="app">
-    <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
-      <n-message-provider>
-        <template v-if="currentMode === LIST_VIEW">
-          <template v-if="refreshStatus ">
-            <list-view  @side-show="settingActive = true" @refresh="dealWithRefresh"/>
-          </template>
+  <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
+    <n-message-provider>
+      <template v-if="currentMode === LIST_VIEW">
+        <template v-if="refreshStatus ">
+          <list-view  @side-show="settingActive = true" @refresh="dealWithRefresh"/>
         </template>
-        <template v-else-if="currentMode === CODE_VIEW">
-          <code-view :name="currentName"  @do-close=" handleCloseCodeView" />
-        </template>
-        <template v-else-if="currentMode === UPDATE_VIEW">
-          <code-snippet-form update  :name="currentName"  @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
-        </template>
-        <template v-else>
-          <code-snippet-form   @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
-        </template>
-        <n-drawer v-model:show="settingActive" :width="370" placement="right">
-          <side-view @refresh="dealWithRefresh" />
-        </n-drawer>
-        <div id="extra-left" v-if="!focusOnUtoolsInput && fullScreenShow">
-          <vim-status-bar />
-        </div>
-      </n-message-provider>
-    </n-config-provider>
-  </div>
+      </template>
+      <template v-else-if="currentMode === CODE_VIEW">
+        <code-view :name="currentName"  @do-close=" handleCloseCodeView" />
+      </template>
+      <template v-else-if="currentMode === UPDATE_VIEW">
+        <code-snippet-form update  :name="currentName"  @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
+      </template>
+      <template v-else>
+        <code-snippet-form   @do-cancel="handleRecoverLiteShow();currentMode = LIST_VIEW" @do-update="handleForm"/>
+      </template>
+      <n-drawer v-model:show="settingActive" :width="370" placement="right">
+        <side-view @refresh="dealWithRefresh" />
+      </n-drawer>
+      <div id="extra-left" v-if="!focusOnUtoolsInput && fullScreenShow">
+        <vim-status-bar />
+      </div>
+    </n-message-provider>
+  </n-config-provider>
 </template>
 
 <script setup>
 import ListView from "./view/ListView.vue";
-import {nextTick, onMounted, ref} from "vue";
-import {codeSnippetManager, configManager, tagColorManager} from "./js/core.js";
+import {nextTick, ref} from "vue";
+import {configManager} from "./js/core.js";
 import {darkTheme} from 'naive-ui'
 import {
   CODE_VIEW,
@@ -39,19 +37,17 @@ import {
   focusOnUtoolsInput,
   fullScreenShow,
   handleRecoverLiteShow,
-  itemOffsetArray,
   keepSelectedStatus,
   LIST_VIEW,
   settingActive,
   UPDATE_VIEW,
-  utoolsSearchContent,
 } from "./js/utils/variable.js";
 import hljs from "highlight.js/lib/common";
 import SideView from "./view/SideView.vue";
 import CodeView from "./view/CodeView.vue";
 import CodeSnippetForm from "./view/FormView.vue";
 import VimStatusBar from "./components/VimStatusBar.vue";
-const app = ref()
+
 const theme = utools.isDarkColors()? darkTheme:null;
 const refreshStatus = ref(true);
 const themeOverrides = ref({
@@ -101,38 +97,6 @@ const handleCloseCodeView = ()=>{
   keepSelectedStatus.value = true;
 
 }
-
-
-onMounted(()=>{
-  utools.onPluginEnter(({code,type,payload})=>{
-    console.log(`The APP is Starting With [${code}-${type}-${payload}]`)
-    console.log('app:'+app.value.offsetHeight)
-    if(configManager.get('enabledLiteShow')){
-      utools.setExpendHeight(app.value.offsetHeight)
-    }
-    tagColorManager.init();
-    configManager.init();
-    codeSnippetManager.init();
-    if(configManager.get('enabledLiteShow')){
-      fullScreenShow.value = false;
-      if(configManager.get('noShowForEmptySearch')){
-        utools.setExpendHeight(0)
-      }
-    }
-    utools.setSubInput(({text})=>{
-      focusOnUtoolsInput.value = true;
-      text = text.trim();
-      if(utoolsSearchContent.value !== text){
-        utoolsSearchContent.value = text;
-        keepSelectedStatus.value = null;
-        itemOffsetArray.value = [];
-      }
-    },"搜索代码片段, 双击Tab键切换UI")
-  })
-})
-
-
-
 </script>
 
 
