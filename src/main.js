@@ -1,14 +1,9 @@
 import {createApp} from 'vue'
 import './style.css'
 import App from './App.vue'
-if(utools.isDarkColors()){
-    import('highlight.js/styles/atom-one-dark.css')
-}else{
-    import('highlight.js/styles/atom-one-light.css')
-}
 import hljsVuePlugin from '@highlightjs/vue-plugin'
 import {codeSnippetManager, configManager, tagColorManager} from "./js/core.js";
-import hljs from "highlight.js/lib/common";
+import hljs from "highlight.js";
 import {
     create,
     NAlert,
@@ -17,7 +12,6 @@ import {
     NCode,
     NColorPicker,
     NConfigProvider,
-    NDataTable,
     NDrawer,
     NDynamicTags,
     NEllipsis,
@@ -37,7 +31,7 @@ import {
     NTabs,
     NTag,
     NTooltip,
-    NList,NListItem
+    NList,NListItem,NCollapse,NCollapseItem
 } from 'naive-ui'
 import {fullScreenShow, itemOffsetArray, keepSelectedStatus, utoolsSearchContent} from "./js/utils/variable.js";
 
@@ -46,18 +40,22 @@ tagColorManager.init();
 configManager.init();
 codeSnippetManager.init()
 
-
-
 // highlight
+if(utools.isDarkColors()){
+    import('highlight.js/styles/atom-one-dark.css')
+}else{
+    import('highlight.js/styles/atom-one-light.css')
+}
 hljs.registerAliases(["vue","html"],{languageName:"xml"})
+
 
 const naive = create({
     components:[
         NMessageProvider,NConfigProvider,
         NSpace,NButton,NTag,
-        NTooltip, NDrawer, NResult,NDataTable, NTabPane, NTabs, NFormItem,NForm, NSwitch,NScrollbar,
+        NTooltip, NDrawer, NResult, NTabPane, NTabs, NFormItem,NForm, NSwitch,NScrollbar,
         NCard,NCode,NEllipsis, NPopover, NColorPicker,NInput,NSelect,NDynamicTags,NAlert,NRadio,
-        NRadioGroup,NList,NListItem
+        NRadioGroup,NList,NListItem,NCollapse,NCollapseItem
     ]
 })
 

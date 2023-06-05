@@ -2,7 +2,7 @@
 
   <div @contextmenu="emit('doClose')">
     <n-scrollbar style="max-height: 100vh" x-scrollable trigger="hover" ref="scrollBar">
-      <template v-if="isSupportedLanguage(snippet.type??'plaintext')">
+      <template v-if="isValidLanguage">
         <div @contextmenu="emit('doClose')">
           <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
         </div>
@@ -27,17 +27,20 @@
             @mouseenter="hover = true"
                   @mouseleave="hover = false"
           >
-            <n-list-item style="height: 32px; padding: 0 5px">
+            <n-list-item >
               <div align="center">{{snippet.name}}</div>
             </n-list-item>
-            <n-list-item style="height: 32px; padding: 0 5px" v-if="snippet.desc != null">
+            <n-list-item  v-if="snippet.desc != null">
               <div>{{"📢 "+snippet.desc}}</div>
             </n-list-item >
-            <n-list-item style="height: 32px; padding: 0 5px" v-if="snippet.tags != null && snippet.tags.length > 0">
+            <n-list-item  v-if="snippet.tags != null && snippet.tags.length > 0">
               <div>{{"🚩 "+snippet.tags.join()}}</div>
             </n-list-item >
-            <n-list-item style="height: 32px; padding: 0 5px">
+            <n-list-item >
               <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0}`}}</div>
+            </n-list-item>
+            <n-list-item v-if="!isValidLanguage">
+              <div style="color: indianred">🚨 语言不内置支持，故启用自动高亮</div>
             </n-list-item>
           </n-list>
         </n-popover>
@@ -59,7 +62,7 @@
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {calculateTime, scrollCodeInvoker, showCodeTip} from "../js/utils/variable.js";
 import {isSupportedLanguage} from "../js/utils/some.js";
 
@@ -68,7 +71,7 @@ const emit = defineEmits(['doClose'])
 const scrollBar = ref(null)
 const snippet = codeSnippetManager.get(props.name);
 const hover = ref(false)
-
+const isValidLanguage = computed(()=>isSupportedLanguage(snippet.type??'plaintext'))
 
 
 const handleClick = ()=>{
@@ -101,5 +104,9 @@ onMounted(()=>{
   position: fixed;
   right:20px;
   top:90vh;
+}
+.n-list-item{
+  height: 32px;
+  padding: 0 5px
 }
 </style>

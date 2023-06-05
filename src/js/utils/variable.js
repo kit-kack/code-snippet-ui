@@ -240,6 +240,18 @@ function init(list,refreshFunc){
                         }
                     }
                     break;
+                case "Digit0":
+                    if(selectIndex.value === -1){
+                        if(configManager.get("enabledBeep")){
+                            utools.shellBeep();
+                        }
+                    }else{
+                        selectIndex.value = 0;
+                        if(itemOffsetArray.value[selectIndex.value] != null){
+                            scrollListInvoker.value?.(itemOffsetArray.value[selectIndex.value])
+                        }
+                    }
+                    break;
             }
         }else if(currentMode.value === CODE_VIEW){
             switch (e.code){

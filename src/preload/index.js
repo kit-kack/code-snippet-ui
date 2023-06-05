@@ -1,5 +1,3 @@
-console.log('preload')
-
 import { readFileSync, appendFileSync} from 'fs'
 
 export const readConfig = (path) => readFileSync(path).toString();

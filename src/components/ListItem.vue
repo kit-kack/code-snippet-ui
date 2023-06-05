@@ -65,7 +65,7 @@
 
     <template v-if="isDel && selected">
       <div id="child">
-        确认删除?
+        <span style="color: gray">确认删除?</span>
         <selectable-button  :mid="395" lite type="primary" tip="搞错了" :index="0" @invoke="isDel = false;" >
           ✗
         </selectable-button>

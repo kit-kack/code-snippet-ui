@@ -2,7 +2,7 @@
   "name": "zy0gidc9",
   "version": "2.0.0",
   "pluginName": "code-snippet",
-  "description": "管理您的代码片段，支持伪Vim操作方式",
+  "description": "管理您的代码片段，支持Vim操作方式",
   "author": "kitkack",
   "logo": "logo.png",
   "main": "index.html",
@@ -20,11 +20,6 @@
       "code": "code-snippet",
       "explain": "记录代码片段",
       "cmds": ["code-snippet","snippet","cs"]
-    },
-    {
-      "code": "code-snippet-list",
-      "explain": "记录代码片段-list",
-      "cmds": ["code-snippet-list","csl","cl"]
     }
   ]
 }

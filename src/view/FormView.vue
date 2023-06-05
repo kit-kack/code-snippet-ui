@@ -9,20 +9,13 @@
         :model="codeTemplate"
         ref="form"
     >
-      <n-form-item
-          label="代码片段名" path="name"
-      >
+      <n-form-item label="代码片段名" path="name">
         <n-input v-model:value="codeTemplate.name" clearable/>
       </n-form-item>
-      <n-form-item
-          label="代码描述" path="desc"
-      >
+      <n-form-item label="代码描述" path="desc">
         <n-input v-model:value="codeTemplate.desc" clearable />
       </n-form-item>
-
-      <n-form-item
-          label="标签" path="tags"
-      >
+      <n-form-item label="标签" path="tags">
         <n-dynamic-tags v-model:value="codeTemplate.tags">
           <template #input="{ submit, deactivate }">
             <n-select
@@ -42,7 +35,7 @@
                 placeholder="请输入代码片段"
                 type="textarea"
                 size="small"
-                style="padding-top: 40px"
+                style="padding-top: 40px;padding-bottom: 5px"
                 show-count
                 @keydown="handleKeyDown"
                 ref="codeTextArea"
@@ -68,6 +61,7 @@
                   :options="languages"
                   id="select"
                   :default-value="codeSnippet.type??'plaintext'"
+                  tag
               />
             </div>
           </div>
@@ -275,10 +269,6 @@ const handleKeyDown = (e)=>{
 }
 .btn{
   width: 100px;
-}
-.n-select{
-  border: none;
-  outline: none;
 }
 
 </style>

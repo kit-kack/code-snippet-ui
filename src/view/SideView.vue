@@ -90,15 +90,8 @@
     </n-tab-pane>
 
     <n-tab-pane :name="1" tab="快捷方式">
-      <n-scrollbar style="max-height: calc(100vh - 54px)">
-        <n-alert >
-          <template #icon>📢</template>
-          下面的Shortcut中以 空格 间隔多个快捷键
-        </n-alert>
-        <n-data-table
-            :columns="columns"
-            :data="data"
-        />
+      <n-scrollbar style="max-height: calc(100vh - 44px)">
+        <shortcut-pane/>
       </n-scrollbar>
     </n-tab-pane>
     <n-tab-pane :name="2" tab="说明">
@@ -115,13 +108,13 @@
 </template>
 
 <script setup>
-import {columns, data} from "../js/utils/some.js";
 import {NDivider} from 'naive-ui'
 import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import ColorPicker from "../components/ColorPicker.vue";
 import Tag from "../components/Tag.vue";
 import {nextTick, ref} from "vue";
+import ShortcutPane from "../components/ShortcutPane.vue";
 
 const emit = defineEmits(['refresh'])
 const refreshStatus = ref(true)
