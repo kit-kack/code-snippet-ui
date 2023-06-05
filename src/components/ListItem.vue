@@ -115,7 +115,7 @@ import {
   isDel,
   itemOffsetArray, keepSelectedStatus,
   scrollbarMovedDistance, selectIndex,
-  subItemSelectIndex
+  subItemSelectIndex, utoolsSearchContent
 } from "../js/utils/variable.js";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
@@ -169,6 +169,9 @@ const handleDelete = ()=>{
 }
 
 const handleClick = (e)=>{
+  if(configManager.get("enabledAutoVim")){
+    focusOnUtoolsInput.value = false;
+  }
   subItemSelectIndex.value = -1;
   if(e.ctrlKey || e.metaKey){
     emit('viewCode',props.snippet.name)

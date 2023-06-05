@@ -21,7 +21,7 @@ export declare type ConfigItem =
     "showTimeTag"                                    // 是否展示 内置时间标签
     | "showCountTag"                                 // 是否展示 内置计数标签
     | "showLanguageTag"                              // 是否展示 内置类型标签
-    | "enabledVim"                                   // 是否启用Vim默认
+    | "enabledAutoVim"                               // 点击元素是否自动进入Vim模式
     | "defaultColor"                                 // 给定 自定义标签颜色
     | "darkGlobalColor" | "lightGlobalColor"         // 全局颜色 （依据平台暗黑模式而定）
     | "sortKey"                                      // 排序策略： 0-创建时间  1-最近使用时间 2-累计使用次数 3-自然排序

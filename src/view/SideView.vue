@@ -46,8 +46,9 @@
               其他设置
             </n-divider>
             <n-space vertical align="center">
-              <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
               <config-switch title="粘贴后插件是否退出" config="exitAfterPaste"/>
+              <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
+              <config-switch title="点击元素是否自动进入Vim模式" config="enabledAutoVim"/>
               <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
             </n-space>
           </n-tab-pane>
@@ -62,16 +63,17 @@
               其他设置
             </n-divider>
             <n-space vertical align="center">
+              <config-switch title="默认是否启用列表UI模式" config="enabledLiteShow"/>
+              <config-switch title="行内代码块是否不进行高亮解析" config="rawLineCode" @refresh="emit('refresh')"/>
+              <color-picker :instance="defaultColorInstance"/>
               <n-tooltip trigger="hover">
                 <template #trigger>
                   <color-picker :instance="defaultGlobalColorInstance"/>
                 </template>
                 亮色和暗色场景下独立保存，互不影响
               </n-tooltip>
-              <color-picker :instance="defaultColorInstance"/>
-              <config-switch title="默认是否启用列表UI模式" config="enabledLiteShow"/>
-              <config-switch title="行内代码块是否不进行高亮解析" config="rawLineCode" @refresh="emit('refresh')"/>
             </n-space>
+
           </n-tab-pane>
           <n-tab-pane :name="2" tab="清理">
             <n-scrollbar style="max-height: 80vh">
