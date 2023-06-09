@@ -33,7 +33,7 @@ import {
     NTooltip,
     NList,NListItem,NCollapse,NCollapseItem
 } from 'naive-ui'
-import {fullScreenShow, itemOffsetArray, keepSelectedStatus, utoolsSearchContent} from "./js/utils/variable.js";
+import {$var, CREATE_VIEW} from "./js/store";
 
 // init
 tagColorManager.init();
@@ -60,35 +60,37 @@ const naive = create({
 })
 
 
-utools.onPluginEnter(({code, type, payload})=>{
-    console.log('Welcome to use this app')
-    console.log('Your code_type_payload is ['+code+'_'+type+'_'+payload+']')
+utools.onPluginEnter((data)=>{
+    console.log('Enter App ...')
+    console.log('The Following is Your [code type payload]')
+    console.log(data)
     if(configManager.get('enabledLiteShow')){
-        fullScreenShow.value = false;
-        console.log('lite show')
+        $var.view.fullScreenShow = false;
         if(configManager.get('noShowForEmptySearch')){
             utools.setExpendHeight(0)
-            console.log('lite mini show')
         }
     }else{
-        console.log('normal show')
         utools.setExpendHeight(545)
     }
-    console.log('fullScreenShow: '+fullScreenShow.value)
+    console.log('fullScreenShow: '+$var.view.fullScreenShow)
     utools.setSubInput(({text}) =>{
         text = text.trim();
         if(text.length === 0){
-            utoolsSearchContent.value = null;
+            $var.utools.search = null;
             console.log('search empty')
         }else{
-            if(utoolsSearchContent.value !== text){
+            if($var.utools.search !== text){
                 console.log('search: '+text)
-                utoolsSearchContent.value = text;
-                keepSelectedStatus.value = null;
-                itemOffsetArray.value = [];
+                $var.utools.search = text;
+                $var.utools.keepSelectedStatus = null;
+                $var.scroll.itemOffsetArray = [];
             }
         }
     },"搜索代码片段, 双击Tab切换UI模式")
+    if(data.type==='over'){
+        $var.currentMode = CREATE_VIEW;
+        $var.others.code = data.payload;
+    }
 })
 
 const app = createApp(App)

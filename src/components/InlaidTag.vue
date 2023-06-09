@@ -2,19 +2,19 @@
   <n-space :wrap="false">
     <template v-if="configManager.get('showTagIcon')">
       <n-tag size="small" round :bordered="false" v-if="configManager.get('showLanguageTag')" >
-        {{props.type}}
+        {{type}}
         <template #avatar>
           🚀
         </template>
       </n-tag>
       <n-tag size="small" round :bordered="false" v-if="configManager.get('showCountTag')">
-        {{props.count??0}}
+        {{count??0}}
         <template #avatar>
           🎲
         </template>
       </n-tag>
       <n-tag size="small" round :bordered="false" v-if="configManager.get('showTimeTag')">
-        {{calculateTime(props.time)}}
+        {{calculateTime(time)}}
         <template #avatar>
           ⏰
         </template>
@@ -22,19 +22,19 @@
     </template>
     <template v-else>
       <n-tag size="small" round :bordered="false" v-if="configManager.get('showLanguageTag')" >
-        {{props.type}}
+        {{type}}
         <template #avatar>
           <span class="circle" ></span>
         </template>
       </n-tag>
       <n-tag size="small" round :bordered="false" v-if="configManager.get('showCountTag')">
-        {{props.count??0}}
+        {{count??0}}
         <template #avatar>
           <span class="circle yellow"></span>
         </template>
       </n-tag>
       <n-tag size="small" round :bordered="false" v-if="configManager.get('showTimeTag')">
-        {{calculateTime(props.time)}}
+        {{calculateTime(time)}}
         <template #avatar>
           <span class="circle green"></span>
         </template>
@@ -45,9 +45,9 @@
 <script setup>
 
 import {configManager} from "../js/core.js";
-import {calculateTime} from "../js/utils/variable.js";
+import {calculateTime} from "../js/some";
 
-const props = defineProps(["type","count","time"])
+defineProps(["type","count","time"])
 
 
 

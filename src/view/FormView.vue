@@ -95,19 +95,16 @@
 <script setup>
 import {computed, onMounted, reactive, ref} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
-import {CtrlStr, keepSelectedStatus} from "../js/utils/variable.js";
-import {languages} from "../js/utils/some.js";
-
-const emit = defineEmits(['doCancel','doUpdate'])
-const props = defineProps({
-  name: String,
-  update: Boolean
-})
+import {handleRecoverLiteShow, languages} from "../js/some.js";
+import {$var, LIST_VIEW, UPDATE_VIEW} from "../js/store";
+const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()
-const codeSnippet = codeSnippetManager.get(props.name)??{};
-let codeTemplate = props.update ? reactive({
+const codeSnippet = ($var.currentMode === UPDATE_VIEW)? codeSnippetManager.get($var.currentName) :{
+  code: $var.others.code
+}
+const codeTemplate = reactive({
   ...codeSnippet
-}) : reactive({})
+})
 let tempTag = ref()
 const tags = computed(()=>{
   return tagColorManager.all().map(v=>{
@@ -139,7 +136,7 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if(props.update && codeSnippet.name === value){
+        if($var.currentMode === UPDATE_VIEW && codeSnippet.name === value){
           return true;
         }
         return !codeSnippetManager.contain(value)
@@ -154,11 +151,12 @@ const rules = {
   }
 }
 
-let handleCancel = ()=>{
-  keepSelectedStatus.value = true;
-  emit('doCancel')
+const handleCancel = ()=>{
+  $var.utools.keepSelectedStatus = true;
+  handleRecoverLiteShow()
+  $var.currentMode = LIST_VIEW;
 }
-let handleUpdate = ()=>{
+const handleUpdate = ()=>{
   form.value.validate().then(error=>{
       if(error!=null && error.length >= 0){
         window.$message.warning("请按要求填写")
@@ -168,23 +166,25 @@ let handleUpdate = ()=>{
         codeSnippet.tags = [...new Set(codeTemplate.tags)];
         codeSnippet.type = codeTemplate.type?? "plaintext";
 
-        if(props.update){
+        if($var.currentMode === UPDATE_VIEW){
           if(codeSnippet.name === codeTemplate.name){
-            keepSelectedStatus.value = true;
+            $var.utools.keepSelectedStatus = true;
             codeSnippetManager.update(codeSnippet)
           }else{
-            keepSelectedStatus.value = null;
+            $var.utools.keepSelectedStatus = null;
             // 这里清理查询缓存
             delete codeSnippet.query;
             codeSnippetManager.replace(codeTemplate.name,codeSnippet)
           }
         }else{
           codeSnippet.name = codeTemplate.name;
-          keepSelectedStatus.value = null;
+          $var.utools.keepSelectedStatus = null;
           codeSnippetManager.add(codeSnippet)
         }
         window.$message.success("操作成功")
-        emit('doUpdate')
+        handleRecoverLiteShow()
+        $var.currentMode = LIST_VIEW;
+        $var.others.code = null;
       }
   },()=>{
     window.$message.warning("请按要求填写")

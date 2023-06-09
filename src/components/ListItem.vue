@@ -1,9 +1,10 @@
 <template>
   <div id="main"
+       ref="item"
        @contextmenu="handleContextMenu"
        @click="handleClick"
        @dblclick="handleDoubleClick"
-       @mouseleave="showBtnModal=false;isDel=false"
+       @mouseleave="showBtnModal=false;$var.view.isDel=false"
        >
     <n-card
             hoverable
@@ -35,7 +36,7 @@
               <div class="sub">
                 <template v-if="flag">
                   <n-space :wrap="false">
-                    <tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+                    <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
                   </n-space>
                 </template>
                 <template v-else>
@@ -50,23 +51,23 @@
       </template>
       <template v-else>
         <n-space>
-          <tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+          <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
         </n-space>
       </template>
       <n-ellipsis style="max-width: 98%" :tooltip="false" >
         <template v-if="configManager.get('rawLineCode')">
-          <span  :style="getCodeStyle()">{{snippet.code}}</span>
+          <span  :style="getCodeStyle()">{{handleCode(snippet.code)}}</span>
         </template>
         <template v-else>
-          <n-code :code="snippet.code" :language="snippet.type"   inline :style="getCodeStyle()" />
+          <n-code :code="handleCode(snippet.code)" :language="snippet.type"   inline :style="getCodeStyle()" />
         </template>
       </n-ellipsis>
     </n-card>
 
-    <template v-if="isDel && selected">
+    <template v-if="$var.view.isDel && selected">
       <div id="child">
         <span style="color: gray">确认删除?</span>
-        <selectable-button  :mid="395" lite type="primary" tip="搞错了" :index="0" @invoke="isDel = false;" >
+        <selectable-button  :mid="395" lite type="primary" tip="搞错了" :index="0" @invoke="$var.view.isDel = false;" >
           ✗
         </selectable-button>
         <selectable-button :mid="440" lite type="error" tip="真的删" :index="1" @invoke="handleDelete" >
@@ -86,7 +87,7 @@
           <selectable-button :mid="395" lite type="info" tip="复制" :index="2" @invoke="handleCopy" >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M5.503 4.627L5.5 6.75v10.504a3.25 3.25 0 0 0 3.25 3.25h8.616a2.251 2.251 0 0 1-2.122 1.5H8.75A4.75 4.75 0 0 1 4 17.254V6.75c0-.98.627-1.815 1.503-2.123zM17.75 2A2.25 2.25 0 0 1 20 4.25v13a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-13A2.25 2.25 0 0 1 8.75 2h9zm0 1.5h-9a.75.75 0 0 0-.75.75v13c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75v-13a.75.75 0 0 0-.75-.75z" fill="currentColor"></path></g></svg>
           </selectable-button>
-          <selectable-button :mid="440" lite type="error" tip="删除" :index="3" @invoke="isDel = true;subItemSelectIndex=1">
+          <selectable-button :mid="440" lite type="error" tip="删除" :index="3" @invoke="$var.view.isDel = true;$var.utools.subItemSelectedIndex=1">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
           </selectable-button>
           <template v-if="topIndex === -1">
@@ -106,29 +107,24 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
-import Tag from "./Tag.vue";
+import {computed, onMounted, ref} from "vue";
 import InlaidTag from "./InlaidTag.vue";
-import {
-  focusOnUtoolsInput,
-  handleCopy,
-  isDel,
-  itemOffsetArray, keepSelectedStatus,
-  scrollbarMovedDistance, selectIndex,
-  subItemSelectIndex, utoolsSearchContent
-} from "../js/utils/variable.js";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
+import {$var} from "../js/store";
+import {handleCopy} from "../js/some";
+import NormalTag from "./NormalTag.vue";
 
 let showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index'])
 const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
 const flag = configManager.get('shiftTagPosition')
+const item = ref()
 const isShowBtn = computed(()=>{
   if(showBtnModal.value){
     return true;
   }
-  return !!(props.selected && subItemSelectIndex.value > -1);
+  return !!(props.selected && $var.utools.subItemSelectedIndex > -1);
 })
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
 
@@ -136,8 +132,7 @@ const getSelectedStyle =(selected)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
   if(selected){
     // 保存当前滚动距离
-    itemOffsetArray.value[props.index] = scrollbarMovedDistance.distance;
-    if(focusOnUtoolsInput.value){
+    if($var.utools.focused){
       return style
     }
     return `border: 2px solid ${configManager.getGlobalColor()} !important; ${style}`;
@@ -159,20 +154,23 @@ const getCodeStyle = () =>{
     fontFamily: "'Consolas' !important"
   }
 }
+onMounted(()=>{
+  $var.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
+})
 
 const handleDelete = ()=>{
   codeSnippetManager.del(props.snippet.name)
-  keepSelectedStatus.value = null;
-  window.$message.success("成功删除")
-  isDel.value = false;
+  $var.utools.selectedIndex--;
+  $var.utools.keepSelectedStatus = true;
+  $var.view.isDel = false;
   emit('itemRefresh')
 }
 
 const handleClick = (e)=>{
   if(configManager.get("enabledAutoVim")){
-    focusOnUtoolsInput.value = false;
+    $var.utools.focused = false;
   }
-  subItemSelectIndex.value = -1;
+  $var.utools.subItemSelectedIndex = -1;
   if(e.ctrlKey || e.metaKey){
     emit('viewCode',props.snippet.name)
   }
@@ -183,7 +181,7 @@ const handleClick = (e)=>{
 }
 const handleContextMenu = ()=>{
   showBtnModal.value=true;
-  subItemSelectIndex.value = -1;
+  $var.utools.subItemSelectedIndex = -1;
   if(!props.selected){
     emit('userClick',props.index)
   }
@@ -195,12 +193,20 @@ const handleDoubleClick = ()=>{
 }
 const handleCancelTop = ()=>{
   configManager.delTopItem(topIndex)
-  selectIndex.value = props.index;
+  $var.utools.selectedIndex = props.index;
   emit('itemRefresh')
 }
 const handleSetTop = ()=>{
-  selectIndex.value = configManager.addTopItem(props.snippet.name)
+  $var.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
   emit('itemRefresh')
+}
+/**
+ *
+ * @param {string} code
+ * @return {*}
+ */
+const  handleCode = (code)=>{
+  return code.replace("\n",'↩')
 }
 </script>
 
@@ -276,7 +282,7 @@ const handleSetTop = ()=>{
   transform-origin: 0 0;  /* 左对齐 */
 }
 
-.n-card:hover .show{
+.n-card:hover .circle{
   animation: blink 1s 3 steps(1);
 }
 

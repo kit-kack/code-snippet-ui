@@ -3,14 +3,7 @@
   margin: 0;
 }
 
-body {
-  margin: 0;
-  background-color: transparent;
-}
 
-#app{
-  width: 100%;
-}
 pre{
   border: 1px;
   border-radius: 3px;

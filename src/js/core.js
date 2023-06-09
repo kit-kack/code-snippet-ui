@@ -16,7 +16,7 @@ const CS_MARK_ID = "#kitkack.code-snippet#";      // 标签及代码片段部分
 const CS_DOC_ID = "#kitkack.code-snippet-doc#";   // 描述部分前缀
 
 
-let funcUtils = {
+const funcUtils = {
     mapToJson(map) {
         return JSON.stringify([...map]);
     },
@@ -59,7 +59,7 @@ let funcUtils = {
                         snippet.count = count;
                     }
                 }else if(str.startsWith("tags:")){
-                    let tags = str.substring(5).trim().split(' ');
+                    let tags = str.substring(5).trim().split(' ').filter(value => value.length>0);
                     if(tags!=null && tags.length> 0){
                         snippet.tags = tags;
                     }
@@ -225,7 +225,7 @@ let funcUtils = {
 }
 
 
-let codeSnippetManager = {
+const codeSnippetManager = {
     // Code Snippet Map (key is its name)
     codeMap: new Map(),
     result: '',
@@ -388,7 +388,6 @@ let codeSnippetManager = {
         let list = [];
         if(name !== null){
             if(configManager.get('enabledFuzzySymbolQuery')){
-                console.log('fuzzy query')
                 // 0. 搜索词需要同样被替换
                 name = funcUtils.getFuzzyQueriedValue(name);
                 console.log(name)
@@ -449,7 +448,7 @@ let codeSnippetManager = {
             if(codeSnippet.count != null){
                 str += `> count: ${codeSnippet.count}\n> \n`;
             }
-            if(codeSnippet.tags != null){
+            if(codeSnippet.tags != null && codeSnippet.tags.length > 0){
                 str += `> tags: ${codeSnippet.tags.join(' ')}\n> \n`;
             }
             // output code
@@ -494,7 +493,7 @@ let codeSnippetManager = {
     }
 }
 
-let tagColorManager={
+const tagColorManager={
     // tag Color Map
     // key: tag name
     // value: color
@@ -538,7 +537,7 @@ let tagColorManager={
 }
 
 
-let configManager = {
+const configManager = {
     configMap: new Map(),
     isInited: false,
     init(){

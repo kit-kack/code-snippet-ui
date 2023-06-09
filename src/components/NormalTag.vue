@@ -15,7 +15,7 @@
 <script setup>
 
 import {reactive} from "vue";
-import Color from "../js/utils/color.js";
+import Color from "../js/lib/color.js";
 import {tagColorManager} from "../js/core.js";
 import ColorPicker from "./ColorPicker.vue";
 
@@ -68,9 +68,5 @@ const handleClose = ()=>{
 <style scoped>
 #tag{
   height: 14px;
-}
-
-.dark{
-  background-color: #303133 !important;
 }
 </style>

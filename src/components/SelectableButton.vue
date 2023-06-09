@@ -3,7 +3,7 @@
              :show="hover || (selected && show)"
               :keep-alive-on-hover="false"
              content-style="{point-event:none;"
-             :placement="onlyOne&&!fullScreenShow?(flag? 'right':'left'):'top'"
+             :placement="$var.others.onlyOne&&!$var.view.fullScreenShow?(flag? 'right':'left'):'top'"
   >
     <template #trigger>
       <n-button  circle
@@ -26,8 +26,8 @@
 
 <script setup>
 import {computed, onMounted, ref} from "vue";
-import {fullScreenShow, onlyOne, recoverLiteShow, spaceInvokers, subItemSelectIndex} from "../js/utils/variable.js";
 import {configManager} from "../js/core.js";
+import {$var} from "../js/store";
 
 const props = defineProps({
   "tip": String,
@@ -43,8 +43,8 @@ const emit = defineEmits(['invoke'])
 const hover = ref(false)
 const flag = ref(false)
 const selected = computed(()=>{
-  if(subItemSelectIndex.value === props.index){
-    if(onlyOne &&  !fullScreenShow.value){
+  if($var.utools.subItemSelectedIndex === props.index){
+    if($var.others.onlyOne &&  !$var.view.fullScreenShow){
       show.value = true;
       setTimeout(()=>{
         show.value = false
@@ -58,16 +58,16 @@ const selected = computed(()=>{
 })
 
 const operate = ()=>{
-  if(!(props.lite || fullScreenShow.value)){
-    fullScreenShow.value = true;
-    recoverLiteShow.value = true;
+  if(!(props.lite || $var.view.fullScreenShow)){
+    $var.view.fullScreenShow = true;
+    $var.view.recoverLiteShow = true;
     utools.setExpendHeight(545)
   }
   emit('invoke')
 }
 
 onMounted(()=>{
-  spaceInvokers.value[props.index] = ()=> {
+  $var.scroll.spaceInvoker[props.index] = ()=> {
     operate()
   }
 })

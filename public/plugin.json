@@ -20,6 +20,16 @@
       "code": "code-snippet",
       "explain": "记录代码片段",
       "cmds": ["code-snippet","snippet","cs"]
+    },
+    {
+      "code": "code-snippet-save",
+      "explain": "保存代码片段",
+      "cmds": [
+        {
+          "type": "over",
+          "label": "保存代码片段"
+        }
+      ]
     }
   ]
 }

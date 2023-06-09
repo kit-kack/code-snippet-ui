@@ -12,10 +12,10 @@
             </n-divider>
             <n-space vertical align="center">
               <div>
-                当前共有{{codeSnippetManager.codeMap.size}}条数据，点击<n-button quaternary type="info" size="small" @click="handleExport">导出</n-button>
+                当前共有{{codeSnippetManager.codeMap.size}}条数据，点击<n-button  quaternary type="info" size="small" @click="handleExport" :color="configManager.getGlobalColor()">导出</n-button>
               </div>
               <div>
-                当然你也可以<n-button quaternary type="info" size="small" @click="handleImport">导入</n-button>数据，注意要符合格式哦!
+                当然你也可以<n-button  quaternary type="info" size="small" @click="handleImport" :color="configManager.getGlobalColor()">导入</n-button>数据，注意要符合格式哦!
               </div>
             </n-space>
             <n-divider title-placement="center">
@@ -82,7 +82,7 @@
               </n-divider>
               <template v-if="refreshStatus">
                 <n-space>
-                  <tag raw v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithRefresh"/>
+                  <normal-tag raw v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithRefresh"/>
                 </n-space>
               </template>
             </n-scrollbar>
@@ -114,9 +114,9 @@ import {NDivider} from 'naive-ui'
 import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import ColorPicker from "../components/ColorPicker.vue";
-import Tag from "../components/Tag.vue";
 import {nextTick, ref} from "vue";
 import ShortcutPane from "../components/ShortcutPane.vue";
+import NormalTag from "../components/NormalTag.vue";
 
 const emit = defineEmits(['refresh'])
 const refreshStatus = ref(true)

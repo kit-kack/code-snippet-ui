@@ -1,21 +1,17 @@
 <template>
 
-  <div @contextmenu="emit('doClose')">
+  <div @contextmenu=" handleClose()">
     <n-scrollbar style="max-height: 100vh" x-scrollable trigger="hover" ref="scrollBar">
       <template v-if="isValidLanguage">
-        <div @contextmenu="emit('doClose')">
-          <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
-        </div>
+        <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
       </template>
       <template v-else>
-        <div @contextmenu="emit('doClose')">
-          <highlightjs  autodetect :code="snippet.code" width="100%"/>
-        </div>
+        <highlightjs  autodetect :code="snippet.code" width="100%"/>
       </template>
     </n-scrollbar>
     <div id="extra">
       <n-space>
-        <n-popover trigger="hover" :show="hover || showCodeTip" placement="top" :show-arrow="false" style="padding:5px">
+        <n-popover trigger="hover" :show="hover || $var.view.showCodeTip" placement="top" :show-arrow="false" style="padding:5px">
           <template #trigger>
             <n-button
                 @mouseenter="hover = true"
@@ -23,10 +19,7 @@
                 @click="handleClick"
                 quaternary :color="configManager.getGlobalColor()">🚀{{ snippet.type??'plaintext' }}</n-button>
           </template>
-          <n-list hoverable clickable :show-divider="false"
-            @mouseenter="hover = true"
-                  @mouseleave="hover = false"
-          >
+          <n-list hoverable clickable :show-divider="false" @mouseenter="hover = true" @mouseleave="hover = false">
             <n-list-item >
               <div align="center">{{snippet.name}}</div>
             </n-list-item>
@@ -47,7 +40,7 @@
 
         <n-tooltip trigger="hover" placement="left">
           <template #trigger>
-            <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="emit('doClose')">
+            <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="handleClose">
               <template #icon>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
               </template>
@@ -63,13 +56,10 @@
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
 import {computed, onMounted, ref} from "vue";
-import {calculateTime, scrollCodeInvoker, showCodeTip} from "../js/utils/variable.js";
-import {isSupportedLanguage} from "../js/utils/some.js";
-
-const props = defineProps(['name'])
-const emit = defineEmits(['doClose'])
+import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
+import {$var, LIST_VIEW} from "../js/store";
 const scrollBar = ref(null)
-const snippet = codeSnippetManager.get(props.name);
+const snippet = codeSnippetManager.get($var.currentName);
 const hover = ref(false)
 const isValidLanguage = computed(()=>isSupportedLanguage(snippet.type??'plaintext'))
 
@@ -77,9 +67,17 @@ const isValidLanguage = computed(()=>isSupportedLanguage(snippet.type??'plaintex
 const handleClick = ()=>{
   $message.info('该提示部分可以由Vim模式下s键控制')
 }
+const handleClose = ()=>{
+  $var.view.showCodeTip = false;
+  $var.utools.keepSelectedStatus = true;
+  handleRecoverLiteShow();
+  $var.currentMode = LIST_VIEW;
+
+
+}
 
 onMounted(()=>{
-    scrollCodeInvoker.value = (direction)=>{
+    $var.scroll.codeInvoker = (direction)=>{
       switch (direction){
         case "left":
           scrollBar.value.scrollBy({left: -30})
