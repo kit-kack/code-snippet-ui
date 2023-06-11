@@ -4,12 +4,26 @@
       <n-scrollbar style="max-height: 99vh" ref="scrollBar">
         <div ref="listViewAspect">
           <div style="width: 100%; height: 2px; background-color: transparent"/>
-          <list-item
-              @view-code="handleViewCode"
-              @item-refresh="handleRefresh()"
-              @edit-item="handleEdit"
-              @user-click="ind => $var.utools.selectedIndex = ind"
-              v-for="(snippet,index) in list" :selected="handleSelect(index,snippet.name)" :index="index"   v-bind:snippet="snippet" :key="index" />
+          <template v-if="configManager.get('fullItemCodeShow')">
+            <super-list-item
+                v-for="(snippet,index) in list"
+                :index="index"   :snippet="snippet" :key="index"
+                :selected="handleSelect(index,snippet.name)"
+                @view-code="handleViewCode"
+                @item-refresh="handleRefresh()"
+                @edit-item="handleEdit"
+                @user-click="ind => $var.utools.selectedIndex = ind"/>
+          </template>
+          <template v-else>
+            <list-item
+                v-for="(snippet,index) in list"
+                :index="index"   :snippet="snippet" :key="index"
+                :selected="handleSelect(index,snippet.name)"
+                @view-code="handleViewCode"
+                @item-refresh="handleRefresh()"
+                @edit-item="handleEdit"
+                @user-click="ind => $var.utools.selectedIndex = ind"/>
+          </template>
           <div id="info" v-if="$var.view.fullScreenShow">
             <p style="color:gray;">~共有{{list.length}}条数据~</p>
           </div>
@@ -67,22 +81,19 @@
 </template>
 
 <script setup>
-import {useMessage} from "naive-ui";
+import {NButton, useMessage, useNotification} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
-import {computed, onMounted, onUpdated, ref} from "vue";
+import {computed, h, onMounted, onUpdated, ref} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
 import {$var, CODE_VIEW, CREATE_VIEW, UPDATE_VIEW} from "../js/store";
 import {refreshListView} from "../js/some";
 import {configManager} from "../js/core";
+import SuperListItem from "../components/SuperListItem.vue";
+import $version from '../js/version'
 const scrollBar = ref()
 const listViewAspect = ref()
 window.$message = useMessage();
-const list = computed(/**
- *
- * 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
- */
-()=>parseSearchWord($var.utools.search,$var.view.refresh))
-
+const list = computed(()=>parseSearchWord($var.utools.search,$var.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 
 const handleEdit = (name)=>{
   $var.currentName = name;
@@ -106,24 +117,45 @@ const handleRefresh = ()=>{
   $var.utools.keepSelectedStatus = true;
   refreshListView();
 }
-
+const newVersionShow = ()=>{
+  if(configManager.get('version') !== $version.version){
+    utools.setExpendHeight(550)
+    const notification = useNotification();
+    const n = notification.create({
+      title: "🎉新版本内容介绍",
+      content: $version.content,
+      meta: $version.version,
+      action: () =>
+          h(
+              NButton,
+              {
+                text: true,
+                type: 'primary',
+                onClick: () => {
+                  configManager.set('version',$version.version)
+                  n.destroy()
+                  $message.info("该版本通知后续不会再出现")
+                }
+              },
+              {
+                default: () => '已读'
+              }
+          ),
+      onClose: () => {
+        $message.info('该版本通知下次仍会出现，如果不想再出现请点击【已读】')
+        return true
+      }
+    })
+  }else{
+    handleAppHeight();
+  }
+}
 onMounted(()=>{
   parseSearchWord($var.utools.search)
-  handleAppHeight();
+  newVersionShow();
   init(list)
-  $var.scroll.listInvoker = (direction)=>{
-    switch (direction){
-      case "down":
-        scrollBar.value.scrollBy({top: 50})
-        break;
-      case "up":
-        scrollBar.value.scrollBy({top: -50})
-        break;
-      default:
-        scrollBar.value.scrollTo?.({top:+direction,left:0})
-        break;
-    }
-  }
+  $var.scroll.listInvoker = scrollBar;
+
 })
 const handleAppHeight = ()=>{
   if($var.view.fullScreenShow){

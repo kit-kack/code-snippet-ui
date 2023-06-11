@@ -13,12 +13,34 @@ const gotoTheLastPosition = ()=>{
     // 校准位置
     if($var.utools.selectedIndex > -1 ){
         let distance = $var.scroll.itemOffsetArray[$var.utools.selectedIndex] -200;
+        console.log(distance)
         if(distance < 0){
             distance = 0;
         }
-        $var.scroll.listInvoker?.(distance)
+        $var.scroll.listInvoker?.scrollTo({top:+distance,left:0})
+        // $var.scroll.listInvoker?.(distance)
     }
 }
+const handleScrollBar =(scrollBar,direction)=>{
+    switch (direction){
+        case "left":
+            scrollBar?.scrollBy?.({left: -10})
+            break;
+        case "down":
+            scrollBar?.scrollBy?.({top: 10})
+            break;
+        case "up":
+            scrollBar?.scrollBy?.({top: -10})
+            break;
+        case "right":
+            scrollBar?.scrollBy?.({left: 10})
+            break;
+        case "reset":
+            scrollBar?.scrollTo?.({left:0,top:0,behavior:'smooth'})
+            break;
+    }
+}
+
 
 /**
  * Only ListView
@@ -32,6 +54,8 @@ function dealWithListView(e,list){
                 if(configManager.get("enabledBeep")){
                     utools.shellBeep();
                 }
+            }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
+                handleScrollBar($var.scroll.itemCodeInvoker,"left")
             }else{
                 if($var.view.isDel){
                     $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
@@ -49,14 +73,24 @@ function dealWithListView(e,list){
             if($var.view.isDel){
                 $var.view.isDel = false;
             }
-            if ($var.utools.selectedIndex >= list.value.length -1) { // -1 >= 0-1
-                if(configManager.get("enabledBeep")){
-                    utools.shellBeep();
+            if(e.shiftKey && configManager.get('fullItemCodeShow')){
+                if ($var.utools.selectedIndex === -1) { // -1 >= 0-1
+                    if(configManager.get("enabledBeep")){
+                        utools.shellBeep();
+                    }
+                }else {
+                    handleScrollBar($var.scroll.itemCodeInvoker,"down")
                 }
-            } else {
-                $var.utools.selectedIndex++;
-                $var.utools.subItemSelectedIndex = -1;
-                $var.scroll.listInvoker?.("down")
+            }else{
+                if ($var.utools.selectedIndex >= list.value.length -1) { // -1 >= 0-1
+                    if(configManager.get("enabledBeep")){
+                        utools.shellBeep();
+                    }
+                }else {
+                    $var.utools.selectedIndex++;
+                    $var.utools.subItemSelectedIndex = -1;
+                    gotoTheLastPosition();
+                }
             }
             break;
         case "KeyK":
@@ -64,15 +98,27 @@ function dealWithListView(e,list){
             if($var.view.isDel){
                 $var.view.isDel = false;
             }
-            if ($var.utools.selectedIndex <= 0) {
-                if(configManager.get("enabledBeep")){
-                    utools.shellBeep();
+            if(e.shiftKey && configManager.get('fullItemCodeShow')){
+                if ($var.utools.selectedIndex === -1) {
+                    if (configManager.get("enabledBeep")) {
+                        utools.shellBeep();
+                    }
+                }else {
+                    handleScrollBar($var.scroll.itemCodeInvoker,"up")
                 }
-            } else {
-                $var.utools.selectedIndex--;
-                $var.utools.subItemSelectedIndex = -1;
-                $var.scroll.listInvoker?.("up")
+            }else{
+                if ($var.utools.selectedIndex <= 0) {
+                    if (configManager.get("enabledBeep")) {
+                        utools.shellBeep();
+                    }
+                }else {
+                    $var.utools.selectedIndex--;
+                    $var.utools.subItemSelectedIndex = -1;
+                    // $var.scroll.listInvoker?.("up")
+                    gotoTheLastPosition();
+                }
             }
+
             break;
         case "KeyL":
         case "ArrowRight":
@@ -81,6 +127,8 @@ function dealWithListView(e,list){
                 if(configManager.get("enabledBeep")){
                     utools.shellBeep();
                 }
+            }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
+                handleScrollBar($var.scroll.itemCodeInvoker,"right")
             }else{
                 if($var.view.isDel){
                     $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
@@ -102,13 +150,16 @@ function dealWithListView(e,list){
             }
             break;
         case "Digit0":
+        case "KeyR":
             if($var.utools.selectedIndex === -1){
                 if(configManager.get("enabledBeep")){
                     utools.shellBeep();
                 }
+            }else if(e.shiftKey){
+                handleScrollBar($var.scroll.itemCodeInvoker,"reset")
             }else{
                 $var.utools.selectedIndex = 0;
-                $var.scroll.listInvoker?.(0)
+                $var.scroll.listInvoker?.scrollTo({top:0,left:0})
             }
             break;
         case 'KeyT':
@@ -133,6 +184,10 @@ function dealWithListView(e,list){
                 }
                 $var.currentMode = CODE_VIEW;
                 return;
+        case 'KeyQ':
+            $var.utools.subItemSelectedIndex = -1;
+            $var.view.isDel = false;
+            break;
         default:
             dealWithCommonView(e)
             break;
@@ -144,19 +199,19 @@ function dealWithCodeView(e){
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
-            $var.scroll.codeInvoker?.("left");
+            handleScrollBar($var.scroll.codeInvoker,"left")
             break;
         case "KeyJ":
         case "ArrowDown":
-            $var.scroll.codeInvoker?.("down");
+            handleScrollBar($var.scroll.codeInvoker,"down")
             break;
         case "KeyK":
         case "ArrowUp":
-            $var.scroll.codeInvoker?.("up");
+            handleScrollBar($var.scroll.codeInvoker,"up")
             break;
         case "KeyL":
         case "ArrowRight":
-            $var.scroll.codeInvoker?.("right");
+            handleScrollBar($var.scroll.codeInvoker,"right")
             break;
         case 'KeyS':
             $var.view.showCodeTip = !$var.view.showCodeTip;
@@ -165,6 +220,10 @@ function dealWithCodeView(e){
             handleRecoverLiteShow();
             $var.currentMode = LIST_VIEW;
             $var.utools.keepSelectedStatus = true;
+            break;
+        case 'Digit0':
+        case 'KeyR':
+            handleScrollBar($var.scroll.codeInvoker,"reset")
             break;
         default:
             dealWithCommonView(e)
@@ -240,7 +299,7 @@ function init(list) {
             return;
         }
         // 其他键无法触发
-        if ($var.utools.focused || e.shiftKey || e.altKey) {
+        if ($var.utools.focused) {
             return;
         }
         // 处理Ctrl键
@@ -280,8 +339,8 @@ function init(list) {
         }
         if (e.code === 'Space') {
             e.preventDefault();
-            if (longKeyDown.value) {
-                longKeyDown.value = false;
+            if (longKeyDown) {
+                longKeyDown = false;
                 $var.currentMode = LIST_VIEW;
                 $var.utools.keepSelectedStatus = true;
                 return;

@@ -39,3 +39,5 @@ declare type ConfigItem =
     | "rawLineCode"                                  // 原始行内代码，不进行高亮
     | "enabledLiteShow"                              // 支持无UI模式下的显示效果
     | "noShowForEmptySearch"                         // 对于空的搜索词，是否不显示（所有）数据
+    | "fullItemCodeShow"                             // 展示元素 代码块
+    | "version"                                      // 插件版本，用来判断是否为最新版本

@@ -5,14 +5,14 @@
        @click="handleClick"
        @dblclick="handleDoubleClick"
        @mouseleave="showBtnModal=false;$var.view.isDel=false"
-       >
+  >
     <n-card
-            hoverable
-            embedded
-            size="small"
-            content-style="padding: 0 10px"
-            header-style="height:28px;"
-            :style="getSelectedStyle(props.selected)"
+        hoverable
+        embedded
+        size="small"
+        content-style="padding: 0 10px"
+        header-style="height:28px;"
+        :style="getSelectedStyle(props.selected)"
     >
       <div class="circle"
            :style="{
@@ -32,18 +32,18 @@
       </template>
       <template #header-extra >
         <div id="right">
-            <n-scrollbar x-scrollable :size="10">
-              <div class="sub">
-                <template v-if="flag">
-                  <n-space :wrap="false">
-                    <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
-                  </n-space>
-                </template>
-                <template v-else>
-                  <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
-                </template>
-              </div>
-            </n-scrollbar>
+          <n-scrollbar x-scrollable :size="10">
+            <div class="sub">
+              <template v-if="flag">
+                <n-space :wrap="false">
+                  <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+                </n-space>
+              </template>
+              <template v-else>
+                <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
+              </template>
+            </div>
+          </n-scrollbar>
         </div>
       </template>
       <template v-if="flag">
@@ -54,14 +54,17 @@
           <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
         </n-space>
       </template>
-      <n-ellipsis style="max-width: 98%" :tooltip="false" >
+      <n-scrollbar style="max-height: 88px" x-scrollable trigger="hover" class="item-code" ref="itemCodeScrollBar">
         <template v-if="configManager.get('rawLineCode')">
-          <span  :style="getCodeStyle()">{{handleCode(snippet.code)}}</span>
+          <pre :style="getCodeStyle()">{{snippet.code}}</pre>
+        </template>
+        <template v-else-if="isValidLanguage">
+          <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
         </template>
         <template v-else>
-          <n-code :code="handleCode(snippet.code)" :language="snippet.type"   inline :style="getCodeStyle()" />
+          <highlightjs  autodetect :code="snippet.code" width="100%"/>
         </template>
-      </n-ellipsis>
+      </n-scrollbar>
     </n-card>
 
     <template v-if="$var.view.isDel && selected">
@@ -92,12 +95,12 @@
           </selectable-button>
           <template v-if="topIndex === -1">
             <selectable-button :mid="485" lite  type="primary"  color="#9b59b6" :index="4" tip="置顶" @invoke="handleSetTop">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 8.826l.874.998a.5.5 0 0 0 .752-.658l-1.75-2a.5.5 0 0 0-.752 0l-1.75 2a.5.5 0 0 0 .752.658l.874-.998v3.679a.5.5 0 0 0 1 0v-3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-3.834a1.495 1.495 0 0 0-.287-.493l-1.75-2a1.5 1.5 0 0 0-2.258 0l-1.75 2c-.13.15-.226.317-.287.493H3v5z" fill="currentColor"></path></g></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 8.826l.874.998a.5.5 0 0 0 .752-.658l-1.75-2a.5.5 0 0 0-.752 0l-1.75 2a.5.5 0 0 0 .752.658l.874-.998v3.679a.5.5 0 0 0 1 0v-3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-3.834a1.495 1.495 0 0 0-.287-.493l-1.75-2a1.5 1.5 0 0 0-2.258 0l-1.75 2c-.13.15-.226.317-.287.493H3v5z" fill="currentColor"></path></g></svg>
             </selectable-button>
           </template>
           <template v-else>
             <selectable-button :mid="485" lite  type="primary"  color="#9b59b6" :index="4" tip="取消置顶" @invoke="handleCancelTop">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 11.174l.874-.998a.5.5 0 0 1 .752.658l-1.75 2a.5.5 0 0 1-.752 0l-1.75-2a.5.5 0 1 1 .752-.658l.874.998V7.495a.5.5 0 0 1 1 0v3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-5.5V7.495a1.5 1.5 0 1 0-3 0V9H3v5z" fill="currentColor"></path></g></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 11.174l.874-.998a.5.5 0 0 1 .752.658l-1.75 2a.5.5 0 0 1-.752 0l-1.75-2a.5.5 0 1 1 .752-.658l.874.998V7.495a.5.5 0 0 1 1 0v3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-5.5V7.495a1.5 1.5 0 1 0-3 0V9H3v5z" fill="currentColor"></path></g></svg>
             </selectable-button>
           </template>
         </n-space>
@@ -112,7 +115,7 @@ import InlaidTag from "./InlaidTag.vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
 import {$var} from "../js/store";
-import {handleCopy} from "../js/some";
+import {handleCopy, isSupportedLanguage} from "../js/some";
 import NormalTag from "./NormalTag.vue";
 
 let showBtnModal = ref(false)
@@ -127,19 +130,23 @@ const isShowBtn = computed(()=>{
   return !!(props.selected && $var.utools.subItemSelectedIndex > -1);
 })
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
-
+const isValidLanguage = computed(()=>isSupportedLanguage(props.snippet.type??'plaintext'))
+const itemCodeScrollBar = ref()
 const getSelectedStyle =(selected)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
+  if(props.index === 0){
+    $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
+  }
   if(selected){
     // 保存当前滚动距离
     if($var.utools.focused){
       return style
     }
+    $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
     return `border: 2px solid ${configManager.getGlobalColor()} !important; ${style}`;
   }else{
     return style;
   }
-
 }
 const getTitleStyle = (selected,flag) =>{
   return {
@@ -151,7 +158,8 @@ const getCodeStyle = () =>{
   return {
     fontSize: '12px',
     color: utools.isDarkColors()? '#696666':'#a4a4a4',
-    fontFamily: "'Consolas' !important"
+    fontFamily: "'Consolas' !important",
+    padding: '5px'
   }
 }
 onMounted(()=>{
@@ -200,14 +208,6 @@ const handleSetTop = ()=>{
   $var.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
   emit('itemRefresh')
 }
-/**
- *
- * @param {string} code
- * @return {*}
- */
-const  handleCode = (code)=>{
-  return code.replaceAll("\n",'↩')
-}
 </script>
 
 <style scoped>
@@ -235,7 +235,7 @@ const  handleCode = (code)=>{
 
 .n-card{
   width:98vw;
-  margin: 0 1vw 4px 1vw;
+  margin: 0 1vw 10px 1vw;
   position:relative;
   overflow: hidden;
 }
@@ -286,10 +286,10 @@ const  handleCode = (code)=>{
   animation: blink 1s 3 steps(1);
 }
 
-
 @keyframes blink{
   50% {
     background-color: transparent;
   }
 }
+
 </style>

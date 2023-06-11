@@ -63,7 +63,25 @@ const funcUtils = {
                     if(tags!=null && tags.length> 0){
                         snippet.tags = tags;
                     }
+                }else if(str.startsWith('🔖')){
+                    let tags = str.substring(2).trim().split(' ').filter(value => value.length>0);
+                    if(tags!=null && tags.length> 0){
+                        snippet.tags = tags;
+                    }
+                }else if(str.startsWith('📢')){
+                    snippet.desc = str.substring(2).trim();
+                }else if(str.startsWith('⏰')){
+                    let time =  parseInt(str.substring(2).trim());
+                    if(!isNaN(time)){
+                        snippet.time = time;
+                    }
+                }else if(str.startsWith('🎲')){
+                    let count =  parseInt(str.substring(2).trim());
+                    if(!isNaN(count)){
+                        snippet.count = count;
+                    }
                 }
+
             }else{
                 let pair = this.recongizeCodeBlock(str);
                 if(pair == null){
@@ -440,16 +458,16 @@ const codeSnippetManager = {
         for (let codeSnippet of this.codeMap.values()) {
             let str = '\n### '+codeSnippet.name+'\n';
             if(codeSnippet.desc != null){
-                str += `> desc: ${codeSnippet.desc}\n> \n`;
+                str += `> 📢 ${codeSnippet.desc}\n> \n`;
             }
             if(codeSnippet.time != null){
-                str += `> time: ${codeSnippet.time}\n> \n`;
+                str += `> ⏰ ${codeSnippet.time}\n> \n`;
             }
             if(codeSnippet.count != null){
-                str += `> count: ${codeSnippet.count}\n> \n`;
+                str += `> 🎲 ${codeSnippet.count}\n> \n`;
             }
             if(codeSnippet.tags != null && codeSnippet.tags.length > 0){
-                str += `> tags: ${codeSnippet.tags.join(' ')}\n> \n`;
+                str += `> 🔖 ${codeSnippet.tags.join(' ')}\n> \n`;
             }
             // output code
             str += "```"+(codeSnippet.type??"plaintext")+"\n"+codeSnippet.code+"\n```\n";
@@ -465,23 +483,18 @@ const codeSnippetManager = {
         while (cur < lines.length){
             // 先识别 三级标题
             let str = lines[cur].trim();
-            if(str === ''){
+            if(str === '' || !str.startsWith('### ')){
                 cur++;
                 continue;
             }
-            if(str.startsWith('### ')){
-                // 识别一个CodeSnippet
-                let result = funcUtils.recongzieCodeSnippet(lines,cur)
-                if(result.snippet != null){
-                    count++;
-                    this.add(result.snippet)
-                    cur = result.cur+1;
-                }else{
-                    msg = result;
-                    break;
-                }
+            // 识别一个CodeSnippet
+            let result = funcUtils.recongzieCodeSnippet(lines,cur)
+            if(result.snippet != null){
+                count++;
+                this.add(result.snippet)
+                cur = result.cur+1;
             }else{
-                msg = `在${cur}行发生解析错误：一个代码片段必须要以一个三级标题开始，此处不符合要求`
+                msg = result;
                 break;
             }
         }

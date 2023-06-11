@@ -13,9 +13,9 @@ const $var = reactive({
     scroll:{
         codeInvoker: null,       // 控制CodeView滚动
         listInvoker: null,       // 控制ListView滚动
+        itemCodeInvoker: null,   // 控制Item CodeView滚动
         spaceInvoker: [],      // Vim模式下空格执行的程序
-        itemOffsetArray: [],  // 元素偏移（目前根据滚动条滚动距离计算）
-        movedDistance: 0   // 滚动条滚动距离
+        itemOffsetArray: []  // 元素偏移（目前根据滚动条滚动距离计算）
     },
     // 控制当前视图
     view:{

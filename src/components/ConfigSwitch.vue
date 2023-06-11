@@ -18,11 +18,6 @@
 import {configManager} from "../js/core.js";
 
 const props = defineProps(['config','title','icon'])
-
-/**
- *
- * @type {EmitFn<string[]>} just refresh for someone,not all
- */
 const emit = defineEmits(['refresh'])
 
 const handleValue = value=>{

@@ -10,7 +10,7 @@
         ref="form"
     >
       <n-form-item label="代码片段名" path="name">
-        <n-input v-model:value="codeTemplate.name" clearable/>
+        <n-input v-model:value="codeTemplate.name" clearable autofocus/>
       </n-form-item>
       <n-form-item label="代码描述" path="desc">
         <n-input v-model:value="codeTemplate.desc" clearable />

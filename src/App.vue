@@ -1,16 +1,16 @@
 <template>
   <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
-    <n-message-provider>
-      <component :is="Tabs[$var.currentMode]"/>
-
-      <div id="extra-left" v-if="!$var.utools.focused && $var.view.fullScreenShow">
-        <vim-status-bar />
-      </div>
-      <n-drawer v-model:show="$var.view.settingActive" :width="380" placement="right">
-        <side-view @refresh="dealWithRefresh" />
-      </n-drawer>
-
-    </n-message-provider>
+    <n-notification-provider placement="bottom-right">
+      <n-message-provider>
+        <component :is="Tabs[$var.currentMode]"/>
+        <div id="extra-left" v-if="!$var.utools.focused && $var.view.fullScreenShow">
+          <vim-status-bar />
+        </div>
+        <n-drawer v-model:show="$var.view.settingActive" :width="380" placement="right">
+          <side-view @refresh="dealWithRefresh" />
+        </n-drawer>
+      </n-message-provider>
+    </n-notification-provider>
   </n-config-provider>
 </template>
 

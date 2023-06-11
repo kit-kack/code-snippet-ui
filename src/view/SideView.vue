@@ -31,13 +31,13 @@
               </n-space>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <config-switch title="启用模糊符号查询" config="enabledFuzzySymbolQuery"/>
+                  <config-switch title="💡启用模糊符号查询" config="enabledFuzzySymbolQuery"/>
                 </template>
                 启用后，忽略符号来进行匹配，例如使用ab能查询到a@b记录（忽略中间的@符号）,支持C-f来切换
               </n-tooltip>
               <n-tooltip trigger="hover">
                 <template #trigger>
-                  <config-switch title="搜索词为空时，是否不显示数据" config="noShowForEmptySearch"/>
+                  <config-switch title="💡搜索词为空时，是否不显示数据" config="noShowForEmptySearch"/>
                 </template>
                 本功能只在 列表UI模式下 生效
               </n-tooltip>
@@ -63,8 +63,19 @@
               其他设置
             </n-divider>
             <n-space vertical align="center">
-              <config-switch title="默认是否启用列表UI模式" config="enabledLiteShow"/>
-              <config-switch title="行内代码块是否不进行高亮解析" config="rawLineCode" @refresh="emit('refresh')"/>
+              <n-tooltip trigger="hover">
+                <template #trigger>
+                  <config-switch title="💡默认是否启用列表UI模式" config="enabledLiteShow"/>
+                </template>
+                这里是指初进入插件时的显示策略
+              </n-tooltip>
+              <n-tooltip trigger="hover">
+                <template #trigger>
+                  <config-switch title="💡元素代码块启用多行显示" config="fullItemCodeShow" @refresh="emit('refresh')"/>
+                </template>
+                默认元素代码块是行内块形式（其中↩代表换行符），开启该功能后将显示多行代码块（借鉴官方【备忘快贴】插件）
+              </n-tooltip>
+              <config-switch title="元素代码块是否不进行高亮解析" config="rawLineCode" @refresh="emit('refresh')"/>
               <color-picker :instance="defaultColorInstance"/>
               <n-tooltip trigger="hover">
                 <template #trigger>
@@ -103,7 +114,7 @@
         <template #icon>💻</template>
         查询代码片段，<br/>XXX对应代码片段名（模糊匹配），<br/>tag对应标签部分(可指定多个)，<br/>type对应代码片段类型；<br/>三者没有固定顺序且都可选，请以空格间隔
       </n-alert>
-      <p>&nbsp;&nbsp;&nbsp;&nbsp;为了方便键盘流操作，本插件提供了基本的Vim模式来操作，请按Tab键来切换；<br/>&nbsp;&nbsp;&nbsp;&nbsp;相关Vim模式命令查看 中间选项卡【快捷方式】<br/>&nbsp;&nbsp;&nbsp;&nbsp;同时，按下Tab键会使Utools子输入框失焦或聚焦；<br/>在子输入框聚焦时，不启用Vim模式</p>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;为了方便键盘流操作，本插件提供了基本的Vim模式来操作，请按Tab键来切换；<br/>&nbsp;&nbsp;&nbsp;&nbsp;相关Vim模式命令查看 中间选项卡【快捷方式】<br/>&nbsp;&nbsp;&nbsp;&nbsp;同时，按下Tab键会使Utools子输入框失焦或聚焦</p>
       <p>&nbsp;&nbsp;&nbsp;&nbsp;最后非常感谢大家的使用，由于本人是个前端小白，所以插件有什么问题欢迎大家反馈</p>
     </n-tab-pane>
   </n-tabs>
@@ -160,7 +171,7 @@ const defaultColorInstance = {
   }
 }
 const defaultGlobalColorInstance  = {
-  title: "全局主题 颜色",
+  title: "💡全局主题 颜色",
   color: configManager.getGlobalColor(),
   handleConfirm: v=>{
     configManager.setGlobalColor(v)

@@ -2,7 +2,6 @@
   <n-tooltip trigger="manual"
              :show="hover || (selected && show)"
               :keep-alive-on-hover="false"
-             content-style="{point-event:none;"
              :placement="$var.others.onlyOne&&!$var.view.fullScreenShow?(flag? 'right':'left'):'top'"
   >
     <template #trigger>

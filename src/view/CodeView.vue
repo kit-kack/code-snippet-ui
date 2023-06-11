@@ -27,7 +27,7 @@
               <div>{{"📢 "+snippet.desc}}</div>
             </n-list-item >
             <n-list-item  v-if="snippet.tags != null && snippet.tags.length > 0">
-              <div>{{"🚩 "+snippet.tags.join()}}</div>
+              <div>{{"🔖 "+snippet.tags.join()}}</div>
             </n-list-item >
             <n-list-item >
               <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0}`}}</div>
@@ -77,27 +77,12 @@ const handleClose = ()=>{
 }
 
 onMounted(()=>{
-    $var.scroll.codeInvoker = (direction)=>{
-      switch (direction){
-        case "left":
-          scrollBar.value.scrollBy({left: -30})
-          break;
-        case "down":
-          scrollBar.value.scrollBy({top: 30})
-          break;
-        case "up":
-          scrollBar.value.scrollBy({top: -30})
-          break;
-        case "right":
-          scrollBar.value.scrollBy({left: 30})
-          break;
-      }
-    }
+    $var.scroll.codeInvoker = scrollBar.value;
 })
 
 </script>
 
-<style scoped>
+<style >
 #extra{
   position: fixed;
   right:20px;

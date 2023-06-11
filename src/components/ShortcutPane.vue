@@ -4,7 +4,20 @@
       <n-list hoverable clickable :show-divider="false">
         <n-list-item v-for="item in data.items" >
           <div>
-            <div style="float: left;">{{item.feature}}</div>
+            <div style="float: left;">
+              <template v-if="item.tooltip">
+                <n-tooltip>
+                  <template #trigger>
+                    💡{{item.feature}}
+                  </template>
+                  {{item.tooltip}}
+                </n-tooltip>
+              </template>
+              <template v-else>
+                {{item.feature}}
+              </template>
+            </div>
+
             <div style="float: right;">
               <template v-if="Array.isArray(item.shortcut)">
                 <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
@@ -61,10 +74,12 @@ const datas = [
     title: "元素-Vim模式",
     items: [{
         feature: "上下浏览",
-        shortcut: ["J","K","↑","↓"]
+        shortcut: ["J","K","↑","↓"],
+        tooltip: '浏览多行元素代码块时请结合Shift键'
       },{
         feature: "左右浏览",
-        shortcut: ["H","L","←","→"]
+        shortcut: ["H","L","←","→"],
+        tooltip: '浏览多行元素代码块时请结合Shift键'
       },{
         feature: "预览代码片段View",
         shortcut: ["V","Space(长按)"]
@@ -83,7 +98,15 @@ const datas = [
       },{
         feature: "(取消)置顶Top",
         shortcut: "T"
-      }
+      },{
+        feature: "退出Quit",
+        shortcut: "Q",
+        tooltip: "该功能也适用于退出元素功能菜单"
+      },{
+        feature: '重置（回到开始）Reset',
+        shortcut: ["R","0"],
+        tooltip: "该功能同样适用于代码浏览，浏览多行元素代码块时请结合Shift键"
+    }
     ]
   }
 
