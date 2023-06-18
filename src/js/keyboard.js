@@ -21,19 +21,20 @@ const gotoTheLastPosition = ()=>{
         // $var.scroll.listInvoker?.(distance)
     }
 }
-const handleScrollBar =(scrollBar,direction)=>{
+const handleScrollBar =(scrollBar,direction,fast)=>{
+    const distance = fast? 50: 10;
     switch (direction){
         case "left":
-            scrollBar?.scrollBy?.({left: -10})
+            scrollBar?.scrollBy?.({left: -distance})
             break;
         case "down":
-            scrollBar?.scrollBy?.({top: 10})
+            scrollBar?.scrollBy?.({top: distance})
             break;
         case "up":
-            scrollBar?.scrollBy?.({top: -10})
+            scrollBar?.scrollBy?.({top: -distance})
             break;
         case "right":
-            scrollBar?.scrollBy?.({left: 10})
+            scrollBar?.scrollBy?.({left: distance})
             break;
         case "reset":
             scrollBar?.scrollTo?.({left:0,top:0,behavior:'smooth'})
@@ -47,6 +48,11 @@ const handleScrollBar =(scrollBar,direction)=>{
  */
 function dealWithListView(e,list){
     switch (e.code){
+        case "KeyS":
+            utools.setSubInputValue('')
+            utools.subInputFocus();
+            $var.utools.focused = true;
+            break;
         case "KeyH":
         case "ArrowLeft":
             // 校验是否有效
@@ -144,6 +150,11 @@ function dealWithListView(e,list){
         case "Space":
             if($var.utools.subItemSelectedIndex === -1){
                 if(e.repeat){
+                    if(!$var.view.fullScreenShow){
+                        $var.view.fullScreenShow = true;
+                        $var.view.recoverLiteShow= true;
+                        utools.setExpendHeight(545)
+                    }
                     $var.currentMode = CODE_VIEW;
                     longKeyDown = true;
                 }
@@ -199,19 +210,20 @@ function dealWithCodeView(e){
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
-            handleScrollBar($var.scroll.codeInvoker,"left")
+            handleScrollBar($var.scroll.codeInvoker,"left",e.shiftKey)
+
             break;
         case "KeyJ":
         case "ArrowDown":
-            handleScrollBar($var.scroll.codeInvoker,"down")
+            handleScrollBar($var.scroll.codeInvoker,"down",e.shiftKey)
             break;
         case "KeyK":
         case "ArrowUp":
-            handleScrollBar($var.scroll.codeInvoker,"up")
+            handleScrollBar($var.scroll.codeInvoker,"up",e.shiftKey)
             break;
         case "KeyL":
         case "ArrowRight":
-            handleScrollBar($var.scroll.codeInvoker,"right")
+            handleScrollBar($var.scroll.codeInvoker,"right",e.shiftKey)
             break;
         case 'KeyS':
             $var.view.showCodeTip = !$var.view.showCodeTip;
@@ -297,6 +309,8 @@ function init(list) {
             }
             lastTabTime = e.timeStamp;
             return;
+        }else if(e.code === 'Space'){
+            e.preventDefault();
         }
         // 其他键无法触发
         if ($var.utools.focused) {
@@ -341,6 +355,7 @@ function init(list) {
             e.preventDefault();
             if (longKeyDown) {
                 longKeyDown = false;
+                handleRecoverLiteShow();
                 $var.currentMode = LIST_VIEW;
                 $var.utools.keepSelectedStatus = true;
                 return;

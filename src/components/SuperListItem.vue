@@ -4,7 +4,7 @@
        @contextmenu="handleContextMenu"
        @click="handleClick"
        @dblclick="handleDoubleClick"
-       @mouseleave="showBtnModal=false;$var.view.isDel=false"
+       @mouseleave="handleMouseLeave"
   >
     <n-card
         hoverable
@@ -207,6 +207,19 @@ const handleCancelTop = ()=>{
 const handleSetTop = ()=>{
   $var.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
   emit('itemRefresh')
+}
+const handleMouseLeave = (e)=>{
+  if(showBtnModal.value){
+    if($var.others.onlyOne){
+      if(e.relatedTarget!=null){
+        if(e.relatedTarget.classList.contains("n-popover") || e.relatedTarget.classList.contains("n-popover-arrow")){
+          return;
+        }
+      }
+    }
+    showBtnModal.value=false;
+    $var.view.isDel=false
+  }
 }
 </script>
 

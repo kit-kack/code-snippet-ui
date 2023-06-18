@@ -1,8 +1,8 @@
 <template>
   <n-tooltip trigger="manual"
              :show="hover || (selected && show)"
-              :keep-alive-on-hover="false"
              :placement="$var.others.onlyOne&&!$var.view.fullScreenShow?(flag? 'right':'left'):'top'"
+             :delay="0"
   >
     <template #trigger>
       <n-button  circle

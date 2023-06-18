@@ -1,6 +1,12 @@
 <template>
   <template v-if="raw">
-    <n-tag closable id="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
+    <n-tooltip>
+      <template #trigger>
+        <n-tag closable id="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
+      </template>
+      {{tagColorManager.tags[props.content] === null? "清除标签":"清除颜色"}}
+    </n-tooltip>
+
   </template>
   <template v-else>
     <n-popover trigger="click" raw :show-arrow="false" >
@@ -58,8 +64,7 @@ const instance = {
   }
 }
 const handleClose = ()=>{
-  console.log('del tag')
-  tagColorManager.del(props.content)
+  tagColorManager.clear(props.content)
   emit('tagRefresh')
 }
 

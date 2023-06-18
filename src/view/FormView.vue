@@ -13,7 +13,7 @@
         <n-input v-model:value="codeTemplate.name" clearable autofocus/>
       </n-form-item>
       <n-form-item label="代码描述" path="desc">
-        <n-input v-model:value="codeTemplate.desc" clearable />
+        <n-input v-model:value="codeTemplate.desc" clearable/>
       </n-form-item>
       <n-form-item label="标签" path="tags">
         <n-dynamic-tags v-model:value="codeTemplate.tags">
@@ -23,6 +23,7 @@
                 filterable tag
                 @blur="submit(tempTag);tempTag=null"
                 :options="tags"
+                placeholder="请选择或输入标签"
             />
           </template>
         </n-dynamic-tags>

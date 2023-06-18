@@ -106,6 +106,9 @@ const datas = [
         feature: '重置（回到开始）Reset',
         shortcut: ["R","0"],
         tooltip: "该功能同样适用于代码浏览，浏览多行元素代码块时请结合Shift键"
+      },{
+        feature: '清空重新搜索Search',
+        shortcut: "S"
     }
     ]
   }

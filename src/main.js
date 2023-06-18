@@ -2,7 +2,7 @@ import {createApp} from 'vue'
 import './style.css'
 import App from './App.vue'
 import hljsVuePlugin from '@highlightjs/vue-plugin'
-import {codeSnippetManager, configManager, tagColorManager} from "./js/core.js";
+import {configManager, init} from "./js/core.js";
 import hljs from "highlight.js";
 import {
     create,
@@ -10,6 +10,8 @@ import {
     NButton,
     NCard,
     NCode,
+    NCollapse,
+    NCollapseItem,
     NColorPicker,
     NConfigProvider,
     NDrawer,
@@ -18,7 +20,10 @@ import {
     NForm,
     NFormItem,
     NInput,
+    NList,
+    NListItem,
     NMessageProvider,
+    NNotificationProvider,
     NPopover,
     NRadio,
     NRadioGroup,
@@ -30,15 +35,12 @@ import {
     NTabPane,
     NTabs,
     NTag,
-    NTooltip,
-    NList,NListItem,NCollapse,NCollapseItem,NNotificationProvider
+    NTooltip
 } from 'naive-ui'
 import {$var, CREATE_VIEW} from "./js/store";
 
 // init
-tagColorManager.init();
-configManager.init();
-codeSnippetManager.init()
+init()
 
 // highlight
 if(utools.isDarkColors()){
@@ -84,12 +86,16 @@ utools.onPluginEnter((data)=>{
                 $var.utools.search = text;
                 $var.utools.keepSelectedStatus = null;
                 $var.scroll.itemOffsetArray = [];
+                // fix: 修复删除界面不移除
+                $var.view.isDel = false;
             }
         }
     },"搜索代码片段, 双击Tab切换UI模式")
     if(data.type==='over'){
         $var.currentMode = CREATE_VIEW;
         $var.others.code = data.payload;
+        // fix: liteShow模式下高度统一
+        utools.setExpendHeight(545)
     }
 })
 

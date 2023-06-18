@@ -12,7 +12,7 @@
             </n-divider>
             <n-space vertical align="center">
               <div>
-                当前共有{{codeSnippetManager.codeMap.size}}条数据，点击<n-button  quaternary type="info" size="small" @click="handleExport" :color="configManager.getGlobalColor()">导出</n-button>
+                当前共有{{codeSnippetManager.codeMap.size}}条数据，可以被 <n-button  quaternary type="info" size="small" @click="handleExport" :color="configManager.getGlobalColor()">导出</n-button>
               </div>
               <div>
                 当然你也可以<n-button  quaternary type="info" size="small" @click="handleImport" :color="configManager.getGlobalColor()">导入</n-button>数据，注意要符合格式哦!
@@ -88,9 +88,14 @@
           </n-tab-pane>
           <n-tab-pane :name="2" tab="清理">
             <n-scrollbar style="max-height: 80vh">
-              <n-divider title-placement="center">
-                清除自定义标签关联颜色
-              </n-divider>
+              <n-tooltip>
+                <template #trigger>
+                  <n-divider title-placement="center">
+                    💡清除自定义标签（若有关联颜色先清除颜色）
+                  </n-divider>
+                </template>
+                自定义标签被清除后，只会影响到创建/更新 代码片段的表单界面中的标签选择
+              </n-tooltip>
               <template v-if="refreshStatus">
                 <n-space>
                   <normal-tag raw v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithRefresh"/>
@@ -125,12 +130,13 @@ import {NDivider} from 'naive-ui'
 import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import ColorPicker from "../components/ColorPicker.vue";
-import {nextTick, ref} from "vue";
+import {computed, nextTick, ref} from "vue";
 import ShortcutPane from "../components/ShortcutPane.vue";
 import NormalTag from "../components/NormalTag.vue";
 
 const emit = defineEmits(['refresh'])
 const refreshStatus = ref(true)
+const tags = computed(()=>tagColorManager.all())
 const dealWithRefresh = ()=>{
   refreshStatus.value = false;
   emit('refresh')
