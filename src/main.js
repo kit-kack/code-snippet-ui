@@ -102,6 +102,26 @@ utools.onPluginEnter((data)=>{
 const app = createApp(App)
 app.use(hljsVuePlugin)
 app.use(naive)
+app.directive("code", {
+    mounted(el) {
+        //获取代码片段
+        let code = el.querySelector('code.hljs')?.innerHTML;
+        let collection = code.split('\n');
+        let size = collection.length;
+        if(collection[collection.length -1].trim() === ''){
+            size --;
+        }
+        //插入行数
+        let ul = document.createElement('ul')
+        for (let i = 1; i <= size; i++) {
+            let li = document.createElement('li')
+            li.innerText = i + ''
+            ul.appendChild(li)
+        }
+        ul.classList.add('hljs-code-number')
+        el.prepend(ul)
+    }
+})
 app.mount('#app')
 
 

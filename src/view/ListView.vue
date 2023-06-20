@@ -1,5 +1,7 @@
 <template>
-  <div v-if="$var.view.refresh">
+  <div v-if="$var.view.refresh" :style="{
+    cursor: ($var.view.cursorShow)? '': 'none'
+  }" @mousemove="$var.view.cursorShow = true">
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" ref="scrollBar">
         <div ref="listViewAspect">
@@ -42,40 +44,59 @@
       </n-result>
     </template>
 
-    <div id="extra" v-if="$var.view.fullScreenShow">
-      <n-space vertical>
+    <div id="extra" v-if="$var.view.fullScreenShow" @mouseenter="expanded = true" @mouseleave="expanded = false">
+      <template v-if="expanded || $var.view.buttonFixed">
+        <n-space vertical style="padding-bottom: 6px">
+          <n-tooltip trigger="hover" placement="left">
+            <template #trigger>
+              <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()">
+                <template #icon>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 13h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V6c0-.55.45-1 1-1s1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1z" fill="currentColor"></path></svg>
+                </template>
+              </n-button>
+            </template>
+            添加代码片段
+          </n-tooltip>
+
+          <n-tooltip trigger="hover" placement="left" >
+            <template #trigger>
+              <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()" @click="$var.view.settingActive = true">
+                <template #icon>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 7h9v2h-9zm0 8h9v2h-9zm3-4h6v2h-6zm-3 1L8 7v4H2v2h6v4z" fill="currentColor"></path></svg>
+                </template>
+              </n-button>
+            </template>
+            查看更多
+          </n-tooltip>
+          <n-tooltip trigger="hover" placement="left">
+            <template #trigger>
+              <n-button strong circle secondary type="primary"  :color="configManager.getGlobalColor()"  @contextmenu="$var.view.buttonFixed = !$var.view.buttonFixed" @click="refreshListView()">
+                <template #icon>
+                  <template v-if="$var.view.buttonFixed">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M21.25 7.5a.75.75 0 0 1 .743.648L22 8.25v8.5a3.25 3.25 0 0 1-3.066 3.245L18.75 20H6.061l.72.72a.75.75 0 0 1 .072.976l-.073.084a.75.75 0 0 1-.976.073l-.084-.073l-2-2l-.064-.072a1.213 1.213 0 0 1-.007-.01l.07.082a.753.753 0 0 1-.127-.89a.775.775 0 0 1 .128-.17l2-2a.75.75 0 0 1 1.133.976l-.073.084l-.72.72h12.69a1.75 1.75 0 0 0 1.744-1.607l.006-.143v-8.5a.75.75 0 0 1 .75-.75zm-3.054-5.353l.084.073l2 2a.75.75 0 0 1 .071.081l-.07-.081a.752.752 0 0 1 .004 1.056l-.005.004l-2 2a.75.75 0 0 1-1.133-.976l.073-.084l.718-.72H5.25a1.75 1.75 0 0 0-1.744 1.606L3.5 7.25v8.5a.75.75 0 0 1-1.493.102L2 15.75v-8.5a3.25 3.25 0 0 1 3.066-3.245L5.25 4h12.689l-.72-.72a.75.75 0 0 1-.072-.976l.073-.084a.75.75 0 0 1 .976-.073zM12 8a4 4 0 1 1 0 8a4 4 0 0 1 0-8z" fill="currentColor"></path></g></svg>
+                  </template>
+                  <template v-else>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 20 20"><g fill="none"><path d="M14.854 2.146a.5.5 0 0 0-.708.708L15.293 4H4a2 2 0 0 0-2 2v6.5a.5.5 0 0 0 1 0V6a1 1 0 0 1 1-1h11.293l-1.147 1.146a.5.5 0 0 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2zM16 15a1 1 0 0 0 1-1V7.5a.5.5 0 0 1 1 0V14a2 2 0 0 1-2 2H4.707l1.147 1.146a.5.5 0 0 1-.708.708l-2-2a.5.5 0 0 1 0-.708l2-2a.5.5 0 0 1 .708.708L4.707 15H16zm-3-5a3 3 0 1 1-6 0a3 3 0 0 1 6 0zm-1 0a2 2 0 1 0-4 0a2 2 0 0 0 4 0z" fill="currentColor"></path></g></svg>
+                  </template>
+                </template>
+              </n-button>
+            </template>
+            左击刷新，右击{{$var.view.buttonFixed? '取消固定':'固定'}}
+          </n-tooltip>
+        </n-space>
+      </template>
+      <template v-else>
         <n-tooltip trigger="hover" placement="left">
           <template #trigger>
-            <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()" @click="$var.currentMode = CREATE_VIEW" >
+            <n-button strong circle type="primary" quaternary :color="configManager.getGlobalColor()" @click="expanded = true" >
               <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 13h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V6c0-.55.45-1 1-1s1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1z" fill="currentColor"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6z" fill="currentColor"></path></svg>
               </template>
             </n-button>
           </template>
-          添加代码片段
+          展开
         </n-tooltip>
-
-        <n-tooltip trigger="hover" placement="left" >
-          <template #trigger>
-            <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()" @click="$var.view.settingActive = true">
-              <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 7h9v2h-9zm0 8h9v2h-9zm3-4h6v2h-6zm-3 1L8 7v4H2v2h6v4z" fill="currentColor"></path></svg>
-              </template>
-            </n-button>
-          </template>
-          查看更多
-        </n-tooltip>
-        <n-tooltip trigger="hover" placement="left" >
-          <template #trigger>
-            <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()" @click="refreshListView()">
-              <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"></path></svg>
-              </template>
-            </n-button>
-          </template>
-          刷新
-        </n-tooltip>
-      </n-space>
+      </template>
     </div>
   </div>
 </template>
@@ -94,7 +115,8 @@ const scrollBar = ref()
 const listViewAspect = ref()
 window.$message = useMessage();
 const list = computed(()=>parseSearchWord($var.utools.search,$var.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
-
+const expanded = ref(false)
+const fixed = ref(false)
 const handleEdit = (name)=>{
   $var.currentName = name;
   $var.currentMode = UPDATE_VIEW;
@@ -197,6 +219,8 @@ onUpdated(()=>{
 #extra{
   position: fixed;
   right:20px;
-  top:75vh;
+  bottom: 6px;
+  z-index: 20;
+  text-align: center;
 }
 </style>

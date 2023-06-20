@@ -47,7 +47,13 @@ const handleScrollBar =(scrollBar,direction,fast)=>{
  * Only ListView
  */
 function dealWithListView(e,list){
+    // vim操作下隐藏鼠标
+    $var.view.cursorShow = false;
     switch (e.code){
+        case "Slash":
+            $var.view.fullScreenShow = true;
+            $var.view.settingActive = true;
+            break;
         case "KeyS":
             utools.setSubInputValue('')
             utools.subInputFocus();
@@ -300,6 +306,7 @@ function init(list) {
             } else {
                 if ($var.utools.focused && $var.utools.selectedIndex > -1) {
                     $var.utools.focused = false;
+                    $var.view.cursorShow = false;
                     utools.subInputBlur();
                     gotoTheLastPosition();
                 } else {

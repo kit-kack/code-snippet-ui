@@ -65,7 +65,7 @@ defineProps(["type","count","time"])
   background-color: #fc6057;
   border-radius: 50%;
   margin-left: 2px;
-  margin-right: 5.5px;
+  margin-right: 2px;
 }
 .green{
   background-color: #31c648;

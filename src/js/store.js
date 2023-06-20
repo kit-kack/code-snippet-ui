@@ -25,7 +25,9 @@ const $var = reactive({
         isDel: false,             // 当前是否为 删除操作
         recoverLiteShow: false,   // 是否恢复为 列表UI
         recoverLiteHeight: 0,      // 恢复为列表UI的高度
-        refresh: true              // 控制刷新
+        refresh: true,              // 控制刷新
+        cursorShow: true,
+        buttonFixed: false
     },
     // 控制utool及Vim模式
     utools:{

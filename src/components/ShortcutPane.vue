@@ -1,5 +1,5 @@
 <template>
-  <n-collapse  style="padding-top: 10px" :default-expanded-names="['0','1','2']">
+  <n-collapse  style="padding-top: 10px;padding-bottom: 10px;" :default-expanded-names="['0','1','2','3','4']">
     <n-collapse-item v-for="(data,index) in datas" :title="data.title" :name="index+''" :key="index">
       <n-list hoverable clickable :show-divider="false">
         <n-list-item v-for="item in data.items" >
@@ -71,19 +71,8 @@ const datas = [
       }]
   },
   {
-    title: "元素-Vim模式",
+    title: "元素-Vim模式(通用)",
     items: [{
-        feature: "上下浏览",
-        shortcut: ["J","K","↑","↓"],
-        tooltip: '浏览多行元素代码块时请结合Shift键'
-      },{
-        feature: "左右浏览",
-        shortcut: ["H","L","←","→"],
-        tooltip: '浏览多行元素代码块时请结合Shift键'
-      },{
-        feature: "预览代码片段View",
-        shortcut: ["V","Space(长按)"]
-      },{
         feature: "编辑Edit",
         shortcut: "E"
       },{
@@ -93,12 +82,6 @@ const datas = [
         feature: "粘贴Paste",
         shortcut: ["Enter","P"]
       },{
-        feature: "删除Delete",
-        shortcut: ["D","X"]
-      },{
-        feature: "(取消)置顶Top",
-        shortcut: "T"
-      },{
         feature: "退出Quit",
         shortcut: "Q",
         tooltip: "该功能也适用于退出元素功能菜单"
@@ -106,9 +89,45 @@ const datas = [
         feature: '重置（回到开始）Reset',
         shortcut: ["R","0"],
         tooltip: "该功能同样适用于代码浏览，浏览多行元素代码块时请结合Shift键"
-      },{
-        feature: '清空重新搜索Search',
-        shortcut: "S"
+      }
+    ]
+  },
+  {
+    title: '元素-Vim模式（主界面)',
+    items: [{
+      feature: "上下浏览",
+      shortcut: ["J","K","↑","↓"],
+      tooltip: '浏览多行元素代码块时请结合Shift键'
+    },{
+      feature: "左右浏览（菜单/代码)",
+      shortcut: ["H","L","←","→"],
+      tooltip: '浏览多行元素代码块时请结合Shift键'
+    },{
+      feature: "预览代码片段View",
+      shortcut: ["V","Space(长按)"]
+    },{
+      feature: "删除Delete",
+      shortcut: ["D","X"]
+    },{
+      feature: "(取消)置顶Top",
+      shortcut: "T"
+    },{
+      feature: '清空重新搜索Search',
+      shortcut: "S"
+    },{
+      feature: '查看更多',
+      shortcut: '/'
+    }]
+  },
+  {
+    title: '元素-Vim模式（代码预览界面)',
+    items: [{
+      feature: "查看代码片段说明Show",
+      shortcut: 'S'
+    },{
+      feature: "上下左右浏览",
+      shortcut: ["H","J","K","L","←","↑","↓","→"],
+      tooltip: "结合Shift键使用，滚动更快哦"
     }
     ]
   }

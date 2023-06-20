@@ -5,14 +5,14 @@
        @click="handleClick"
        @dblclick="handleDoubleClick"
        @mouseleave="handleMouseLeave"
+       @mouseenter="isHover = true"
   >
     <n-card
-        hoverable
         embedded
         size="small"
         content-style="padding: 0 10px"
         header-style="height:28px;"
-        :style="getSelectedStyle(props.selected)"
+        :style="getSelectedStyle(props.selected,isHover&&$var.view.cursorShow)"
     >
       <div class="circle"
            :style="{
@@ -40,14 +40,14 @@
                 </n-space>
               </template>
               <template v-else>
-                <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
+                <inlaid-tag :type="snippet.type??'plaintext'" :count="snippet.count" :time="snippet.time"/>
               </template>
             </div>
           </n-scrollbar>
         </div>
       </template>
       <template v-if="flag">
-        <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
+        <inlaid-tag :type="snippet.type??'plaintext'" :count="snippet.count" :time="snippet.time"/>
       </template>
       <template v-else>
         <n-space>
@@ -132,20 +132,24 @@ const isShowBtn = computed(()=>{
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
 const isValidLanguage = computed(()=>isSupportedLanguage(props.snippet.type??'plaintext'))
 const itemCodeScrollBar = ref()
-const getSelectedStyle =(selected)=>{
+let isHover = ref(false)
+const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
+  if(isHoverRef){
+    style = utools.isDarkColors()? 'backgroundColor: #3a3a3c' : 'background: linear-gradient(108deg,#eee,#fafafc) no-repeat'
+  }
   if(props.index === 0){
     $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
   }
   if(selected){
     // 保存当前滚动距离
     if($var.utools.focused){
-      return style
+      return `border: 2px solid rgba(128,128,128,.1) !important; ${style}`
     }
     $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
     return `border: 2px solid ${configManager.getGlobalColor()} !important; ${style}`;
   }else{
-    return style;
+    return`border: 2px solid rgba(128,128,128,.1) !important; ${style}`;
   }
 }
 const getTitleStyle = (selected,flag) =>{
@@ -220,6 +224,7 @@ const handleMouseLeave = (e)=>{
     showBtnModal.value=false;
     $var.view.isDel=false
   }
+  isHover.value = false;
 }
 </script>
 
@@ -231,7 +236,7 @@ const handleMouseLeave = (e)=>{
   position: absolute;
   top:0;
   left:0;
-  z-index: 1231;
+  z-index: 10;
   height: 100%;
   width: 98vw;
   overflow: auto;
@@ -257,6 +262,7 @@ const handleMouseLeave = (e)=>{
 
 #left{
   max-width: 400px;
+  z-index: 20;
 }
 #small{
   margin-left: 10px;

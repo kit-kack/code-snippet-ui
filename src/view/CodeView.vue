@@ -1,14 +1,22 @@
 <template>
 
-  <div @contextmenu=" handleClose()">
+  <div @contextmenu=" handleClose()" id="code-view">
+
     <n-scrollbar style="max-height: 100vh" x-scrollable trigger="hover" ref="scrollBar">
-      <template v-if="isValidLanguage">
-        <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
-      </template>
-      <template v-else>
-        <highlightjs  autodetect :code="snippet.code" width="100%"/>
-      </template>
+      <div class="hljs-container" v-code>
+        <template v-if="isValidLanguage">
+
+          <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
+
+        </template>
+        <template v-else>
+          <highlightjs  autodetect :code="snippet.code" width="100%"/>
+        </template>
+      </div>
+      <div class="bottom"></div>
     </n-scrollbar>
+
+
     <div id="extra">
       <n-space>
         <n-popover trigger="hover" :show="hover || $var.view.showCodeTip" placement="top" :show-arrow="false" style="padding:5px">
@@ -86,10 +94,68 @@ onMounted(()=>{
 #extra{
   position: fixed;
   right:20px;
-  top:90vh;
+  bottom: 12px;
 }
 .n-list-item{
   height: 32px;
   padding: 0 5px
 }
+#code-view pre{
+  width: 100%;
+  padding-left: 3px;
+}
+
+#code-view pre code.hljs::selection{
+  background-color: rgba(0,0,0,.1) !important;
+}
+#code-view pre code.hljs span::selection{
+  background-color: rgba(0,0,0,.1) !important;
+}
+#dark-app #code-view pre code.hljs::selection{
+  background-color: rgba(255,255,255,.3) !important;
+}
+#dark-app #code-view pre code.hljs span::selection{
+  background-color: rgba(255,255,255,.3) !important;
+}
+#code-view code.hljs{
+  background-color: #fff;
+}
+#dark-app #code-view code.hljs{
+  background-color: #303133;
+}
+/* 语法高亮 */
+.hljs-container {
+  display: flex;
+  padding-top: 4px;
+  padding-bottom: 8px;
+}
+.bottom{
+  height: 40px;
+  width: 100%;
+}
+
+/** 行数样式 */
+.hljs-code-number {
+  padding: 0 6px 0 3px;
+  color: #888;
+  font-size: 14px;
+  list-style: none;
+  border-right: 1px solid #dcdfe5;
+
+  user-select:none;
+}
+#dark-app .hljs-code-number{
+  border-right-color:  #3a3c41;
+}
+.hljs-code-number :first-child{
+  margin-top: 0;
+}
+.hljs-code-number li{
+  height: 17px;
+  text-align: right;
+  //line-height: 1.6;
+  margin-top: 5.4px;
+}
+
+
 </style>
