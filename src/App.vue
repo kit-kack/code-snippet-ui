@@ -1,24 +1,19 @@
 <template>
-  <div :id="theme? 'dark-app': 'light-app' "  >
-    <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
-      <n-notification-provider placement="bottom-right">
-        <n-message-provider>
-          <component :is="Tabs[$var.currentMode]"/>
-          <vim-status-bar/>
-          <n-drawer v-model:show="$var.view.settingActive" :width="380" placement="right">
-            <side-view @refresh="dealWithRefresh" />
-          </n-drawer>
-        </n-message-provider>
-      </n-notification-provider>
-    </n-config-provider>
-  </div>
+  <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
+    <n-notification-provider placement="bottom-right">
+      <n-message-provider>
+        <component :is="Tabs[$var.currentMode]"/>
+        <vim-status-bar/>
+        <n-drawer v-model:show="$var.view.settingActive" :width="380" placement="right">
+          <side-view @refresh="dealWithRefresh" />
+        </n-drawer>
+      </n-message-provider>
+    </n-notification-provider>
+  </n-config-provider>
 </template>
 
 <script setup>
 import ListView from "./view/ListView.vue";
-import {ref} from "vue";
-import {configManager} from "./js/core.js";
-import {darkTheme} from 'naive-ui'
 import hljs from "highlight.js/lib/common";
 import SideView from "./view/SideView.vue";
 import CodeView from "./view/CodeView.vue";
@@ -26,39 +21,38 @@ import VimStatusBar from "./components/VimStatusBar.vue";
 import FormView from "./view/FormView.vue";
 import {$var} from "./js/store"
 import {refreshListView} from "./js/some";
+import CustomView from "./view/CustomView.vue";
+import {
+  colorSchemaStyleOptions,
+  darkColorSchemaStyleOptions,
+  globalThemeRefresh,
+  theme,
+  themeOverrides
+} from "./js/theme";
+import {onMounted} from "vue";
+import {configManager} from "./js/core";
 
-const theme = utools.isDarkColors()? darkTheme:null;
-const themeOverrides = ref({
-  Card:{
-    boxShadow:'0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px '+configManager.getGlobalColor()
-  },
-  Switch:{
-    railColorActive: configManager.getGlobalColor()
-  },
-  Tooltip:{
-    color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
-    textColor: utools.isDarkColors()? '#fafafc':'#2a2a2c'
-  }
-})
 const Tabs = [
-    ListView,CodeView,FormView,FormView
+    ListView,CodeView,FormView,FormView,CustomView
 ]
 
 const dealWithRefresh = ()=>{
-  themeOverrides.value = {
-    Card:{
-      boxShadow:'0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px '+configManager.getGlobalColor(),
-    },
-    Switch:{
-      railColorActive: configManager.getGlobalColor()
-    },
-    Tooltip:{
-      color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
-      textColor: utools.isDarkColors()? '#fafafc':'#2a2a2c'
-    }
-  }
+  globalThemeRefresh()
   refreshListView()
 }
+onMounted(()=>{
+  if(configManager.get("colorSchema") === undefined){
+    configManager.configs["colorSchema"] = 0
+    configManager.configs["lightGlobalColor"] = colorSchemaStyleOptions[0].globalColor
+    configManager.configs["darkGlobalColor"] = darkColorSchemaStyleOptions[0].globalColor
+    configManager.configs["lightTagColor"] = colorSchemaStyleOptions[0].tagColor
+    configManager.configs["darkTagColor"] = darkColorSchemaStyleOptions[0].tagColor
+    configManager.configs["lightSelectedColor"] = colorSchemaStyleOptions[0].selectedColor
+    configManager.configs["darkSelectedColor"] = darkColorSchemaStyleOptions[0].selectedColor
+    configManager.writeToDB()
+  }
+  document.body.id =  theme? 'dark-app': 'light-app';
+})
 
 </script>
 

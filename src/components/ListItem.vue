@@ -54,14 +54,12 @@
           <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
         </n-space>
       </template>
-      <n-ellipsis style="max-width: 98%" :tooltip="false" >
-        <template v-if="configManager.get('rawLineCode')">
-          <span  :style="getCodeStyle()">{{handleCode(snippet.code)}}</span>
-        </template>
-        <template v-else>
-          <n-code :code="handleCode(snippet.code)" :language="snippet.type"   inline :style="getCodeStyle()" />
-        </template>
-      </n-ellipsis>
+      <template v-if="configManager.get('fullItemCodeShow')">
+        <multi-line-code :type="snippet.type" :code="snippet.code" :active="index===0 || selected"/>
+      </template>
+      <template v-else>
+        <single-line-code :type="snippet.type" :code="snippet.code"/>
+      </template>
     </n-card>
 
     <transition>
@@ -116,9 +114,11 @@ import SelectableButton from "./SelectableButton.vue";
 import {$var} from "../js/store";
 import {handleCopy} from "../js/some";
 import NormalTag from "./NormalTag.vue";
+import SingleLineCode from "./item/SingleLineCode.vue";
+import MultiLineCode from "./item/MultiLineCode.vue";
 
 let showBtnModal = ref(false)
-const props = defineProps(['snippet','selected','index'])
+const props = defineProps(['snippet','selected','index','debug'])
 const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
 const flag = configManager.get('shiftTagPosition')
 const item = ref()
@@ -134,9 +134,10 @@ let topIndex = configManager.getTopList().indexOf(props.snippet.name)
 const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
   if(isHoverRef){
-    style = utools.isDarkColors()? 'backgroundColor: #3a3a3c' : 'background: linear-gradient(108deg,#eee,#fafafc) no-repeat'
+    style = utools.isDarkColors()? 'backgroundColor: #3a3a3c' : 'background-color: #f5f5f5'
   }
   if(selected){
+    style = `background: ${configManager.getColor('SelectedColor')}`
     // 保存当前滚动距离
     if($var.utools.focused){
       return `border: 2px solid transparent !important; ${style};`
@@ -145,20 +146,12 @@ const getSelectedStyle =(selected,isHoverRef)=>{
   }else{
     return `border: 2px solid transparent !important; ${style}`;
   }
-
 }
 const getTitleStyle = (selected,flag) =>{
   return {
     color: selected? configManager.getGlobalColor():(utools.isDarkColors()?'#E0E0E0':'#505050'),
     fontWeight: flag?'bold':'normal',
     'zIndex': 20
-  }
-}
-const getCodeStyle = () =>{
-  return {
-    fontSize: '12px',
-    color: utools.isDarkColors()? '#696666':'#a4a4a4',
-    fontFamily: "'Consolas' !important"
   }
 }
 onMounted(()=>{
@@ -204,17 +197,13 @@ const handleCancelTop = ()=>{
   emit('itemRefresh')
 }
 const handleSetTop = ()=>{
+  if(props.debug){
+    return;
+  }
   $var.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
   emit('itemRefresh')
 }
-/**
- *
- * @param {string} code
- * @return {*}
- */
-const  handleCode = (code)=>{
-  return code.replaceAll("\n",'↩')
-}
+
 const handleMouseLeave = (e)=>{
   if(showBtnModal.value){
     if($var.others.onlyOne){
@@ -229,9 +218,7 @@ const handleMouseLeave = (e)=>{
   }
   isHover.value = false;
 }
-const handleContextMenuWithoutVim = ()=>{
-  handleContextMenu()
-}
+
 </script>
 
 <style scoped>
@@ -256,6 +243,10 @@ const handleContextMenuWithoutVim = ()=>{
   -webkit-backdrop-filter: saturate(180%) blur(5px)!important;
   /* 磨砂的背景颜色 */
   background: rgba(228,237,250,.1)!important;
+}
+#dark-app #child{
+  /* 磨砂的背景颜色 */
+  background: rgba(255,255,255,.1)!important;
 }
 
 .n-card{

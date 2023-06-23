@@ -35,7 +35,9 @@ import {
     NTabPane,
     NTabs,
     NTag,
-    NTooltip
+    NTooltip,
+    NDivider,
+    NPopselect
 } from 'naive-ui'
 import {$var, CREATE_VIEW} from "./js/store";
 
@@ -57,7 +59,7 @@ const naive = create({
         NSpace,NButton,NTag,
         NTooltip, NDrawer, NResult, NTabPane, NTabs, NFormItem,NForm, NSwitch,NScrollbar,
         NCard,NCode,NEllipsis, NPopover, NColorPicker,NInput,NSelect,NDynamicTags,NAlert,NRadio,
-        NRadioGroup,NList,NListItem,NCollapse,NCollapseItem,NNotificationProvider
+        NRadioGroup,NList,NListItem,NCollapse,NCollapseItem,NNotificationProvider,NDivider,NPopselect
     ]
 })
 

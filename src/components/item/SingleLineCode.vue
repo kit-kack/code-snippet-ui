@@ -12,6 +12,7 @@
 <script setup>
 
 import {configManager} from "../../js/core";
+
 const getCodeStyle = () =>{
   return {
     fontSize: '12px',

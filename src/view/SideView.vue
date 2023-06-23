@@ -2,11 +2,11 @@
   <n-tabs  animated  :default-value="0" justify-content="space-evenly"
           pane-style="padding-top:5px" type="segment"
   >
-    <n-tab-pane :name="0" tab="设置">
+    <n-tab-pane :name="0" tab="基本">
         <n-tabs type="segment"
                 pane-style="height:calc(100vh - 95px)"
                 placement="bottom" animated  :default-value="0" justify-content="space-evenly" >
-          <n-tab-pane :name="0" tab="基本设置">
+          <n-tab-pane :name="0" tab="设置">
             <n-divider title-placement="center">
               数据导出导入
             </n-divider>
@@ -29,35 +29,20 @@
                           :default-value="configManager.getSortKey()"
                           @update:value="handleSortStrategy"/>
               </n-space>
-              <n-tooltip trigger="hover">
-                <template #trigger>
-                  <config-switch title="💡启用模糊符号查询" config="enabledFuzzySymbolQuery"/>
-                </template>
-                启用后，忽略符号来进行匹配，例如使用ab能查询到a@b记录（忽略中间的@符号）,支持C-f来切换
-              </n-tooltip>
-              <n-tooltip trigger="hover">
-                <template #trigger>
-                  <config-switch title="💡搜索词为空时，是否不显示数据" config="noShowForEmptySearch"/>
-                </template>
-                本功能只在 列表UI模式下 生效
-              </n-tooltip>
-            </n-space>
-            <n-divider title-placement="center">
-              其他设置
-            </n-divider>
-            <n-space vertical align="center">
-              <config-switch title="粘贴后插件是否退出" config="exitAfterPaste"/>
-              <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
-              <config-switch title="点击元素是否自动进入Vim模式" config="enabledAutoVim"/>
-              <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
-            </n-space>
-          </n-tab-pane>
-          <n-tab-pane :name="1" tab="个性化设置">
-            <n-divider title-placement="center">
-              内置标签 控制显示
-            </n-divider>
-            <n-space vertical align="center">
-              <config-switch @refresh="emit('refresh')"   v-for="it in inlaidTags" :title="it.title" :icon="it.icon" :config="it.config"/>
+              <n-space>
+                <n-tooltip trigger="hover">
+                  <template #trigger>
+                    <config-check-tag title="💡启用模糊符号查询" config="enabledFuzzySymbolQuery"/>
+                  </template>
+                  启用后，忽略符号来进行匹配，例如使用ab能查询到a@b记录（忽略中间的@符号）,支持C-f来切换
+                </n-tooltip>
+                <n-tooltip trigger="hover">
+                  <template #trigger>
+                    <config-check-tag title="💡搜索词为空时，是否不显示数据" config="noShowForEmptySearch"/>
+                  </template>
+                  本功能只在 列表UI模式下 生效
+                </n-tooltip>
+              </n-space>
             </n-space>
             <n-divider title-placement="center">
               其他设置
@@ -69,24 +54,24 @@
                 </template>
                 这里是指初进入插件时的显示策略
               </n-tooltip>
-              <n-tooltip trigger="hover">
+              <config-switch title="粘贴后插件是否退出" config="exitAfterPaste"/>
+              <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
+              <config-switch title="点击元素是否自动进入Vim模式" config="enabledAutoVim"/>
+              <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
+              <n-tooltip placement="left">
                 <template #trigger>
-                  <config-switch title="💡元素代码块启用多行显示" config="fullItemCodeShow" @refresh="emit('refresh')"/>
+                  <n-button id="diy" circle @click="$var.currentMode = CUSTOM_VIEW;$var.view.settingActive = false">
+                    <template #icon>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M224 96l16-32l32-16l-32-16l-16-32l-16 32l-32 16l32 16l16 32zM80 160l26.66-53.33L160 80l-53.34-26.67L80 0L53.34 53.33L0 80l53.34 26.67L80 160zm352 128l-26.66 53.33L352 368l53.34 26.67L432 448l26.66-53.33L512 368l-53.34-26.67L432 288zm70.62-193.77L417.77 9.38C411.53 3.12 403.34 0 395.15 0c-8.19 0-16.38 3.12-22.63 9.38L9.38 372.52c-12.5 12.5-12.5 32.76 0 45.25l84.85 84.85c6.25 6.25 14.44 9.37 22.62 9.37c8.19 0 16.38-3.12 22.63-9.37l363.14-363.15c12.5-12.48 12.5-32.75 0-45.24zM359.45 203.46l-50.91-50.91l86.6-86.6l50.91 50.91l-86.6 86.6z" fill="currentColor"></path></svg>
+                    </template>
+                  </n-button>
                 </template>
-                默认元素代码块是行内块形式（其中↩代表换行符），开启该功能后将显示多行代码块（借鉴官方【备忘快贴】插件）
+                个性化定制
               </n-tooltip>
-              <config-switch title="元素代码块是否不进行高亮解析" config="rawLineCode" @refresh="emit('refresh')"/>
-              <color-picker :instance="defaultColorInstance"/>
-              <n-tooltip trigger="hover">
-                <template #trigger>
-                  <color-picker :instance="defaultGlobalColorInstance"/>
-                </template>
-                亮色和暗色场景下独立保存，互不影响
-              </n-tooltip>
-            </n-space>
 
+            </n-space>
           </n-tab-pane>
-          <n-tab-pane :name="2" tab="清理">
+          <n-tab-pane :name="1" tab="清理">
             <n-scrollbar style="max-height: 80vh">
               <n-tooltip>
                 <template #trigger>
@@ -126,13 +111,13 @@
 </template>
 
 <script setup>
-import {NDivider} from 'naive-ui'
 import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
-import ColorPicker from "../components/ColorPicker.vue";
 import {computed, nextTick, ref} from "vue";
 import ShortcutPane from "../components/ShortcutPane.vue";
 import NormalTag from "../components/NormalTag.vue";
+import {$var, CUSTOM_VIEW} from "../js/store";
+import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 
 const emit = defineEmits(['refresh'])
 const refreshStatus = ref(true)
@@ -168,48 +153,6 @@ const handleSortStrategy = (v)=>{
   emit('refresh')
 }
 
-const defaultColorInstance = {
-  title: "自定义标签 默认颜色",
-  color: configManager.getDefaultColor(),
-  handleConfirm: v=>{
-    configManager.set("defaultColor",v)
-    emit('refresh')
-  }
-}
-const defaultGlobalColorInstance  = {
-  title: "💡全局主题 颜色",
-  color: configManager.getGlobalColor(),
-  handleConfirm: v=>{
-    configManager.setGlobalColor(v)
-    emit('refresh')
-  }
-}
-
-const  inlaidTags= [
-  {
-    title:"最近使用时间",
-    icon:"⏰",
-    config:"showTimeTag"
-  },
-  {
-    title:"累计使用次数",
-    icon:"🎲",
-    config:"showCountTag"
-  },
-  {
-    title:"代码片段类型",
-    icon:"🚀",
-    config:"showLanguageTag"
-  },
-  {
-    title: "标签位置切换",
-    config: "shiftTagPosition"
-  },
-  {
-    title: "换个图标看看",
-    config: "showTagIcon"
-  }
-];
 const handleExport = ()=>{
   const realPath = utools.showSaveDialog({
     title: 'code-snippet文件保存位置',
@@ -254,5 +197,10 @@ const handleImport = ()=>{
 }
 .n-divider{
   height: 12px;
+}
+#diy{
+  position: absolute;
+  right:2px;
+  bottom:2px;
 }
 </style>

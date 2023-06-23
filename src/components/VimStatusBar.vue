@@ -24,8 +24,6 @@
 </template>
 
 <script setup>
-
-
 import {configManager} from "../js/core.js";
 import {$var, CODE_VIEW} from "../js/store";
 const getBtnStyle = ()=>{

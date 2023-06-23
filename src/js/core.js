@@ -1,7 +1,6 @@
 // 全局便利常量和函数
 
 const utools = window.utools;
-const setDBItem = utools.dbStorage.setItem
 const getDBItem = utools.dbStorage.getItem
 const removeDBItem = utools.dbStorage.removeItem
 
@@ -405,7 +404,6 @@ const codeSnippetManager = {
         if(this.codeMap.has(codeSnippet.name)){
             funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.name,codeSnippet)
             this.codeMap.set(codeSnippet.name,codeSnippet)
-            console.log(codeSnippet)
             this.addTagInfo(codeSnippet,true)
             return true;
         }else{
@@ -580,7 +578,7 @@ const tagColorManager={
      * @return {string} - color string
      */
     get(tag){
-        return this.tags[tag]?? configManager.getDefaultColor();
+        return this.tags[tag]?? configManager.getColor('TagColor');
     },
     update(tag,color){
         this.tags[tag] = color;
@@ -593,10 +591,6 @@ const tagColorManager={
             //处理 颜色
             this.tags[tag] = null;
         }
-        this.writeToDB();
-    },
-    del(tag){
-        this.tags[tag] = undefined;
         this.writeToDB();
     },
     add(tag){  // 仅适用旧版本
@@ -627,6 +621,13 @@ const configManager = {
         }else{
             this.configs = utools.db.get(GLOBAL_CONFIG)?.data ?? {}
         }
+        // if defaultColor existed, del it
+        if(this.configs['defaultColor']){
+            this.configs['lightTagColor'] = this.configs['defaultColor']
+            this.configs['darkTagColor'] = this.configs['defaultColor'];
+            delete this.configs['defaultColor']
+            this.writeToDB()
+        }
         console.log('configManager init')
         this.isInited = true;
     },
@@ -648,6 +649,23 @@ const configManager = {
      */
     set(config,value){
         this.configs[config] = value;
+        this.writeToDB();
+    },
+    /**
+     *
+     * @param {'SelectedColor' | 'TagColor' } key
+     * @return {*|string}
+     */
+    getColor(key){
+        return this.configs[(utools.isDarkColors()? 'dark':'light')+key]?? '#707070FF';
+    },
+    /**
+     *
+     * @param {'SelectedColor' | 'TagColor' } key
+     * @param {String} value
+     */
+    setColor(key,value){
+        this.configs[(utools.isDarkColors()? 'dark':'light')+key] = value;
         this.writeToDB();
     },
     getDefaultColor(){

@@ -16,7 +16,11 @@
 
 import {configManager} from "../../js/core";
 import {isSupportedLanguage} from "../../js/some";
-defineProps(['code','type'])
+import {$var} from "../../js/store";
+import {onUpdated, ref} from "vue";
+
+const props = defineProps(['code','type','active']);
+const itemCodeScrollBar = ref();
 const getCodeStyle = () =>{
   return {
     fontSize: '12px',
@@ -24,6 +28,11 @@ const getCodeStyle = () =>{
     fontFamily: "'Consolas' !important"
   }
 }
+onUpdated(()=>{
+  if(props.active){
+    $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
+  }
+})
 </script>
 
 <style>

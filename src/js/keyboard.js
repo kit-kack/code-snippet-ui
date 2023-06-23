@@ -13,7 +13,6 @@ const gotoTheLastPosition = ()=>{
     // 校准位置
     if($var.utools.selectedIndex > -1 ){
         let distance = $var.scroll.itemOffsetArray[$var.utools.selectedIndex] -200;
-        console.log(distance)
         if(distance < 0){
             distance = 0;
         }

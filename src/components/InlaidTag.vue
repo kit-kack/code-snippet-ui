@@ -57,6 +57,7 @@ defineProps(["type","count","time"])
 <style scoped>
 .n-tag{
   height: 17px;
+  background-color: rgba(128,128,128,.1);
 }
 .circle {
   display: block;

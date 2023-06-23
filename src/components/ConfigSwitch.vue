@@ -1,5 +1,5 @@
 <template>
-  <n-space>
+  <n-space >
     {{ title }}
     <template v-if="props.icon">
       <n-switch @update:value="handleValue" :default-value="configManager.get(config)">

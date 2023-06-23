@@ -4,6 +4,7 @@ const LIST_VIEW = 0;
 const CODE_VIEW = 1;
 const UPDATE_VIEW = 2;
 const CREATE_VIEW = 3;
+const CUSTOM_VIEW = 4;
 
 const $var = reactive({
     currentMode : LIST_VIEW,    // 当前模式
@@ -46,5 +47,5 @@ const $var = reactive({
 
 export {
     $var,
-    LIST_VIEW,CODE_VIEW,UPDATE_VIEW,CREATE_VIEW,
+    LIST_VIEW,CODE_VIEW,UPDATE_VIEW,CREATE_VIEW,CUSTOM_VIEW
 }

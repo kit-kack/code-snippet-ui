@@ -6,7 +6,6 @@
       </template>
       {{tagColorManager.tags[props.content] === null? "清除标签":"清除颜色"}}
     </n-tooltip>
-
   </template>
   <template v-else>
     <n-popover trigger="click" raw :show-arrow="false" >

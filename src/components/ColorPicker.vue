@@ -4,9 +4,9 @@
         justify-content: center;
         align-content: center;
         padding: 2px;"
-       :class="{ style:isStyled,dark:isDark}"
+        id="color"
+        :class="{ style:isStyled}"
   >
-    {{instance.title}}
     <n-color-picker
         :actions="['confirm']"
         size="small"
@@ -23,25 +23,29 @@
                 '#bf1866FF']" >
       <template #label> </template>
     </n-color-picker>
+    {{instance.title}}
   </div>
 </template>
 
 <script setup>
-const isDark = utools.isDarkColors();
 defineProps({
   instance: Object,
   isStyled: Boolean
 })
 </script>
 
-<style scoped>
+<style>
+
 .style{
   background-color: #d9d9d9;
 }
-.style.dark{
+#dark-app .style{
   background-color: #303133 !important;
 }
+#dark-app #color{
+  color: #d9d9d9;
+}
 .n-color-picker{
-  margin-left:4px;
+  margin-right:4px;
 }
 </style>

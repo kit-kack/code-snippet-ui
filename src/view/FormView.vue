@@ -55,15 +55,17 @@
                 Tab键的原生行为默认是切换焦点，这里可以定制行为
               </n-tooltip>
 
-              <n-select
-                  v-model:value="codeTemplate.type"
-                  filterable
-                  placeholder="选择代码类型"
-                  :options="languages"
-                  id="select"
-                  :default-value="codeSnippet.type??'plaintext'"
-                  tag
-              />
+              <div id="select">
+                <n-select
+                    v-model:value="codeTemplate.type"
+                    filterable
+                    placeholder="选择代码类型"
+                    :options="languages"
+                    :default-value="codeSnippet.type??'plaintext'"
+                    tag
+                    :theme-overrides="selectThemeOverrides"
+                />
+              </div>
             </div>
           </div>
         </template>
@@ -98,6 +100,7 @@ import {computed, onMounted, reactive, ref} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {handleRecoverLiteShow, languages} from "../js/some.js";
 import {$var, LIST_VIEW, UPDATE_VIEW} from "../js/store";
+
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()
 const codeSnippet = ($var.currentMode === UPDATE_VIEW)? codeSnippetManager.get($var.currentName) :{
@@ -229,6 +232,23 @@ const handleKeyDown = (e)=>{
   }
 }
 
+
+const selectThemeOverrides = {
+  peers:{
+    InternalSelection:{
+      border: `1px solid transparent`,
+      borderActive: `1px solid transparent`,
+      borderHover: `1px solid transparent`,
+      borderFocus: `1px solid transparent`,
+      boxShadowHover: 'none',
+      boxShadowActive: 'none',
+      boxShadowFocus: 'none',
+      textColor: utools.isDarkColors()? 'white':'black',
+      borderRadius: 0
+    }
+  }
+}
+
 </script>
 
 <style scoped>
@@ -245,15 +265,15 @@ const handleKeyDown = (e)=>{
   top: 0;
   left: 0;
   width: 100%;
-  height: 38px;
+  height: 37px;
   box-sizing: border-box;
-  border-bottom: 1px dashed #36ad6a;
-  padding: 2px;
+  border-bottom: 1px solid #efeff2;
+  padding: 1px;
 }
 #select{
-  border: none;
-  width:250px;
+  width:230px;
   float: right;
+  border-left: 2px solid #9a9b9c;
 }
 #tab{
   float: left;

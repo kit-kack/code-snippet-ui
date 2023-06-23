@@ -1,13 +1,10 @@
 <template>
 
   <div @contextmenu=" handleClose()" id="code-view">
-
     <n-scrollbar style="max-height: 100vh" x-scrollable trigger="hover" ref="scrollBar">
       <div class="hljs-container" v-code>
         <template v-if="isValidLanguage">
-
           <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
-
         </template>
         <template v-else>
           <highlightjs  autodetect :code="snippet.code" width="100%"/>
@@ -15,7 +12,6 @@
       </div>
       <div class="bottom"></div>
     </n-scrollbar>
-
 
     <div id="extra">
       <n-space>
@@ -66,6 +62,7 @@ import {codeSnippetManager, configManager} from "../js/core.js";
 import {computed, onMounted, ref} from "vue";
 import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
+
 const scrollBar = ref(null)
 const snippet = codeSnippetManager.get($var.currentName);
 const hover = ref(false)
@@ -80,8 +77,6 @@ const handleClose = ()=>{
   $var.utools.keepSelectedStatus = true;
   handleRecoverLiteShow();
   $var.currentMode = LIST_VIEW;
-
-
 }
 
 onMounted(()=>{
