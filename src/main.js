@@ -76,15 +76,12 @@ utools.onPluginEnter((data)=>{
     }else{
         utools.setExpendHeight(545)
     }
-    console.log('fullScreenShow: '+$var.view.fullScreenShow)
     utools.setSubInput(({text}) =>{
         text = text.trim();
         if(text.length === 0){
             $var.utools.search = null;
-            console.log('search empty')
         }else{
             if($var.utools.search !== text){
-                console.log('search: '+text)
                 $var.utools.search = text;
                 $var.utools.keepSelectedStatus = null;
                 $var.scroll.itemOffsetArray = [];

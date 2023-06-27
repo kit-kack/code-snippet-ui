@@ -32,3 +32,12 @@ pre code.hljs{
 .item-code{
   border-top: 1px darkgray dashed;
 }
+#dark-app .n-input{
+  --n-color-focus: #454647 !important;
+}
+#dark-app .n-dynamic-tags .n-button:not(.n-button--disabled):hover{
+  --n-text-color-hover: white !important;
+}
+.n-dynamic-tags .n-button:not(.n-button--disabled):hover{
+  --n-text-color-hover: #ccc !important;
+}

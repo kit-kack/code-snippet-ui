@@ -1,7 +1,7 @@
-# Vue 3 + Vite
+# Code-Snippet-UI
+个人开发的一个utools上的插件应用，来管理自己的代码片段
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+1.  管理您的代码片段，方便粘贴使用
+2.  支持Vim操作方式，将键盘流贯彻到底
+3.  提供基本的数据导入导出功能，方便转移
+4.  支持暗色模式（目前随utools自身模式改变），切换前请将在“我的插件应用”中关闭重启本插件

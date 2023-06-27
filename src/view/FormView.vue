@@ -273,7 +273,10 @@ const selectThemeOverrides = {
 #select{
   width:230px;
   float: right;
-  border-left: 2px solid #9a9b9c;
+  border-left: 1px solid #ddd;
+}
+#dark-app #select{
+  border-left-color: #9a9b9c;
 }
 #tab{
   float: left;

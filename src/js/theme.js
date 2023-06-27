@@ -11,68 +11,72 @@ const theme = utools.isDarkColors()? darkTheme:null;
  * @return { import('naive-ui').GlobalThemeOverrides }
  */
 function getThemeOverrides(){
+    configManager.init();
     const gc = configManager.getGlobalColor();
+    const borderVar = `1px solid ${gc}`
+    const boxShadowVar = `inset 0 0 0 1px ${gc}`
+    const textOrCaretColorVar =  utools.isDarkColors()? 'white': '#4b4e51';
+    const inputBorderVar = utools.isDarkColors()? 'none': '1px solid #ddd';
+
+
     return {
         Card:{
             boxShadow:`0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px ${gc}`
         },
-        // Switch:{
-        //     railColorActive: gc
-        // },
+        Switch:{
+            railColorActive: gc
+        },
         Tooltip:{
             color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
             textColor: utools.isDarkColors()? '#fafafc':'#2a2a2c'
         },
-        // Tag:{
-        //     colorChecked: gc,
-        //     colorCheckedHover: gc,
-        //     colorCheckedPressed:gc
-        // },
-        // Input:{
-        //     borderFocus: `1px solid ${gc}`,
-        //     boxShadowFocus: `0 0 5px 0px ${gc}`,
-        //     borderHover: `1px solid ${gc}`
-        // },
-        // Select:{
-        //     peers:{
-        //         InternalSelection:{
-        //             textColor: gc,
-        //             borderFocus: `1px solid ${gc}`,
-        //             borderActive: `1px solid ${gc}`,
-        //             boxShadowActive: `0 0 5px 0px ${gc}`,
-        //             boxShadowFocus: `0 0 5px 0px ${gc}`,
-        //             borderHover: `1px solid ${gc}`
-        //         },
-        //         InternalSelectMenu:{
-        //             optionCheckColor: gc,
-        //             optionTextColorActive: gc,
-        //             optionTextColorPressed: gc
-        //         }
-        //     }
-        // },
-        // Button:{
-        //     borderHover: `1px solid ${gc}`,
-        //     borderFocus: `1px solid ${gc}`,
-        //     borderPressed: `1px solid ${gc}`,
-        //     textColorPressed: utools.isDarkColors()? 'white': 'black',
-        //     textColorHover: gc,
-        //     textColorFocus: gc
-        // },
-        // Radio:{
-        //     dotColorActive: gc,
-        //     boxShadowFocus: `inset 0 0 0 1px ${gc}`,
-        //     boxShadowActive: `inset 0 0 0 1px ${gc}`,
-        //     boxShadowHover: `inset 0 0 0 1px ${gc}`,
-        // },
-        // DynamicTags:{
-        //     peers:{
-        //         Button:{
-        //             color: 'red',
-        //             colorHover: 'red',
-        //             colorFocus: 'red'
-        //         }
-        //     }
-        // }
+        Tag:{
+            colorChecked: gc,
+            colorCheckedHover: gc,
+            colorCheckedPressed:gc
+        },
+        Input:{
+            borderFocus: utools.isDarkColors()? 'none': borderVar,
+            boxShadowFocus: `0px 1px 0px rgba(17,17,26,0.05), 0px 0px 2px ${gc} inset, 0 0 3px ${gc}`,
+            borderHover: utools.isDarkColors()? 'none': borderVar,
+            border: inputBorderVar,
+            caretColor: textOrCaretColorVar,
+        },
+        Select:{
+            peers:{
+                InternalSelection:{
+                    textColor: textOrCaretColorVar,
+                    borderFocus: 'none',
+                    boxShadowFocus: 'none',
+                    borderHover: 'none',
+                    border: inputBorderVar,
+                    borderActive: 'none',
+                    boxShadowActive: 'none',
+                    caretColor: textOrCaretColorVar,
+                    colorFocus: 'white',
+                    colorActive: utools.isDarkColors()? '#575859': '#fff'
+                },
+                InternalSelectMenu:{
+                    optionCheckColor: gc,
+                    optionTextColorActive: gc,
+                    optionTextColorPressed: gc
+                }
+            }
+        },
+        Button:{
+            borderHover: borderVar,
+            borderFocus: borderVar,
+            borderPressed: borderVar,
+            textColorPressed: utools.isDarkColors()? 'white': 'black',
+            textColorHover: gc,
+            textColorFocus: gc
+        },
+        Radio:{
+            dotColorActive: gc,
+            boxShadowFocus: boxShadowVar,
+            boxShadowActive: boxShadowVar,
+            boxShadowHover: boxShadowVar,
+        }
     }
 }
 
@@ -119,7 +123,7 @@ const darkColorSchemaStyleOptions = [
     {
         globalColor: '#479a6dff',
         selectedColor: '#343c38ff',
-        tagColor: '#163c28ff',
+        tagColor: '#1e5237ff',
     },
     {
         globalColor: '#069898ff',

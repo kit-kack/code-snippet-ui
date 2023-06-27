@@ -13,14 +13,7 @@
         :default-value="instance.color"
         @update:value="v=> instance.handleUpdate?.(v)"
         @confirm="v=> instance.handleConfirm?.(v)"
-        :swatches="[
-                '#707070FF',
-                '#18A058FF',
-                '#1f5aa3FF',
-                '#513A9DFF',
-                '#a31f37FF',
-                '#F4B23CEB',
-                '#bf1866FF']" >
+        :swatches="colorSwatches" >
       <template #label> </template>
     </n-color-picker>
     {{instance.title}}
@@ -28,10 +21,23 @@
 </template>
 
 <script setup>
+import {colorSchemaStyleOptions, darkColorSchemaStyleOptions} from "../js/theme";
+
 defineProps({
   instance: Object,
   isStyled: Boolean
 })
+const colorSwatches = getSwatchesFromOptions(utools.isDarkColors()? darkColorSchemaStyleOptions: colorSchemaStyleOptions)
+
+
+/**
+ *
+ * @param {any[]} options
+ * @return {*}
+ */
+function getSwatchesFromOptions(options){
+  return options.map(op => op.tagColor)
+}
 </script>
 
 <style>

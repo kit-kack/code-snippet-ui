@@ -134,7 +134,7 @@ let topIndex = configManager.getTopList().indexOf(props.snippet.name)
 const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
   if(isHoverRef){
-    style = utools.isDarkColors()? 'backgroundColor: #3a3a3c' : 'background-color: #f5f5f5'
+    style = utools.isDarkColors()? 'backgroundColor: #3a3a3c' : 'background-color: #eaeef2'
   }
   if(selected){
     style = `background: ${configManager.getColor('SelectedColor')}`
