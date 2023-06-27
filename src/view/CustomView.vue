@@ -90,7 +90,7 @@ const refresh = ()=>{
   })
 }
 const message = useMessage();
-const colorSchemaRef = ref(configManager.get('colorSchema')??0)
+const colorSchemaRef = ref(configManager.get(utools.isDarkColors()? 'darkColorSchema': 'colorSchema')??-1)
 const snippet = {
   name: "test",
   desc: "测试数据",
@@ -211,7 +211,7 @@ const renderLabel = (option) => {
       );
 }
 const handleColorSchema = (v)=>{
-  configManager.set('colorSchema',v);
+  configManager.set(utools.isDarkColors()? 'darkColorSchema': 'colorSchema',v);
   if(v < 0){
     return;
   }

@@ -43,4 +43,4 @@ declare type ConfigItem =
     | "fullItemCodeShow"                             // 展示元素 代码块
     | "version"                                      // 插件版本，用来判断是否为最新版本
     | "forbidMouseHover"                             // 禁用鼠标滑过
-    | "colorSchema"                                   // 颜色方案
+    | "colorSchema" | "darkColorSchema"              // 颜色方案

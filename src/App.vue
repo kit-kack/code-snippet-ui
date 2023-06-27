@@ -41,8 +41,10 @@ const dealWithRefresh = ()=>{
   refreshListView()
 }
 onMounted(()=>{
+  document.body.id = utools.isDarkColors()? 'dark-app' : 'light-app'
   if(configManager.get("colorSchema") === undefined){
     configManager.configs["colorSchema"] = 0
+    configManager.configs["darkColorSchema"] = 0
     configManager.configs["lightGlobalColor"] = colorSchemaStyleOptions[0].globalColor
     configManager.configs["darkGlobalColor"] = darkColorSchemaStyleOptions[0].globalColor
     configManager.configs["lightTagColor"] = colorSchemaStyleOptions[0].tagColor
@@ -51,7 +53,6 @@ onMounted(()=>{
     configManager.configs["darkSelectedColor"] = darkColorSchemaStyleOptions[0].selectedColor
     configManager.writeToDB()
   }
-  document.body.id =  theme? 'dark-app': 'light-app';
 })
 
 </script>
