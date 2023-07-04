@@ -1,27 +1,60 @@
 <template>
-
-  <div @contextmenu=" handleClose()" id="code-view">
-    <n-scrollbar style="max-height: 100vh" x-scrollable trigger="hover" ref="scrollBar">
-      <div class="hljs-container" v-code>
-        <template v-if="isValidLanguage">
-          <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="snippet.code" width="100%"/>
+  <div  id="code-view">
+    <n-scrollbar style="max-height: 100vh" :x-scrollable="!$var.view.isRendering" trigger="hover" ref="scrollBar">
+      <template v-if="refresh">
+        <template v-if="snippet.type === 'image'">
+          <img :src="snippet.path" alt="" style="width: 100vw;">
+        </template>
+        <template v-else-if="isRenderable && $var.view.isRendering">
+          <v-md-preview :text="$var.currentCode"></v-md-preview>
         </template>
         <template v-else>
-          <highlightjs  autodetect :code="snippet.code" width="100%"/>
-        </template>
-      </div>
-      <div class="bottom"></div>
-    </n-scrollbar>
+          <div class="hljs-container" v-code>
+            <template v-if="isValidLanguage">
+              <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="$var.currentCode" width="100%"/>
+            </template>
+            <template v-else>
+              <highlightjs  autodetect :code="$var.currentCode" width="100%"/>
+            </template>
+            <div class="hljs-line-container">
+              <template v-for="(section,sindex) in snippet.sections">
+                <div class="hljs-line-item"
+                     v-for="(line,lindex) in section_generate(section)"
+                     :style="{
+                       color: configManager.getGlobalColor(),
+                        backgroundColor:configManager.getColor('HighlightColor'),
+                   top: (22*line-22)+'px'}">{{lindex === 0? (sindex <9? getNumShow(sindex): ''):''}}</div>
+              </template>
 
+            </div>
+          </div>
+        </template>
+        <div class="bottom"></div>
+      </template>
+    </n-scrollbar>
     <div id="extra">
       <n-space>
+        <template v-if="snippet.path && snippet.type !=='image'">
+          <n-button quaternary
+                    @click="updateCode"
+                    :color="configManager.getGlobalColor()">
+            {{  snippet.code? '🌝已缓存 [B]': '未缓存 [B]' }}
+          </n-button>
+        </template>
+        <template v-if="isRenderable">
+          <n-button quaternary
+                    @click=" $var.view.isRendering = !$var.view.isRendering"
+                    :color="configManager.getGlobalColor()">
+            {{ $var.view.isRendering? '💎已渲染 [R]': '未渲染 [R]' }}
+          </n-button>
+        </template>
         <n-popover trigger="hover" :show="hover || $var.view.showCodeTip" placement="top" :show-arrow="false" style="padding:5px">
           <template #trigger>
             <n-button
                 @mouseenter="hover = true"
                 @mouseleave="hover = false"
                 @click="handleClick"
-                quaternary :color="configManager.getGlobalColor()">🚀{{ snippet.type??'plaintext' }}</n-button>
+                quaternary :color="configManager.getGlobalColor()">🚀{{ (snippet.type??'plaintext')+' [S]' }}</n-button>
           </template>
           <n-list hoverable clickable :show-divider="false" @mouseenter="hover = true" @mouseleave="hover = false">
             <n-list-item >
@@ -35,9 +68,6 @@
             </n-list-item >
             <n-list-item >
               <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0}`}}</div>
-            </n-list-item>
-            <n-list-item v-if="!isValidLanguage">
-              <div style="color: indianred">🚨 语言不内置支持，故启用自动高亮</div>
             </n-list-item>
           </n-list>
         </n-popover>
@@ -59,16 +89,67 @@
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {computed, onMounted, ref} from "vue";
+import {computed, h, nextTick, onMounted, ref, toRaw} from "vue";
 import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
-
+import {section_generate} from "../js/utils/section";
 const scrollBar = ref(null)
-const snippet = codeSnippetManager.get($var.currentName);
+const snippet = $var.currentSnippet;
+$var.currentCode = getCode()
 const hover = ref(false)
+const refresh = ref(true)
 const isValidLanguage = computed(()=>isSupportedLanguage(snippet.type??'plaintext'))
-
-
+const isRenderable = computed(()=>snippet.type === 'markdown')
+const lines = computed(()=>{
+  if(snippet.sections){
+    /**
+     * @type number[]
+     */
+    let array = [];
+    for (const section of snippet.sections) {
+      section_generate(array,section)
+    }
+    return array;
+  }else{
+    return [];
+  }
+})
+function doRefresh(){
+  refresh.value = false;
+  nextTick(()=>{
+    refresh.value = true;
+    // 滚动条重新绑定
+    $var.scroll.codeInvoker = scrollBar.value;
+  })
+}
+function getCode(){
+  if(snippet.path){
+    if(snippet.code){
+      return snippet.code;
+    }else{
+      return getCodeFromPath();
+    }
+  }
+  return snippet.code;
+}
+function getCodeFromPath(){
+  if(snippet.local){
+    return window.preload.readConfig(snippet.path)?? '[本地内容为空]'
+  }else if(snippet.type !== 'image'){
+    fetch(snippet.path).then(resp=>{
+      if(resp.ok){
+        resp.text().then(value=>{
+          // 刷新页面
+          $var.currentCode = value;
+          doRefresh();
+        })
+      }else{
+        $var.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
+      }
+    })
+    return "网络文件[ "+snippet.path +" ]数据正在获取中..."
+  }
+}
 const handleClick = ()=>{
   $message.info('该提示部分可以由Vim模式下s键控制')
 }
@@ -78,26 +159,62 @@ const handleClose = ()=>{
   handleRecoverLiteShow();
   $var.currentMode = LIST_VIEW;
 }
+function updateCode(){
+  if(snippet.code){   // 清除缓存
+    snippet.code = undefined;
+    $var.currentCode = getCodeFromPath();  // 抓取数据
+  }else{  // 添加缓存
+    snippet.code = $var.currentCode;
+  }
+  codeSnippetManager.update(toRaw(snippet))
+}
+function getNumShow(num){
+  return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
+}
+
 
 onMounted(()=>{
+    $var.others.updateCacheCodeFunc = updateCode
     $var.scroll.codeInvoker = scrollBar.value;
 })
 
 </script>
 
 <style >
+#bg{
+  background-color: white;
+}
+#code-view{
+  position: relative;
+}
+
+#dark-app .github-markdown-body div[class*=v-md-pre-wrapper-]{
+  background-color: #242425;
+}
 #extra{
   position: fixed;
   right:20px;
   bottom: 12px;
+  z-index: 10;
 }
 .n-list-item{
   height: 32px;
   padding: 0 5px
 }
-#code-view pre{
+#code-view .hljs-container pre{
   width: 100%;
-  padding-left: 3px;
+  padding-left: 10px;
+  z-index: 1;
+  background: transparent;
+}
+#code-view pre code  {
+  line-height: 22px;
+  z-index: 2;
+  background: transparent;
+}
+#code-view pre code > *{
+  z-index: 100;
+  background: transparent;
 }
 
 #code-view pre code.hljs::selection{
@@ -107,23 +224,33 @@ onMounted(()=>{
   background-color: rgba(0,0,0,.1) !important;
 }
 #dark-app #code-view pre code.hljs::selection{
-  background-color: rgba(255,255,255,.3) !important;
+  background-color: rgba(255,255,255,.1) !important;
 }
 #dark-app #code-view pre code.hljs span::selection{
-  background-color: rgba(255,255,255,.3) !important;
+  background-color: rgba(255,255,255,.1) !important;
 }
-#code-view code.hljs{
-  background-color: #fff;
-}
-#dark-app #code-view code.hljs{
-  background-color: #303133;
-}
-/* 语法高亮 */
+
 .hljs-container {
+  position: relative;
   display: flex;
   padding-top: 4px;
   padding-bottom: 8px;
 }
+.hljs-line-container{
+  position: absolute;
+  width: 100%;
+}
+.hljs-line-item{
+  position: absolute;
+  font-size: 12px;
+  line-height: 12px;
+  height: 12px;
+  padding: 5px 0;
+  width: 100%;
+  z-index: 0;
+}
+
+
 .bottom{
   height: 40px;
   width: 100%;
@@ -131,25 +258,47 @@ onMounted(()=>{
 
 /** 行数样式 */
 .hljs-code-number {
-  padding: 0 6px 0 3px;
-  color: #888;
+  padding: 0 10px 0 10px;
+  color: #999;
   font-size: 14px;
   list-style: none;
   border-right: 1px solid #dcdfe5;
-
   user-select:none;
+  z-index: 1;
 }
 #dark-app .hljs-code-number{
+  color: #666;
   border-right-color:  #3a3c41;
 }
 .hljs-code-number :first-child{
   margin-top: 0;
 }
 .hljs-code-number li{
-  height: 17px;
-  text-align: right;
+  line-height: 12px;
+  padding: 5px 0;
+  font-size: 14px;
+  text-align: center;
+  z-index: 2;
   //line-height: 1.6;
-  margin-top: 5.4px;
+}
+
+#dark-app .v-md-editor {
+  background-color: transparent !important;
+}
+#dark-app .v-md-editor.v-md-editor--edit {
+  background-color: transparent;
+}
+#dark-app .v-md-editor__toolbar {
+  background-color: transparent;
+  color: #ddd;
+}
+#dark-app .v-md-textarea-editor textarea{
+  background-color: transparent;
+  color: #ddd !important;
+}
+
+#dark-app .github-markdown-body  {
+  color: white !important;
 }
 
 

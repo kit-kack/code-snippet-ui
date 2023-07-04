@@ -89,23 +89,11 @@
             </n-scrollbar>
           </n-tab-pane>
         </n-tabs>
-
     </n-tab-pane>
-
     <n-tab-pane :name="1" tab="快捷方式">
       <n-scrollbar style="max-height: calc(100vh - 44px)">
         <shortcut-pane/>
       </n-scrollbar>
-    </n-tab-pane>
-    <n-tab-pane :name="2" tab="说明">
-      <h4 align="center">Hello Coder</h4>
-      <p>&nbsp;&nbsp;&nbsp;&nbsp;本插件仅支持旧版本（无UI版本）的查询命令，其他命令现以可视化方式实现</p>
-      <n-alert title="XXX #tag @type" type="default">
-        <template #icon>💻</template>
-        查询代码片段，<br/>XXX对应代码片段名（模糊匹配），<br/>tag对应标签部分(可指定多个)，<br/>type对应代码片段类型；<br/>三者没有固定顺序且都可选，请以空格间隔
-      </n-alert>
-      <p>&nbsp;&nbsp;&nbsp;&nbsp;为了方便键盘流操作，本插件提供了基本的Vim模式来操作，请按Tab键来切换；<br/>&nbsp;&nbsp;&nbsp;&nbsp;相关Vim模式命令查看 中间选项卡【快捷方式】<br/>&nbsp;&nbsp;&nbsp;&nbsp;同时，按下Tab键会使Utools子输入框失焦或聚焦</p>
-      <p>&nbsp;&nbsp;&nbsp;&nbsp;最后非常感谢大家的使用，由于本人是个前端小白，所以插件有什么问题欢迎大家反馈</p>
     </n-tab-pane>
   </n-tabs>
 </template>
@@ -131,7 +119,7 @@ const dealWithRefresh = ()=>{
 }
 const sortKeyOptions = [
   {
-    label: "创建时间",
+    label: "创建次序",
     value: 0
   },
   {

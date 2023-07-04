@@ -76,11 +76,16 @@ const funcUtils = {
                     if(!isNaN(count)){
                         snippet.count = count;
                     }
-                }else if(str.startsWith("tags:")){
-                    let tags = str.substring(5).trim().split(' ').filter(value => value.length>0);
-                    if(tags!=null && tags.length> 0){
+                }else if(str.startsWith("tags:")) {
+                    let tags = str.substring(5).trim().split(' ').filter(value => value.length > 0);
+                    if (tags != null && tags.length > 0) {
                         snippet.tags = tags;
                     }
+                }else if(str.startsWith('local:')) {
+                    snippet.path = str.substring(6).trim()
+                    snippet.local = true;
+                }else if(str.startsWith('network:')){
+                    snippet.path = str.substring(8).trim()
                 }else if(str.startsWith('🔖')){
                     let tags = str.substring(2).trim().split(' ').filter(value => value.length>0);
                     if(tags!=null && tags.length> 0){
@@ -174,6 +179,30 @@ const funcUtils = {
                 prefix: prefix,
                 type: line.substring(i)
             }
+        }
+    },
+    /**
+     *
+     * @param {string} code
+     */
+    getMaxMarkCount(code){
+        if(code != null){
+            let max = 0;
+            let temp = 0;
+
+            for (let ch of code) {
+                if(ch === '`'){
+                    temp ++;
+                }else{
+                    if(temp > max){
+                        max = temp;
+                    }
+                    temp = 0;
+                }
+            }
+            return max;
+        }else{
+            return 0;
         }
     },
 
@@ -509,8 +538,20 @@ const codeSnippetManager = {
             if(codeSnippet.tags != null && codeSnippet.tags.length > 0){
                 str += `> 🔖 ${codeSnippet.tags.join(' ')}\n> \n`;
             }
+            if(codeSnippet.path != null){
+                if(codeSnippet.local){
+                    str += `> local: ${codeSnippet.path}\n> \n`
+                }else{
+                    str += `> network: ${codeSnippet.path}\n> \n`
+                }
+            }
             // output code
-            str += "```"+(codeSnippet.type??"plaintext")+"\n"+codeSnippet.code+"\n```\n";
+            let max = funcUtils.getMaxMarkCount(codeSnippet.code)
+            let block = '```';
+            for (let i = 3; i <= max; i++) {
+                block+='`'
+            }
+            str+=`${block}${codeSnippet.type??'plaintext'}\n${codeSnippet.code}\n${block}\n`
             window.preload.writeConfig(path,str);
         }
     },
@@ -531,6 +572,9 @@ const codeSnippetManager = {
             let result = funcUtils.recongzieCodeSnippet(lines,cur)
             if(result.snippet != null){
                 count++;
+                if(result.snippet.path){
+                    result.snippet.code = undefined;
+                }
                 this.add(result.snippet)
                 cur = result.cur+1;
             }else{
@@ -653,7 +697,7 @@ const configManager = {
     },
     /**
      *
-     * @param {'SelectedColor' | 'TagColor' } key
+     * @param {'SelectedColor' | 'TagColor' | 'HighlightColor' } key
      * @return {*|string}
      */
     getColor(key){
@@ -661,7 +705,7 @@ const configManager = {
     },
     /**
      *
-     * @param {'SelectedColor' | 'TagColor' } key
+     * @param {'SelectedColor' | 'TagColor' | 'HighlightColor' } key
      * @param {String} value
      */
     setColor(key,value){

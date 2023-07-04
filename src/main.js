@@ -1,67 +1,14 @@
-import {createApp} from 'vue'
+import {createApp, toRaw} from 'vue'
 import './style.css'
 import App from './App.vue'
-import hljsVuePlugin from '@highlightjs/vue-plugin'
-import {configManager, init} from "./js/core.js";
-import hljs from "highlight.js";
-import {
-    create,
-    NAlert,
-    NButton,
-    NCard,
-    NCode,
-    NCollapse,
-    NCollapseItem,
-    NColorPicker,
-    NConfigProvider,
-    NDrawer,
-    NDynamicTags,
-    NEllipsis,
-    NForm,
-    NFormItem,
-    NInput,
-    NList,
-    NListItem,
-    NMessageProvider,
-    NNotificationProvider,
-    NPopover,
-    NRadio,
-    NRadioGroup,
-    NResult,
-    NScrollbar,
-    NSelect,
-    NSpace,
-    NSwitch,
-    NTabPane,
-    NTabs,
-    NTag,
-    NTooltip,
-    NDivider,
-    NPopselect
-} from 'naive-ui'
+import {codeSnippetManager, configManager, init} from "./js/core.js";
 import {$var, CREATE_VIEW} from "./js/store";
+import initNU from "./js/dep/naiveui-dep";
+import initVH from "./js/dep/vmd&highlight-dep";
+import {section_add,section_del, section_contain} from "./js/utils/section";
 
 // init
 init()
-
-// highlight
-if(utools.isDarkColors()){
-    import('highlight.js/styles/atom-one-dark.css')
-}else{
-    import('highlight.js/styles/atom-one-light.css')
-}
-hljs.registerAliases(["vue","html"],{languageName:"xml"})
-
-
-const naive = create({
-    components:[
-        NMessageProvider,NConfigProvider,
-        NSpace,NButton,NTag,
-        NTooltip, NDrawer, NResult, NTabPane, NTabs, NFormItem,NForm, NSwitch,NScrollbar,
-        NCard,NCode,NEllipsis, NPopover, NColorPicker,NInput,NSelect,NDynamicTags,NAlert,NRadio,
-        NRadioGroup,NList,NListItem,NCollapse,NCollapseItem,NNotificationProvider,NDivider,NPopselect
-    ]
-})
 
 
 utools.onPluginEnter((data)=>{
@@ -99,13 +46,13 @@ utools.onPluginEnter((data)=>{
 })
 
 const app = createApp(App)
-app.use(hljsVuePlugin)
-app.use(naive)
+initNU(app)
+initVH(app)
 app.directive("code", {
     mounted(el) {
         //获取代码片段
-        let code = el.querySelector('code.hljs')?.innerHTML;
-        let collection = code.split('\n');
+        let collection = $var.currentCode.split('\n');
+        $var.currentSplitCode = collection;
         let size = collection.length;
         if(collection[collection.length -1].trim() === ''){
             size --;
@@ -115,7 +62,42 @@ app.directive("code", {
         for (let i = 1; i <= size; i++) {
             let li = document.createElement('li')
             li.innerText = i + ''
+            li.value = i;
             ul.appendChild(li)
+        }
+        ul.onclick = (event)=>{
+            let target = event.target;
+            if(target && target.value){
+                console.log(target.value)
+                if($var.currentSnippet.sections){
+                    if(section_contain($var.currentSnippet.sections,target.value)){
+                        section_del($var.currentSnippet.sections,target.value,false)
+                    }else{
+                        section_add($var.currentSnippet.sections,target.value,false)
+                    }
+                }else{
+                    $var.currentSnippet.sections = [[target.value,target.value]]
+                }
+                // 保存
+                codeSnippetManager.update(toRaw($var.currentSnippet))
+            }
+        }
+        ul.oncontextmenu = (event) =>{
+            let target = event.target;
+            if(target && target.value){
+                console.log(target.value)
+                if($var.currentSnippet.sections){
+                    if(section_contain($var.currentSnippet.sections,target.value)){
+                        section_del($var.currentSnippet.sections,target.value,true)
+                    }else{
+                        section_add($var.currentSnippet.sections,target.value,true)
+                    }
+                }else{
+                    $var.currentSnippet.sections = [[0,target.value]]
+                }
+                // 保存
+                codeSnippetManager.update(toRaw($var.currentSnippet))
+            }
         }
         ul.classList.add('hljs-code-number')
         el.prepend(ul)

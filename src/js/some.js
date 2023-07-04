@@ -99,8 +99,15 @@ const refreshListView = ()=>{
         $var.view.refresh = true
     })
 }
+const getOriginType = (path,local) =>{
+    if(path){
+        return local? "local" : "network"
+    }else{
+        return "normal"
+    }
+}
 
 export {
-    languages,
-    isSupportedLanguage,calculateTime,handleCopy,handleRecoverLiteShow,refreshListView
+    languages,ctrlKey,
+    isSupportedLanguage,calculateTime,handleCopy,handleRecoverLiteShow,refreshListView,getOriginType
 }

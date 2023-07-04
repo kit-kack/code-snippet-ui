@@ -4,9 +4,6 @@
       <n-divider title-placement="center" style="width: 100vw">
         个性化定制
       </n-divider>
-      <n-space align="center">&nbsp;启用内置标签：
-        <config-check-tag @refresh="refresh()"   v-for="it in inlaidTags" :icon="it.icon" :title="it.title" :config="it.config" />
-      </n-space>
       <div style="height: 5px"></div>
       <n-space>&nbsp;元素代码块：
         <config-check-tag @refresh="refresh()"   v-for="it in otherSettings" :title="it.title"  :config="it.config" />
@@ -19,20 +16,18 @@
           </template>
           亮色和暗色场景独立保存，互不影响
         </n-tooltip>
-        <n-popselect
+        <n-select
             v-model:value="colorSchemaRef"
             :options="colorSchemaOptions"
             :render-label="renderLabel"
-            scrollable
+            size="small"
             @update-value="handleColorSchema"
-            size="small">
-          <n-button size="small">{{ colorSchemaOptions[colorSchemaRef<0?(6-colorSchemaRef):colorSchemaRef].label }}</n-button>
-        </n-popselect>
-        <template v-if="colorSchemaRef === -1">
-          <color-picker v-for="instance in getColorInstances()" :instance="instance" :key="instance.title"/>
-        </template>
+          />
       </n-space>
-      <template v-if="colorSchemaRef === -2">
+      <template v-if="colorSchemaRef === -1">
+        <n-space><color-picker v-for="instance in getColorInstances()" :instance="instance" :key="instance.title"/></n-space>
+      </template>
+      <template v-else-if="colorSchemaRef === -2">
         <n-space align="center">
           <n-input
               v-model:value="cssCode"
@@ -80,7 +75,9 @@ const getCSSCode = ()=>{
     //   被选中 元素颜色，对应 background属性（可渐变）
     "selected-color": "${configManager.getColor('SelectedColor')}",
     //   标签颜色，对应background-color属性，需要提供alpha透明度参数
-    "tag-color": "${configManager.getColor('TagColor')}"
+    "tag-color": "${configManager.getColor('TagColor')}",
+    //   代码预览界面 高亮行颜色
+    "highlight-color": "${configManager.getColor('HighlightColor')}"
 }`
 }
 const refresh = ()=>{
@@ -100,31 +97,6 @@ const snippet = {
   count: 100,
   time: 0
 }
-const  inlaidTags= [
-  {
-    title:"最近使用时间",
-    icon:"⏰",
-    config:"showTimeTag"
-  },
-  {
-    title:"累计使用次数",
-    icon:"🎲",
-    config:"showCountTag"
-  },
-  {
-    title:"代码片段类型",
-    icon:"🚀",
-    config:"showLanguageTag"
-  },
-  {
-    title: "内置标签位置改变",
-    config: "shiftTagPosition"
-  },
-  {
-    title: "使用符号图标",
-    config: "showTagIcon"
-  }
-];
 const otherSettings = [
   {
     title: "启用多行显示",
@@ -156,6 +128,12 @@ const getColorInstances = ()=>{
     handleConfirm: v=>{
       configManager.setColor('TagColor',v)
       refresh()
+    }
+  },{
+    title: '代码高亮行颜色',
+    color: configManager.getColor('HighlightColor'),
+    handleConfirm: v=>{
+      configManager.setColor('HighlightColor',v)
     }
   }]
 }
@@ -238,6 +216,9 @@ const handleCSSCode = ()=>{
     if(obj['selected-color']){
       configManager.setColor('SelectedColor',obj['selected-color'])
     }
+    if(obj['highlight-color']){
+      configManager.setColor('HighlightColor',obj['highlight-color'])
+    }
     globalThemeRefresh()
     refresh()
   }catch (e){
@@ -250,6 +231,7 @@ const handleCSSCode = ()=>{
 <style scoped>
 .n-select{
   font-size: 12px;
+  width: 150px;
 }
 #custom{
   overflow: auto;

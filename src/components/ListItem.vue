@@ -1,5 +1,5 @@
 <template>
-  <div id="main"
+  <div class="snippet-item"
        ref="item"
        @contextmenu="handleContextMenu"
        @click="handleClick"
@@ -14,52 +14,48 @@
             header-style="height:28px;"
             :style="getSelectedStyle(props.selected,isHover&&$var.view.cursorShow)"
     >
-      <div class="circle"
+      <div class="snippet-item__top"
            :style="{
               backgroundColor: configManager.getTopList().includes(snippet.name)? configManager.getGlobalColor(): ''
            }"
       ></div>
-      <span class="index" :style="getTitleStyle(props.selected,false)">{{index}}</span>
+      <span class="snippet-item__index" :style="getTitleStyle(props.selected,false)">{{index}}</span>
       <template #header>
         <n-scrollbar x-scrollable>
-          <div id="left">
+          <div class="snippet-item-head__left">
             <n-ellipsis >
               <span :style="getTitleStyle(props.selected,true)"  >{{props.snippet.name}}</span>
-              <span id="small">{{props.snippet.desc}}</span>
+              <span class="snippet-item__desc">{{snippet.desc}}</span>
             </n-ellipsis>
           </div>
         </n-scrollbar>
       </template>
       <template #header-extra >
-        <div id="right">
-            <n-scrollbar x-scrollable :size="10">
-              <div class="sub">
-                <template v-if="flag">
-                  <n-space :wrap="false">
-                    <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
-                  </n-space>
-                </template>
-                <template v-else>
-                  <inlaid-tag :type="snippet.type??'plaintext'" :count="snippet.count" :time="snippet.time"/>
-                </template>
-              </div>
-            </n-scrollbar>
-        </div>
+        <n-scrollbar x-scrollable :size="10" style="max-width: 250px;margin-left: 5px">
+          <div class="sub">
+            <n-space :wrap="false">
+              <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+            </n-space>
+          </div>
+        </n-scrollbar>
       </template>
-      <template v-if="flag">
-        <inlaid-tag :type="snippet.type??'plaintext'" :count="snippet.count" :time="snippet.time"/>
+      <template v-if="!configManager.get('noItemCodeShow')">
+        <template v-if="configManager.get('fullItemCodeShow')">
+          <multi-line-code :type="snippet.type" :code="snippet.code??snippet.path" :active="$var.utools.selectedIndex === index"/>
+        </template>
+        <template v-else>
+          <single-line-code :type="snippet.type" :code="snippet.code??snippet.path"/>
+        </template>
       </template>
-      <template v-else>
-        <n-space>
-          <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
-        </n-space>
-      </template>
-      <template v-if="configManager.get('fullItemCodeShow')">
-        <multi-line-code :type="snippet.type" :code="snippet.code" :active="index===0 || selected"/>
-      </template>
-      <template v-else>
-        <single-line-code :type="snippet.type" :code="snippet.code"/>
-      </template>
+      <span v-if="selected" class="snippet-item-info"
+            :style="{
+                color: configManager.getGlobalColor()
+            }"
+      >
+              {{(snippet.type?? 'plaintext')+ ' | '}}
+              {{snippet.count? snippet.count+' | ':''}}
+              {{calculateTime(snippet.time)}}
+      </span>
     </n-card>
 
     <transition>
@@ -107,12 +103,12 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onErrorCaptured, onMounted, ref} from "vue";
 import InlaidTag from "./InlaidTag.vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
 import {$var} from "../js/store";
-import {handleCopy} from "../js/some";
+import {calculateTime, getOriginType, handleCopy} from "../js/some";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
@@ -128,9 +124,14 @@ const isShowBtn = computed(()=>{
   }
   return !!(props.selected && $var.utools.subItemSelectedIndex > -1);
 })
+let pathCode = `文件(${props.snippet.path})，请在预览界面预览]`
+if(props.snippet.local){
+  pathCode = "[当前代码片段为本地"+pathCode;
+}else{
+  pathCode = "[当前代码片段为网络"+pathCode;
+}
 let isHover = ref(false)
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
-
 const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
   if(isHoverRef){
@@ -222,9 +223,12 @@ const handleMouseLeave = (e)=>{
 </script>
 
 <style scoped>
-#main{
+.snippet-item{
   position: relative;
   overflow: hidden;
+}
+.sub{
+  margin-bottom: 6px;
 }
 #child{
   position: absolute;
@@ -258,11 +262,10 @@ const handleMouseLeave = (e)=>{
 
 
 
-#left{
-  max-width: 400px;
+.snippet-item-head__left{
   z-index: 20;
 }
-#small{
+.snippet-item__desc{
   margin-left: 10px;
   font-size: 12px;
   display:inline-block;
@@ -270,17 +273,7 @@ const handleMouseLeave = (e)=>{
   transform: scale(0.9); /* 用缩放来解决 */
   transform-origin: 0 0;  /* 左对齐 */
 }
-#right{
-  max-width: 300px;
-  overflow: auto;
-  margin-right: 5px;
-}
-.sub{
-  margin-bottom: 6px;
-}
-
-
-.circle {
+.snippet-item__top {
   position: absolute;
   top:11px;
   left: 2px;
@@ -290,7 +283,7 @@ const handleMouseLeave = (e)=>{
   border-radius: 50%;
   z-index: 100;
 }
-.index{
+.snippet-item__index{
   position: absolute;
   right: 0;
   top:-1px;
@@ -301,6 +294,15 @@ const handleMouseLeave = (e)=>{
 
 .n-card:hover .circle{
   animation: blink 1s 3 steps(1);
+}
+.snippet-item-info{
+  position: absolute;
+  bottom: 4px;
+  right: 0;
+  font-size:12px;
+  transform: scale(0.78); /* 用缩放来解决 */
+  line-height: 1;
+
 }
 
 

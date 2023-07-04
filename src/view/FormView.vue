@@ -28,48 +28,86 @@
           </template>
         </n-dynamic-tags>
       </n-form-item>
-      <n-form-item label="代码" path="code">
+      <n-form-item label="代码片段" path="code">
         <template #default>
-          <div id="main">
-            <n-input
-                v-model:value="codeTemplate.code"
-                placeholder="请输入代码片段"
-                type="textarea"
-                size="small"
-                style="padding-top: 40px;padding-bottom: 5px"
-                show-count
-                @keydown="handleKeyDown"
-                ref="codeTextArea"
-                :autosize="{minRows: 10,maxRows: 10}"/>
-            <div id="sub">
-              <n-tooltip trigger="hover">
-                <template #trigger>
-                  <n-radio-group id="tab" size="small" v-model:value="tabValue" :default-value="configManager.get('whatTabDo')??0" @update:value="v=> configManager.set('whatTabDo',v)" name="radiogroup">
-                    <n-space :size="1">
-                      <n-radio v-for="op in tabOptions" :key="op.value" :value="op.value" name="radiogroup">
-                        {{ op.label }}
-                      </n-radio>
-                    </n-space>
-                  </n-radio-group>
-                </template>
-                Tab键的原生行为默认是切换焦点，这里可以定制行为
-              </n-tooltip>
+          <n-tabs  animated
+                   v-model:value="currentTab"
+                   @update:value="handleChange"
+                   justify-content="space-evenly"
+                   type="line"
+                   size="small">
+            <n-tab-pane name="code" tab="代码">
+              <div id="main">
+                <n-input
+                    v-model:value="codeTemplate.code"
+                    placeholder="请输入代码片段"
+                    type="textarea"
+                    size="small"
+                    style="padding-top: 40px;padding-bottom: 5px"
+                    show-count
+                    @keydown="handleKeyDown"
+                    ref="codeTextArea"
+                    :autosize="{minRows: 9,maxRows: 9}"/>
+                <div id="sub">
+                  <n-tooltip trigger="hover">
+                    <template #trigger>
+                      <n-radio-group id="tab" size="small" v-model:value="tabValue" :default-value="configManager.get('whatTabDo')??0" @update:value="v=> configManager.set('whatTabDo',v)" name="radiogroup">
+                        <n-space :size="1">
+                          <n-radio v-for="op in tabOptions" :key="op.value" :value="op.value" name="radiogroup">
+                            {{ op.label }}
+                          </n-radio>
+                        </n-space>
+                      </n-radio-group>
+                    </template>
+                    Tab键的原生行为默认是切换焦点，这里可以定制行为
+                  </n-tooltip>
 
-              <div id="select">
-                <n-select
-                    v-model:value="codeTemplate.type"
-                    filterable
-                    placeholder="选择代码类型"
-                    :options="languages"
-                    :default-value="codeSnippet.type??'plaintext'"
-                    tag
-                    :theme-overrides="selectThemeOverrides"
-                />
+                  <div id="select">
+                    <n-select
+                        v-model:value="codeTemplate.type"
+                        filterable
+                        placeholder="选择代码类型"
+                        :options="languages"
+                        default-value="plaintext"
+                        tag
+                        :theme-overrides="selectThemeOverrides"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </n-tab-pane>
+            <n-tab-pane name="path" tab="链接文件">
+              <n-button @click="handleImport" quaternary type="primary">关联本地文件</n-button> &nbsp;&nbsp;
+              <n-button @click="showModal = true" quaternary type="info">关联链接</n-button>
+              <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
+                <n-list-item v-if="codeTemplate.path" style="height: 100px">
+                  <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
+                    <div style="width: 24px" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z" fill="currentColor"></path></svg></div>
+                    <div style="position: absolute; left: 32px; bottom: 7px">{{codeTemplate.path}}</div>
+                    <div style="position: absolute; right:36px; bottom: 7px">[ {{codeTemplate.local? '本地文件':'网络文件'}} ]</div>
+                    <n-button @click="handleClearPath" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error">
+                      <template #icon>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
+                      </template>
+                    </n-button>
+                  </div>
+                  <n-select
+                      v-model:value="codeTemplate.type"
+                      filterable
+                      placeholder="选择代码类型"
+                      :options="languages"
+                      default-value="plaintext"
+                      tag
+                      :theme-overrides="selectThemeOverrides"
+                  />
+                </n-list-item>
+              </n-list>
+            </n-tab-pane>
+          </n-tabs>
         </template>
       </n-form-item>
+
+
 
 
       <div id="btn">
@@ -92,22 +130,35 @@
       </div>
     </n-form>
   </div>
+  <n-modal v-model:show="showModal"
+           preset="card"
+           title="请输入链接"
+            style="width: 60%"
 
+  >
+    <n-input v-model:value="url" clearable/>
+    <template #footer>
+      <div style="width: 100%;position: relative">
+        <n-space style="position: absolute; right: 3px">
+          <n-button quaternary @click="showModal = false">取消</n-button>
+          <n-button quaternary type="success" @click="handleSetUrlAsPath">确定</n-button>
+        </n-space>
+      </div>
+      <br/>
+    </template>
+  </n-modal>
 </template>
 
 <script setup>
-import {computed, onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {handleRecoverLiteShow, languages} from "../js/some.js";
 import {$var, LIST_VIEW, UPDATE_VIEW} from "../js/store";
 
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()
-const codeSnippet = ($var.currentMode === UPDATE_VIEW)? codeSnippetManager.get($var.currentName) :{
+const codeTemplate = reactive(($var.currentMode === UPDATE_VIEW)? codeSnippetManager.get($var.currentName) :{
   code: $var.others.code
-}
-const codeTemplate = reactive({
-  ...codeSnippet
 })
 let tempTag = ref()
 const tags = computed(()=>{
@@ -118,8 +169,11 @@ const tags = computed(()=>{
     }
   })
 })
-const tabValue = ref()
+const tabValue = ref()   // Tab键行为
+const currentTab = ref(codeTemplate.path? 'path':'code')  // 当前Tab页
 const codeTextArea = ref()
+const showModal = ref(false)
+const url = ref()
 const tabOptions = [
   {label: '原生行为',value: 0},
   {label: '\\t制表符',value: 1},
@@ -140,7 +194,7 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if($var.currentMode === UPDATE_VIEW && codeSnippet.name === value){
+        if($var.currentMode === UPDATE_VIEW && $var.currentName === value){
           return true;
         }
         return !codeSnippetManager.contain(value)
@@ -150,9 +204,21 @@ const rules = {
 
   ],
   "code":{
-    required:true,
+    validator(rule,value){
+      if(currentTab.value === 'code'){
+        if(value && value.length > 0){
+          return true;
+        }
+        return false;
+      }
+      return true;
+    },
     message:"请放置代码片段"
   }
+}
+function handleChange(value){
+  console.log(value)
+  console.log(currentTab.value)
 }
 
 const handleCancel = ()=>{
@@ -165,25 +231,28 @@ const handleUpdate = ()=>{
       if(error!=null && error.length >= 0){
         window.$message.warning("请按要求填写")
       }else{
-        codeSnippet.code = codeTemplate.code;
-        codeSnippet.desc = codeTemplate.desc;
-        codeSnippet.tags = [...new Set(codeTemplate.tags)];
-        codeSnippet.type = codeTemplate.type?? "plaintext";
-
+        //
+        if(currentTab.value === 'path'){
+          //
+          if(!codeTemplate.path){
+            $message.warning("请提供 链接文件")
+            return;
+          }
+        }
         if($var.currentMode === UPDATE_VIEW){
-          if(codeSnippet.name === codeTemplate.name){
+          if($var.currentName === codeTemplate.name){
             $var.utools.keepSelectedStatus = true;
-            codeSnippetManager.update(codeSnippet)
+            codeSnippetManager.update(toRaw(codeTemplate))
           }else{
             $var.utools.keepSelectedStatus = null;
             // 这里清理查询缓存
+            let codeSnippet = toRaw(codeTemplate);
             delete codeSnippet.query;
-            codeSnippetManager.replace(codeTemplate.name,codeSnippet)
+            codeSnippetManager.replace($var.currentName,codeSnippet)
           }
         }else{
-          codeSnippet.name = codeTemplate.name;
           $var.utools.keepSelectedStatus = null;
-          codeSnippetManager.add(codeSnippet)
+          codeSnippetManager.add(toRaw(codeTemplate))
         }
         window.$message.success("操作成功")
         handleRecoverLiteShow()
@@ -244,11 +313,42 @@ const selectThemeOverrides = {
       boxShadowActive: 'none',
       boxShadowFocus: 'none',
       textColor: utools.isDarkColors()? 'white':'black',
-      borderRadius: 0
+      borderRadius: 0,
+      color:'transparent',
+      colorFocus: 'white',
+      colorActive: utools.isDarkColors()? '#575859': '#fff'
     }
   }
 }
+const handleImport = ()=>{
+  const realPathList = utools.showOpenDialog({
+    title: '指定你的本地关联文件',
+    defaultPath: utools.getPath('desktop'),
+    buttonLabel: '确定',
+    properties: [
+      'openFile'
+    ]
+  })
+  if (realPathList != null) {
+    codeTemplate.path = realPathList[0]
+    codeTemplate.local = true;
+  }
+}
+const isFullUrlRegex = /^\w+:\/\/.*/
 
+function handleSetUrlAsPath(){
+  if(url.value && url.value.match(isFullUrlRegex)){
+    codeTemplate.path = url.value;
+    codeTemplate.local = undefined;
+    showModal.value = false;
+  }else{
+    $message.warning("请填写合法链接")
+  }
+}
+function handleClearPath(){
+  codeTemplate.path = undefined;
+  codeTemplate.local = undefined;
+}
 </script>
 
 <style scoped>
@@ -284,6 +384,8 @@ const selectThemeOverrides = {
   margin-left: 6px;
 }
 #btn{
+  position: fixed;
+  bottom: 20px;
   width: 100%;
   display: flex;
   justify-content: center;

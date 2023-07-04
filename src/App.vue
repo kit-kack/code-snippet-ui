@@ -1,14 +1,12 @@
 <template>
   <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
-    <n-notification-provider placement="bottom-right">
-      <n-message-provider>
-        <component :is="Tabs[$var.currentMode]"/>
-        <vim-status-bar/>
-        <n-drawer v-model:show="$var.view.settingActive" :width="380" placement="right">
-          <side-view @refresh="dealWithRefresh" />
-        </n-drawer>
-      </n-message-provider>
-    </n-notification-provider>
+    <n-message-provider>
+      <component :is="Tabs[$var.currentMode]"/>
+      <vim-status-bar/>
+      <n-drawer v-model:show="$var.view.settingActive" :width="380" placement="right">
+        <side-view @refresh="dealWithRefresh" />
+      </n-drawer>
+    </n-message-provider>
   </n-config-provider>
 </template>
 
@@ -42,6 +40,11 @@ const dealWithRefresh = ()=>{
 }
 onMounted(()=>{
   document.body.id = utools.isDarkColors()? 'dark-app' : 'light-app'
+  if(configManager.get('darkHighlightColor') === undefined){
+    configManager.configs["darkHighlightColor"] = darkColorSchemaStyleOptions[0].highColor
+    configManager.configs["lightHighlightColor"]  = colorSchemaStyleOptions[0].highColor;
+    configManager.writeToDB()
+  }
   if(configManager.get("colorSchema") === undefined){
     configManager.configs["colorSchema"] = 0
     configManager.configs["darkColorSchema"] = 0
@@ -53,6 +56,7 @@ onMounted(()=>{
     configManager.configs["darkSelectedColor"] = darkColorSchemaStyleOptions[0].selectedColor
     configManager.writeToDB()
   }
+
 })
 
 </script>

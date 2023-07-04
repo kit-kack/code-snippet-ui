@@ -20,9 +20,6 @@ function getThemeOverrides(){
 
 
     return {
-        Card:{
-            boxShadow:`0px 1px 0px rgba(17,17,26,0.05), 0px 0px 4px ${gc}`
-        },
         Switch:{
             railColorActive: gc
         },
@@ -92,64 +89,78 @@ const colorSchemaStyleOptions = [
         globalColor: '#65b88cff',
         selectedColor: '#f9fff5ff',
         tagColor: '#18a057ff',
+        highColor: '#d1f8e3aa'
     },
     {
         globalColor: '#36cfc9ff',
         selectedColor: '#e6fffbff',
         tagColor: '#10d5d5ff',
+        highColor: '#cbf3f199'
     },
     {
         globalColor: '#40a9ffff',
         selectedColor: '#e6f2ffff',
-        tagColor: '#1375d8ff'
+        tagColor: '#1375d8ff',
+        highColor: '#bbd9f1bb'
     },{
         globalColor: '#b37febff',
         selectedColor: '#f9f0ffff',
-        tagColor: '#6a1fc7ff'
+        tagColor: '#6a1fc7ff',
+        highColor: '#E8D9F8AA'
     },{
         globalColor: '#ff85c0ff',
         selectedColor: '#fff0f6ff',
-        tagColor: '#d41678ff'
+        tagColor: '#d41678ff',
+        highColor: '#fdd8eaaa'
     },{
         globalColor: '#f8c76dff',
         selectedColor: '#fffbe6ff',
-        tagColor: '#d9950dff'
+        tagColor: '#d9950dff',
+        highColor: '#f6e6c8aa'
     },{
         globalColor: '#ff7875ff',
         selectedColor: '#fff1f0ff',
-        tagColor: '#d41619ff'
+        tagColor: '#d41619ff',
+        highColor: '#fcd0cfaa'
     }];
 const darkColorSchemaStyleOptions = [
     {
         globalColor: '#479a6dff',
         selectedColor: '#343c38ff',
         tagColor: '#1e5237ff',
+        highColor: '#1A49319E'
     },
     {
         globalColor: '#069898ff',
         selectedColor: '#3a4547ff',
         tagColor: '#0f5252ff',
+        highColor: '#154D4DAA'
     },
     {
         globalColor: '#0266caff',
         selectedColor: '#2d3945ff',
-        tagColor: '#1f4061ff'
+        tagColor: '#1f4061ff',
+        highColor: '#0241855B'
     },{
         globalColor: '#8a63bbff',
         selectedColor: '#3e3747ff',
-        tagColor: '#4a3861ff'
+        tagColor: '#4a3861ff',
+        highColor: '#4D2E738E'
     },{
         globalColor: '#aa467aff',
         selectedColor: '#4d3641ff',
-        tagColor: '#68314eff'
+        tagColor: '#68314eff',
+        highColor: '#562940AF'
     },{
         globalColor: '#ffa600ff',
         selectedColor: '#524b3fff',
-        tagColor: '#8a610fff'
+        tagColor: '#8a610fff',
+        highColor: '#EC9E0721'
     },{
         globalColor: '#ff7875ff',
         selectedColor: '#4d3636ff',
-        tagColor: '#84393aff'
+        tagColor: '#84393aff',
+        highColor: '#FF78753D'
     }];
 
 function adjustTheme(v){
@@ -157,6 +168,7 @@ function adjustTheme(v){
     configManager.setGlobalColor(style.globalColor)
     configManager.setColor('TagColor',style.tagColor)
     configManager.setColor('SelectedColor',style.selectedColor)
+    configManager.setColor('HighlightColor',style.highColor)
 }
 
 

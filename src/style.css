@@ -1,10 +1,13 @@
+@import "style/atom.css";
 *{
   padding: 0;
   margin: 0;
 }
 
-
-#app pre{
+.n-card > .n-card__footer{
+  padding-bottom: 0 !important;
+}
+#app .hljs-container pre{
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -12,8 +15,8 @@
   background-color: transparent;
 }
 
-pre code.hljs{
-  font-family: 'Consolas' !important;
+
+.hljs-container pre code.hljs{
   padding: 0 !important;
 }
 .n-color-picker {
@@ -40,4 +43,19 @@ pre code.hljs{
 }
 .n-dynamic-tags .n-button:not(.n-button--disabled):hover{
   --n-text-color-hover: #ccc !important;
+}
+
+
+#dark-app .v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre::-webkit-scrollbar-track-piece{
+ background-color: #303133;
+}
+
+#dark-app .v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  border: none;
+  background: rgba(0, 0, 0, 0.2);
+}
+#dark-app .v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre::-webkit-scrollbar-track {
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.1);
 }

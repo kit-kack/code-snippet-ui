@@ -9,6 +9,9 @@ const CUSTOM_VIEW = 4;
 const $var = reactive({
     currentMode : LIST_VIEW,    // 当前模式
     currentName : null,         // 当前代码片段名（被选中元素）
+    currentSnippet: null,       // 当前代码片段
+    currentCode: null,          // 当前代码
+    currentSplitCode: null,
     list: [],                   // 存放CodeSnippet列表
     // 控制滚动
     scroll:{
@@ -28,7 +31,8 @@ const $var = reactive({
         recoverLiteHeight: 0,      // 恢复为列表UI的高度
         refresh: true,              // 控制刷新
         cursorShow: true,
-        buttonFixed: false
+        buttonFixed: false,
+        isRendering: false,
     },
     // 控制utool及Vim模式
     utools:{
@@ -40,7 +44,8 @@ const $var = reactive({
     },
     others:{
         onlyOne: false,      // 当前查询结果是否仅有一条记录
-        code: null           // 快速进入创建界面的携带的代码
+        code: null,           // 快速进入创建界面的携带的代码
+        updateCacheCodeFunc: null,      // 调整缓存函数
     }
 })
 

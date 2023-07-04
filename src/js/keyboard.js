@@ -1,13 +1,46 @@
-import {nextTick} from "vue";
+import {nextTick, toRaw} from "vue";
 import {codeSnippetManager, configManager} from "./core.js";
 import {$var, CODE_VIEW, CREATE_VIEW, LIST_VIEW,  UPDATE_VIEW} from "./store"
-import {handleCopy, handleRecoverLiteShow, refreshListView} from "./some";
+import {ctrlKey, handleCopy, handleRecoverLiteShow, refreshListView} from "./some";
+import {debounce} from "./utils/debounce";
 
 // 控制长按键
 let longKeyDown = false;
 let lastTabTime = 0;  // 计算上次按下Tab时间
 
-
+const debMoveDown = debounce(function(){
+    $var.utools.selectedIndex++;
+    $var.utools.subItemSelectedIndex = -1;
+    gotoTheLastPosition();
+})
+const debMoveUp = debounce(function(){
+    $var.utools.selectedIndex--;
+    $var.utools.subItemSelectedIndex = -1;
+    // $var.scroll.listInvoker?.("up")
+    gotoTheLastPosition();
+})
+const debItemMoveLeft = debounce(function(){
+    if($var.view.isDel){
+        $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
+    }else{
+        if($var.utools.subItemSelectedIndex === -1){
+            $var.utools.subItemSelectedIndex = 4;
+        }else{
+            $var.utools.subItemSelectedIndex --;
+        }
+    }
+})
+const debItemMoveRight = debounce(function(){
+    if($var.view.isDel){
+        $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
+    }else{
+        if($var.utools.subItemSelectedIndex === 4){
+            $var.utools.subItemSelectedIndex = -1;
+        }else{
+            $var.utools.subItemSelectedIndex ++;
+        }
+    }
+})
 
 const gotoTheLastPosition = ()=>{
     // 校准位置
@@ -68,15 +101,7 @@ function dealWithListView(e,list){
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 handleScrollBar($var.scroll.itemCodeInvoker,"left")
             }else{
-                if($var.view.isDel){
-                    $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
-                }else{
-                    if($var.utools.subItemSelectedIndex === -1){
-                        $var.utools.subItemSelectedIndex = 4;
-                    }else{
-                        $var.utools.subItemSelectedIndex --;
-                    }
-                }
+                debItemMoveLeft()
             }
             break;
         case "KeyJ":
@@ -98,9 +123,7 @@ function dealWithListView(e,list){
                         utools.shellBeep();
                     }
                 }else {
-                    $var.utools.selectedIndex++;
-                    $var.utools.subItemSelectedIndex = -1;
-                    gotoTheLastPosition();
+                    debMoveDown()
                 }
             }
             break;
@@ -123,10 +146,7 @@ function dealWithListView(e,list){
                         utools.shellBeep();
                     }
                 }else {
-                    $var.utools.selectedIndex--;
-                    $var.utools.subItemSelectedIndex = -1;
-                    // $var.scroll.listInvoker?.("up")
-                    gotoTheLastPosition();
+                    debMoveUp()
                 }
             }
 
@@ -141,15 +161,7 @@ function dealWithListView(e,list){
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 handleScrollBar($var.scroll.itemCodeInvoker,"right")
             }else{
-                if($var.view.isDel){
-                    $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
-                }else{
-                    if($var.utools.subItemSelectedIndex === 4){
-                        $var.utools.subItemSelectedIndex = -1;
-                    }else{
-                        $var.utools.subItemSelectedIndex ++;
-                    }
-                }
+                debItemMoveRight();
             }
             break;
         case "Space":
@@ -166,7 +178,6 @@ function dealWithListView(e,list){
             }
             break;
         case "Digit0":
-        case "KeyR":
             if($var.utools.selectedIndex === -1){
                 if(configManager.get("enabledBeep")){
                     utools.shellBeep();
@@ -198,6 +209,7 @@ function dealWithListView(e,list){
                     $var.view.recoverLiteShow= true;
                     utools.setExpendHeight(545)
                 }
+                $var.currentSnippet = codeSnippetManager.get($var.currentName)
                 $var.currentMode = CODE_VIEW;
                 return;
         case 'KeyQ':
@@ -210,13 +222,52 @@ function dealWithListView(e,list){
     }
 
 }
+const isElementVisible = (el) => {
+    const rect = el.getBoundingClientRect()
+    const vWidth = window.innerWidth || document.documentElement.clientWidth
+    const vHeight = window.innerHeight || document.documentElement.clientHeight
+    if (
+        rect.right < 0 ||
+        rect.bottom < 0 ||
+        rect.left > vWidth ||
+        rect.top > vHeight
+    ) {
+        return false
+    }
+
+    return true
+}
+function handleMdHorizonMove(left,fast){
+    let pres  = document.querySelectorAll(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre")
+    let distance = fast? 50 : 10;
+    // 判断视口
+    for (let pre of pres) {
+        if(isElementVisible(pre)){
+            if(left){
+                if(pre.scrollLeft < distance){
+                    pre.scrollLeft = 0;
+                }else{
+                    pre.scrollLeft -= distance;
+                }
+            }else{
+                pre.scrollLeft += distance;
+            }
+            return;
+        }
+    }
+}
 
 function dealWithCodeView(e){
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
-            handleScrollBar($var.scroll.codeInvoker,"left",e.shiftKey)
-
+            if($var.view.isRendering){
+                if($var.currentSnippet.type === 'markdown'){
+                    handleMdHorizonMove(true,e.shiftKey)
+                }
+            }else{
+                handleScrollBar($var.scroll.codeInvoker,"left",e.shiftKey)
+            }
             break;
         case "KeyJ":
         case "ArrowDown":
@@ -228,7 +279,13 @@ function dealWithCodeView(e){
             break;
         case "KeyL":
         case "ArrowRight":
-            handleScrollBar($var.scroll.codeInvoker,"right",e.shiftKey)
+            if($var.view.isRendering){
+                if($var.currentSnippet.type === 'markdown'){
+                    handleMdHorizonMove(false,e.shiftKey)
+                }
+            }else{
+                handleScrollBar($var.scroll.codeInvoker,"right",e.shiftKey)
+            }
             break;
         case 'KeyS':
             $var.view.showCodeTip = !$var.view.showCodeTip;
@@ -239,8 +296,15 @@ function dealWithCodeView(e){
             $var.utools.keepSelectedStatus = true;
             break;
         case 'Digit0':
-        case 'KeyR':
             handleScrollBar($var.scroll.codeInvoker,"reset")
+            break;
+        case 'KeyR':
+            $var.view.isRendering = !$var.view.isRendering;
+            break;
+        case 'KeyB':
+            if($var.currentSnippet.path){
+                $var.others.updateCacheCodeFunc?.()
+            }
             break;
         default:
             dealWithCommonView(e)
@@ -267,6 +331,61 @@ function dealWithCommonView(e){
                 utools.setExpendHeight(545)
             }
             $var.currentMode = UPDATE_VIEW;
+            break;
+        case 'Digit1':
+        case 'Digit2':
+        case 'Digit3':
+        case 'Digit4':
+        case 'Digit5':
+        case 'Digit6':
+        case 'Digit7':
+        case 'Digit8':
+        case 'Digit9':
+            let num = (+e.code[5]) ;
+
+            if($var.currentMode === LIST_VIEW){
+                $var.currentSnippet = codeSnippetManager.get($var.currentName)
+            }
+            let sections = codeSnippetManager.get($var.currentName).sections;
+            if(sections && sections.length >= num){
+                let section = sections[num-1]
+                let code
+                if($var.currentMode === LIST_VIEW){
+                    if($var.currentSnippet.code){
+                        code = $var.currentSnippet.code.split('\n')
+                    }else{
+                        $message.warning("当前代码片段不支持")
+                        return;
+                    }
+                }else{
+                    code = $var.currentSplitCode??[];
+                }
+                let max = (code??[]).length;
+                if(section[0] > max || section[1] > max ){
+                    $message.warning("区间值超出代码片段区间，请更新或清除旧区间值")
+                }else{
+                    let str = '';
+                    for (let i = section[0]; i <= section[1]; i++) {
+                        str += (code[i-1]+'\n')
+                    }
+                    $var.currentSnippet.time = Date.now()
+                    $var.currentSnippet.count = ($var.currentSnippet.count??0) +1;
+                    codeSnippetManager.update(toRaw(($var.currentSnippet)))
+                    // 复制
+                    utools.copyText(str.slice(0,-1));
+                    $message.success(`已复制${$var.currentName}#${num}号子代码片段的内容`)
+                    // 粘贴
+                    if(e.shiftKey || e.altKey){
+                        utools.hideMainWindow();
+                        utools.simulateKeyboardTap('v',ctrlKey);
+                        if(configManager.get('exitAfterPaste')){
+                            utools.outPlugin();
+                        }
+                    }
+                }
+            }else{
+                $message.warning(`当前没有 ${num}号 子代码片段`)
+            }
             break;
     }
 }

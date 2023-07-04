@@ -17,7 +17,7 @@
 import {configManager} from "../../js/core";
 import {isSupportedLanguage} from "../../js/some";
 import {$var} from "../../js/store";
-import {onUpdated, ref} from "vue";
+import {onMounted, onUpdated, ref} from "vue";
 
 const props = defineProps(['code','type','active']);
 const itemCodeScrollBar = ref();
@@ -29,6 +29,11 @@ const getCodeStyle = () =>{
   }
 }
 onUpdated(()=>{
+  if(props.active){
+    $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
+  }
+})
+onMounted(()=>{
   if(props.active){
     $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
   }

@@ -1,6 +1,9 @@
 <template>
-  <n-collapse  style="padding-top: 10px;padding-bottom: 10px;" :default-expanded-names="['0','1','2','3','4']">
-    <n-collapse-item v-for="(data,index) in datas" :title="data.title" :name="index+''" :key="index">
+  <div style="padding-bottom: 10px;">
+    <template v-for="data in datas">
+      <n-divider dashed>
+        {{data.title}}
+      </n-divider>
       <n-list hoverable clickable :show-divider="false">
         <n-list-item v-for="item in data.items" >
           <div>
@@ -29,9 +32,8 @@
           </div>
         </n-list-item>
       </n-list>
-    </n-collapse-item>
-
-  </n-collapse>
+    </template>
+  </div>
 </template>
 
 <script setup>
@@ -78,16 +80,18 @@ const datas = [
       },{
         feature: "复制Copy",
         shortcut: ["C","Y"],
+        tooltip: "结合Shift使用，只会复制高亮行内容"
       },{
         feature: "粘贴Paste",
-        shortcut: ["Enter","P"]
+        shortcut: ["Enter","P"],
+        tooltip: "结合Shift使用，只会复制高亮行内容"
       },{
         feature: "退出Quit",
         shortcut: "Q",
         tooltip: "该功能也适用于退出元素功能菜单"
       },{
-        feature: '重置（回到开始）Reset',
-        shortcut: ["R","0"],
+        feature: '回到开始',
+        shortcut: ["0"],
         tooltip: "该功能同样适用于代码浏览，浏览多行元素代码块时请结合Shift键"
       }
     ]
@@ -121,7 +125,14 @@ const datas = [
   },
   {
     title: '元素-Vim模式（代码预览界面)',
-    items: [{
+    items: [
+    {
+      feature: "开启/关闭渲染模式Render",
+      shortcut: "R"
+    },{
+      feature: "缓存数据Buffer",
+      shortcut: "B"
+    },{
       feature: "查看代码片段说明Show",
       shortcut: 'S'
     },{

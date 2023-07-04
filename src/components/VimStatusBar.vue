@@ -24,8 +24,9 @@
 </template>
 
 <script setup>
-import {configManager} from "../js/core.js";
-import {$var, CODE_VIEW} from "../js/store";
+import {codeSnippetManager, configManager} from "../js/core.js";
+import {$var, CODE_VIEW, LIST_VIEW} from "../js/store";
+import {toRaw} from "vue";
 const getBtnStyle = ()=>{
   if($var.currentMode<= CODE_VIEW){
     return {
@@ -41,14 +42,31 @@ const getBtnStyle = ()=>{
 }
 
 let showCount = 0 // 必须要到达 7
+let clearCount = 0
+let lastTime = 0  // 时间
 const handleVimStatusBarClick = ()=>{
-  if($var.currentMode <=CODE_VIEW){
+  if($var.currentMode === LIST_VIEW){
     if(showCount === 7){
       $message.success("花点时间去看看外面的风景吧")
       showCount = 0;
     }else{
       showCount++;
     }
+  }else if($var.currentMode === CODE_VIEW){
+    let now = Date.now();
+    if(now - lastTime < 500){
+      if(clearCount === 5){
+        $message.info("清除 所有高亮行")
+        $var.currentSnippet.sections = [];
+        codeSnippetManager.update(toRaw(($var.currentSnippet)))
+        clearCount = 0;
+      }else{
+        clearCount++;
+      }
+    }else{
+      clearCount = 1;
+    }
+    lastTime = now;
   }
 }
 

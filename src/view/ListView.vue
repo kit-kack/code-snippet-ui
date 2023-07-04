@@ -87,6 +87,17 @@
       </template>
     </div>
   </div>
+  <n-modal v-model:show="newVersionShow"
+           preset="card"
+           title="🎉新版本内容介绍"
+           style="width: 60%"
+
+  >
+    <p v-for="c in $version.content" v-html="c"></p>
+    <template #footer>
+      <n-button style="float: right;margin-bottom: 10px" quaternary type="success" @click=" handleCloseNewVersionModal">知晓</n-button>
+    </template>
+  </n-modal>
 </template>
 
 <script setup>
@@ -96,7 +107,7 @@ import {computed, h, onMounted, onUpdated, ref} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
 import {$var, CODE_VIEW, CREATE_VIEW, UPDATE_VIEW} from "../js/store";
 import {refreshListView} from "../js/some";
-import {configManager} from "../js/core";
+import {codeSnippetManager, configManager} from "../js/core";
 import $version from '../js/version'
 
 const scrollBar = ref()
@@ -105,6 +116,7 @@ window.$message = useMessage();
 const list = computed(()=>parseSearchWord($var.utools.search,$var.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
 const fixed = ref(false)
+const newVersionShow = ref(false)
 const handleEdit = (name)=>{
   $var.currentName = name;
   $var.currentMode = UPDATE_VIEW;
@@ -120,6 +132,7 @@ const handleSelect = (index,name)=>{
 
 const handleViewCode = (name)=>{
   $var.currentName = name;
+  $var.currentSnippet = codeSnippetManager.get(name)
   $var.currentMode = CODE_VIEW;
 }
 
@@ -127,42 +140,19 @@ const handleRefresh = ()=>{
   $var.utools.keepSelectedStatus = true;
   refreshListView();
 }
-const newVersionShow = ()=>{
-  if(configManager.get('version') !== $version.version){
-    utools.setExpendHeight(550)
-    const notification = useNotification();
-    const n = notification.create({
-      title: "🎉新版本内容介绍",
-      content: $version.content,
-      meta: $version.version,
-      action: () =>
-          h(
-              NButton,
-              {
-                text: true,
-                type: 'primary',
-                onClick: () => {
-                  configManager.set('version',$version.version)
-                  n.destroy()
-                  $message.info("该版本通知后续不会再出现")
-                }
-              },
-              {
-                default: () => '已读'
-              }
-          ),
-      onClose: () => {
-        $message.info('该版本通知下次仍会出现，如果不想再出现请点击【已读】')
-        return true
-      }
-    })
-  }else{
-    handleAppHeight();
-  }
+function handleCloseNewVersionModal(){
+  configManager.set('version',$version.version);
+  newVersionShow.value = false;
 }
+
 onMounted(()=>{
   parseSearchWord($var.utools.search)
-  newVersionShow();
+  if(configManager.get('version') !== $version.version){
+    utools.setExpendHeight(550);
+    newVersionShow.value = true;
+  }else{
+    handleAppHeight()
+  }
   init(list)
   $var.scroll.listInvoker = scrollBar;
 

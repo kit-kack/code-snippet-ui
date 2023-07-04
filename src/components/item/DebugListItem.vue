@@ -28,31 +28,31 @@
         </n-scrollbar>
       </template>
       <template #header-extra >
-        <div id="right">
-          <n-scrollbar x-scrollable :size="10">
-            <div class="sub">
-              <template v-if="flag">
-                <n-tag id="tag"  :bordered="false" size="small" :color="colorStyle" >test</n-tag>
-              </template>
-              <template v-else>
-                <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
-              </template>
-            </div>
-          </n-scrollbar>
-        </div>
+        <n-scrollbar x-scrollable :size="10" style="max-width: 250px;margin-left: 5px">
+          <div class="sub">
+            <n-space :wrap="false">
+              <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+            </n-space>
+          </div>
+        </n-scrollbar>
       </template>
-      <template v-if="flag">
-        <inlaid-tag :type="snippet.type" :count="snippet.count" :time="snippet.time"/>
+      <template v-if="!configManager.get('noItemCodeShow')">
+        <template v-if="configManager.get('fullItemCodeShow')">
+          <multi-line-code :type="snippet.type" :code="snippet.code"/>
+        </template>
+        <template v-else>
+          <single-line-code :type="snippet.type" :code="snippet.code"/>
+        </template>
       </template>
-      <template v-else>
-        <n-tag id="tag"  :bordered="false" size="small" :color="colorStyle" >test</n-tag>
-      </template>
-      <template v-if="configManager.get('fullItemCodeShow')">
-        <multi-line-code :type="snippet.type" :code="snippet.code"/>
-      </template>
-      <template v-else>
-        <single-line-code :type="snippet.type" :code="snippet.code"/>
-      </template>
+      <span v-if="isSelected" class="snippet-item-info"
+            :style="{
+                color: configManager.getGlobalColor()
+            }"
+      >
+              {{(snippet.type?? 'plaintext')+ ' | '}}
+              {{snippet.count? snippet.count+' | ':''}}
+              {{calculateTime(snippet.time)}}
+      </span>
     </n-card>
 
     <transition>
@@ -90,6 +90,8 @@ import {$var} from "../../js/store";
 import SingleLineCode from "./SingleLineCode.vue";
 import MultiLineCode from "./MultiLineCode.vue";
 import Color from "../../js/lib/color";
+import {calculateTime, getOriginType} from "../../js/some";
+import NormalTag from "../NormalTag.vue";
 
 const isHover = ref(false)
 const isSelected = ref(false)
@@ -110,25 +112,34 @@ const colorStyle = reactive({
   textColor:color
 })
 const props = defineProps(['mode'])
-const getTitle=()=>{
+const getDifferentProperty=()=>{
   switch (props.mode){
     case 'normal':
-      return "默认情况，可测试鼠标滑过Hover效果";
+      return {
+        desc: "默认情况，可测试鼠标滑过Hover效果"
+      };
     case "selected":
-      return "点击被选中情况";
+      return {
+        desc: "点击被选中情况",
+        path: "Hello World"
+      };
     case "vim":
-      return "Vim模式下被选中情况（体现为边框）"
+      return {
+        desc: "Vim模式下被选中情况（体现为边框）",
+        path: "Hello World",
+        local: true
+      }
   }
 }
 
 const snippet = {
   name: "test",
-  desc: getTitle(),
   code: "console.log('当前代码代码片段仅用于测试自定义配置数据，共有七行')\nconsole.log('这是第二行数据')\nconsole.log('这是第三行数据')\nconsole.log('这是第四行数据')\nconsole.log('这是第五行数据')\nconsole.log('这是第六行数据')\nconsole.log('这是第七行数据')",
   type: 'javascript',
   tags: ['test'],
   count: 100,
-  time: 0
+  time: 0,
+  ...getDifferentProperty()
 }
 const getSelectedStyle = (isSelectedRef, isHoverRef)=>{
   let style;
@@ -210,7 +221,11 @@ const handleMouseLeave = (e)=>{
   position:relative;
   overflow: hidden;
 }
-
+.snippet-item-info{
+  font-size:12px;
+  transform: scale(0.78); /* 用缩放来解决 */
+  line-height: 1;
+}
 
 
 #left{
