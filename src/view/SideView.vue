@@ -58,12 +58,11 @@
               <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
               <config-switch title="点击元素是否自动进入Vim模式" config="enabledAutoVim"/>
               <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
-              <n-tooltip placement="left">
+              <n-tooltip placement="left" trigger="hover">
                 <template #trigger>
-                  <n-button id="diy" circle @click="$var.currentMode = CUSTOM_VIEW;$var.view.settingActive = false">
+                  <n-button id="diy"  circle  @click="$var.view.settingActive = false;$var.view.customActive = true">
                     <template #icon>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M224 96l16-32l32-16l-32-16l-16-32l-16 32l-32 16l32 16l16 32zM80 160l26.66-53.33L160 80l-53.34-26.67L80 0L53.34 53.33L0 80l53.34 26.67L80 160zm352 128l-26.66 53.33L352 368l53.34 26.67L432 448l26.66-53.33L512 368l-53.34-26.67L432 288zm70.62-193.77L417.77 9.38C411.53 3.12 403.34 0 395.15 0c-8.19 0-16.38 3.12-22.63 9.38L9.38 372.52c-12.5 12.5-12.5 32.76 0 45.25l84.85 84.85c6.25 6.25 14.44 9.37 22.62 9.37c8.19 0 16.38-3.12 22.63-9.37l363.14-363.15c12.5-12.48 12.5-32.75 0-45.24zM359.45 203.46l-50.91-50.91l86.6-86.6l50.91 50.91l-86.6 86.6z" fill="currentColor"></path></svg>
-                    </template>
+                      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><rect fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" x="280.48" y="122.9" width="63.03" height="378.2" rx="31.52" transform="rotate(-45 312.002 311.994)"></rect><path d="M178.38 178.38a31.64 31.64 0 0 0 0 44.75L223.25 268L268 223.25l-44.87-44.87a31.64 31.64 0 0 0-44.75 0z" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M48 192h48" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M90.18 90.18l33.94 33.94" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M192 48v48" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M293.82 90.18l-33.94 33.94" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M124.12 259.88l-33.94 33.94" fill="currentColor"></path></svg>                </template>
                   </n-button>
                 </template>
                 个性化定制
@@ -104,12 +103,12 @@ import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js"
 import {computed, nextTick, ref} from "vue";
 import ShortcutPane from "../components/ShortcutPane.vue";
 import NormalTag from "../components/NormalTag.vue";
-import {$var, CUSTOM_VIEW} from "../js/store";
+import {$var} from "../js/store";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
+import {NButton} from "naive-ui";
 
 const emit = defineEmits(['refresh'])
 const refreshStatus = ref(true)
-const tags = computed(()=>tagColorManager.all())
 const dealWithRefresh = ()=>{
   refreshStatus.value = false;
   emit('refresh')

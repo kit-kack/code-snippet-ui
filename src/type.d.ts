@@ -54,3 +54,4 @@ declare type ConfigItem =
     | "forbidMouseHover"                             // 禁用鼠标滑过
     | "colorSchema" | "darkColorSchema"              // 颜色方案
     | "renderApi"                                   // 可选渲染选项
+    | "defaultLanguage"                             // 默认选择语言

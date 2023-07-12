@@ -51,10 +51,9 @@ initVH(app)
 app.directive("code", {
     mounted(el) {
         //获取代码片段
-        let collection = $var.currentCode.split('\n');
-        $var.currentSplitCode = collection;
+        let collection = el.querySelector('code.hljs')?.innerHTML.split('\n');
         let size = collection.length;
-        if(collection[collection.length -1].trim() === ''){
+        if(collection[size -1].trim() === ''){
             size --;
         }
         //插入行数

@@ -4,7 +4,7 @@
       <pre :style="getCodeStyle()">{{code}}</pre>
     </template>
     <template v-else-if="isSupportedLanguage(type??'plaintext')">
-      <highlightjs :language="type??'plaintext'" :autodetect="false" :code="code" width="100%"/>
+      <highlightjs :language="type" :autodetect="false" :code="code" width="100%"/>
     </template>
     <template v-else>
       <highlightjs  autodetect :code="code" width="100%"/>

@@ -13,10 +13,11 @@ const theme = utools.isDarkColors()? darkTheme:null;
 function getThemeOverrides(){
     configManager.init();
     const gc = configManager.getGlobalColor();
+    const hoverBorderVar = `1px solid #737475`
     const borderVar = `1px solid ${gc}`
     const boxShadowVar = `inset 0 0 0 1px ${gc}`
     const textOrCaretColorVar =  utools.isDarkColors()? 'white': '#4b4e51';
-    const inputBorderVar = utools.isDarkColors()? 'none': '1px solid #ddd';
+    const inputBorderVar = `1px solid ${utools.isDarkColors()? '#303133': '#e7e7e8'}`;
 
 
     return {
@@ -33,9 +34,9 @@ function getThemeOverrides(){
             colorCheckedPressed:gc
         },
         Input:{
-            borderFocus: utools.isDarkColors()? 'none': borderVar,
-            boxShadowFocus: `0px 1px 0px rgba(17,17,26,0.05), 0px 0px 2px ${gc} inset, 0 0 3px ${gc}`,
-            borderHover: utools.isDarkColors()? 'none': borderVar,
+            borderFocus: borderVar,
+            boxShadowFocus: 'none',
+            borderHover: hoverBorderVar,
             border: inputBorderVar,
             caretColor: textOrCaretColorVar,
         },
@@ -145,7 +146,7 @@ const darkColorSchemaStyleOptions = [
         globalColor: '#8a63bbff',
         selectedColor: '#3e3747ff',
         tagColor: '#4a3861ff',
-        highColor: '#4D2E738E'
+        highColor: '#4a386155'
     },{
         globalColor: '#aa467aff',
         selectedColor: '#4d3641ff',

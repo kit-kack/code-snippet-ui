@@ -34,8 +34,6 @@
 
 // create namespaces
 /*global net */
-import Color from "colorjs.io";
-
 if ("undefined" == typeof net) {
     var net = {};
 }

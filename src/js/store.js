@@ -4,7 +4,7 @@ const LIST_VIEW = 0;
 const CODE_VIEW = 1;
 const UPDATE_VIEW = 2;
 const CREATE_VIEW = 3;
-const CUSTOM_VIEW = 4;
+
 
 const $var = reactive({
     currentMode : LIST_VIEW,    // 当前模式
@@ -25,6 +25,7 @@ const $var = reactive({
     view:{
         fullScreenShow: true,     // 是否为完整UI模式
         settingActive: false,     // 侧边栏是否开启，禁止其他按键操作
+        customActive: false,      // 自定义底边栏
         showCodeTip: false,       // 是否展示 CodeView中的 Tip
         isDel: false,             // 当前是否为 删除操作
         recoverLiteShow: false,   // 是否恢复为 列表UI
@@ -33,6 +34,7 @@ const $var = reactive({
         cursorShow: true,
         buttonFixed: false,
         isRendering: false,
+        edit: false
     },
     // 控制utool及Vim模式
     utools:{
@@ -52,5 +54,5 @@ const $var = reactive({
 
 export {
     $var,
-    LIST_VIEW,CODE_VIEW,UPDATE_VIEW,CREATE_VIEW,CUSTOM_VIEW
+    LIST_VIEW,CODE_VIEW,UPDATE_VIEW,CREATE_VIEW
 }

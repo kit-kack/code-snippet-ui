@@ -1,20 +1,22 @@
 <template>
   <div  id="code-view">
-    <n-scrollbar style="max-height: 100vh" :x-scrollable="!$var.view.isRendering" trigger="hover" ref="scrollBar">
+    <n-scrollbar style="max-height: 100vh" :x-scrollable="!isRenderable || !$var.view.isRendering" trigger="hover" ref="scrollBar">
       <template v-if="refresh">
-        <template v-if="snippet.type === 'image'">
-          <img :src="snippet.path" alt="" style="width: 100vw;">
-        </template>
-        <template v-else-if="isRenderable && $var.view.isRendering">
-          <v-md-preview :text="$var.currentCode"></v-md-preview>
+        <template v-if="isRenderable && $var.view.isRendering">
+          <template v-if="snippet.type === 'image'">
+            <img :src="snippet.path??snippet.code" alt="" style="width: 100vw;">
+          </template>
+          <template v-else-if="snippet.type === 'markdown'">
+            <v-md-preview :text="$var.currentCode" ></v-md-preview>
+          </template>
         </template>
         <template v-else>
           <div class="hljs-container" v-code>
             <template v-if="isValidLanguage">
-              <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="$var.currentCode" width="100%"/>
+              <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="getLimitedCode($var.currentCode)" width="100%"/>
             </template>
             <template v-else>
-              <highlightjs  autodetect :code="$var.currentCode" width="100%"/>
+              <highlightjs language="plaintext" :autodetect="false" :code="getLimitedCode($var.currentCode)" width="100%"/>
             </template>
             <div class="hljs-line-container">
               <template v-for="(section,sindex) in snippet.sections">
@@ -25,7 +27,6 @@
                         backgroundColor:configManager.getColor('HighlightColor'),
                    top: (22*line-22)+'px'}">{{lindex === 0? (sindex <9? getNumShow(sindex): ''):''}}</div>
               </template>
-
             </div>
           </div>
         </template>
@@ -44,7 +45,9 @@
         <template v-if="isRenderable">
           <n-button quaternary
                     @click=" $var.view.isRendering = !$var.view.isRendering"
-                    :color="configManager.getGlobalColor()">
+                    :color="configManager.getGlobalColor()"
+                    :disabled="snippet.type === 'image' && snippet.path"
+          >
             {{ $var.view.isRendering? '💎已渲染 [R]': '未渲染 [R]' }}
           </n-button>
         </template>
@@ -72,16 +75,11 @@
           </n-list>
         </n-popover>
 
-        <n-tooltip trigger="hover" placement="left">
-          <template #trigger>
-            <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="handleClose">
-              <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
-              </template>
-            </n-button>
+        <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="handleClose">
+          <template #icon>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
           </template>
-          你可以使用按下右键或q来退出页面
-        </n-tooltip>
+        </n-button>
       </n-space>
     </div>
   </div>
@@ -89,7 +87,7 @@
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {computed, h, nextTick, onMounted, ref, toRaw} from "vue";
+import {computed, defineComponent, h, nextTick, onMounted, ref, toRaw} from "vue";
 import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
 import {section_generate} from "../js/utils/section";
@@ -98,22 +96,16 @@ const snippet = $var.currentSnippet;
 $var.currentCode = getCode()
 const hover = ref(false)
 const refresh = ref(true)
-const isValidLanguage = computed(()=>isSupportedLanguage(snippet.type??'plaintext'))
-const isRenderable = computed(()=>snippet.type === 'markdown')
-const lines = computed(()=>{
-  if(snippet.sections){
-    /**
-     * @type number[]
-     */
-    let array = [];
-    for (const section of snippet.sections) {
-      section_generate(array,section)
-    }
-    return array;
+const isValidLanguage = computed(()=>{
+  if(snippet.type === 'image'){
+    $var.view.isRendering = true;
+    return false;
   }else{
-    return [];
+    return isSupportedLanguage(snippet.type??'plaintext')
   }
 })
+
+const isRenderable = computed(()=>snippet.type === 'markdown' || snippet.type === 'image')
 function doRefresh(){
   refresh.value = false;
   nextTick(()=>{
@@ -121,6 +113,13 @@ function doRefresh(){
     // 滚动条重新绑定
     $var.scroll.codeInvoker = scrollBar.value;
   })
+}
+function getLimitedCode(code){
+  if(code.length > 100000){
+    return "[代码长度超过100000个字符，无法全部加载]\n"+code.slice(0,100000)
+  }else{
+    return code;
+  }
 }
 function getCode(){
   if(snippet.path){
@@ -134,7 +133,13 @@ function getCode(){
 }
 function getCodeFromPath(){
   if(snippet.local){
-    return window.preload.readConfig(snippet.path)?? '[本地内容为空]'
+    try{
+      return window.preload.readConfig(snippet.path)?? '[本地内容为空]'
+    }catch (e){
+      $message.error(e.message)
+      return `😅加载失败: 本地文件[ ${snippet.path} ]`
+    }
+
   }else if(snippet.type !== 'image'){
     fetch(snippet.path).then(resp=>{
       if(resp.ok){
@@ -298,8 +303,29 @@ onMounted(()=>{
 }
 
 #dark-app .github-markdown-body  {
-  color: white !important;
+  color: #ccc !important;
 }
-
+#dark-app .github-markdown-body table{
+  background-color: #313134;
+}
+#dark-app .github-markdown-body table thead  tr{
+  background-color: #313134;
+}
+#dark-app .github-markdown-body table tr{
+  background-color: #353539;
+  border-top-color: #313134;
+}
+#dark-app .github-markdown-body table tr:nth-child(2n){
+  background-color: #313134;
+}
+#dark-app .github-markdown-body table td, #dark-app .github-markdown-body table th{
+  border-color: #444 !important;
+}
+#dark-app .github-markdown-body blockquote{
+  border-left-color: #515154;
+}
+#dark-app .github-markdown-body h1, #dark-app .github-markdown-body h2{
+  border-bottom-color: #515154;
+}
 
 </style>

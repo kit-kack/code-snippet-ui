@@ -43,32 +43,50 @@
                     placeholder="请输入代码片段"
                     type="textarea"
                     size="small"
-                    style="padding-top: 40px;padding-bottom: 5px"
-                    show-count
+                    style="padding-top: 40px;padding-bottom: 10px"
                     @keydown="handleKeyDown"
                     ref="codeTextArea"
+                    show-count
                     :autosize="{minRows: 9,maxRows: 9}"/>
                 <div id="sub">
-                  <n-tooltip trigger="hover">
+                  <n-popover>
                     <template #trigger>
-                      <n-radio-group id="tab" size="small" v-model:value="tabValue" :default-value="configManager.get('whatTabDo')??0" @update:value="v=> configManager.set('whatTabDo',v)" name="radiogroup">
-                        <n-space :size="1">
-                          <n-radio v-for="op in tabOptions" :key="op.value" :value="op.value" name="radiogroup">
-                            {{ op.label }}
-                          </n-radio>
-                        </n-space>
-                      </n-radio-group>
+                      <n-button  quaternary style="position: absolute;">
+                        <template #icon>
+                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M7.77 6.76L6.23 5.48L.82 12l5.41 6.52l1.54-1.28L3.42 12l4.35-5.24zM7 13h2v-2H7v2zm10-2h-2v2h2v-2zm-6 2h2v-2h-2v2zm6.77-7.52l-1.54 1.28L20.58 12l-4.35 5.24l1.54 1.28L23.18 12l-5.41-6.52z" fill="currentColor"></path></svg>
+                        </template>
+                      </n-button>
                     </template>
-                    Tab键的原生行为默认是切换焦点，这里可以定制行为
-                  </n-tooltip>
-
+                    <n-space align="center">
+                      Tab键行为：
+                      <n-select
+                          :options="tabOptions"
+                          :default-value="configManager.get('whatTabDo')"
+                          :theme-overrides="selectThemeOverrides"
+                          @update-value="v=> configManager.set('whatTabDo',v)"
+                          style="width: 190px"
+                      />
+                    </n-space>
+                    <n-space align="center">
+                      默认语言：
+                      <n-select
+                          filterable
+                          placeholder="选择默认语言"
+                          :options="languages"
+                          :default-value="configManager.get('defaultLanguage')??'plaintext'"
+                          tag
+                          @update-value="v=> configManager.set('defaultLanguage',v)"
+                          :theme-overrides="selectThemeOverrides"
+                      />
+                    </n-space>
+                  </n-popover>
                   <div id="select">
                     <n-select
                         v-model:value="codeTemplate.type"
                         filterable
                         placeholder="选择代码类型"
                         :options="languages"
-                        default-value="plaintext"
+                        :default-value="configManager.get('defaultLanguage')??'plaintext'"
                         tag
                         :theme-overrides="selectThemeOverrides"
                     />
@@ -83,23 +101,25 @@
                 <n-list-item v-if="codeTemplate.path" style="height: 100px">
                   <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
                     <div style="width: 24px" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z" fill="currentColor"></path></svg></div>
-                    <div style="position: absolute; left: 32px; bottom: 7px">{{codeTemplate.path}}</div>
-                    <div style="position: absolute; right:36px; bottom: 7px">[ {{codeTemplate.local? '本地文件':'网络文件'}} ]</div>
+                    <div style="position: absolute; left: 32px; bottom: 7px">[ {{codeTemplate.dir? '本地目录':(codeTemplate.local? '本地文件':'网络文件')}} ]</div>
+                    <n-select
+                        style="position: absolute; right:36px; bottom: 7px;width: 230px;height: 24px"
+                        v-model:value="codeTemplate.type"
+                        filterable
+                        size="small"
+                        placeholder="选择代码类型"
+                        :options="languages"
+                        default-value="plaintext"
+                        tag
+                        :theme-overrides="selectThemeOverrides"
+                    />
                     <n-button @click="handleClearPath" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error">
                       <template #icon>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
                       </template>
                     </n-button>
                   </div>
-                  <n-select
-                      v-model:value="codeTemplate.type"
-                      filterable
-                      placeholder="选择代码类型"
-                      :options="languages"
-                      default-value="plaintext"
-                      tag
-                      :theme-overrides="selectThemeOverrides"
-                  />
+                  <div style="margin-left: 8px;margin-top: 10px">{{codeTemplate.path}}</div>
                 </n-list-item>
               </n-list>
             </n-tab-pane>
@@ -154,10 +174,11 @@ import {computed, onMounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {handleRecoverLiteShow, languages} from "../js/some.js";
 import {$var, LIST_VIEW, UPDATE_VIEW} from "../js/store";
+import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()
-const codeTemplate = reactive(($var.currentMode === UPDATE_VIEW)? codeSnippetManager.get($var.currentName) :{
+const codeTemplate = reactive(($var.currentMode === UPDATE_VIEW)? {...codeSnippetManager.get($var.currentName)} :{
   code: $var.others.code
 })
 let tempTag = ref()
@@ -169,7 +190,6 @@ const tags = computed(()=>{
     }
   })
 })
-const tabValue = ref()   // Tab键行为
 const currentTab = ref(codeTemplate.path? 'path':'code')  // 当前Tab页
 const codeTextArea = ref()
 const showModal = ref(false)
@@ -322,7 +342,7 @@ const selectThemeOverrides = {
 }
 const handleImport = ()=>{
   const realPathList = utools.showOpenDialog({
-    title: '指定你的本地关联文件',
+    title: '指定你的本地关联文件' ,
     defaultPath: utools.getPath('desktop'),
     buttonLabel: '确定',
     properties: [
@@ -352,9 +372,7 @@ function handleClearPath(){
 </script>
 
 <style scoped>
-#root{
-  padding: 20px;
-}
+
 #main{
   position: relative;
   width: 100%;
@@ -364,21 +382,25 @@ function handleClearPath(){
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: calc(100% - 2px);
   height: 37px;
   box-sizing: border-box;
+  margin-left: 1px;
   border-bottom: 1px solid #efeff2;
   padding: 1px;
+}
+#dark-app #sub{
+  border-bottom-color: #848586;
 }
 #select{
   width:230px;
   float: right;
-  border-left: 1px solid #ddd;
+  border-left: 2px solid #efeff2;
 }
 #dark-app #select{
-  border-left-color: #9a9b9c;
+  border-left-color: #646666;
 }
-#tab{
+#setting{
   float: left;
   margin-top: 6px;
   margin-left: 6px;
@@ -395,6 +417,9 @@ function handleClearPath(){
 }
 .btn{
   width: 100px;
+}
+.n-card{
+  padding-bottom: 50px;
 }
 
 </style>

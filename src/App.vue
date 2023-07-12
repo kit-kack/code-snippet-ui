@@ -6,6 +6,9 @@
       <n-drawer v-model:show="$var.view.settingActive" :width="380" placement="right">
         <side-view @refresh="dealWithRefresh" />
       </n-drawer>
+      <n-drawer v-model:show="$var.view.customActive" placement="bottom" :height="height">
+        <custom-view v-model:height="height"/>
+      </n-drawer>
     </n-message-provider>
   </n-config-provider>
 </template>
@@ -27,12 +30,13 @@ import {
   theme,
   themeOverrides
 } from "./js/theme";
-import {onMounted} from "vue";
+import {onMounted, ref} from "vue";
 import {configManager} from "./js/core";
 
 const Tabs = [
     ListView,CodeView,FormView,FormView,CustomView
 ]
+const height = ref(150)
 
 const dealWithRefresh = ()=>{
   globalThemeRefresh()

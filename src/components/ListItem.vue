@@ -19,13 +19,14 @@
               backgroundColor: configManager.getTopList().includes(snippet.name)? configManager.getGlobalColor(): ''
            }"
       ></div>
-      <span class="snippet-item__index" :style="getTitleStyle(props.selected,false)">{{index}}</span>
+      <span class="snippet-item__index"  :style="getTitleStyle(props.selected,false)">{{index}}</span>
       <template #header>
         <n-scrollbar x-scrollable>
           <div class="snippet-item-head__left">
             <n-ellipsis >
               <span :style="getTitleStyle(props.selected,true)"  >{{props.snippet.name}}</span>
-              <span class="snippet-item__desc">{{snippet.desc}}</span>
+              <span class="snippet-item__desc" style="margin-left: 10px;" v-if="snippet.path&& configManager.get('noItemCodeShow')">{{snippet.local? '本地':'网络'}}</span>
+              <span class="snippet-item__desc" style="margin-left: 10px;" v-if="!configManager.get('noItemCodeShow')">{{snippet.desc}}</span>
             </n-ellipsis>
           </div>
         </n-scrollbar>
@@ -39,19 +40,20 @@
           </div>
         </n-scrollbar>
       </template>
-      <template v-if="!configManager.get('noItemCodeShow')">
+      <template v-if="configManager.get('noItemCodeShow')">
+        <n-ellipsis :tooltip="false">
+          <span class="snippet-item__desc" style="margin-left: 6px">{{snippet.desc}}</span>
+        </n-ellipsis>
+      </template>
+      <template v-else>
         <template v-if="configManager.get('fullItemCodeShow')">
-          <multi-line-code :type="snippet.type" :code="snippet.code??snippet.path" :active="$var.utools.selectedIndex === index"/>
+          <multi-line-code :type="pair.type" :code="pair.code" :active="$var.utools.selectedIndex === index"/>
         </template>
         <template v-else>
-          <single-line-code :type="snippet.type" :code="snippet.code??snippet.path"/>
+          <single-line-code :type="pair.type" :code="pair.code"/>
         </template>
       </template>
-      <span v-if="selected" class="snippet-item-info"
-            :style="{
-                color: configManager.getGlobalColor()
-            }"
-      >
+      <span v-if="selected" class="snippet-item-info" style="right: -5px" :style="{color: configManager.getGlobalColor()}">
               {{(snippet.type?? 'plaintext')+ ' | '}}
               {{snippet.count? snippet.count+' | ':''}}
               {{calculateTime(snippet.time)}}
@@ -116,7 +118,6 @@ import MultiLineCode from "./item/MultiLineCode.vue";
 let showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','debug'])
 const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
-const flag = configManager.get('shiftTagPosition')
 const item = ref()
 const isShowBtn = computed(()=>{
   if(showBtnModal.value){
@@ -124,14 +125,25 @@ const isShowBtn = computed(()=>{
   }
   return !!(props.selected && $var.utools.subItemSelectedIndex > -1);
 })
-let pathCode = `文件(${props.snippet.path})，请在预览界面预览]`
-if(props.snippet.local){
-  pathCode = "[当前代码片段为本地"+pathCode;
-}else{
-  pathCode = "[当前代码片段为网络"+pathCode;
-}
 let isHover = ref(false)
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
+const pair = computed(()=>{
+  if(props.snippet.code){
+    return {
+      code: props.snippet.code,
+      type: props.snippet.type??'plaintext'
+    }
+  }else{
+    return {
+      code: (
+          '['+
+          (props.snippet.local? '本地':'网络')
+          + '文件]: '+props.snippet.path
+      ),
+      type: 'markdown'
+    }
+  }
+})
 const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
   if(isHoverRef){
@@ -255,6 +267,7 @@ const handleMouseLeave = (e)=>{
 
 .n-card{
   width:98vw;
+  padding-bottom: 5px;
   margin: 2px 1vw 2px 1vw;
   position:relative;
   overflow: hidden;
@@ -266,7 +279,6 @@ const handleMouseLeave = (e)=>{
   z-index: 20;
 }
 .snippet-item__desc{
-  margin-left: 10px;
   font-size: 12px;
   display:inline-block;
   color: rgb(169, 168, 168);
@@ -297,12 +309,10 @@ const handleMouseLeave = (e)=>{
 }
 .snippet-item-info{
   position: absolute;
-  bottom: 4px;
-  right: 0;
+  bottom: -1px;
   font-size:12px;
   transform: scale(0.78); /* 用缩放来解决 */
   line-height: 1;
-
 }
 
 

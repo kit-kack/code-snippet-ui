@@ -4,9 +4,6 @@
   margin: 0;
 }
 
-.n-card > .n-card__footer{
-  padding-bottom: 0 !important;
-}
 #app .hljs-container pre{
   overflow: hidden;
   margin: 0;

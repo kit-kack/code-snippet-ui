@@ -172,6 +172,7 @@ function dealWithListView(e,list){
                         $var.view.recoverLiteShow= true;
                         utools.setExpendHeight(545)
                     }
+                    $var.currentSnippet = codeSnippetManager.get($var.currentName)
                     $var.currentMode = CODE_VIEW;
                     longKeyDown = true;
                 }
@@ -299,6 +300,9 @@ function dealWithCodeView(e){
             handleScrollBar($var.scroll.codeInvoker,"reset")
             break;
         case 'KeyR':
+            if($var.currentSnippet.path && $var.currentSnippet.type === 'image'){
+                return;
+            }
             $var.view.isRendering = !$var.view.isRendering;
             break;
         case 'KeyB':
@@ -348,39 +352,32 @@ function dealWithCommonView(e){
             }
             let sections = codeSnippetManager.get($var.currentName).sections;
             if(sections && sections.length >= num){
-                let section = sections[num-1]
-                let code
-                if($var.currentMode === LIST_VIEW){
-                    if($var.currentSnippet.code){
-                        code = $var.currentSnippet.code.split('\n')
-                    }else{
-                        $message.warning("当前代码片段不支持")
-                        return;
-                    }
-                }else{
-                    code = $var.currentSplitCode??[];
+                const  [start,end] = sections[num-1]
+                if(!$var.currentSnippet.code){
+                    $message.warning("当前代码片段不支持")
+                    return;
                 }
-                let max = (code??[]).length;
-                if(section[0] > max || section[1] > max ){
+                let lines = $var.currentSnippet.code.split('\n',end)
+                if(lines.length < start){
                     $message.warning("区间值超出代码片段区间，请更新或清除旧区间值")
-                }else{
-                    let str = '';
-                    for (let i = section[0]; i <= section[1]; i++) {
-                        str += (code[i-1]+'\n')
-                    }
-                    $var.currentSnippet.time = Date.now()
-                    $var.currentSnippet.count = ($var.currentSnippet.count??0) +1;
-                    codeSnippetManager.update(toRaw(($var.currentSnippet)))
-                    // 复制
-                    utools.copyText(str.slice(0,-1));
-                    $message.success(`已复制${$var.currentName}#${num}号子代码片段的内容`)
-                    // 粘贴
-                    if(e.shiftKey || e.altKey){
-                        utools.hideMainWindow();
-                        utools.simulateKeyboardTap('v',ctrlKey);
-                        if(configManager.get('exitAfterPaste')){
-                            utools.outPlugin();
-                        }
+                    return;
+                }
+                let str = '';
+                for (let i = start; i <= lines.length; i++) {
+                    str += (lines[i-1]+'\n')
+                }
+                $var.currentSnippet.time = Date.now()
+                $var.currentSnippet.count = ($var.currentSnippet.count??0) +1;
+                codeSnippetManager.update(toRaw(($var.currentSnippet)))
+                // 复制
+                utools.copyText(str.slice(0,-1));
+                $message.success(`已复制${$var.currentName}#${num}号子代码片段的内容`)
+                // 粘贴
+                if(e.shiftKey || e.altKey){
+                    utools.hideMainWindow();
+                    utools.simulateKeyboardTap('v',ctrlKey);
+                    if(configManager.get('exitAfterPaste')){
+                        utools.outPlugin();
                     }
                 }
             }else{
@@ -408,6 +405,8 @@ function init(list) {
             } else if (e.code === 'KeyQ') {
                 $var.view.settingActive = false;
             }
+            return;
+        }else if($var.view.customActive){
             return;
         }
         // super key

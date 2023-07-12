@@ -1,72 +1,58 @@
 <template>
-  <n-scrollbar style="max-height: 99vh">
-    <div id="custom">
-      <n-divider title-placement="center" style="width: 100vw">
-        个性化定制
-      </n-divider>
-      <div style="height: 5px"></div>
-      <n-space>&nbsp;元素代码块：
-        <config-check-tag @refresh="refresh()"   v-for="it in otherSettings" :title="it.title"  :config="it.config" />
-      </n-space>
-      <div style="height: 5px"></div>
-      <n-space align="center">
-        <n-tooltip>
-          <template #trigger>
-            <span>&nbsp;💡配色方案：</span>
-          </template>
-          亮色和暗色场景独立保存，互不影响
-        </n-tooltip>
-        <n-select
-            v-model:value="colorSchemaRef"
-            :options="colorSchemaOptions"
-            :render-label="renderLabel"
-            size="small"
-            @update-value="handleColorSchema"
-          />
-      </n-space>
-      <template v-if="colorSchemaRef === -1">
-        <n-space><color-picker v-for="instance in getColorInstances()" :instance="instance" :key="instance.title"/></n-space>
+  <n-divider title-placement="center">
+    个性化定制
+  </n-divider>
+  <div style="height: 5px"></div>
+  <div style="height: 5px"></div>
+  <n-space align="center">
+    <n-tooltip>
+      <template #trigger>
+        <span>&nbsp;💡配色方案：</span>
       </template>
-      <template v-else-if="colorSchemaRef === -2">
-        <n-space align="center">
-          <n-input
-              v-model:value="cssCode"
-              placeholder="请输入关于CSS的JSON数据"
-              type="textarea"
-              size="small"
-              style="width: 66vw;margin: 5px"
-              :default-value="getCSSCode()"
-              :autosize="{minRows:8,maxRows: 8}"/>
-          <n-button @click="handleCSSCode">确定</n-button>
-        </n-space>
-      </template>
-      <br/>
-      <debug-list-item v-if="refreshRef" mode="normal"/>
-      <debug-list-item v-if="refreshRef" mode="selected"/>
-      <debug-list-item v-if="refreshRef" mode="vim"/>
-      <div id="extra">
-        <n-button strong secondary type="info" circle :color="configManager.getGlobalColor()"  @click="$var.currentMode = LIST_VIEW">
-          <template #icon>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
-          </template>
-        </n-button>
-      </div>
-
-    </div>
-  </n-scrollbar>
+      亮色和暗色场景独立保存，互不影响
+    </n-tooltip>
+    <n-select
+        v-model:value="colorSchemaRef"
+        :options="colorSchemaOptions"
+        :render-label="renderLabel"
+        size="tiny"
+        @update-value="handleColorSchema"
+    />
+    <span style="padding: 0 20px">|</span>
+    元素代码块：
+    <n-select  v-model:value="codeBlockRef" :options="codeBlockOptions" size="tiny" @update-value="handleCodeBlockChange"/>
+    <config-check-tag v-if="!configManager.get('noItemCodeShow')" @refresh="refreshListView()" title="不高亮展示" config="rawLineCode"/>
+  </n-space>
+  <div style="height: 20px"></div>
+  <template v-if="colorSchemaRef === -1">
+    <n-space><color-picker v-for="instance in getColorInstances()" :instance="instance" :key="instance.title"/></n-space>
+  </template>
+  <template v-else-if="colorSchemaRef === -2">
+    <n-space align="center">
+      <n-input
+          v-model:value="cssCode"
+          placeholder="请输入关于CSS的JSON数据"
+          type="textarea"
+          size="small"
+          style="width: 66vw;margin: 5px"
+          :default-value="getCSSCode()"
+          :autosize="{minRows:10,maxRows: 10}"/>
+      <n-button @click="handleCSSCode">确定</n-button>
+    </n-space>
+  </template>
 </template>
 
 <script setup>
-import {h, nextTick, ref} from "vue";
-import DebugListItem from "../components/item/DebugListItem.vue";
+import {h, onMounted, ref} from "vue";
 import ColorPicker from "../components/ColorPicker.vue";
 import {configManager} from "../js/core";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../js/theme";
 import {useMessage} from "naive-ui";
-import {$var, LIST_VIEW} from "../js/store";
+import {refreshListView} from "../js/some";
+const props = defineProps(['height'])
+const emit = defineEmits(['update:height'])
 
-const refreshRef = ref(true)
 const cssCode = ref()
 const getCSSCode = ()=>{
   return `{
@@ -80,33 +66,34 @@ const getCSSCode = ()=>{
     "highlight-color": "${configManager.getColor('HighlightColor')}"
 }`
 }
-const refresh = ()=>{
-  refreshRef.value = false;
-  nextTick(()=>{
-    refreshRef.value = true;
-  })
-}
 const message = useMessage();
 const colorSchemaRef = ref(configManager.get(utools.isDarkColors()? 'darkColorSchema': 'colorSchema')??-1)
-const snippet = {
-  name: "test",
-  desc: "测试数据",
-  code: "console.log('当前代码代码片段仅用于测试，共有七行')\nconsole.log('这是第二行数据')\nconsole.log('这是第三行数据')\nconsole.log('这是第四行数据')\nconsole.log('这是第五行数据')\nconsole.log('这是第六行数据')\nconsole.log('这是第七行数据')",
-  type: 'javascript',
-  tags: ['test'],
-  count: 100,
-  time: 0
-}
-const otherSettings = [
+const codeBlockRef = ref(configManager.get('noItemCodeShow')? -1: (configManager.get('fullItemCodeShow')? 1: 0))
+const codeBlockOptions = [
   {
-    title: "启用多行显示",
-    config: "fullItemCodeShow"
-  },
-  {
-    title: "不高亮解析",
-    config: "rawLineCode"
+    label: '不展示',
+    value: -1
+  },{
+    label: '单行显示',
+    value: 0
+  },{
+    label: '多行显示',
+    value: 1
   }
 ]
+function handleCodeBlockChange(v){
+  switch (v){
+    case -1:
+      configManager.set('noItemCodeShow',true)
+          break;
+    case 0:
+    case 1:
+      configManager.set('noItemCodeShow',false)
+      configManager.set('fullItemCodeShow', v===1);
+      break;
+  }
+  refreshListView()
+}
 const getColorInstances = ()=>{
   return [{
     title: "全局主题 颜色",
@@ -114,20 +101,21 @@ const getColorInstances = ()=>{
     handleConfirm: v=>{
       configManager.setGlobalColor(v)
       globalThemeRefresh();
+      refreshListView()
     }
   },{
     title: "被选中元素 背景颜色",
     color: configManager.getColor('SelectedColor'),
     handleConfirm: v=>{
       configManager.setColor('SelectedColor',v)
-      refresh()
+      refreshListView()
     }
   },{
     title: "自定义标签 默认颜色",
     color: configManager.getColor('TagColor'),
     handleConfirm: v=>{
       configManager.setColor('TagColor',v)
-      refresh()
+      refreshListView()
     }
   },{
     title: '代码高亮行颜色',
@@ -190,12 +178,20 @@ const renderLabel = (option) => {
 }
 const handleColorSchema = (v)=>{
   configManager.set(utools.isDarkColors()? 'darkColorSchema': 'colorSchema',v);
+  changeHeight(v)
   if(v < 0){
     return;
   }
   adjustTheme(v)
   globalThemeRefresh()
-  refresh()
+  refreshListView()
+}
+function changeHeight(v){
+  if(v >= 0){
+    emit('update:height',150)
+  }else{
+    emit('update:height',(v=== -1? 200:370))
+  }
 }
 const handleCSSCode = ()=>{
 /**
@@ -220,11 +216,14 @@ const handleCSSCode = ()=>{
       configManager.setColor('HighlightColor',obj['highlight-color'])
     }
     globalThemeRefresh()
-    refresh()
+    refreshListView()
   }catch (e){
     message.error("格式错误："+e.message)
   }
 }
+onMounted(()=>{
+  changeHeight(colorSchemaRef.value)
+})
 
 </script>
 
@@ -233,22 +232,8 @@ const handleCSSCode = ()=>{
   font-size: 12px;
   width: 150px;
 }
-#custom{
-  overflow: auto;
-}
-#dark-app #custom{
-  color: whitesmoke;
-}
 .n-divider{
-  margin-top: 0;
+  margin-top: 20px;
   height: 10px;
 }
- .n-divider:not(.n-divider--vertical) {
-   margin-top: 5px;
- }
- #extra{
-   position: fixed;
-   right:20px;
-   bottom: 12px;
- }
 </style>

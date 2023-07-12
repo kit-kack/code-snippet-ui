@@ -1,5 +1,5 @@
 import hljs from "highlight.js";
-import {$var} from "./store";
+import {$var, CODE_VIEW} from "./store";
 import {nextTick} from "vue";
 import {codeSnippetManager, configManager} from "./core";
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
@@ -73,7 +73,11 @@ const handleCopy = (isPasted)=>{
     codeSnippet.count = (codeSnippet.count??0) +1;
     codeSnippetManager.update(codeSnippet)
     // 复制
-    utools.copyText(codeSnippet.code);
+    if($var.currentMode === CODE_VIEW){
+        utools.copyText($var.currentCode)
+    }else{
+        utools.copyText(codeSnippet.code);
+    }
     $message.success(`已复制代码片段${$var.currentName}的内容`)
     // 粘贴
     if(isPasted){

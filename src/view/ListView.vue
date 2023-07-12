@@ -101,9 +101,9 @@
 </template>
 
 <script setup>
-import {NButton, useMessage, useNotification} from "naive-ui";
+import {NButton, useMessage} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
-import {computed, h, onMounted, onUpdated, ref} from "vue";
+import {computed, onMounted, onUpdated, ref} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
 import {$var, CODE_VIEW, CREATE_VIEW, UPDATE_VIEW} from "../js/store";
 import {refreshListView} from "../js/some";
@@ -115,7 +115,6 @@ const listViewAspect = ref()
 window.$message = useMessage();
 const list = computed(()=>parseSearchWord($var.utools.search,$var.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
-const fixed = ref(false)
 const newVersionShow = ref(false)
 const handleEdit = (name)=>{
   $var.currentName = name;

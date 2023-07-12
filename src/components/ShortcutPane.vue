@@ -79,12 +79,14 @@ const datas = [
         shortcut: "E"
       },{
         feature: "复制Copy",
-        shortcut: ["C","Y"],
-        tooltip: "结合Shift使用，只会复制高亮行内容"
+        shortcut: ["C","Y"]
       },{
         feature: "粘贴Paste",
-        shortcut: ["Enter","P"],
-        tooltip: "结合Shift使用，只会复制高亮行内容"
+        shortcut: ["Enter","P"]
+      },{
+        feature: "复制高亮行",
+        shortcut: "1 ~ 9",
+        tooltip: "粘贴请结合Shift或Alt键"
       },{
         feature: "退出Quit",
         shortcut: "Q",
