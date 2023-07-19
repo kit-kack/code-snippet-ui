@@ -105,12 +105,11 @@
 </template>
 
 <script setup>
-import {computed, onErrorCaptured, onMounted, ref} from "vue";
-import InlaidTag from "./InlaidTag.vue";
+import {computed, onMounted, ref} from "vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
 import {$var} from "../js/store";
-import {calculateTime, getOriginType, handleCopy} from "../js/some";
+import {calculateTime, handleCopy} from "../js/some";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";

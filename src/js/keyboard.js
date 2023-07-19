@@ -350,7 +350,7 @@ function dealWithCommonView(e){
             if($var.currentMode === LIST_VIEW){
                 $var.currentSnippet = codeSnippetManager.get($var.currentName)
             }
-            let sections = codeSnippetManager.get($var.currentName).sections;
+            let sections = $var.currentSnippet.sections;
             if(sections && sections.length >= num){
                 const  [start,end] = sections[num-1]
                 if(!$var.currentSnippet.code){

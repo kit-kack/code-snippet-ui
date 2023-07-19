@@ -151,7 +151,6 @@ function section_contain(section_list,value){
 
 /**
  *
- * @param {number[]} list
  * @param {[number,number]} section
  */
 function section_generate(section){

@@ -9,6 +9,10 @@ const CREATE_VIEW = 3;
 const $var = reactive({
     currentMode : LIST_VIEW,    // 当前模式
     currentName : null,         // 当前代码片段名（被选中元素）
+
+    /**
+     * @type CodeSnippet
+     */
     currentSnippet: null,       // 当前代码片段
     currentCode: null,          // 当前代码
     currentSplitCode: null,
