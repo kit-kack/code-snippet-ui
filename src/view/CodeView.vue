@@ -87,10 +87,11 @@
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {computed, defineComponent, h, nextTick, onMounted, ref, toRaw} from "vue";
+import {computed, nextTick, onMounted, ref, toRaw} from "vue";
 import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
 import {section_generate} from "../js/utils/section";
+
 const scrollBar = ref(null)
 const snippet = $var.currentSnippet;
 $var.currentCode = getCode()

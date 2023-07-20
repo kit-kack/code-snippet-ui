@@ -74,6 +74,13 @@ function getThemeOverrides(){
             boxShadowFocus: boxShadowVar,
             boxShadowActive: boxShadowVar,
             boxShadowHover: boxShadowVar,
+        },
+        Tabs:{
+            tabTextColorHoverLine: gc,
+            tabTextColorActiveLine: gc,
+            tabTextColorActiveBar: gc,
+            tabTextColorHoverBar: gc,
+            barColor: gc
         }
     }
 }
