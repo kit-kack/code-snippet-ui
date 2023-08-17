@@ -1,4 +1,5 @@
 import {reactive} from "vue";
+import {codeSnippetManager} from "./core";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
@@ -28,6 +29,7 @@ const $var = reactive({
     // 控制当前视图
     view:{
         fullScreenShow: true,     // 是否为完整UI模式
+        helpActive: false,
         settingActive: false,     // 侧边栏是否开启，禁止其他按键操作
         customActive: false,      // 自定义底边栏
         showCodeTip: false,       // 是否展示 CodeView中的 Tip
@@ -55,6 +57,13 @@ const $var = reactive({
     }
 })
 
+
+function List2Code(name){
+    $var.currentName = name;
+    $var.currentSnippet = codeSnippetManager.get(name)
+    // 最终修改模式
+    $var.currentMode = CODE_VIEW;
+}
 
 export {
     $var,

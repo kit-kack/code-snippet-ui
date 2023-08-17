@@ -35,7 +35,7 @@
         <n-scrollbar x-scrollable :size="10" style="max-width: 250px;margin-left: 5px">
           <div class="sub">
             <n-space :wrap="false">
-              <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="emit('itemRefresh')"/>
+              <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="doItemRefresh"/>
             </n-space>
           </div>
         </n-scrollbar>
@@ -75,10 +75,10 @@
       <template v-else-if="isShowBtn">
         <div id="child" >
           <n-space>
-            <selectable-button :mid="305"  type="warning" tip="编辑" :index="0" @invoke="$emit('editItem',snippet.name)" >
+            <selectable-button :mid="305"  type="warning" tip="编辑" :index="0" @invoke="doEdit" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M20.998 6.25A3.25 3.25 0 0 0 17.748 3H6.25A3.25 3.25 0 0 0 3 6.25v11.499a3.25 3.25 0 0 0 3.25 3.25h4.914l.356-1.424l.02-.076H6.25a1.75 1.75 0 0 1-1.75-1.75v-9.25h14.998v2.733c.48-.19.994-.264 1.5-.22V6.25zM6.25 4.5h11.499c.966 0 1.75.783 1.75 1.75V7h-15v-.75c0-.967.784-1.75 1.75-1.75zm12.848 8.169l-5.901 5.901a2.685 2.685 0 0 0-.707 1.248l-.457 1.83c-.2.797.522 1.518 1.318 1.319l1.83-.458a2.685 2.685 0 0 0 1.248-.706L22.33 15.9a2.286 2.286 0 0 0-3.233-3.232z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <selectable-button :mid="350" type="primary" tip="预览代码" :index="1" @invoke="$emit('viewCode',snippet.name)" >
+            <selectable-button :mid="350" type="primary" tip="预览代码" :index="1" @invoke="doViewCode" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M8.086 18.611l5.996-14.004a1 1 0 0 1 1.878.677l-.04.11l-5.996 14.004a1 1 0 0 1-1.878-.677l.04-.11l5.996-14.004L8.086 18.61zm-5.793-7.318l4-4a1 1 0 0 1 1.497 1.32l-.083.094L4.414 12l3.293 3.293a1 1 0 0 1-1.32 1.498l-.094-.084l-4-4a1 1 0 0 1-.083-1.32l.083-.094l4-4l-4 4zm14-4.001a1 1 0 0 1 1.32-.083l.093.083l4.001 4.001a1 1 0 0 1 .083 1.32l-.083.095l-4.001 3.995a1 1 0 0 1-1.497-1.32l.084-.095L19.584 12l-3.293-3.294a1 1 0 0 1 0-1.414z" fill="currentColor"></path></g></svg>
             </selectable-button>
             <selectable-button :mid="395" lite type="info" tip="复制" :index="2" @invoke="handleCopy" >
@@ -108,13 +108,13 @@
 import {computed, onMounted, ref} from "vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
-import {$var} from "../js/store";
-import {calculateTime, handleCopy} from "../js/some";
+import {$var, CODE_VIEW, UPDATE_VIEW} from "../js/store";
+import {calculateTime, handleCopy, refreshListView} from "../js/some";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
 
-let showBtnModal = ref(false)
+const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','debug'])
 const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
 const item = ref()
@@ -124,7 +124,7 @@ const isShowBtn = computed(()=>{
   }
   return !!(props.selected && $var.utools.subItemSelectedIndex > -1);
 })
-let isHover = ref(false)
+const isHover = ref(false)
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
 const pair = computed(()=>{
   if(props.snippet.code){
@@ -175,7 +175,7 @@ const handleDelete = ()=>{
   $var.utools.selectedIndex--;
   $var.utools.keepSelectedStatus = true;
   $var.view.isDel = false;
-  emit('itemRefresh')
+  doItemRefresh()
 }
 
 const handleClick = (e)=>{
@@ -184,7 +184,7 @@ const handleClick = (e)=>{
   }
   $var.utools.subItemSelectedIndex = -1;
   if(e.ctrlKey || e.metaKey){
-    emit('viewCode',props.snippet.name)
+    doViewCode()
   }
   if(props.selected){
     return;
@@ -206,14 +206,14 @@ const handleDoubleClick = ()=>{
 const handleCancelTop = ()=>{
   configManager.delTopItem(topIndex)
   $var.utools.selectedIndex = props.index;
-  emit('itemRefresh')
+  doItemRefresh()
 }
 const handleSetTop = ()=>{
   if(props.debug){
     return;
   }
   $var.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
-  emit('itemRefresh')
+  doItemRefresh()
 }
 
 const handleMouseLeave = (e)=>{
@@ -229,6 +229,19 @@ const handleMouseLeave = (e)=>{
     $var.view.isDel=false
   }
   isHover.value = false;
+}
+const doViewCode = ()=>{
+  $var.currentName = props.snippet.name;
+  $var.currentSnippet = codeSnippetManager.get(props.snippet.name)
+  $var.currentMode = CODE_VIEW;
+}
+const doEdit = ()=>{
+  $var.currentName = props.snippet.name;
+  $var.currentMode = UPDATE_VIEW;
+}
+const doItemRefresh = ()=>{
+  $var.utools.keepSelectedStatus = true;
+  refreshListView();
 }
 
 </script>

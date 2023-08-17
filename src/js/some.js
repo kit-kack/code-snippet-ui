@@ -13,6 +13,11 @@ const languages = rootLanguages.map(v=>{
             label: "plaintext - 纯文本",
             value: "plaintext"
         }
+    }else if(v === "markdown"){
+        return {
+            label: "markdown - 可渲染显示✨",
+            value: "markdown"
+        }
     }
     return {
         label:v,

@@ -5,12 +5,12 @@ import {codeSnippetManager, configManager, init} from "./js/core.js";
 import {$var, CREATE_VIEW} from "./js/store";
 import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd&highlight-dep";
-import {section_add,section_del, section_contain} from "./js/utils/section";
+import {section_add, section_contain, section_del} from "./js/utils/section";
 
 // init
 init()
 
-
+console.log("before")
 utools.onPluginEnter((data)=>{
     console.log('Enter App ...')
     console.log('The Following is Your [code type payload]')
@@ -44,7 +44,7 @@ utools.onPluginEnter((data)=>{
         utools.setExpendHeight(545)
     }
 })
-
+console.log("after")
 const app = createApp(App)
 initNU(app)
 initVH(app)
@@ -103,6 +103,7 @@ app.directive("code", {
     }
 })
 app.mount('#app')
+console.log('Hello World')
 
 
 

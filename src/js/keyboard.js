@@ -2,7 +2,7 @@ import {nextTick, toRaw} from "vue";
 import {codeSnippetManager, configManager} from "./core.js";
 import {$var, CODE_VIEW, CREATE_VIEW, LIST_VIEW,  UPDATE_VIEW} from "./store"
 import {ctrlKey, handleCopy, handleRecoverLiteShow, refreshListView} from "./some";
-import {debounce} from "./utils/debounce";
+import {debounce} from "./utils/common";
 
 // 控制长按键
 let longKeyDown = false;
@@ -262,13 +262,13 @@ function dealWithCodeView(e){
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
-            if($var.view.isRendering){
-                if($var.currentSnippet.type === 'markdown'){
+            if($var.currentSnippet.type === 'markdown'){
+                if($var.view.isRendering){
                     handleMdHorizonMove(true,e.shiftKey)
+                    break;
                 }
-            }else{
-                handleScrollBar($var.scroll.codeInvoker,"left",e.shiftKey)
             }
+            handleScrollBar($var.scroll.codeInvoker,"left",e.shiftKey)
             break;
         case "KeyJ":
         case "ArrowDown":
@@ -280,13 +280,13 @@ function dealWithCodeView(e){
             break;
         case "KeyL":
         case "ArrowRight":
-            if($var.view.isRendering){
-                if($var.currentSnippet.type === 'markdown'){
+            if($var.currentSnippet.type === 'markdown'){
+                if($var.view.isRendering){
                     handleMdHorizonMove(false,e.shiftKey)
+                    break;
                 }
-            }else{
-                handleScrollBar($var.scroll.codeInvoker,"right",e.shiftKey)
             }
+            handleScrollBar($var.scroll.codeInvoker,"right",e.shiftKey)
             break;
         case 'KeyS':
             $var.view.showCodeTip = !$var.view.showCodeTip;
@@ -384,6 +384,13 @@ function dealWithCommonView(e){
                 $message.warning(`当前没有 ${num}号 子代码片段`)
             }
             break;
+        case 'KeyZ':
+            if(!$var.view.fullScreenShow){
+                $var.view.fullScreenShow = true;
+                utools.setExpendHeight(545)
+            }
+            $var.view.helpActive = !$var.view.helpActive;
+            break
     }
 }
 

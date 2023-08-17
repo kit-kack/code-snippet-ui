@@ -10,9 +10,6 @@
               v-for="(snippet,index) in list"
               :index="index"   :snippet="snippet" :key="index"
               :selected="handleSelect(index,snippet.name)"
-              @view-code="handleViewCode"
-              @item-refresh="handleRefresh()"
-              @edit-item="handleEdit"
               @user-click="ind => $var.utools.selectedIndex = ind"/>
           <div id="info" v-if="$var.view.fullScreenShow">
             <p style="color:gray;">~共有{{list.length}}条数据~</p>
@@ -105,9 +102,9 @@ import {NButton, useMessage} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
 import {computed, onMounted, onUpdated, ref} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
-import {$var, CODE_VIEW, CREATE_VIEW, UPDATE_VIEW} from "../js/store";
+import {$var, CREATE_VIEW} from "../js/store";
 import {refreshListView} from "../js/some";
-import {codeSnippetManager, configManager} from "../js/core";
+import {configManager} from "../js/core";
 import $version from '../js/version'
 
 const scrollBar = ref()
@@ -116,10 +113,6 @@ window.$message = useMessage();
 const list = computed(()=>parseSearchWord($var.utools.search,$var.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
 const newVersionShow = ref(false)
-const handleEdit = (name)=>{
-  $var.currentName = name;
-  $var.currentMode = UPDATE_VIEW;
-}
 const handleSelect = (index,name)=>{
   if(index === $var.utools.selectedIndex){
     $var.currentName = name;
@@ -127,17 +120,6 @@ const handleSelect = (index,name)=>{
   }else{
     return false;
   }
-}
-
-const handleViewCode = (name)=>{
-  $var.currentName = name;
-  $var.currentSnippet = codeSnippetManager.get(name)
-  $var.currentMode = CODE_VIEW;
-}
-
-const handleRefresh = ()=>{
-  $var.utools.keepSelectedStatus = true;
-  refreshListView();
 }
 function handleCloseNewVersionModal(){
   configManager.set('version',$version.version);

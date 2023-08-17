@@ -1,13 +1,19 @@
 <template>
   <div  id="code-view">
-    <n-scrollbar style="max-height: 100vh" :x-scrollable="!isRenderable || !$var.view.isRendering" trigger="hover" ref="scrollBar">
-      <template v-if="refresh">
+    <n-scrollbar
+        style="max-height: 100vh"
+        :x-scrollable="!isRenderable || !$var.view.isRendering"
+        trigger="hover" ref="scrollBar">
+      <template v-if="refreshFlag">
         <template v-if="isRenderable && $var.view.isRendering">
           <template v-if="snippet.type === 'image'">
-            <img :src="snippet.path??snippet.code" alt="" style="width: 100vw;">
+            <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 100vw;">
           </template>
           <template v-else-if="snippet.type === 'markdown'">
             <v-md-preview :text="$var.currentCode" ></v-md-preview>
+          </template>
+          <template v-else>
+            未知渲染类型
           </template>
         </template>
         <template v-else>
@@ -48,7 +54,7 @@
                     :color="configManager.getGlobalColor()"
                     :disabled="snippet.type === 'image' && snippet.path"
           >
-            {{ $var.view.isRendering? '💎已渲染 [R]': '未渲染 [R]' }}
+            {{ $var.view.isRendering? '✨已渲染 [R]': '未渲染 [R]' }}
           </n-button>
         </template>
         <n-popover trigger="hover" :show="hover || $var.view.showCodeTip" placement="top" :show-arrow="false" style="padding:5px">
@@ -87,16 +93,18 @@
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {computed, nextTick, onMounted, ref, toRaw} from "vue";
+import {computed, onMounted, ref, toRaw} from "vue";
 import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
 import {section_generate} from "../js/utils/section";
+import {getRefreshFunc} from "../js/utils/common";
 
 const scrollBar = ref(null)
 const snippet = $var.currentSnippet;
 $var.currentCode = getCode()
 const hover = ref(false)
-const refresh = ref(true)
+const refreshFlag = ref(true)
+const isRenderable = (snippet.type === 'markdown' || snippet.type === 'image');
 const isValidLanguage = computed(()=>{
   if(snippet.type === 'image'){
     $var.view.isRendering = true;
@@ -106,18 +114,14 @@ const isValidLanguage = computed(()=>{
   }
 })
 
-const isRenderable = computed(()=>snippet.type === 'markdown' || snippet.type === 'image')
-function doRefresh(){
-  refresh.value = false;
-  nextTick(()=>{
-    refresh.value = true;
-    // 滚动条重新绑定
-    $var.scroll.codeInvoker = scrollBar.value;
-  })
-}
+const doRefresh = getRefreshFunc(refreshFlag,()=>{
+  // 滚动条重新绑定
+  $var.scroll.codeInvoker = scrollBar.value;
+})
 function getLimitedCode(code){
   if(code.length > 100000){
-    return "[代码长度超过100000个字符，无法全部加载]\n"+code.slice(0,100000)
+    $message.info("代码长度超限，只会显示前100000个字符")
+    return code.slice(0,100000)
   }else{
     return code;
   }

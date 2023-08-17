@@ -2,8 +2,7 @@
   <n-divider title-placement="center">
     个性化定制
   </n-divider>
-  <div style="height: 5px"></div>
-  <div style="height: 5px"></div>
+  <div style="height: 10px"></div>
   <n-space align="center">
     <n-tooltip>
       <template #trigger>

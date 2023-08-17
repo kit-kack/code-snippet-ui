@@ -48,6 +48,7 @@ const handleVimStatusBarClick = ()=>{
   if($var.currentMode === LIST_VIEW){
     if(showCount === 7){
       $message.success("花点时间去看看外面的风景吧")
+      $var.view.helpActive = true;
       showCount = 0;
     }else{
       showCount++;

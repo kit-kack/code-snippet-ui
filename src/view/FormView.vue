@@ -32,7 +32,6 @@
         <template #default>
           <n-tabs  animated
                    v-model:value="currentTab"
-                   @update:value="handleChange"
                    justify-content="space-evenly"
                    type="line"
                    size="small">
@@ -96,7 +95,7 @@
             </n-tab-pane>
             <n-tab-pane name="path" tab="链接文件">
               <n-button @click="handleImport" quaternary type="primary">关联本地文本文件</n-button> &nbsp;&nbsp;
-              <n-button @click="showModal = true" quaternary type="info">关联文本链接</n-button>
+              <n-button @click="showModal = true" quaternary type="info" disabled>关联文本链接</n-button>
               <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
                 <n-list-item v-if="codeTemplate.path" style="height: 100px">
                   <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
@@ -181,7 +180,7 @@ const form = ref()
 const codeTemplate = reactive(($var.currentMode === UPDATE_VIEW)? {...codeSnippetManager.get($var.currentName)} :{
   code: $var.others.code
 })
-let tempTag = ref()
+const tempTag = ref()
 const tags = computed(()=>{
   return tagColorManager.all().map(v=>{
     return {
@@ -226,21 +225,13 @@ const rules = {
   "code":{
     validator(rule,value){
       if(currentTab.value === 'code'){
-        if(value && value.length > 0){
-          return true;
-        }
-        return false;
+        return value && value.length > 0;
       }
       return true;
     },
     message:"请放置代码片段"
   }
 }
-function handleChange(value){
-  console.log(value)
-  console.log(currentTab.value)
-}
-
 const handleCancel = ()=>{
   $var.utools.keepSelectedStatus = true;
   handleRecoverLiteShow()
@@ -355,7 +346,6 @@ const handleImport = ()=>{
   }
 }
 const isFullUrlRegex = /^\w+:\/\/.*/
-
 function handleSetUrlAsPath(){
   if(url.value && url.value.match(isFullUrlRegex)){
     codeTemplate.path = url.value;
@@ -388,6 +378,7 @@ function handleClearPath(){
   margin-left: 1px;
   border-bottom: 1px solid #efeff2;
   padding: 1px;
+  z-index: 3;
 }
 #dark-app #sub{
   border-bottom-color: #848586;

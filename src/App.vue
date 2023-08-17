@@ -9,6 +9,11 @@
       <n-drawer v-model:show="$var.view.customActive" placement="bottom" :height="height">
         <custom-view v-model:height="height"/>
       </n-drawer>
+      <n-drawer display-directive="show" v-model:show="$var.view.helpActive" placement="left" :width="380">
+        <n-scrollbar style="max-height: 99%">
+          <shortcut-pane/>
+        </n-scrollbar>
+      </n-drawer>
     </n-message-provider>
   </n-config-provider>
 </template>
@@ -32,6 +37,7 @@ import {
 } from "./js/theme";
 import {onMounted, ref} from "vue";
 import {configManager} from "./js/core";
+import ShortcutPane from "./components/ShortcutPane.vue";
 
 const Tabs = [
     ListView,CodeView,FormView,FormView,CustomView
