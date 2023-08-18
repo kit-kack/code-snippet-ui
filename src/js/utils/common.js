@@ -1,5 +1,11 @@
 import {nextTick} from "vue";
 
+/**
+ * 防抖函数
+ * @param fn
+ * @param wait
+ * @returns {(function(): void)|*}
+ */
 export function debounce(fn, wait=150){
     let timer = null;
     return function(){

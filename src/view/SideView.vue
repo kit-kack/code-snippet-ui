@@ -53,7 +53,7 @@
         <config-switch title="粘贴后插件是否退出" config="exitAfterPaste"/>
         <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
         <config-switch title="点击元素是否自动进入Vim模式" config="enabledAutoVim"/>
-        <config-switch @refresh="emit('refresh')"  title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
+        <config-switch title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
         <n-tooltip placement="left" trigger="hover">
           <template #trigger>
             <n-button id="diy"  circle  @click="$var.view.settingActive = false;$var.view.customActive = true">
@@ -89,19 +89,18 @@
 <script setup>
 import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
-import {computed, nextTick, ref} from "vue";
-import ShortcutPane from "../components/ShortcutPane.vue";
+import {ref} from "vue";
 import NormalTag from "../components/NormalTag.vue";
 import {$var} from "../js/store";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
+import {refreshListView} from "../js/some";
 
-const emit = defineEmits(['refresh'])
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
 const dealWithTagRefresh = ()=>{
-  emit('refresh')
+  refreshListView()
   doRefresh();
 }
 const sortKeyOptions = [
@@ -125,7 +124,7 @@ const sortKeyOptions = [
 const handleSortStrategy = (v)=>{
   configManager.set('sortKey',v);
   console.log(v)
-  emit('refresh')
+  refreshListView()
 }
 
 const handleExport = ()=>{
@@ -159,7 +158,7 @@ const handleImport = ()=>{
   })
   if (realPathList != null) {
       codeSnippetManager.load(realPathList[0])
-      emit('refresh')
+      refreshListView()
   }
 }
 

@@ -173,7 +173,6 @@ import {computed, onMounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {handleRecoverLiteShow, languages} from "../js/some.js";
 import {$var, LIST_VIEW, UPDATE_VIEW} from "../js/store";
-import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()

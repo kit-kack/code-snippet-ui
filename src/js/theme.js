@@ -1,6 +1,7 @@
 import {darkTheme} from "naive-ui";
 import {ref} from "vue";
 import {configManager} from "./core";
+import {refreshListView} from "./some";
 
 const theme = utools.isDarkColors()? darkTheme:null;
 
@@ -171,6 +172,32 @@ const darkColorSchemaStyleOptions = [
         highColor: '#FF78753D'
     }];
 
+function initTheme(){
+    let flag = false;
+    if(configManager.get('darkHighlightColor') === undefined){
+        configManager.configs["darkHighlightColor"] = darkColorSchemaStyleOptions[0].highColor
+        configManager.configs["lightHighlightColor"]  = colorSchemaStyleOptions[0].highColor;
+        configManager.writeToDB()
+        flag = true;
+    }
+    if(configManager.get("colorSchema") === undefined){
+        configManager.configs["colorSchema"] = 0
+        configManager.configs["darkColorSchema"] = 0
+        configManager.configs["lightGlobalColor"] = colorSchemaStyleOptions[0].globalColor
+        configManager.configs["darkGlobalColor"] = darkColorSchemaStyleOptions[0].globalColor
+        configManager.configs["lightTagColor"] = colorSchemaStyleOptions[0].tagColor
+        configManager.configs["darkTagColor"] = darkColorSchemaStyleOptions[0].tagColor
+        configManager.configs["lightSelectedColor"] = colorSchemaStyleOptions[0].selectedColor
+        configManager.configs["darkSelectedColor"] = darkColorSchemaStyleOptions[0].selectedColor
+        configManager.writeToDB()
+        flag = true;
+    }
+    if(flag){
+        globalThemeRefresh()
+        refreshListView();
+    }
+}
+
 function adjustTheme(v){
     let style = utools.isDarkColors()? darkColorSchemaStyleOptions[v]: colorSchemaStyleOptions[v];
     configManager.setGlobalColor(style.globalColor)
@@ -185,6 +212,7 @@ export {
     themeOverrides,
     globalThemeRefresh,
     adjustTheme,
+    initTheme,
     colorSchemaStyleOptions,
     darkColorSchemaStyleOptions
 }
