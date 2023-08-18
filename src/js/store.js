@@ -24,6 +24,7 @@ const $var = reactive({
         listInvoker: null,       // 控制ListView滚动
         itemCodeInvoker: null,   // 控制Item CodeView滚动
         spaceInvoker: [],      // Vim模式下空格执行的程序
+        helpInvoker: null,    // 【快捷方式】控制的滚动
         itemOffsetArray: []  // 元素偏移（目前根据滚动条滚动距离计算）
     },
     // 控制当前视图

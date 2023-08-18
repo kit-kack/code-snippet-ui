@@ -48,7 +48,6 @@ const handleVimStatusBarClick = ()=>{
   if($var.currentMode === LIST_VIEW){
     if(showCount === 7){
       $message.success("花点时间去看看外面的风景吧")
-      $var.view.helpActive = true;
       showCount = 0;
     }else{
       showCount++;
@@ -56,7 +55,7 @@ const handleVimStatusBarClick = ()=>{
   }else if($var.currentMode === CODE_VIEW){
     let now = Date.now();
     if(now - lastTime < 500){
-      if(clearCount === 5){
+      if(clearCount === 3){
         $message.info("清除 所有高亮行")
         $var.currentSnippet.sections = [];
         codeSnippetManager.update(toRaw(($var.currentSnippet)))

@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-bottom: 10px;">
+  <div>
     <template v-for="data in datas">
       <n-divider dashed>
         {{data.title}}
@@ -84,7 +84,7 @@ const datas = [
         feature: "粘贴Paste",
         shortcut: ["Enter","P"]
       },{
-        feature: "复制高亮行",
+        feature: "复制高亮行-子代码片段",
         shortcut: "1 ~ 9",
         tooltip: "粘贴请结合Shift或Alt键"
       },{
@@ -95,7 +95,10 @@ const datas = [
         feature: '回到开始',
         shortcut: ["0"],
         tooltip: "该功能同样适用于代码浏览，浏览多行元素代码块时请结合Shift键"
-      }
+      },{
+        feature: '查看『快捷方式』',
+        shortcut: ['Z']
+    }
     ]
   },
   {
@@ -121,7 +124,7 @@ const datas = [
       feature: '清空重新搜索Search',
       shortcut: "S"
     },{
-      feature: '查看更多',
+      feature: '查看『设置』',
       shortcut: '/'
     }]
   },

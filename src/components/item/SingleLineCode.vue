@@ -27,7 +27,7 @@ defineProps(['code','type'])
  * @return {*}
  */
 const  handleCode = (code)=>{
-  return code.replaceAll("\n",'↩').slice(0,200)
+  return code.slice(0,200).replaceAll("\n",'↩')
 }
 </script>
 

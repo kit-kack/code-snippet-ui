@@ -3,6 +3,7 @@ import {codeSnippetManager, configManager} from "./core.js";
 import {$var, CODE_VIEW, CREATE_VIEW, LIST_VIEW,  UPDATE_VIEW} from "./store"
 import {ctrlKey, handleCopy, handleRecoverLiteShow, refreshListView} from "./some";
 import {debounce} from "./utils/common";
+import {Direction, doScrollForCodeView, doScrollForHelpView, doScrollForListView} from "./utils/scroller";
 
 // 控制长按键
 let longKeyDown = false;
@@ -53,23 +54,20 @@ const gotoTheLastPosition = ()=>{
         // $var.scroll.listInvoker?.(distance)
     }
 }
-const handleScrollBar =(scrollBar,direction,fast)=>{
-    const distance = fast? 50: 10;
-    switch (direction){
-        case "left":
-            scrollBar?.scrollBy?.({left: -distance})
+function dealWithHelpViewOnly(e){
+    switch (e.code){
+        case 'KeyJ':
+            doScrollForHelpView(Direction.DOWN)
             break;
-        case "down":
-            scrollBar?.scrollBy?.({top: distance})
+        case 'KeyK':
+            doScrollForHelpView(Direction.UP);
             break;
-        case "up":
-            scrollBar?.scrollBy?.({top: -distance})
+        case 'Digit0':
+            doScrollForHelpView(Direction.RESET);
             break;
-        case "right":
-            scrollBar?.scrollBy?.({left: distance})
-            break;
-        case "reset":
-            scrollBar?.scrollTo?.({left:0,top:0,behavior:'smooth'})
+        case 'KeyZ':
+        case 'KeyQ':
+            $var.view.helpActive = false;
             break;
     }
 }
@@ -82,7 +80,7 @@ function dealWithListView(e,list){
     // vim操作下隐藏鼠标
     $var.view.cursorShow = false;
     switch (e.code){
-        case "Slash":
+        case "Slash": // / ?
             $var.view.fullScreenShow = true;
             $var.view.settingActive = true;
             break;
@@ -99,7 +97,7 @@ function dealWithListView(e,list){
                     utools.shellBeep();
                 }
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                handleScrollBar($var.scroll.itemCodeInvoker,"left")
+                doScrollForListView(Direction.LEFT);
             }else{
                 debItemMoveLeft()
             }
@@ -115,7 +113,7 @@ function dealWithListView(e,list){
                         utools.shellBeep();
                     }
                 }else {
-                    handleScrollBar($var.scroll.itemCodeInvoker,"down")
+                    doScrollForListView(Direction.DOWN);
                 }
             }else{
                 if ($var.utools.selectedIndex >= list.value.length -1) { // -1 >= 0-1
@@ -138,7 +136,7 @@ function dealWithListView(e,list){
                         utools.shellBeep();
                     }
                 }else {
-                    handleScrollBar($var.scroll.itemCodeInvoker,"up")
+                    doScrollForListView(Direction.UP);
                 }
             }else{
                 if ($var.utools.selectedIndex <= 0) {
@@ -159,7 +157,7 @@ function dealWithListView(e,list){
                     utools.shellBeep();
                 }
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                handleScrollBar($var.scroll.itemCodeInvoker,"right")
+                doScrollForListView(Direction.RIGHT);
             }else{
                 debItemMoveRight();
             }
@@ -184,7 +182,7 @@ function dealWithListView(e,list){
                     utools.shellBeep();
                 }
             }else if(e.shiftKey){
-                handleScrollBar($var.scroll.itemCodeInvoker,"reset")
+                doScrollForListView(Direction.RESET);
             }else{
                 $var.utools.selectedIndex = 0;
                 $var.scroll.listInvoker?.scrollTo({top:0,left:0})
@@ -268,15 +266,15 @@ function dealWithCodeView(e){
                     break;
                 }
             }
-            handleScrollBar($var.scroll.codeInvoker,"left",e.shiftKey)
+            doScrollForCodeView(Direction.LEFT,e.shiftKey);
             break;
         case "KeyJ":
         case "ArrowDown":
-            handleScrollBar($var.scroll.codeInvoker,"down",e.shiftKey)
+            doScrollForCodeView(Direction.DOWN,e.shiftKey);
             break;
         case "KeyK":
         case "ArrowUp":
-            handleScrollBar($var.scroll.codeInvoker,"up",e.shiftKey)
+            doScrollForCodeView(Direction.UP,e.shiftKey);
             break;
         case "KeyL":
         case "ArrowRight":
@@ -286,7 +284,7 @@ function dealWithCodeView(e){
                     break;
                 }
             }
-            handleScrollBar($var.scroll.codeInvoker,"right",e.shiftKey)
+            doScrollForCodeView(Direction.RIGHT,e.shiftKey);
             break;
         case 'KeyS':
             $var.view.showCodeTip = !$var.view.showCodeTip;
@@ -297,7 +295,7 @@ function dealWithCodeView(e){
             $var.utools.keepSelectedStatus = true;
             break;
         case 'Digit0':
-            handleScrollBar($var.scroll.codeInvoker,"reset")
+            doScrollForCodeView(Direction.RESET,false);
             break;
         case 'KeyR':
             if($var.currentSnippet.path && $var.currentSnippet.type === 'image'){
@@ -333,6 +331,9 @@ function dealWithCommonView(e){
                 $var.view.fullScreenShow = true;
                 $var.view.recoverLiteShow= true;
                 utools.setExpendHeight(545)
+            }
+            if($var.view.helpActive){
+                $var.view.helpActive = false;
             }
             $var.currentMode = UPDATE_VIEW;
             break;
@@ -409,7 +410,7 @@ function init(list) {
             // prevent any possible event
             if (e.code === 'Space' || e.code === 'Enter' || e.code === 'Tab') {
                 e.preventDefault();
-            } else if (e.code === 'KeyQ') {
+            } else if (e.code === 'KeyQ' || e.code === 'Slash') {
                 $var.view.settingActive = false;
             }
             return;
@@ -442,6 +443,9 @@ function init(list) {
             return;
         }else if(e.code === 'Space'){
             e.preventDefault();
+        }else if(e.code === 'KeyZ'){
+            $var.view.helpActive = !$var.view.helpActive;
+            return;
         }
         // 其他键无法触发
         if ($var.utools.focused) {
@@ -469,6 +473,10 @@ function init(list) {
                     $message.success("进入【模糊符号查询】模式")
                 }
             }
+            return;
+        }
+        if($var.view.helpActive){
+            dealWithHelpViewOnly(e);
             return;
         }
         // 剩余处理

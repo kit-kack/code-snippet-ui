@@ -230,12 +230,12 @@ const handleMouseLeave = (e)=>{
   }
   isHover.value = false;
 }
-const doViewCode = ()=>{
+const doViewCode = ()=>{//TODO
   $var.currentName = props.snippet.name;
   $var.currentSnippet = codeSnippetManager.get(props.snippet.name)
   $var.currentMode = CODE_VIEW;
 }
-const doEdit = ()=>{
+const doEdit = ()=>{//TODO
   $var.currentName = props.snippet.name;
   $var.currentMode = UPDATE_VIEW;
 }

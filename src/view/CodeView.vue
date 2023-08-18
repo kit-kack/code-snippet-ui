@@ -62,7 +62,6 @@
             <n-button
                 @mouseenter="hover = true"
                 @mouseleave="hover = false"
-                @click="handleClick"
                 quaternary :color="configManager.getGlobalColor()">🚀{{ (snippet.type??'plaintext')+' [S]' }}</n-button>
           </template>
           <n-list hoverable clickable :show-divider="false" @mouseenter="hover = true" @mouseleave="hover = false">
@@ -159,9 +158,6 @@ function getCodeFromPath(){
     })
     return "网络文件[ "+snippet.path +" ]数据正在获取中..."
   }
-}
-const handleClick = ()=>{
-  $message.info('该提示部分可以由Vim模式下s键控制')
 }
 const handleClose = ()=>{
   $var.view.showCodeTip = false;

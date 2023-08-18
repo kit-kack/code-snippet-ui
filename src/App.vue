@@ -9,8 +9,8 @@
       <n-drawer v-model:show="$var.view.customActive" placement="bottom" :height="height">
         <custom-view v-model:height="height"/>
       </n-drawer>
-      <n-drawer display-directive="show" v-model:show="$var.view.helpActive" placement="left" :width="380">
-        <n-scrollbar style="max-height: 99%">
+      <n-drawer display-directive="show" v-model:show="$var.view.helpActive" placement="left" :width="380" @after-enter="onShow()">
+        <n-scrollbar style="max-height: 99%" ref="helpViewScorllerRef" >
           <shortcut-pane/>
         </n-scrollbar>
       </n-drawer>
@@ -43,11 +43,19 @@ const Tabs = [
     ListView,CodeView,FormView,FormView,CustomView
 ]
 const height = ref(150)
+const helpViewScorllerRef = ref(null)
 
 const dealWithRefresh = ()=>{
   globalThemeRefresh()
   refreshListView()
 }
+function onShow(){
+  if($var.scroll.helpInvoker === null){
+    console.log(helpViewScorllerRef)
+    $var.scroll.helpInvoker = helpViewScorllerRef.value;
+  }
+}
+
 onMounted(()=>{
   document.body.id = utools.isDarkColors()? 'dark-app' : 'light-app'
   if(configManager.get('darkHighlightColor') === undefined){
