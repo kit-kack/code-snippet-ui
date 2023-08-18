@@ -1,8 +1,6 @@
 import hljs from "highlight.js";
-import {$var, CODE_VIEW} from "./store";
+import {$var} from "./store";
 import {nextTick} from "vue";
-import {codeSnippetManager, configManager} from "./core";
-const ctrlKey = utools.isMacOS()? 'command':'ctrl'
 
 let rootLanguages = hljs.listLanguages();
 rootLanguages.push("vue","html")
@@ -66,33 +64,7 @@ const calculateTime =(time)=>{
     return '现在';
 }
 
-const handleCopy = (isPasted)=>{
-    // 校验
-    if ($var.utools.selectedIndex < 0){
-        return;
-    }
-    // 获取当前文本
-    const codeSnippet = codeSnippetManager.get($var.currentName);
-    // 更新次数和时间
-    codeSnippet.time = Date.now();
-    codeSnippet.count = (codeSnippet.count??0) +1;
-    codeSnippetManager.update(codeSnippet)
-    // 复制
-    if($var.currentMode === CODE_VIEW){
-        utools.copyText($var.currentCode)
-    }else{
-        utools.copyText(codeSnippet.code);
-    }
-    $message.success(`已复制代码片段${$var.currentName}的内容`)
-    // 粘贴
-    if(isPasted){
-        utools.hideMainWindow();
-        utools.simulateKeyboardTap('v',ctrlKey);
-        if(configManager.get('exitAfterPaste')){
-            utools.outPlugin();
-        }
-    }
-}
+
 
 const handleRecoverLiteShow = ()=>{
     if($var.view.recoverLiteShow){
@@ -110,6 +82,6 @@ const refreshListView = ()=>{
 }
 
 export {
-    languages,ctrlKey,
-    isSupportedLanguage,calculateTime,handleCopy,handleRecoverLiteShow,refreshListView
+    languages,
+    isSupportedLanguage,calculateTime,handleRecoverLiteShow,refreshListView
 }

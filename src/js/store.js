@@ -16,13 +16,14 @@ const $var = reactive({
      */
     currentSnippet: null,       // 当前代码片段
     currentCode: null,          // 当前代码
+    lastQueryCodeSnippetName: null,  // 避免重复抓取代码
     currentSplitCode: null,
     list: [],                   // 存放CodeSnippet列表
     // 控制滚动
     scroll:{
         codeInvoker: null,       // 控制CodeView滚动
         listInvoker: null,       // 控制ListView滚动
-        itemCodeInvoker: null,   // 控制Item CodeView滚动
+        itemCodeInvoker: null,   // 控制多行代码块滚动
         spaceInvoker: [],      // Vim模式下空格执行的程序
         helpInvoker: null,    // 【快捷方式】控制的滚动
         itemOffsetArray: []  // 元素偏移（目前根据滚动条滚动距离计算）

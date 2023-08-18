@@ -9,6 +9,7 @@ const CODE_PREFIX = "code#";
 const GLOBAL_ROOT_TAGS = "root";
 const GLOBAL_TAGS = "tags";
 const GLOBAL_CONFIG = "config"
+const GLOBAL_FORMAT = "format";
 
 
 // 存入数据库的 键前缀 旧版本标记，兼容性，后续版本可能会被移除
@@ -757,7 +758,87 @@ const configManager = {
     }
 
 }
+
+const formatManager = {
+    pairs:{},
+    isInited: false,
+
+    init(){
+        if(this.isInited){
+            return;
+        }
+        this.pairs = utools.db.get(GLOBAL_FORMAT)?.data ?? {};
+        console.log('formatManager init')
+        this._initForEachRegex();
+        this.isInited = true;
+    },
+    set(raw,target){
+        this.pairs[raw] = target;
+        funcUtils.createOrUpdate(GLOBAL_FORMAT,this.pairs)
+    },
+    del(raw){
+        delete  this.pairs[raw];
+        funcUtils.createOrUpdate(GLOBAL_FORMAT,this.pairs)
+    },
+    contain(raw){
+        return Object.keys(this.pairs).includes(raw);
+    },
+
+
+    _initForEachRegex(){
+        const now = new Date();
+        const random = Math.random();
+        this.pairs.random = random;
+        this.pairs.rand10m = Math.trunc(random*11)
+        this.pairs.rand100m = Math.trunc(random*101)
+        this.pairs.date = now.toLocaleDateString();
+        this.pairs.day = now.getDay();
+        this.pairs.month = now.getMonth();
+        this.pairs.hour = now.getHours();
+        this.pairs.minute = now.getMinutes();
+        this.pairs.time = now.toLocaleTimeString();
+    },
+    /**
+     *
+     * @param {string} code
+     * @returns {string}
+     * @private
+     */
+    _replaceVar(code){
+        const regex = new RegExp(Object.keys(this.pairs).join('|'),'g')
+        return code.replace(regex,(substring)=>{
+            return this.pairs[substring]
+        })
+    },
+
+
+    /**
+     *
+     * @param {string} code
+     * @returns {string}
+     */
+    format(code){
+        this._initForEachRegex();
+        return code.replace(/#{.+?}#/g,(substring, args)=>{
+            let temp = substring.slice(2,-2);
+            // 替换
+            temp = this._replaceVar(temp);
+            if(temp.startsWith('@')){
+                try{
+                    return window.eval(temp.slice(1))
+                }catch (e){
+                    // TODO:
+                    $message.error("在"+args+"处发生解析错误,原因为"+e.message)
+                    return substring;
+                }
+            }else{
+                return temp
+            }
+        })
+    }
+}
 function init(){
+    formatManager.init()
     // first
     configManager.init();
     // two
@@ -771,5 +852,6 @@ export {
     codeSnippetManager,
     tagColorManager,
     configManager,
+    formatManager,
     init
 }

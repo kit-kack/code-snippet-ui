@@ -2,14 +2,14 @@
   <div  id="code-view">
     <n-scrollbar
         style="max-height: 100vh"
-        :x-scrollable="!isRenderable || !$var.view.isRendering"
+        :x-scrollable="!pair.renderable || !$var.view.isRendering"
         trigger="hover" ref="scrollBar">
       <template v-if="refreshFlag">
-        <template v-if="isRenderable && $var.view.isRendering">
-          <template v-if="snippet.type === 'image'">
+        <template v-if="pair.renderable && $var.view.isRendering">
+          <template v-if="pair.type === 'image'">
             <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 100vw;">
           </template>
-          <template v-else-if="snippet.type === 'markdown'">
+          <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
             <v-md-preview :text="$var.currentCode" ></v-md-preview>
           </template>
           <template v-else>
@@ -18,11 +18,11 @@
         </template>
         <template v-else>
           <div class="hljs-container" v-code>
-            <template v-if="isValidLanguage">
-              <highlightjs :language="snippet.type??'plaintext'" :autodetect="false" :code="getLimitedCode($var.currentCode)" width="100%"/>
+            <template v-if="pair.valid">
+              <highlightjs :language="pair.type" :autodetect="false" :code="pair.code" width="100%"/>
             </template>
             <template v-else>
-              <highlightjs language="plaintext" :autodetect="false" :code="getLimitedCode($var.currentCode)" width="100%"/>
+              <highlightjs language="plaintext" :autodetect="false" :code="pair.code" width="100%"/>
             </template>
             <div class="hljs-line-container">
               <template v-for="(section,sindex) in snippet.sections">
@@ -41,18 +41,18 @@
     </n-scrollbar>
     <div id="extra">
       <n-space>
-        <template v-if="snippet.path && snippet.type !=='image'">
+        <template v-if="snippet.path && pair.type !=='image'">
           <n-button quaternary
-                    @click="updateCode"
+                    @click="updateCachedCode"
                     :color="configManager.getGlobalColor()">
             {{  snippet.code? '🌝已缓存 [B]': '未缓存 [B]' }}
           </n-button>
         </template>
-        <template v-if="isRenderable">
+        <template v-if="pair.renderable">
           <n-button quaternary
                     @click=" $var.view.isRendering = !$var.view.isRendering"
                     :color="configManager.getGlobalColor()"
-                    :disabled="snippet.type === 'image' && snippet.path"
+                    :disabled="pair.type === 'image' && snippet.path"
           >
             {{ $var.view.isRendering? '✨已渲染 [R]': '未渲染 [R]' }}
           </n-button>
@@ -71,12 +71,18 @@
             <n-list-item  v-if="snippet.desc != null">
               <div>{{"📢 "+snippet.desc}}</div>
             </n-list-item >
-            <n-list-item  v-if="snippet.tags != null && snippet.tags.length > 0">
+            <n-list-item  v-if="snippet.tags && snippet.tags.length > 0">
               <div>{{"🔖 "+snippet.tags.join()}}</div>
             </n-list-item >
             <n-list-item >
               <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0}`}}</div>
             </n-list-item>
+            <n-list-item >
+              <div>{{`📃 ${pair.count}字`}}</div>
+            </n-list-item>
+            <n-list-item  v-if="snippet.sections && snippet.sections.length > 0">
+              <div>{{`🧩 ${snippet.sections.length}个子代码片段`}}</div>
+            </n-list-item >
           </n-list>
         </n-popover>
 
@@ -91,7 +97,7 @@
 </template>
 
 <script setup>
-import {codeSnippetManager, configManager} from "../js/core.js";
+import {codeSnippetManager, configManager, formatManager} from "../js/core.js";
 import {computed, onMounted, ref, toRaw} from "vue";
 import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
@@ -103,28 +109,43 @@ const snippet = $var.currentSnippet;
 $var.currentCode = getCode()
 const hover = ref(false)
 const refreshFlag = ref(true)
-const isRenderable = (snippet.type === 'markdown' || snippet.type === 'image');
-const isValidLanguage = computed(()=>{
-  if(snippet.type === 'image'){
-    $var.view.isRendering = true;
-    return false;
+const pair = computed(()=>{
+  // 分析类型
+  const result = {};
+  if(snippet.type){
+    if(snippet.type.length>2 && snippet.type.startsWith('x-')){
+      result.type = snippet.type.slice(2);
+    }else{
+      result.type = snippet.type;
+    }
+    if(result.type === 'image'){
+      $var.view.isRendering = true;
+    }else{
+      result.valid = isSupportedLanguage(result.type)
+      result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'md')
+    }
   }else{
-    return isSupportedLanguage(snippet.type??'plaintext')
+    result.type = 'plaintext';
   }
+  if($var.currentCode){
+    result.count = $var.currentCode.length;
+    if($var.currentCode.length > 100000){
+      $message.info("代码长度超限，只会显示前100000个字符")
+      result.code = $var.currentCode.slice(0,100000)
+    }else{
+      result.code = $var.currentCode;
+    }
+  }else{
+    result.count = 0;
+    result.code = '';
+  }
+  return result;
 })
 
 const doRefresh = getRefreshFunc(refreshFlag,()=>{
   // 滚动条重新绑定
   $var.scroll.codeInvoker = scrollBar.value;
 })
-function getLimitedCode(code){
-  if(code.length > 100000){
-    $message.info("代码长度超限，只会显示前100000个字符")
-    return code.slice(0,100000)
-  }else{
-    return code;
-  }
-}
 function getCode(){
   if(snippet.path){
     if(snippet.code){
@@ -143,8 +164,7 @@ function getCodeFromPath(){
       $message.error(e.message)
       return `😅加载失败: 本地文件[ ${snippet.path} ]`
     }
-
-  }else if(snippet.type !== 'image'){
+  }else if(pair.type !== 'image'){
     fetch(snippet.path).then(resp=>{
       if(resp.ok){
         resp.text().then(value=>{
@@ -165,7 +185,7 @@ const handleClose = ()=>{
   handleRecoverLiteShow();
   $var.currentMode = LIST_VIEW;
 }
-function updateCode(){
+function updateCachedCode(){
   if(snippet.code){   // 清除缓存
     snippet.code = undefined;
     $var.currentCode = getCodeFromPath();  // 抓取数据
@@ -177,11 +197,25 @@ function updateCode(){
 function getNumShow(num){
   return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
 }
-
+const _darkFormatBlockStyle = "color:#ffa400;border-radius:3px;background-color:#414141;font-weight: bolder;"
+const _lightFormatBlockStyle = "color:#ffa400;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;";
+const _errorFormatBlockStyle = "color:red";
 
 onMounted(()=>{
-    $var.others.updateCacheCodeFunc = updateCode
+    $var.others.updateCacheCodeFunc = updateCachedCode
     $var.scroll.codeInvoker = scrollBar.value;
+    if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
+      const codeViewer = document.querySelector('#code-view pre > code');
+      console.log(codeViewer)
+      codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
+        const temp = substring.slice(2,-2);
+        let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
+        if(!temp.startsWith('@')  && !formatManager.contain(temp)){
+          style = _errorFormatBlockStyle;
+        }
+        return `<span style="${style}">${substring}</span>`
+      })
+    }
 })
 
 </script>

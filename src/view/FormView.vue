@@ -95,7 +95,7 @@
             </n-tab-pane>
             <n-tab-pane name="path" tab="链接文件">
               <n-button @click="handleImport" quaternary type="primary">关联本地文本文件</n-button> &nbsp;&nbsp;
-              <n-button @click="showModal = true" quaternary type="info" disabled>关联文本链接</n-button>
+              <n-button @click="showModal = true" quaternary type="info" >关联文本链接</n-button>
               <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
                 <n-list-item v-if="codeTemplate.path" style="height: 100px">
                   <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
@@ -248,6 +248,9 @@ const handleUpdate = ()=>{
             $message.warning("请提供 链接文件")
             return;
           }
+        }
+        if(codeTemplate.type === undefined){
+          codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
         }
         if($var.currentMode === UPDATE_VIEW){
           if($var.currentName === codeTemplate.name){

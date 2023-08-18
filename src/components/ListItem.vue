@@ -27,6 +27,9 @@
               <span :style="getTitleStyle(props.selected,true)"  >{{props.snippet.name}}</span>
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="snippet.path&& configManager.get('noItemCodeShow')">{{snippet.local? '本地':'网络'}}</span>
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="!configManager.get('noItemCodeShow')">{{snippet.desc}}</span>
+              <span class="snippet-item__desc"  style="margin-left: 10px;" v-if="configManager.get('noItemCodeShow')">
+                {{(snippet.sections?.length> 0? snippet.sections.length+'个子代码片段': '') ??''}}
+              </span>
             </n-ellipsis>
           </div>
         </n-scrollbar>
@@ -40,6 +43,7 @@
           </div>
         </n-scrollbar>
       </template>
+
       <template v-if="configManager.get('noItemCodeShow')">
         <n-ellipsis :tooltip="false">
           <span class="snippet-item__desc" style="margin-left: 6px">{{snippet.desc}}</span>
@@ -52,11 +56,12 @@
         <template v-else>
           <single-line-code :type="pair.type" :code="pair.code"/>
         </template>
+        <span  class="snippet-item-info sub-item-code" style="left: 0px;z-index: 20;" >
+              {{(snippet.sections?.length> 0? snippet.sections.length+'个子代码片段': '') ??''}}
+        </span>
       </template>
       <span v-if="selected" class="snippet-item-info" style="right: -5px" :style="{color: configManager.getGlobalColor()}">
-              {{(snippet.type?? 'plaintext')+ ' | '}}
-              {{snippet.count? snippet.count+' | ':''}}
-              {{calculateTime(snippet.time)}}
+              {{pair.txt}}
       </span>
     </n-card>
 
@@ -81,7 +86,7 @@
             <selectable-button :mid="350" type="primary" tip="预览代码" :index="1" @invoke="doViewCode" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M8.086 18.611l5.996-14.004a1 1 0 0 1 1.878.677l-.04.11l-5.996 14.004a1 1 0 0 1-1.878-.677l.04-.11l5.996-14.004L8.086 18.61zm-5.793-7.318l4-4a1 1 0 0 1 1.497 1.32l-.083.094L4.414 12l3.293 3.293a1 1 0 0 1-1.32 1.498l-.094-.084l-4-4a1 1 0 0 1-.083-1.32l.083-.094l4-4l-4 4zm14-4.001a1 1 0 0 1 1.32-.083l.093.083l4.001 4.001a1 1 0 0 1 .083 1.32l-.083.095l-4.001 3.995a1 1 0 0 1-1.497-1.32l.084-.095L19.584 12l-3.293-3.294a1 1 0 0 1 0-1.414z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <selectable-button :mid="395" lite type="info" tip="复制" :index="2" @invoke="handleCopy" >
+            <selectable-button :mid="395" lite type="info" tip="复制" :index="2" @invoke="copyCode(false)" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M5.503 4.627L5.5 6.75v10.504a3.25 3.25 0 0 0 3.25 3.25h8.616a2.251 2.251 0 0 1-2.122 1.5H8.75A4.75 4.75 0 0 1 4 17.254V6.75c0-.98.627-1.815 1.503-2.123zM17.75 2A2.25 2.25 0 0 1 20 4.25v13a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-13A2.25 2.25 0 0 1 8.75 2h9zm0 1.5h-9a.75.75 0 0 0-.75.75v13c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75v-13a.75.75 0 0 0-.75-.75z" fill="currentColor"></path></g></svg>
             </selectable-button>
             <selectable-button :mid="440" lite type="error" tip="删除" :index="3" @invoke="$var.view.isDel = true;$var.utools.subItemSelectedIndex=1">
@@ -109,10 +114,11 @@ import {computed, onMounted, ref} from "vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
 import {$var, CODE_VIEW, UPDATE_VIEW} from "../js/store";
-import {calculateTime, handleCopy, refreshListView} from "../js/some";
+import {calculateTime, refreshListView} from "../js/some";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
+import {copyCode} from "../js/utils/copy";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','debug'])
@@ -127,10 +133,16 @@ const isShowBtn = computed(()=>{
 const isHover = ref(false)
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
 const pair = computed(()=>{
+  let txt = (props.snippet.type?? 'plaintext') + ' | ';
+  if(props.snippet.count){
+    txt += props.snippet.count +' | ';
+  }
+  txt += calculateTime(props.snippet.time);
   if(props.snippet.code){
     return {
       code: props.snippet.code,
-      type: props.snippet.type??'plaintext'
+      type: props.snippet.type??'plaintext',
+      txt: txt
     }
   }else{
     return {
@@ -139,7 +151,8 @@ const pair = computed(()=>{
           (props.snippet.local? '本地':'网络')
           + '文件]: '+props.snippet.path
       ),
-      type: 'markdown'
+      type: 'markdown',
+      txt: txt
     }
   }
 })
@@ -200,7 +213,8 @@ const handleContextMenu = ()=>{
 }
 const handleDoubleClick = ()=>{
   if(configManager.get("doubleClickPaste")){
-    handleCopy(true)
+    copyCode(true)
+    // handleCopy(true)
   }
 }
 const handleCancelTop = ()=>{
@@ -232,6 +246,7 @@ const handleMouseLeave = (e)=>{
 }
 const doViewCode = ()=>{//TODO
   $var.currentName = props.snippet.name;
+  $var.lastQueryCodeSnippetName = $var.currentName;
   $var.currentSnippet = codeSnippetManager.get(props.snippet.name)
   $var.currentMode = CODE_VIEW;
 }
@@ -279,7 +294,7 @@ const doItemRefresh = ()=>{
 
 .n-card{
   width:98vw;
-  padding-bottom: 5px;
+  padding-bottom: 8px;
   margin: 2px 1vw 2px 1vw;
   position:relative;
   overflow: hidden;
@@ -322,9 +337,15 @@ const doItemRefresh = ()=>{
 .snippet-item-info{
   position: absolute;
   bottom: -1px;
-  font-size:12px;
+  font-size:13px;
   transform: scale(0.78); /* 用缩放来解决 */
   line-height: 1;
+}
+.sub-item-code {
+  color: #676767;
+}
+#light-app .sub-item-code{
+  color:#bdbfc0;
 }
 
 

@@ -1,9 +1,10 @@
-import {nextTick, toRaw} from "vue";
+import {nextTick} from "vue";
 import {codeSnippetManager, configManager} from "./core.js";
-import {$var, CODE_VIEW, CREATE_VIEW, LIST_VIEW,  UPDATE_VIEW} from "./store"
-import {ctrlKey, handleCopy, handleRecoverLiteShow, refreshListView} from "./some";
+import {$var, CODE_VIEW, CREATE_VIEW, LIST_VIEW, UPDATE_VIEW} from "./store"
+import {handleRecoverLiteShow, refreshListView} from "./some";
 import {debounce} from "./utils/common";
 import {Direction, doScrollForCodeView, doScrollForHelpView, doScrollForListView} from "./utils/scroller";
+import {copyCode} from "./utils/copy";
 
 // 控制长按键
 let longKeyDown = false;
@@ -170,6 +171,7 @@ function dealWithListView(e,list){
                         $var.view.recoverLiteShow= true;
                         utools.setExpendHeight(545)
                     }
+                    $var.lastQueryCodeSnippetName = $var.currentName;
                     $var.currentSnippet = codeSnippetManager.get($var.currentName)
                     $var.currentMode = CODE_VIEW;
                     longKeyDown = true;
@@ -208,6 +210,7 @@ function dealWithListView(e,list){
                     $var.view.recoverLiteShow= true;
                     utools.setExpendHeight(545)
                 }
+                $var.lastQueryCodeSnippetName = $var.currentName;
                 $var.currentSnippet = codeSnippetManager.get($var.currentName)
                 $var.currentMode = CODE_VIEW;
                 return;
@@ -321,10 +324,12 @@ function dealWithCommonView(e){
     switch (e.code){
         case 'KeyC':
         case 'KeyY':
-            handleCopy(false)
+            copyCode(false);
+            // handleCopy(false)
             break;
         case 'KeyP':
-            handleCopy(true)
+            copyCode(true);
+            // handleCopy(true)
             break;
         case 'KeyE':
             if(!$var.view.fullScreenShow){
@@ -346,44 +351,7 @@ function dealWithCommonView(e){
         case 'Digit7':
         case 'Digit8':
         case 'Digit9':
-            let num = (+e.code[5]) ;
-
-            if($var.currentMode === LIST_VIEW){
-                $var.currentSnippet = codeSnippetManager.get($var.currentName)
-            }
-            let sections = $var.currentSnippet.sections;
-            if(sections && sections.length >= num){
-                const  [start,end] = sections[num-1]
-                if(!$var.currentSnippet.code){
-                    $message.warning("当前代码片段不支持")
-                    return;
-                }
-                let lines = $var.currentSnippet.code.split('\n',end)
-                if(lines.length < start){
-                    $message.warning("区间值超出代码片段区间，请更新或清除旧区间值")
-                    return;
-                }
-                let str = '';
-                for (let i = start; i <= lines.length; i++) {
-                    str += (lines[i-1]+'\n')
-                }
-                $var.currentSnippet.time = Date.now()
-                $var.currentSnippet.count = ($var.currentSnippet.count??0) +1;
-                codeSnippetManager.update(toRaw(($var.currentSnippet)))
-                // 复制
-                utools.copyText(str.slice(0,-1));
-                $message.success(`已复制${$var.currentName}#${num}号子代码片段的内容`)
-                // 粘贴
-                if(e.shiftKey || e.altKey){
-                    utools.hideMainWindow();
-                    utools.simulateKeyboardTap('v',ctrlKey);
-                    if(configManager.get('exitAfterPaste')){
-                        utools.outPlugin();
-                    }
-                }
-            }else{
-                $message.warning(`当前没有 ${num}号 子代码片段`)
-            }
+            copyCode(e.shiftKey || e.altKey,+e.code[5])
             break;
         case 'KeyZ':
             if(!$var.view.fullScreenShow){
@@ -419,7 +387,8 @@ function init(list) {
         }
         // super key
         if (e.code === 'Enter') {
-            handleCopy(true)
+            copyCode(true)
+            // handleCopy(true)
             return;
         } else if (e.code === 'Tab') {
             e.preventDefault();
