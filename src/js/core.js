@@ -868,6 +868,7 @@ const formatManager = {
      */
     format(code){
         this._initForEachRegex()
+
         return code.replace(/#{.+?}#/g,(substring, args)=>{
             let temp = substring.slice(2,-2);
             if(!temp.startsWith('@')){
@@ -879,7 +880,8 @@ const formatManager = {
             }
             if(temp.startsWith('@')){
                 try{
-                    return window.eval(temp.slice(1))
+                    const func = new Function('$','return '+temp.slice(1))
+                    return func(this.pairs);
                 }catch (e){
                     // TODO:
                     $message.error("在"+args+"处发生解析错误,原因为"+e.message)
