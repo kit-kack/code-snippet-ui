@@ -44,22 +44,25 @@
         其他设置
       </n-divider>
       <n-space vertical align="center">
-        <n-tooltip trigger="hover">
-          <template #trigger>
-            <config-switch title="💡是否开启自动备份" config="autoBackup"/>
-          </template>
-          每三天自动备份一次，备份文件位置：%home%\code-snippet-backup.md
-        </n-tooltip>
-        <n-tooltip trigger="hover">
-          <template #trigger>
-            <config-switch title="💡默认是否启用列表UI模式" config="enabledLiteShow"/>
-          </template>
-          这里是指初进入插件时的显示策略
-        </n-tooltip>
+        <n-space>
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <config-check-tag title="💡启用自动备份" config="autoBackup"/>
+            </template>
+            每三天自动备份一次，备份文件位置：{{backupFilePath}}
+          </n-tooltip>
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <config-check-tag title="💡默认启用列表UI模式" config="enabledLiteShow"/>
+            </template>
+            这里是指初进入插件时的默认显示策略
+          </n-tooltip>
+        </n-space>
         <config-switch title="粘贴后插件是否退出" config="exitAfterPaste"/>
         <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
         <config-switch title="点击元素是否自动进入Vim模式" config="enabledAutoVim"/>
         <config-switch title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
+        <config-switch title="关闭显示入门手册" config="closeHelpSnippet" @refresh="refreshListView()"/>
         <n-tooltip placement="left" trigger="hover">
           <template #trigger>
             <n-button id="diy"  circle  @click="$var.view.settingActive = false;$var.view.customActive = true">
@@ -102,7 +105,7 @@ import {$var} from "../js/store";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import {refreshListView} from "../js/some";
+import {backupFilePath, refreshListView} from "../js/some";
 import VariablePane from "../components/VariablePane.vue";
 
 const refreshFlag = ref(true)

@@ -1,7 +1,7 @@
 import {nextTick} from "vue";
 import {codeSnippetManager, configManager} from "./core.js";
 import {$var, CODE_VIEW, CREATE_VIEW, LIST_VIEW, UPDATE_VIEW} from "./store"
-import {handleRecoverLiteShow, refreshListView} from "./some";
+import {defaultHelpSnippet, handleRecoverLiteShow, refreshListView} from "./some";
 import {debounce} from "./utils/common";
 import {Direction, doScrollForCodeView, doScrollForHelpView, doScrollForListView} from "./utils/scroller";
 import {copyCode} from "./utils/copy";
@@ -332,6 +332,10 @@ function dealWithCommonView(e){
             // handleCopy(true)
             break;
         case 'KeyE':
+            if($var.currentName === defaultHelpSnippet.name){
+                $message.warning("内置文档，无法修改");
+                return;
+            }
             if(!$var.view.fullScreenShow){
                 $var.view.fullScreenShow = true;
                 $var.view.recoverLiteShow= true;
@@ -512,6 +516,9 @@ function parseSearchWord(searchWord){
         if($var.view.fullScreenShow  || !configManager.get('noShowForEmptySearch')){
             array = codeSnippetManager.queryForMany(null,null,null)
         }else{
+            if(!configManager.get('closeHelpSnippet')){
+                return [defaultHelpSnippet];
+            }
             return [];
         }
     }else{
@@ -533,6 +540,9 @@ function parseSearchWord(searchWord){
             }
         }
         array = codeSnippetManager.queryForMany(name,tags,type)
+    }
+    if(!configManager.get('closeHelpSnippet')){
+        array.unshift(defaultHelpSnippet)
     }
 
     // 判断 keepSelectedStatus ，如果为true，需要保留selectIndex位置

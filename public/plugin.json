@@ -43,7 +43,7 @@
     },
     {
       "code": "code-snippet-backup",
-      "explain": "备份数据",
+      "explain": "立即备份数据",
       "cmds": ["backup"]
     }
   ]

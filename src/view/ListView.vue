@@ -84,17 +84,6 @@
       </template>
     </div>
   </div>
-  <n-modal v-model:show="newVersionShow"
-           preset="card"
-           title="🎉新版本内容介绍"
-           style="width: 60%"
-
-  >
-    <p v-for="c in $version.content" v-html="c"></p>
-    <template #footer>
-      <n-button style="float: right;margin-bottom: 10px" quaternary type="success" @click=" handleCloseNewVersionModal">知晓</n-button>
-    </template>
-  </n-modal>
 </template>
 
 <script setup>
@@ -105,14 +94,12 @@ import {init, parseSearchWord,} from "../js/keyboard.js";
 import {$var, CREATE_VIEW} from "../js/store";
 import {refreshListView} from "../js/some";
 import {configManager} from "../js/core";
-import $version from '../js/version'
 
 const scrollBar = ref()
 const listViewAspect = ref()
 window.$message = useMessage();
 const list = computed(()=>parseSearchWord($var.utools.search,$var.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
-const newVersionShow = ref(false)
 const handleSelect = (index,name)=>{
   if(index === $var.utools.selectedIndex){
     $var.currentName = name;
@@ -121,22 +108,13 @@ const handleSelect = (index,name)=>{
     return false;
   }
 }
-function handleCloseNewVersionModal(){
-  configManager.set('version',$version.version);
-  newVersionShow.value = false;
-}
+
 
 onMounted(()=>{
   parseSearchWord($var.utools.search)
-  if(configManager.get('version') !== $version.version){
-    utools.setExpendHeight(550);
-    newVersionShow.value = true;
-  }else{
-    handleAppHeight()
-  }
+  handleAppHeight()
   init(list)
   $var.scroll.listInvoker = scrollBar;
-
 })
 const handleAppHeight = ()=>{
   if($var.view.fullScreenShow){

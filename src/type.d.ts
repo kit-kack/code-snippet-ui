@@ -57,3 +57,4 @@ declare type ConfigItem =
     | "defaultLanguage"                             // 默认选择语言
     | "autoBackup"                                  // 自动备份
     | "lastAutoBackupTime"                          // 上次自动备份时间
+    | "closeHelpSnippet"                            // 关闭defaultHelpSnippet

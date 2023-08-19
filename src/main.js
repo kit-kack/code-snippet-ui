@@ -7,6 +7,7 @@ import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd&highlight-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
+import {backupFilePath, defaultHelpSnippet} from "./js/some";
 
 // init
 init()
@@ -45,6 +46,9 @@ function bindApp(){
                         $var.currentSnippet.sections = [[target.value,target.value]]
                     }
                     // 保存
+                    if($var.currentSnippet.help){
+                        return;
+                    }
                     codeSnippetManager.update(toRaw($var.currentSnippet))
                 }
             }
@@ -74,12 +78,9 @@ function bindApp(){
 
 utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
-        let path = utools.getPath('desktop');
-        path += (utools.isWindows()? "\\":'/')
-        const filename = 'code-snippet-backup@'+Date.now()+'.md';
-        path+= filename
-        codeSnippetManager.store(path)
-        utools.showNotification('备份数据文件位于：'+path)
+        codeSnippetManager.store(backupFilePath)
+        configManager.set('lastAutoBackupTime',Date.now())
+        utools.showNotification('备份成功，备份数据文件位于：'+backupFilePath)
         return;
     }
 
@@ -120,8 +121,7 @@ utools.onPluginEnter((data)=>{
                 const now = Date.now();
                 const time = configManager.get('lastAutoBackupTime')??0;
                 if(now - time >= 259200000){
-                    const path =  utools.getPath('home')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
-                    codeSnippetManager.store(path)
+                    codeSnippetManager.store(backupFilePath)
                     configManager.set('lastAutoBackupTime',now)
                 }
             }
@@ -130,21 +130,23 @@ utools.onPluginEnter((data)=>{
     bindApp()
 })
 
-utools.onMainPush(({code,type,payload})=>{
-    let flag = true;
-    const array = codeSnippetManager.queryForMany(payload,null,null)
-    return array.map(cs =>{
-        flag = !flag;
-        return {
-            text: cs.name + '📢'+ (cs.desc??''),
-            name: cs.name,
-            icon: '/code.png'
-        }
-    })
+try{
+    utools.onMainPush(({code,type,payload})=>{
+        let flag = true;
+        const array = codeSnippetManager.queryForMany(payload,null,null)
+        return array.map(cs =>{
+            flag = !flag;
+            return {
+                text: cs.name + '📢'+ (cs.desc??''),
+                name: cs.name,
+                icon: '/code.png'
+            }
+        })
 
-},({code,type,payload,option})=>{
-    $var.currentName = option.name;
-    $var.utools.selectedIndex = 0;
-    copyCode(true,undefined,true)
-})
+    },({code,type,payload,option})=>{
+        $var.currentName = option.name;
+        $var.utools.selectedIndex = 0;
+        copyCode(true,undefined,true)
+    })
+}catch (_){}
 

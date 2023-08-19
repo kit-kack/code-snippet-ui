@@ -1,5 +1,7 @@
 // 全局便利常量和函数
 
+import {defaultHelpSnippet} from "./some";
+
 const utools = window.utools;
 const getDBItem = utools.dbStorage.getItem
 const removeDBItem = utools.dbStorage.removeItem
@@ -384,6 +386,10 @@ const codeSnippetManager = {
      * @param {CodeSnippet} codeSnippet
      */
     add(codeSnippet){
+        if(codeSnippet.name === defaultHelpSnippet.name){
+            $message.error(defaultHelpSnippet.name+"属于内置名，无法被使用")
+            return;
+        }
         codeSnippet.count = codeSnippet.count??0;
         codeSnippet.time = codeSnippet.time??Date.now();
         this.codeMap.set(codeSnippet.name,codeSnippet);
@@ -399,6 +405,10 @@ const codeSnippetManager = {
      * @returns {boolean} - is success
      */
     del(name){
+        if(name === defaultHelpSnippet.name){
+            configManager.set('closeHelpSnippet',true)
+            return true;
+        }
         // 先查询是否存在
         if(this.codeMap.has(name)){
             utools.db.remove(CODE_PREFIX+name)
@@ -421,6 +431,9 @@ const codeSnippetManager = {
      * @return {CodeSnippet}
      */
     get(name){
+        if(name === defaultHelpSnippet.name){
+            return defaultHelpSnippet;
+        }
         return this.codeMap.get(name);
     },
 
@@ -430,6 +443,9 @@ const codeSnippetManager = {
      * @return {boolean}
      */
     contain(name){
+        if(name === defaultHelpSnippet.name){
+            return true;
+        }
         return this.codeMap.has(name)
     },
     /**

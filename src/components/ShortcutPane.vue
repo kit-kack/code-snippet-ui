@@ -86,7 +86,7 @@ const datas = [
       },{
         feature: "复制高亮行-子代码片段",
         shortcut: "1 ~ 9",
-        tooltip: "粘贴请结合Shift或Alt键"
+        tooltip: "粘贴请结合Shift/Alt/Ctrl(Command)键"
       },{
         feature: "退出Quit",
         shortcut: "Q",

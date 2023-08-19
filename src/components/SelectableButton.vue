@@ -12,7 +12,7 @@
                  :color="color"
                  @mouseenter="handleMouseEnter"
                  @mouseleave="hover = false"
-
+                :disabled="disabled"
       >
         <template #icon>
           <slot></slot>
@@ -35,7 +35,8 @@ const props = defineProps({
   "color": String,
   "right": Boolean,
   "mid": Number,
-  "lite": Boolean   // 支持Lite Show
+  "lite": Boolean,   // 支持Lite Show
+  "disabled": Boolean
 })
 const show = ref()
 const emit = defineEmits(['invoke'])
@@ -67,7 +68,9 @@ const operate = ()=>{
 
 onMounted(()=>{
   $var.scroll.spaceInvoker[props.index] = ()=> {
-    operate()
+    if(!props.disabled){
+      operate()
+    }
   }
 })
 

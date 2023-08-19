@@ -27,7 +27,7 @@
         </template>
       </n-list-item>
     </n-list>
-    <n-button type="success" size="small" style="margin:5px;"
+    <n-button size="small" style="margin:5px;"
       @click="enterAddView"
     >添加</n-button>
     <n-modal v-model:show="showModal"

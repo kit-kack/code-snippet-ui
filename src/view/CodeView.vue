@@ -99,10 +99,10 @@
 <script setup>
 import {codeSnippetManager, configManager, formatManager} from "../js/core.js";
 import {computed, onMounted, ref, toRaw, watch} from "vue";
-import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
+import {handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
 import {section_generate} from "../js/utils/section";
-import {getRefreshFunc} from "../js/utils/common";
+import {calculateTime, getRefreshFunc} from "../js/utils/common";
 
 const scrollBar = ref(null)
 const snippet = $var.currentSnippet;
