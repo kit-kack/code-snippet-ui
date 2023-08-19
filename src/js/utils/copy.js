@@ -2,12 +2,12 @@ import {$var} from "../store";
 import {codeSnippetManager, configManager, formatManager} from "../core";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
-function getCode(path,local){
+function getCode(path,local,noView){
     if(local){
         try{
             return window.preload.readConfig(path)?? '[本地内容为空]'
         }catch (e){
-            $message.error(`😅加载失败: 本地文件[ ${path} ]，原因为${e.message}`)
+            _notify(`😅加载失败: 本地文件[ ${path} ]，原因为${e.message}`,noView)
             return null;
         }
     }else {
@@ -17,7 +17,7 @@ function getCode(path,local){
         if(200 <=xhr.status < 400){
             return xhr.responseText;
         }else{
-            $message.error(`😅加载失败: 网络文件[ ${path} ]，原因为${xhr.statusText}`)
+            _notify(`😅加载失败: 网络文件[ ${path} ]，原因为${xhr.statusText}`,noView)
             return null;
         }
     }
@@ -49,11 +49,26 @@ function copyOrPaste(isPasted,text,type){
 }
 
 /**
+ * 通知信息
+ * @param {string} msg
+ * @param {boolean} noView
+ * @private
+ */
+function _notify(msg,noView){
+    if(noView){
+        utools.showNotification(msg)
+    }else{
+        $message.warning(msg)
+    }
+}
+
+/**
  *
  * @param {boolean} isPasted - 是否粘贴
  * @param {number} [num] - 子代码片段,若为undefined，则为复制粘贴整体代码
+ * @param {boolean} [noView] - 适用于没有UI的场景
  */
-export function copyCode(isPasted,num){
+export function copyCode(isPasted,num,noView){
     // 校验
     if ($var.utools.selectedIndex < 0){
         return;
@@ -63,9 +78,9 @@ export function copyCode(isPasted,num){
     // 获取代码
     if($var.lastQueryCodeSnippetName !== codeSnippet.name){  // 获取代码
         if(!codeSnippet.code && codeSnippet.path){
-            const temp = getCode(codeSnippet.path,codeSnippet.local);
+            const temp = getCode(codeSnippet.path,codeSnippet.local,noView);
             if(temp === null){
-                $message.warning("当前代码片段加载失败，无法复制粘贴")
+                _notify("当前代码片段加载失败，无法复制粘贴",noView)
                 return;
             }else{
                 $var.currentCode = temp??'';
@@ -83,7 +98,9 @@ export function copyCode(isPasted,num){
         codeSnippetManager.update(codeSnippet)
         // 复制
         copyOrPaste(isPasted,$var.currentCode,codeSnippet.type)
-        $message.success(`已复制代码片段${codeSnippet.name}的内容`)
+        if(!noView){
+            $message.success(`已复制代码片段${codeSnippet.name}的内容`)
+        }
     }else{
         if(codeSnippet.sections && codeSnippet.sections.length >= num){
             const  [start,end] = codeSnippet.sections[num-1]

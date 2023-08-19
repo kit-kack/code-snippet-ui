@@ -30,6 +30,21 @@
           "label": "保存代码片段"
         }
       ]
+    },
+    {
+      "code": "code-snippet-paste",
+      "explain": "快速粘贴代码片段",
+      "cmds": [{
+        "type": "over",
+        "label": "快速粘贴代码片段",
+        "maxLength": 20
+      }],
+      "mainPush": true
+    },
+    {
+      "code": "code-snippet-backup",
+      "explain": "备份数据",
+      "cmds": ["backup"]
     }
   ]
 }

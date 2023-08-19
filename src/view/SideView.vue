@@ -46,6 +46,12 @@
       <n-space vertical align="center">
         <n-tooltip trigger="hover">
           <template #trigger>
+            <config-switch title="💡是否开启自动备份" config="autoBackup"/>
+          </template>
+          每三天自动备份一次，备份文件位置：%home%\code-snippet-backup.md
+        </n-tooltip>
+        <n-tooltip trigger="hover">
+          <template #trigger>
             <config-switch title="💡默认是否启用列表UI模式" config="enabledLiteShow"/>
           </template>
           这里是指初进入插件时的显示策略
@@ -66,8 +72,8 @@
 
       </n-space>
     </n-tab-pane>
-    <n-tab-pane :name="1" tab="清理">
-      <n-scrollbar style="max-height: 80vh">
+    <n-tab-pane :name="1" tab="标签与变量">
+      <n-scrollbar style="max-height: 91vh">
         <n-tooltip>
           <template #trigger>
             <n-divider title-placement="center">
@@ -81,6 +87,7 @@
             <normal-tag raw v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithTagRefresh"/>
           </n-space>
         </template>
+        <variable-pane/>
       </n-scrollbar>
     </n-tab-pane>
   </n-tabs>
@@ -96,6 +103,7 @@ import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
 import {refreshListView} from "../js/some";
+import VariablePane from "../components/VariablePane.vue";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);

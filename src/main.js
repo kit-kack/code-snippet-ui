@@ -6,12 +6,83 @@ import {$var, CREATE_VIEW} from "./js/store";
 import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd&highlight-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
+import {copyCode} from "./js/utils/copy";
 
 // init
 init()
 
-console.log("before")
+function bindApp(){
+    const app = createApp(App)
+    initNU(app)
+    initVH(app)
+    app.directive("code", {
+        mounted(el) {
+            //获取代码片段
+            let collection = el.querySelector('code.hljs')?.innerHTML.split('\n');
+            let size = collection.length;
+            if(collection[size -1].trim() === ''){
+                size --;
+            }
+            //插入行数
+            let ul = document.createElement('ul')
+            for (let i = 1; i <= size; i++) {
+                let li = document.createElement('li')
+                li.innerText = i + ''
+                li.value = i;
+                ul.appendChild(li)
+            }
+            ul.onclick = (event)=>{
+                let target = event.target;
+                if(target && target.value){
+                    console.log(target.value)
+                    if($var.currentSnippet.sections){
+                        if(section_contain($var.currentSnippet.sections,target.value)){
+                            section_del($var.currentSnippet.sections,target.value,false)
+                        }else{
+                            section_add($var.currentSnippet.sections,target.value,false)
+                        }
+                    }else{
+                        $var.currentSnippet.sections = [[target.value,target.value]]
+                    }
+                    // 保存
+                    codeSnippetManager.update(toRaw($var.currentSnippet))
+                }
+            }
+            ul.oncontextmenu = (event) =>{
+                let target = event.target;
+                if(target && target.value){
+                    console.log(target.value)
+                    if($var.currentSnippet.sections){
+                        if(section_contain($var.currentSnippet.sections,target.value)){
+                            section_del($var.currentSnippet.sections,target.value,true)
+                        }else{
+                            section_add($var.currentSnippet.sections,target.value,true)
+                        }
+                    }else{
+                        $var.currentSnippet.sections = [[0,target.value]]
+                    }
+                    // 保存
+                    codeSnippetManager.update(toRaw($var.currentSnippet))
+                }
+            }
+            ul.classList.add('hljs-code-number')
+            el.prepend(ul)
+        }
+    })
+    app.mount('#app')
+}
+
 utools.onPluginEnter((data)=>{
+    if(data.code === 'code-snippet-backup'){
+        let path = utools.getPath('desktop');
+        path += (utools.isWindows()? "\\":'/')
+        const filename = 'code-snippet-backup@'+Date.now()+'.md';
+        path+= filename
+        codeSnippetManager.store(path)
+        utools.showNotification('备份数据文件位于：'+path)
+        return;
+    }
+
     console.log('Enter App ...')
     console.log('The Following is Your [code type payload]')
     console.log(data)
@@ -43,67 +114,37 @@ utools.onPluginEnter((data)=>{
         // fix: liteShow模式下高度统一
         utools.setExpendHeight(545)
     }
-})
-console.log("after")
-const app = createApp(App)
-initNU(app)
-initVH(app)
-app.directive("code", {
-    mounted(el) {
-        //获取代码片段
-        let collection = el.querySelector('code.hljs')?.innerHTML.split('\n');
-        let size = collection.length;
-        if(collection[size -1].trim() === ''){
-            size --;
-        }
-        //插入行数
-        let ul = document.createElement('ul')
-        for (let i = 1; i <= size; i++) {
-            let li = document.createElement('li')
-            li.innerText = i + ''
-            li.value = i;
-            ul.appendChild(li)
-        }
-        ul.onclick = (event)=>{
-            let target = event.target;
-            if(target && target.value){
-                console.log(target.value)
-                if($var.currentSnippet.sections){
-                    if(section_contain($var.currentSnippet.sections,target.value)){
-                        section_del($var.currentSnippet.sections,target.value,false)
-                    }else{
-                        section_add($var.currentSnippet.sections,target.value,false)
-                    }
-                }else{
-                    $var.currentSnippet.sections = [[target.value,target.value]]
+    setTimeout(()=>{
+        try{
+            if(configManager.get('autoBackup')){
+                const now = Date.now();
+                const time = configManager.get('lastAutoBackupTime')??0;
+                if(now - time >= 259200000){
+                    const path =  utools.getPath('home')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
+                    codeSnippetManager.store(path)
+                    configManager.set('lastAutoBackupTime',now)
                 }
-                // 保存
-                codeSnippetManager.update(toRaw($var.currentSnippet))
             }
-        }
-        ul.oncontextmenu = (event) =>{
-            let target = event.target;
-            if(target && target.value){
-                console.log(target.value)
-                if($var.currentSnippet.sections){
-                    if(section_contain($var.currentSnippet.sections,target.value)){
-                        section_del($var.currentSnippet.sections,target.value,true)
-                    }else{
-                        section_add($var.currentSnippet.sections,target.value,true)
-                    }
-                }else{
-                    $var.currentSnippet.sections = [[0,target.value]]
-                }
-                // 保存
-                codeSnippetManager.update(toRaw($var.currentSnippet))
-            }
-        }
-        ul.classList.add('hljs-code-number')
-        el.prepend(ul)
-    }
+        }catch (_){}
+    },100)
+    bindApp()
 })
-app.mount('#app')
-console.log('Hello World')
 
+utools.onMainPush(({code,type,payload})=>{
+    let flag = true;
+    const array = codeSnippetManager.queryForMany(payload,null,null)
+    return array.map(cs =>{
+        flag = !flag;
+        return {
+            text: cs.name + '📢'+ (cs.desc??''),
+            name: cs.name,
+            icon: '/code.png'
+        }
+    })
 
+},({code,type,payload,option})=>{
+    $var.currentName = option.name;
+    $var.utools.selectedIndex = 0;
+    copyCode(true,undefined,true)
+})
 

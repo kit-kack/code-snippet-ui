@@ -98,7 +98,7 @@
 
 <script setup>
 import {codeSnippetManager, configManager, formatManager} from "../js/core.js";
-import {computed, onMounted, ref, toRaw} from "vue";
+import {computed, onMounted, ref, toRaw, watch} from "vue";
 import {calculateTime, handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
 import {$var, LIST_VIEW} from "../js/store";
 import {section_generate} from "../js/utils/section";
@@ -118,12 +118,13 @@ const pair = computed(()=>{
     }else{
       result.type = snippet.type;
     }
-    if(result.type === 'image'){
+    if(result.type === 'md'){
+      result.type = 'markdown';
+    }else if(result.type === 'image'){
       $var.view.isRendering = true;
-    }else{
-      result.valid = isSupportedLanguage(result.type)
-      result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'md')
     }
+    result.valid = isSupportedLanguage(result.type)
+    result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'md')
   }else{
     result.type = 'plaintext';
   }
@@ -164,7 +165,7 @@ function getCodeFromPath(){
       $message.error(e.message)
       return `😅加载失败: 本地文件[ ${snippet.path} ]`
     }
-  }else if(pair.type !== 'image'){
+  }else if(snippet.type !== 'image' && snippet.type !== 'x-image'){
     fetch(snippet.path).then(resp=>{
       if(resp.ok){
         resp.text().then(value=>{
@@ -205,18 +206,26 @@ onMounted(()=>{
     $var.others.updateCacheCodeFunc = updateCachedCode
     $var.scroll.codeInvoker = scrollBar.value;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
-      const codeViewer = document.querySelector('#code-view pre > code');
-      console.log(codeViewer)
-      codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
-        const temp = substring.slice(2,-2);
-        let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
-        if(!temp.startsWith('@')  && !formatManager.contain(temp)){
-          style = _errorFormatBlockStyle;
+      watch(()=>$var.view.isRendering,(newValue)=>{
+        const codeViewer = document.querySelector(newValue? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
+        if(codeViewer){
+          codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
+            const temp = substring.slice(2,-2);
+            let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
+            if(!temp.startsWith('@')  && !formatManager.contain(temp)){
+              style = _errorFormatBlockStyle;
+            }
+            return `<span style="${style}">${substring}</span>`
+          })
         }
-        return `<span style="${style}">${substring}</span>`
+      },{
+        flush:'post',
+        immediate:true
       })
+
     }
 })
+
 
 </script>
 

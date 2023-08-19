@@ -22,17 +22,17 @@
 import ListView from "./view/ListView.vue";
 import hljs from "highlight.js/lib/common";
 import SideView from "./view/SideView.vue";
-import CodeView from "./view/CodeView.vue";
 import VimStatusBar from "./components/VimStatusBar.vue";
-import FormView from "./view/FormView.vue";
 import {$var} from "./js/store"
 import CustomView from "./view/CustomView.vue";
 import {initTheme, theme, themeOverrides} from "./js/theme";
 import {onMounted, ref} from "vue";
 import ShortcutPane from "./components/ShortcutPane.vue";
+import CodeView from "./view/CodeView.vue";
+import FormView from "./view/FormView.vue";
 
 const Tabs = [
-    ListView,CodeView,FormView,FormView,CustomView
+    ListView,CodeView,FormView,FormView
 ]
 const height = ref(150)
 const helpViewScorllerRef = ref(null)

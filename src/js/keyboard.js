@@ -376,7 +376,7 @@ function init(list) {
         // dialog or sideview
         if ($var.view.settingActive) {
             // prevent any possible event
-            if (e.code === 'Space' || e.code === 'Enter' || e.code === 'Tab') {
+            if ( e.code === 'Enter' || e.code === 'Tab') {
                 e.preventDefault();
             } else if (e.code === 'KeyQ' || e.code === 'Slash') {
                 $var.view.settingActive = false;
@@ -422,25 +422,42 @@ function init(list) {
         }
         // 处理Ctrl键
         if (e.ctrlKey || e.metaKey) {
-            if (e.code === 'KeyN') {
-                if (!$var.view.fullScreenShow) {
-                    $var.view.fullScreenShow = true;
-                    $var.view.recoverLiteShow = true;
-                    utools.setExpendHeight(545)
-                }
-                $var.currentMode = CREATE_VIEW;
-                return;
-            } else if (e.code === 'KeyR' && $var.currentMode === LIST_VIEW) {
-                refreshListView()
-                return;
-            } else if (e.code === 'KeyF' && $var.currentMode === LIST_VIEW) {
-                if (configManager.get("enabledFuzzySymbolQuery")) {
-                    configManager.set("enabledFuzzySymbolQuery", false)
-                    $message.info("退出【模糊符号查询】模式")
-                } else {
-                    configManager.set("enabledFuzzySymbolQuery", true)
-                    $message.success("进入【模糊符号查询】模式")
-                }
+            switch (e.code){
+                case 'KeyN':
+                    if (!$var.view.fullScreenShow) {
+                        $var.view.fullScreenShow = true;
+                        $var.view.recoverLiteShow = true;
+                        utools.setExpendHeight(545)
+                    }
+                    $var.currentMode = CREATE_VIEW;
+                    return;
+                case 'KeyR':
+                    if($var.currentMode === LIST_VIEW){
+                        refreshListView()
+                    }
+                    return;
+                case 'KeyF':
+                    if($var.currentMode === LIST_VIEW){
+                        if (configManager.get("enabledFuzzySymbolQuery")) {
+                            configManager.set("enabledFuzzySymbolQuery", false)
+                            $message.info("退出【模糊符号查询】模式")
+                        } else {
+                            configManager.set("enabledFuzzySymbolQuery", true)
+                            $message.success("进入【模糊符号查询】模式")
+                        }
+                    }
+                    return;
+                case 'Digit1':
+                case 'Digit2':
+                case 'Digit3':
+                case 'Digit4':
+                case 'Digit5':
+                case 'Digit6':
+                case 'Digit7':
+                case 'Digit8':
+                case 'Digit9':
+                    copyCode(true,+e.code[5])
+                    return;
             }
             return;
         }

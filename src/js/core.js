@@ -49,6 +49,7 @@ const funcUtils = {
      */
     recongzieCodeSnippet(lines,cur){
         const snippet = {};
+        let top = false;
         snippet.name  =lines[cur].substring(4).trim();
         let str = null;
         while (true){
@@ -104,8 +105,14 @@ const funcUtils = {
                     if(!isNaN(count)){
                         snippet.count = count;
                     }
+                }else if(str.startsWith('🧩')){
+                    const sections = str.substring(2).trim().split(' ').filter(value => value.length>0);
+                    if(sections && sections.length > 0){
+                        snippet.sections = sections.map(v =>v.split('-',2).map(x=>parseInt(x)))
+                    }
+                }else if(str.startsWith('🔰top')){
+                    top = true;
                 }
-
             }else{
                 let pair = this.recongizeCodeBlock(str);
                 if(pair == null){
@@ -122,6 +129,7 @@ const funcUtils = {
                         snippet.type = pair.type??"plaintext";
                         return {
                             cur: cur,
+                            top: top,
                             snippet:snippet
                         };
                     }else{
@@ -546,8 +554,18 @@ const codeSnippetManager = {
                     str += `> network: ${codeSnippet.path}\n> \n`
                 }
             }
+            if(codeSnippet.sections && codeSnippet.sections.length > 0){
+                str+= '> 🧩';
+                for (const section of codeSnippet.sections) {
+                    str+= ` ${section[0]}-${section[1]}`
+                }
+                str+='\n';
+            }
+            if(configManager.getTopList().includes(codeSnippet.name)){
+                str += '> 🔰top \n';
+            }
             // output code
-            let max = funcUtils.getMaxMarkCount(codeSnippet.code)
+            const max = funcUtils.getMaxMarkCount(codeSnippet.code)
             let block = '```';
             for (let i = 3; i <= max; i++) {
                 block+='`'
@@ -577,6 +595,9 @@ const codeSnippetManager = {
                     result.snippet.code = undefined;
                 }
                 this.add(result.snippet)
+                if(result.top){
+                    configManager.addTopItem(result.snippet.name)
+                }
                 cur = result.cur+1;
             }else{
                 msg = result;
@@ -792,23 +813,35 @@ const formatManager = {
         this.pairs.rand10m = Math.trunc(random*11)
         this.pairs.rand100m = Math.trunc(random*101)
         this.pairs.date = now.toLocaleDateString();
-        this.pairs.day = now.getDay();
-        this.pairs.month = now.getMonth();
-        this.pairs.hour = now.getHours();
-        this.pairs.minute = now.getMinutes();
         this.pairs.time = now.toLocaleTimeString();
+        this.pairs.uuid = this._uuid();
     },
-    /**
+    _uuid() {
+        const s = [];
+        const x = "0123456789abcdef";
+        for (let i = 0; i < 36; i++) {
+            s[i] = x.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = "4";
+        s[19] = x.substr((s[19] & 0x3) | 0x8, 1);
+        s[8] = s[13] = s[18] = s[23] = "-";
+        return s.join("");
+    },
+
+
+/**
      *
      * @param {string} code
      * @returns {string}
      * @private
      */
     _replaceVar(code){
-        const regex = new RegExp(Object.keys(this.pairs).join('|'),'g')
-        return code.replace(regex,(substring)=>{
-            return this.pairs[substring]
-        })
+        const vars = Object.keys(this.pairs);
+        if(vars.includes(code)){
+            return this.pairs[code];
+        }else{
+            return undefined;
+        }
     },
 
 
@@ -818,11 +851,16 @@ const formatManager = {
      * @returns {string}
      */
     format(code){
-        this._initForEachRegex();
+        this._initForEachRegex()
         return code.replace(/#{.+?}#/g,(substring, args)=>{
             let temp = substring.slice(2,-2);
-            // 替换
-            temp = this._replaceVar(temp);
+            if(!temp.startsWith('@')){
+                // 替换
+                temp = this._replaceVar(temp);
+                if(temp === undefined){
+                    return substring;
+                }
+            }
             if(temp.startsWith('@')){
                 try{
                     return window.eval(temp.slice(1))
@@ -835,6 +873,15 @@ const formatManager = {
                 return temp
             }
         })
+    },
+    all(){
+        this.pairs.random = '(内置)随机数[0,1)';
+        this.pairs.rand10m = '(内置)随机数[0,10]';
+        this.pairs.rand100m = '(内置)随机数[0,100]';
+        this.pairs.date = '(内置)当前日期';
+        this.pairs.time = '(内置)当前时刻'
+        this.pairs.uuid = '(内置)唯一标识符'
+        return this.pairs;
     }
 }
 function init(){
