@@ -191,6 +191,9 @@ function dealWithListView(e,list){
             }
             break;
         case 'KeyT':
+            if($var.currentName === defaultHelpSnippet.name){
+                return;
+            }
             let index = configManager.getTopList().indexOf($var.currentName)
             if(index === -1){
                 $var.utools.selectedIndex = configManager.addTopItem($var.currentName);
