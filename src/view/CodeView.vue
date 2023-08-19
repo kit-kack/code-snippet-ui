@@ -202,22 +202,28 @@ const _darkFormatBlockStyle = "color:#ffa400;border-radius:3px;background-color:
 const _lightFormatBlockStyle = "color:#ffa400;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;";
 const _errorFormatBlockStyle = "color:red";
 
+function renderFormatBlock(flag){
+  const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
+  if(codeViewer){
+    codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
+      const temp = substring.slice(2,-2);
+      let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
+      if(!temp.startsWith('@')  && !formatManager.contain(temp)){
+        style = _errorFormatBlockStyle;
+      }
+      return `<span style="${style}">${substring}</span>`
+    })
+  }
+}
+
+
 onMounted(()=>{
     $var.others.updateCacheCodeFunc = updateCachedCode
     $var.scroll.codeInvoker = scrollBar.value;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
+      renderFormatBlock(pair.value.renderable && $var.view.isRendering)
       watch(()=>$var.view.isRendering,(newValue)=>{
-        const codeViewer = document.querySelector(newValue? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
-        if(codeViewer){
-          codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
-            const temp = substring.slice(2,-2);
-            let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
-            if(!temp.startsWith('@')  && !formatManager.contain(temp)){
-              style = _errorFormatBlockStyle;
-            }
-            return `<span style="${style}">${substring}</span>`
-          })
-        }
+        renderFormatBlock(newValue)
       },{
         flush:'post',
         immediate:true
