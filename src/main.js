@@ -7,7 +7,7 @@ import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd&highlight-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
-import {backupFilePath, defaultHelpSnippet} from "./js/some";
+import {backupFilePath} from "./js/some";
 
 // init
 init()
@@ -137,7 +137,7 @@ try{
         return array.map(cs =>{
             flag = !flag;
             return {
-                text: cs.name + '📢'+ (cs.desc??''),
+                text: cs.desc? (cs.name+'📢'+cs.desc):cs.name,
                 name: cs.name,
                 icon: '/code.png'
             }

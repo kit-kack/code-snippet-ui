@@ -328,7 +328,6 @@ onMounted(()=>{
   font-size: 14px;
   text-align: center;
   z-index: 2;
-  //line-height: 1.6;
 }
 
 #dark-app .v-md-editor {
@@ -370,6 +369,12 @@ onMounted(()=>{
 }
 #dark-app .github-markdown-body h1, #dark-app .github-markdown-body h2{
   border-bottom-color: #515154;
+}
+#dark-app .github-markdown-body code:not(pre) {
+  background-color: #414141;
+}
+#dark-app .github-markdown-body pre code {
+  background-color: unset;
 }
 
 </style>
