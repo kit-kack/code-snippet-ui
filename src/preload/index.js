@@ -1,4 +1,5 @@
 const fs = require('fs')
+const {ipcRenderer} = require('electron')
 
 export const readConfig = (path) => fs.readFileSync(path).toString();
 export const writeConfig = (path,str)=> fs.appendFileSync(path,str);
@@ -22,4 +23,10 @@ export function getFilesInDir(path) {
         }
     });
     return result;
+}
+
+export function listen(callback){
+    ipcRenderer.on('message',(event,message)=>{
+        callback?.(message);
+    })
 }

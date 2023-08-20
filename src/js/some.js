@@ -1,6 +1,7 @@
 export const backupFilePath = utools.getPath('home')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
 
 export const defaultHelpSnippet = {
+    version: utools.getAppVersion(),
     name: '🎉CodeSnippet插件入门手册&新功能介绍🎉',
     desc: '右键该元素选择预览代码，懂的人已经用v打开了',
     type: 'markdown',

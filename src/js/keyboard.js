@@ -515,6 +515,10 @@ function init(list) {
  */
 function parseSearchWord(searchWord){
     let array = [];
+    if(configManager.get('version') !== utools.getAppVersion()){
+        configManager.set('version',utools.getAppVersion())
+        configManager.set('closeHelpSnippet',false)
+    }
     if(searchWord == null || searchWord.length === 0){
         if($var.view.fullScreenShow  || !configManager.get('noShowForEmptySearch')){
             array = codeSnippetManager.queryForMany(null,null,null)

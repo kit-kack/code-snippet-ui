@@ -795,40 +795,71 @@ const configManager = {
 }
 
 const formatManager = {
-    pairs:{},
+    data:{
+        pairs:{},
+        inputs:[]
+    },
+    tempInputVars: [],
     isInited: false,
 
     init(){
         if(this.isInited){
             return;
         }
-        this.pairs = utools.db.get(GLOBAL_FORMAT)?.data ?? {};
+        const data = utools.db.get(GLOBAL_FORMAT)?.data ?? {};
+        this.data.pairs = data.pairs??{};
+        this.data.inputs = data.inputs??[];
         console.log('formatManager init')
         this._initForEachRegex();
         this.isInited = true;
     },
+    /**
+     *
+     * @param {string} raw
+     * @param {string | null} target
+     */
     set(raw,target){
-        this.pairs[raw] = target;
-        funcUtils.createOrUpdate(GLOBAL_FORMAT,this.pairs)
+        // recongize分析
+        if(target){
+            if(target.startsWith('#{input') && target.endsWith('}#')){
+                // final default
+                if(target[7]===':'){
+                    if(!this.data.inputs.includes(raw)){
+                        this.data.inputs.push(raw)
+                    }
+                    target = target.slice(8,-2);
+                }else if(target.length === 9){  // #{input}#
+                    if(!this.data.inputs.includes(raw)){
+                        this.data.inputs.push(raw)
+                    }
+                    target = null;
+                }
+            }
+        }
+        this.data.pairs[raw] = target;
+        funcUtils.createOrUpdate(GLOBAL_FORMAT,this.data)
     },
     del(raw){
-        delete  this.pairs[raw];
-        funcUtils.createOrUpdate(GLOBAL_FORMAT,this.pairs)
+        delete  this.data.pairs[raw];
+        const index = this.data.inputs.indexOf(raw)
+        if(index!== -1){
+            this.data.inputs.splice(index,1)
+        }
+        funcUtils.createOrUpdate(GLOBAL_FORMAT,this.data)
     },
     contain(raw){
-        return Object.keys(this.pairs).includes(raw);
+        return Object.keys(this.data.pairs).includes(raw);
     },
-
-
     _initForEachRegex(){
         const now = new Date();
         const random = Math.random();
-        this.pairs.random = random;
-        this.pairs.rand10m = Math.trunc(random*11)
-        this.pairs.rand100m = Math.trunc(random*101)
-        this.pairs.date = now.toLocaleDateString();
-        this.pairs.time = now.toLocaleTimeString();
-        this.pairs.uuid = this._uuid();
+        this.data.pairs.random = random;
+        this.data.pairs.rand10m = Math.trunc(random*11)
+        this.data.pairs.rand100m = Math.trunc(random*101)
+        this.data.pairs.date = now.toLocaleDateString();
+        this.data.pairs.time = now.toLocaleTimeString();
+        this.data.pairs.uuid = this._uuid();
+        this.tempInputVars = [];
     },
     _uuid() {
         const s = [];
@@ -850,54 +881,207 @@ const formatManager = {
      * @private
      */
     _replaceVar(code){
-        const vars = Object.keys(this.pairs);
+        const vars = Object.keys(this.data.pairs);
         if(vars.includes(code)){
-            return this.pairs[code];
+            // 分析
+            if(this.data.inputs.includes(code)){
+
+            }
+            // #{default:xxxxxxxxxx}#
+            return this.data.pairs[code];
         }else{
             return undefined;
         }
     },
-
-
     /**
      *
      * @param {string} code
-     * @returns {string}
+     * @private
      */
-    format(code){
-        this._initForEachRegex()
-
-        return code.replace(/#{.+?}#/g,(substring, args)=>{
-            let temp = substring.slice(2,-2);
-            if(!temp.startsWith('@')){
-                // 替换
-                temp = this._replaceVar(temp);
-                if(temp === undefined){
-                    return substring;
-                }
-            }
-            if(temp && (typeof temp === 'string') && temp.startsWith('@')){
-                try{
-                    const func = new Function('$','return '+temp.slice(1))
-                    return func(this.pairs);
-                }catch (e){
-                    // TODO:
-                    $message.error("在"+args+"处发生解析错误,原因为"+e.message)
-                    return substring;
+    _format(code){
+        const formatBlocks = code.matchAll(/#{.+?}#/g)
+        // 判断是否存在inputVars，并且同时进行切分
+        // helloworlddfad
+        const target = [];
+        const inputVars = new Set();
+        let last = 0;
+        for (const formatBlock of formatBlocks) {
+            // 判断是否为inputVar
+            let name = formatBlock[0]
+            // pre
+            target.push({
+                code: code.slice(last,formatBlock.index)
+            })
+            // remaining
+            last = formatBlock.index + name.length;
+            // current
+            name = name.slice(2,-2)
+            if(name.startsWith('@')){  // exp
+                target.push({
+                    exp: true,
+                    code: name
+                })
+            }else if(name in this.data.pairs){
+                if(this.data.inputs.includes(name)){
+                    inputVars.add(name)
+                    target.push({
+                        inp: true,
+                        code: name
+                    })
+                }else{
+                    // 直接替换
+                    target.push({
+                        exp: true,  // 后续可能会解析表达式
+                        code: this.data.pairs[name]
+                    })
                 }
             }else{
-                return temp
+                target.push({
+                    code: formatBlock[0]  // 不解析
+                })
             }
-        })
+        }
+        if(last === 0){
+            return {
+                code: code,
+                parse: false
+            };
+        }else if(last < code.length){
+            target.push({
+                last: true,
+                code: code.slice(last)
+            })
+        }
+        if(inputVars.size > 0){
+            return {
+                parse: true,
+                vars: Array.from(inputVars.keys()),
+                code: target
+            }
+        }else{
+            return {
+                parse:true,
+                code: target
+            }
+        }
     },
+    /**
+     *
+     * @param {any[]} codes
+     * @return {string}
+     */
+    _expression(codes){
+        return codes.map(element=>{
+            if(element.inp){
+                element.code = this.data.pairs[element.code]
+            }
+            if(element.exp){
+                if(element.code && (typeof element.code === 'string') && element.code.startsWith('@')){
+                    try{
+                        const func = new Function('$','return '+element.code.slice(1))
+                        return func(this.data.pairs);
+                    }catch (e){
+                        // TODO:
+                        element.code = `#{${element.code}}#`
+                        $message.error("解析"+element.code+"错误,原因为"+e.message)
+                        return element.code;
+                    }
+                }
+            }
+            return element.code;
+        }).join('')
+    },
+    /**
+     * @param {string} code
+     * @param {boolean} isPaste
+     * @return {string | any[] | any | null}
+     */
+    parse(code,isPaste){
+        const result = this._format(code)
+        if(result.parse){
+            if(result.vars){
+                let uBrower = utools.createBrowserWindow('/helloworld.html',{
+                    show:false,
+                    title: '输入变量',
+                    width: 320,
+                    height: 340,
+                    maxWidth: 340,
+                    minWidth: 340,
+                    // minHeight: 100,
+                    maxHeight: 500,
+                    modal: true,
+                    spellcheck:false,
+                    // titleBarStyle: 'hidden',
+
+                    webPreferences: {
+                        nodeIntegration: true, // 设置开启nodejs环境
+                        enableRemoteModule: true, // enableRemoteModule保证renderer.js可以可以正常require('electron').remote，此选项默认关闭且网上很多资料没有提到
+                        preload: '/preload.js'
+                    }
+                },()=>{
+                    uBrower.show();
+                    uBrower.focus()
+                    uBrower.webContents.send('message',[result.vars,this.data.pairs,result.code,isPaste])
+                })
+                return null;
+            }else{
+                return this._expression(result.code);
+            }
+        }else{
+            return result.code;
+        }
+    },
+
+    // /**
+    //  *
+    //  * @param {string} code
+    //  * @returns {string}
+    //  */
+    // format(code){
+    //     this._initForEachRegex()
+    //     return code.replace(/#{.+?}#/g,(substring, args)=>{
+    //         let temp = substring.slice(2,-2);
+    //         if(!temp.startsWith('@')){
+    //             // 替换
+    //             if( temp in this.data.pairs){
+    //                 if(this.data.inputs.includes(temp)){
+    //
+    //                 }
+    //             }
+    //
+    //
+    //             temp = this._replaceVar(temp);
+    //             if(temp === undefined){
+    //                 return substring;
+    //             }
+    //         }
+    //         if(temp && (typeof temp === 'string') && temp.startsWith('@')){
+    //             try{
+    //                 const func = new Function('$','return '+temp.slice(1))
+    //                 return func(this.pairs);
+    //             }catch (e){
+    //                 // TODO:
+    //                 $message.error("在"+args+"处发生解析错误,原因为"+e.message)
+    //                 return substring;
+    //             }
+    //         }else{
+    //             return temp
+    //         }
+    //     })
+    // },
     all(){
-        this.pairs.random = '(内置)随机数[0,1)';
-        this.pairs.rand10m = '(内置)随机数[0,10]';
-        this.pairs.rand100m = '(内置)随机数[0,100]';
-        this.pairs.date = '(内置)当前日期';
-        this.pairs.time = '(内置)当前时刻'
-        this.pairs.uuid = '(内置)唯一标识符'
-        return this.pairs;
+        const p = {...this.data.pairs}
+        p.random = '(内置)随机数[0,1)';
+        p.rand10m = '(内置)随机数[0,10]';
+        p.rand100m = '(内置)随机数[0,100]';
+        p.date = '(内置)当前日期';
+        p.time = '(内置)当前时刻'
+        p.uuid = '(内置)唯一标识符'
+        // input var
+        for (let input of this.data.inputs) {
+            p[input] = p[input]? '#{input:'+p[input]+'}#' : '#{input}#'
+        }
+        return p;
     }
 }
 function init(){

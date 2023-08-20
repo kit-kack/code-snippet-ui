@@ -25,12 +25,15 @@ function getCode(path,local,noView){
 
 function copyOrPaste(isPasted,text,type){
     if(type && type.length>2 && type.startsWith('x-')){
-        text = formatManager.format(text);
+        text = formatManager.parse(text,isPasted);
+    }
+    if(text === null){
+        return;
     }
     if(isPasted){
         try{
             // utools新API
-            utools.hideMainWindowPasteText(text);
+            utools.hideMainWindowPasteText(text)
             if(configManager.get('exitAfterPaste')){
                 utools.outPlugin();
             }
