@@ -1,5 +1,4 @@
-import {reactive} from "vue";
-import {codeSnippetManager} from "./core";
+import {nextTick, reactive} from "vue";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
@@ -60,14 +59,23 @@ const $var = reactive({
 })
 
 
-function List2Code(name){
-    $var.currentName = name;
-    $var.currentSnippet = codeSnippetManager.get(name)
-    // 最终修改模式
-    $var.currentMode = CODE_VIEW;
+const handleRecoverLiteShow = ()=>{
+    if($var.view.recoverLiteShow){
+        $var.view.recoverLiteShow= false;
+        $var.view.fullScreenShow = false;
+        utools.setExpendHeight($var.view.recoverLiteHeight)
+    }
+}
+
+const refreshListView = ()=>{
+    $var.view.refresh = false;
+    nextTick(()=>{
+        $var.view.refresh = true
+    })
 }
 
 export {
     $var,
-    LIST_VIEW,CODE_VIEW,UPDATE_VIEW,CREATE_VIEW
+    LIST_VIEW,CODE_VIEW,UPDATE_VIEW,CREATE_VIEW,
+    handleRecoverLiteShow,refreshListView
 }

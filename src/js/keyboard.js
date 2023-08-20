@@ -1,7 +1,7 @@
 import {nextTick} from "vue";
 import {codeSnippetManager, configManager} from "./core.js";
-import {$var, CODE_VIEW, CREATE_VIEW, LIST_VIEW, UPDATE_VIEW} from "./store"
-import {defaultHelpSnippet, handleRecoverLiteShow, refreshListView} from "./some";
+import {$var, CODE_VIEW, CREATE_VIEW, handleRecoverLiteShow, LIST_VIEW, refreshListView, UPDATE_VIEW} from "./store"
+import {defaultHelpSnippet} from "./some";
 import {debounce} from "./utils/common";
 import {Direction, doScrollForCodeView, doScrollForHelpView, doScrollForListView} from "./utils/scroller";
 import {copyCode} from "./utils/copy";

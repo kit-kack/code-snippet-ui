@@ -478,7 +478,6 @@ const codeSnippetManager = {
             codeSnippet.name = newName;
             this.codeMap.set(codeSnippet.name,codeSnippet);
             funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.name,codeSnippet)
-            this.codeMap.set(codeSnippet.name,codeSnippet)
             this.writeToDB();
             this.addTagInfo(codeSnippet,true)
             return true;
@@ -502,7 +501,6 @@ const codeSnippetManager = {
             if(configManager.get('enabledFuzzySymbolQuery')){
                 // 0. 搜索词需要同样被替换
                 name = funcUtils.getFuzzyQueriedValue(name);
-                console.log(name)
                 for (const codeSnippet of this.codeMap.values()) {
                     // 1.首先检查 查询缓存
                     if(codeSnippet.query == null){
@@ -878,7 +876,7 @@ const formatManager = {
                     return substring;
                 }
             }
-            if(temp.startsWith('@')){
+            if(temp && (typeof temp === 'string') && temp.startsWith('@')){
                 try{
                     const func = new Function('$','return '+temp.slice(1))
                     return func(this.pairs);

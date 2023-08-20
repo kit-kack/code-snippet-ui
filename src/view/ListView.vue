@@ -91,8 +91,7 @@ import {NButton, useMessage} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
 import {computed, onMounted, onUpdated, ref} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
-import {$var, CREATE_VIEW} from "../js/store";
-import {refreshListView} from "../js/some";
+import {$var, CREATE_VIEW, refreshListView} from "../js/store";
 import {configManager} from "../js/core";
 
 const scrollBar = ref()

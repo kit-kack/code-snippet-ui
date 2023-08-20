@@ -171,8 +171,8 @@
 <script setup>
 import {computed, onMounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
-import {handleRecoverLiteShow, languages} from "../js/some.js";
-import {$var, LIST_VIEW, UPDATE_VIEW} from "../js/store";
+import {$var, handleRecoverLiteShow, LIST_VIEW, UPDATE_VIEW} from "../js/store";
+import {languages} from "../js/utils/common";
 
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()

@@ -99,10 +99,9 @@
 <script setup>
 import {codeSnippetManager, configManager, formatManager} from "../js/core.js";
 import {computed, onMounted, ref, toRaw, watch} from "vue";
-import {handleRecoverLiteShow, isSupportedLanguage} from "../js/some.js";
-import {$var, LIST_VIEW} from "../js/store";
+import {$var, handleRecoverLiteShow, LIST_VIEW} from "../js/store";
 import {section_generate} from "../js/utils/section";
-import {calculateTime, getRefreshFunc} from "../js/utils/common";
+import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
 
 const scrollBar = ref(null)
 const snippet = $var.currentSnippet;
@@ -111,23 +110,11 @@ const hover = ref(false)
 const refreshFlag = ref(true)
 const pair = computed(()=>{
   // 分析类型
-  const result = {};
-  if(snippet.type){
-    if(snippet.type.length>2 && snippet.type.startsWith('x-')){
-      result.type = snippet.type.slice(2);
-    }else{
-      result.type = snippet.type;
-    }
-    if(result.type === 'md'){
-      result.type = 'markdown';
-    }else if(result.type === 'image'){
-      $var.view.isRendering = true;
-    }
-    result.valid = isSupportedLanguage(result.type)
-    result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'md')
-  }else{
-    result.type = 'plaintext';
+  const result = getRealTypeAndValidStatus(snippet.type);
+  if(result.type === 'image'){
+    $var.view.isRendering = true;
   }
+  result.renderable = (result.type === 'markdown' || result.type === 'image')
   if($var.currentCode){
     result.count = $var.currentCode.length;
     if($var.currentCode.length > 100000){
@@ -198,24 +185,6 @@ function updateCachedCode(){
 function getNumShow(num){
   return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
 }
-const _darkFormatBlockStyle = "color:#ffa400;border-radius:3px;background-color:#414141;font-weight: bolder;"
-const _lightFormatBlockStyle = "color:#ffa400;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;";
-const _errorFormatBlockStyle = "color:red";
-
-function renderFormatBlock(flag){
-  const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
-  if(codeViewer){
-    codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
-      const temp = substring.slice(2,-2);
-      let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
-      if(!temp.startsWith('@')  && !formatManager.contain(temp)){
-        style = _errorFormatBlockStyle;
-      }
-      return `<span style="${style}">${substring}</span>`
-    })
-  }
-}
-
 
 onMounted(()=>{
     $var.others.updateCacheCodeFunc = updateCachedCode

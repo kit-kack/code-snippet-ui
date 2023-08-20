@@ -48,7 +48,7 @@ import {configManager} from "../js/core";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../js/theme";
 import {useMessage} from "naive-ui";
-import {refreshListView} from "../js/some";
+import {refreshListView} from "../js/store";
 const props = defineProps(['height'])
 const emit = defineEmits(['update:height'])
 

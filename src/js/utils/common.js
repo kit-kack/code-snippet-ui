@@ -1,4 +1,6 @@
 import {nextTick} from "vue";
+import hljs from "highlight.js";
+import {formatManager} from "../core";
 
 /**
  * 防抖函数
@@ -81,4 +83,100 @@ export function calculateTime(time){
         return seconds+'秒前';
     }
     return '现在';
+}
+
+
+const rootLanguages = hljs.listLanguages();
+rootLanguages.push("vue","html")
+rootLanguages.sort()
+/**
+ * 用在FormView来选择代码片段类型
+ * @type {unknown[]}
+ */
+export const languages = rootLanguages.map(v=>{
+    if(v === "plaintext"){
+        return {
+            label: "plaintext - 纯文本",
+            value: "plaintext"
+        }
+    }else if(v === "markdown"){
+        return {
+            label: "markdown - 可渲染显示✨",
+            value: "markdown"
+        }
+    }
+    return {
+        label:v,
+        value:v
+    }
+});
+
+
+/**
+ * 代码片段类型别名映射
+ * @param {string} type
+ * @private
+ * @return {string}
+ */
+function _alias(type){
+    switch (type){
+        case 'js':
+            return 'javascript';
+        case 'md':
+            return 'markdown';
+        case 'py':
+            return 'python';
+        case 'txt':
+            return 'plaintext';
+        default:
+            return type;
+    }
+}
+
+
+
+
+/**
+ * 获取真实文件类型以及是否为内置高亮语言支持
+ * @param {string} type
+ * @return {{valid: boolean, type: string}}
+ */
+export function getRealTypeAndValidStatus(type){
+    if(type){
+        if(type.length>2 && type.startsWith('x-')){
+            type = type.slice(2)
+        }
+        return {
+            type: _alias(type),  // alias
+            valid: rootLanguages.includes(type)
+        }
+    }else{
+        return {
+            type: 'plaintext',
+            valid: true
+        };
+    }
+}
+
+
+const _darkFormatBlockStyle = '<span style="color:#ffa400;border-radius:3px;background-color:#414141;font-weight: bolder;">'
+const _lightFormatBlockStyle = '<span style="color:#ffa400;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;">'
+const _errorFormatBlockStyle = '<span style="color:red">';
+
+/**
+ * 渲染formatBlock
+ * @param {boolean} flag - 是否在渲染模式
+ */
+export function renderFormatBlock(flag){
+    const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
+    if(codeViewer){
+        codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
+            const temp = substring.slice(2,-2);
+            let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
+            if(!temp.startsWith('@')  && !formatManager.contain(temp)){
+                style = _errorFormatBlockStyle;
+            }
+            return style+substring+'</span>'
+        })
+    }
 }

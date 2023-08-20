@@ -2,6 +2,8 @@ declare interface Window{
     preload?: typeof import('./preload/index')
 }
 declare interface CodeSnippet{
+    // TODO: 后续版本重构
+    id?: string,
     // 代码片段名，唯一
     name: string,
     // 代码片段内容

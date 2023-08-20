@@ -3,8 +3,8 @@
     <template v-if="configManager.get('rawLineCode')">
       <pre :style="getCodeStyle()">{{code}}</pre>
     </template>
-    <template v-else-if="isSupportedLanguage(type??'plaintext')">
-      <highlightjs :language="type" :autodetect="false" :code="code" width="100%"/>
+    <template v-else-if="pair.valid">
+      <highlightjs :language="pair.type" :autodetect="false" :code="code" width="100%"/>
     </template>
     <template v-else>
       <highlightjs  autodetect :code="code" width="100%"/>
@@ -15,11 +15,13 @@
 <script setup>
 
 import {configManager} from "../../js/core";
-import {isSupportedLanguage} from "../../js/some";
 import {$var} from "../../js/store";
 import {onMounted, onUpdated, ref} from "vue";
+import {getRealTypeAndValidStatus} from "../../js/utils/common";
+
 
 const props = defineProps(['code','type','active']);
+const pair = getRealTypeAndValidStatus(props.type)
 const itemCodeScrollBar = ref();
 const getCodeStyle = () =>{
   return {

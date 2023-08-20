@@ -4,15 +4,17 @@
       <span  :style="getCodeStyle()">{{handleCode(code)}}</span>
     </template>
     <template v-else>
-      <n-code :code="handleCode(code)" :language="type"   inline :style="getCodeStyle()" />
+      <n-code :code="handleCode(code)" :language="pair.type"   inline :style="getCodeStyle()" />
     </template>
   </n-ellipsis>
 </template>
 
 <script setup>
-
 import {configManager} from "../../js/core";
+import {getRealTypeAndValidStatus} from "../../js/utils/common";
 
+const props = defineProps(['code','type']);
+const pair = getRealTypeAndValidStatus(props.type)
 const getCodeStyle = () =>{
   return {
     fontSize: '12px',
@@ -20,7 +22,7 @@ const getCodeStyle = () =>{
     fontFamily: "'Consolas' !important"
   }
 }
-defineProps(['code','type'])
+
 /**
  *
  * @param {string} code

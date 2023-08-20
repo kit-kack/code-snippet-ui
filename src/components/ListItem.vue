@@ -113,8 +113,7 @@
 import {computed, onMounted, ref} from "vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
-import {$var, CODE_VIEW, UPDATE_VIEW} from "../js/store";
-import {refreshListView} from "../js/some";
+import {$var, CODE_VIEW, refreshListView, UPDATE_VIEW} from "../js/store";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";

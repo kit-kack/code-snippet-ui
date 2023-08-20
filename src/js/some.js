@@ -1,53 +1,3 @@
-import hljs from "highlight.js";
-import {$var} from "./store";
-import {nextTick} from "vue";
-
-let rootLanguages = hljs.listLanguages();
-rootLanguages.push("vue","html")
-rootLanguages = rootLanguages.sort()
-const languages = rootLanguages.map(v=>{
-    if(v === "plaintext"){
-        return {
-            label: "plaintext - 纯文本",
-            value: "plaintext"
-        }
-    }else if(v === "markdown"){
-        return {
-            label: "markdown - 可渲染显示✨",
-            value: "markdown"
-        }
-    }
-    return {
-        label:v,
-        value:v
-    }
-});
-
-
-const isSupportedLanguage = (languageName)=>{
-    if(languageName==null){
-        return false;
-    }
-    return rootLanguages.includes(languageName)
-}
-
-
-
-
-const handleRecoverLiteShow = ()=>{
-    if($var.view.recoverLiteShow){
-        $var.view.recoverLiteShow= false;
-        $var.view.fullScreenShow = false;
-        utools.setExpendHeight($var.view.recoverLiteHeight)
-    }
-}
-
-const refreshListView = ()=>{
-    $var.view.refresh = false;
-    nextTick(()=>{
-        $var.view.refresh = true
-    })
-}
 export const backupFilePath = utools.getPath('home')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
 
 export const defaultHelpSnippet = {
@@ -145,9 +95,4 @@ export const defaultHelpSnippet = {
     sections: [
         [20,31]
     ]
-}
-
-export {
-    languages,
-    isSupportedLanguage,handleRecoverLiteShow,refreshListView
 }

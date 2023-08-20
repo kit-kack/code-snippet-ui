@@ -101,11 +101,11 @@ import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {ref} from "vue";
 import NormalTag from "../components/NormalTag.vue";
-import {$var} from "../js/store";
+import {$var, refreshListView} from "../js/store";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import {backupFilePath, refreshListView} from "../js/some";
+import {backupFilePath} from "../js/some";
 import VariablePane from "../components/VariablePane.vue";
 
 const refreshFlag = ref(true)
