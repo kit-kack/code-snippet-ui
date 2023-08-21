@@ -840,7 +840,6 @@ const formatManager = {
         pairs:{},
         inputs:[]
     },
-    tempInputVars: [],
     isInited: false,
 
     init(){
@@ -862,6 +861,7 @@ const formatManager = {
      */
     set(raw,target,multi){
         // recongize分析
+        raw = raw.trim();
         if(target){
             if(target.startsWith('#{input') && target.endsWith('}#')){
                 // final default
@@ -885,6 +885,7 @@ const formatManager = {
         funcUtils.createOrUpdate(GLOBAL_FORMAT,this.data)
     },
     del(raw){
+        raw = raw.trim()
         delete  this.data.pairs[raw];
         const index = this.data.inputs.indexOf(raw)
         if(index!== -1){
@@ -893,6 +894,7 @@ const formatManager = {
         funcUtils.createOrUpdate(GLOBAL_FORMAT,this.data)
     },
     contain(raw){
+        raw = raw.trim()
         return Object.keys(this.data.pairs).includes(raw);
     },
     _initForEachRegex(){
@@ -904,7 +906,6 @@ const formatManager = {
         this.data.pairs.date = now.toLocaleDateString();
         this.data.pairs.time = now.toLocaleTimeString();
         this.data.pairs.uuid = this._uuid();
-        this.tempInputVars = [];
     },
     _uuid() {
         const s = [];
@@ -940,7 +941,7 @@ const formatManager = {
             // remaining
             last = formatBlock.index + name.length;
             // current
-            name = name.slice(2,-2)
+            name = name.slice(2,-2).trim()
             if(name.startsWith('@')){  // exp
                 target.push({
                     exp: true,
@@ -951,6 +952,7 @@ const formatManager = {
                     inputVars.add(name)
                     target.push({
                         inp: true,
+                        exp: true,
                         code: name
                     })
                 }else{
@@ -973,7 +975,6 @@ const formatManager = {
             };
         }else if(last < code.length){
             target.push({
-                last: true,
                 code: code.slice(last)
             })
         }
