@@ -515,8 +515,8 @@ function init(list) {
  */
 function parseSearchWord(searchWord){
     let array = [];
-    if(configManager.get('version') !== utools.getAppVersion()){
-        configManager.set('version',utools.getAppVersion())
+    if(configManager.get('version') !== defaultHelpSnippet.version){
+        configManager.set('version',defaultHelpSnippet.version)
         configManager.set('closeHelpSnippet',false)
     }
     if(searchWord == null || searchWord.length === 0){
