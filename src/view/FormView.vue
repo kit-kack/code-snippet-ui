@@ -169,7 +169,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, reactive, ref, toRaw} from "vue";
+import {computed, nextTick, onMounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {$var, handleRecoverLiteShow, LIST_VIEW, UPDATE_VIEW} from "../js/store";
 import {languages} from "../js/utils/common";
@@ -307,10 +307,11 @@ const handleKeyDown = (e)=>{
         return;
     }
     e.preventDefault();
+    const start = codeTextArea.value.textareaElRef.selectionStart;
     codeTemplate.code =
-        codeTemplate.code.slice(0,codeTextArea.value.textareaElRef.selectionStart)
+        codeTemplate.code.slice(0,start)
         +char
-        +codeTemplate.code.slice(codeTextArea.value.textareaElRef.selectionStart)
+        +codeTemplate.code.slice(start)
   }
 }
 

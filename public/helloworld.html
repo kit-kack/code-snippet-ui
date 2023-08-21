@@ -108,13 +108,13 @@
     button.onclick=()=>{
         readData();
         const code = _core(window.data)
+        utools.copyText(code)
         // close
         window.close()
         if(window.isPaste){
             try{
                 utools.hideMainWindowPasteCode(code)
             }catch (_){
-                utools.copyText(code)
                 utools.simulateKeyboardTap('v',utools.isMacOS()? 'command':'ctrl');
             }
         }

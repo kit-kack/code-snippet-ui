@@ -547,6 +547,15 @@ const codeSnippetManager = {
         return funcUtils.getSortedArray(list);
     },
     store(path){
+        // store yaml header
+        let header = {
+            tags: tagColorManager.all(),
+            vars: formatManager.all()
+        }
+        header = window.preload.encodeBase64(JSON.stringify(header))
+        window.preload.writeConfig(path,'---\n'+header+'\n---\n> 上面为Base64编码后的 变量与标签 数据\n\n');
+
+        // snippet
         for (let codeSnippet of this.codeMap.values()) {
             let str = '\n### '+codeSnippet.name+'\n';
             if(codeSnippet.desc != null){
@@ -593,10 +602,42 @@ const codeSnippetManager = {
         let cur = 0;   // 当前扫描行
         let msg = null;
         let count = 0;
+        let header = false;
 
         while (cur < lines.length){
             // 先识别 三级标题
             let str = lines[cur].trim();
+            if(!header && str==='---'){
+                // 识别header
+                let temp = ''
+                cur++;
+                while (cur< lines.length && lines[cur].trim()!=='---'){
+                    temp+= lines[cur]
+                    cur++;
+                }
+                console.log(temp)
+                // parse
+                try{
+                    const data = JSON.parse(window.preload.decodeBase64(temp))
+                    if(data.tags){
+                        for (const tag in data.tags) {
+                            tagColorManager.tags.tag = data.tags[tag]
+                        }
+                        tagColorManager.writeToDB()
+                    }
+                    if(data.vars){
+                        for (const v in data.vars) {
+                            formatManager.set(v,data.vars[v],true)
+                        }
+                        funcUtils.createOrUpdate(GLOBAL_FORMAT,formatManager.data)
+                    }
+                    header=true;
+                }catch (e){
+                    utools.showNotification('解析YAML头失败：'+e.message)
+                }
+                cur++;
+                continue;
+            }
             if(str === '' || !str.startsWith('### ')){
                 cur++;
                 continue;
@@ -817,8 +858,9 @@ const formatManager = {
      *
      * @param {string} raw
      * @param {string | null} target
+     * @param {boolean} [multi]
      */
-    set(raw,target){
+    set(raw,target,multi){
         // recongize分析
         if(target){
             if(target.startsWith('#{input') && target.endsWith('}#')){
@@ -837,6 +879,9 @@ const formatManager = {
             }
         }
         this.data.pairs[raw] = target;
+        if(multi){
+            return;
+        }
         funcUtils.createOrUpdate(GLOBAL_FORMAT,this.data)
     },
     del(raw){
@@ -873,26 +918,6 @@ const formatManager = {
         return s.join("");
     },
 
-
-/**
-     *
-     * @param {string} code
-     * @returns {string}
-     * @private
-     */
-    _replaceVar(code){
-        const vars = Object.keys(this.data.pairs);
-        if(vars.includes(code)){
-            // 分析
-            if(this.data.inputs.includes(code)){
-
-            }
-            // #{default:xxxxxxxxxx}#
-            return this.data.pairs[code];
-        }else{
-            return undefined;
-        }
-    },
     /**
      *
      * @param {string} code
