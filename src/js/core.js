@@ -1000,6 +1000,9 @@ const formatManager = {
         return codes.map(element=>{
             if(element.inp){
                 element.code = this.data.pairs[element.code]
+                if(typeof element.code === 'string'){
+                    element.code = element.code?.trim();
+                }
             }
             if(element.exp){
                 if(element.code && (typeof element.code === 'string') && element.code.startsWith('@')){
