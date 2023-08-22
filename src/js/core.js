@@ -242,6 +242,7 @@ const funcUtils = {
         topSnippets.sort((a,b)=> a.index - b.index)
         switch (configManager.getSortKey()){
             case 0:   // 创建时间
+                list = list.reverse()
                 break;
             case 1:   // 最近访问时间
                 list.sort((a,b)=>{

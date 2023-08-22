@@ -248,6 +248,11 @@ const handleUpdate = ()=>{
             $message.warning("请提供 链接文件")
             return;
           }
+        }else{
+          if(!codeTemplate.code){
+            $message.warning("代码不能为空")
+            return;
+          }
         }
         if(codeTemplate.type === undefined){
           codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';

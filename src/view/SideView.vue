@@ -49,7 +49,7 @@
             <template #trigger>
               <config-check-tag title="💡启用自动备份" config="autoBackup"/>
             </template>
-            每三天自动备份一次，备份文件位置：{{backupFilePath}}
+            启用后将每三天自动备份一次，备份文件位置：{{backupFilePath}}
           </n-tooltip>
           <n-tooltip trigger="hover">
             <template #trigger>
