@@ -253,6 +253,10 @@ const handleUpdate = ()=>{
           codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
         }
         if($var.currentMode === UPDATE_VIEW){
+          if(codeTemplate.name === $var.lastQueryCodeSnippetName){
+            // 发生修改，缓存失效
+            $var.lastQueryCodeSnippetName = null;
+          } 
           if($var.currentName === codeTemplate.name){
             $var.utools.keepSelectedStatus = true;
             codeSnippetManager.update(toRaw(codeTemplate))
