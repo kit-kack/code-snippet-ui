@@ -367,6 +367,19 @@ function dealWithCommonView(e){
             }
             $var.view.helpActive = !$var.view.helpActive;
             break
+        case 'KeyO':
+            if($var.currentName === defaultHelpSnippet.name){
+                return;
+            }
+            const snippet = codeSnippetManager.get($var.currentName);
+            if(snippet.path){
+                if(snippet.local){
+                    utools.shellShowItemInFolder(snippet.path)
+                }else{
+                    utools.shellOpenExternal(snippet.path)
+                }
+            }
+            break
     }
 }
 
