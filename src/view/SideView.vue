@@ -28,9 +28,9 @@
         <n-space>
           <n-tooltip trigger="hover">
             <template #trigger>
-              <config-check-tag title="💡启用模糊符号查询" config="enabledFuzzySymbolQuery"/>
+              <config-check-tag title="💡启用进阶模糊查询" config="enabledFuzzySymbolQuery"/>
             </template>
-            启用后，忽略符号来进行匹配，例如使用ab能查询到a@b记录（忽略中间的@符号）,支持C-f来切换
+            启用后，使用最长公共子序列方式来进行匹配,例如 hw 能够匹配到 hello@World ,支持C-f来切换
           </n-tooltip>
           <n-tooltip trigger="hover">
             <template #trigger>

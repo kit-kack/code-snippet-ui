@@ -1,7 +1,7 @@
 export const backupFilePath = utools.getPath('home')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
 
 export const defaultHelpSnippet = {
-    version: 'v2.3.0',
+    version: 'v2.3.1',
     name: '🎉CodeSnippet插件入门手册&新功能介绍🎉',
     desc: '右键该元素选择预览代码，懂的人已经用v打开了',
     type: 'markdown',
@@ -48,7 +48,7 @@ export const defaultHelpSnippet = {
 #{@Date.now()}#  // #{@...}#  不支持内置变量解析,但是可以通过$内置变量来获取，例如$.random
 
 // 其中内置变量若被替换为以@开头的表达式，可以继续表达式解析
-#{exp}#  // exp变量被配置为 @Date.now()，后续进行 #{@Date.now()}表达式解析
+#{exp}#  // exp变量被配置为 @Date.now()，后续进行 #{@Date.now()}#表达式解析
 \`\`\`
 
 > 补充说明：配置内置变量时，可以将变量配置为\`#{input:default}#\`，从而在每次粘贴复制时会触发用户主动输入变量值，其中\`:default\`表示默认值，可以进行省略;但是，由于分离出来的窗口丢失原有的窗口信息，导致无法成功粘贴（目前需要手动粘贴），其实嘛就是我作为前端小白，不太会Electron技术啊

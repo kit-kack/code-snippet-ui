@@ -1,6 +1,7 @@
 // 全局便利常量和函数
 
 import {defaultHelpSnippet} from "./some";
+import { fuzzyCompare } from "./utils/fuzzy";
 
 const utools = window.utools;
 const getDBItem = utools.dbStorage.getItem
@@ -281,22 +282,6 @@ const funcUtils = {
                 break;
         }
         return topSnippets.concat(list);
-    },
-    /**
-     *
-     * @param {string} name
-     */
-    getFuzzyQueriedValue(name){
-        name = name.trim().toLowerCase();
-        let template = '';
-        for (let char of name) {
-            let ascii = char.charCodeAt(0);
-            if((ascii >=20 && ascii <= 47) || (ascii>=58 && ascii<=64) || (ascii>=91 && ascii<=96) || (ascii>=123 && ascii<=126)){
-                continue;
-            }
-            template+=char;
-        }
-        return template;
     }
 }
 
@@ -498,27 +483,21 @@ const codeSnippetManager = {
          */
         let list = [];
         if(name !== null){
-            if(configManager.get('enabledFuzzySymbolQuery')){
-                // 0. 搜索词需要同样被替换
-                name = funcUtils.getFuzzyQueriedValue(name);
-                for (const codeSnippet of this.codeMap.values()) {
-                    // 1.首先检查 查询缓存
-                    if(codeSnippet.query == null){
-                        // 1.1 不存在查询缓存时生成缓存名
-                        codeSnippet.query = funcUtils.getFuzzyQueriedValue(codeSnippet.name)
-                        funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.name,codeSnippet)
-                    }
-                    // 2.比较 查询缓存
-                    if(codeSnippet.query.includes(name)){
-                        list.push(codeSnippet)
-                    }
+            // 0. 搜索词需要同样被替换
+            for (const codeSnippet of this.codeMap.values()) {
+                // 1.首先检查 查询缓存
+                if(codeSnippet.query == null){
+                    // 1.1 不存在查询缓存时生成缓存名
+                    codeSnippet.query = codeSnippet.name.trim().toLowerCase();
                 }
-            }else{
-                // 0. 搜索词需要同样被替换
-                name = name.trim().toLowerCase();
-                for (const codeSnippet of this.codeMap.values()) {
-                    if(codeSnippet.name.toLowerCase().includes(name)){
+                // 2.比较 查询缓存
+                if(configManager.get('enabledFuzzySymbolQuery')){
+                    if(fuzzyCompare(name,codeSnippet.query)){
                         list.push(codeSnippet)
+                    }
+                }else{
+                    if(codeSnippet.query.includes(name)){
+                        list.push(codeSnippet);
                     }
                 }
             }

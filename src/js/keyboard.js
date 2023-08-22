@@ -374,7 +374,11 @@ function dealWithCommonView(e){
             const snippet = codeSnippetManager.get($var.currentName);
             if(snippet.path){
                 if(snippet.local){
-                    utools.shellShowItemInFolder(snippet.path)
+                    if(e.shiftKey){
+                        utools.shellOpenPath(snippet.path);
+                    }else{
+                        utools.shellShowItemInFolder(snippet.path)
+                    }
                 }else{
                     utools.shellOpenExternal(snippet.path)
                 }
