@@ -1,5 +1,5 @@
 import hljsVuePlugin from '@highlightjs/vue-plugin'
-import hljs from "highlight.js";
+import hljs from "./highlight-dep";
 import VMdPreview from '@kangc/v-md-editor/lib/preview';
 import '@kangc/v-md-editor/lib/style/preview.css';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
@@ -12,7 +12,6 @@ import createKatexPlugin from '@kangc/v-md-editor/lib/plugins/katex/cdn';
 import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
 // highlight
-hljs.registerAliases(["vue","html"],{languageName:"xml"})
 
 VMdPreview.use(githubTheme,{
     Hljs: hljs

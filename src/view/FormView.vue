@@ -169,7 +169,7 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onMounted, reactive, ref, toRaw} from "vue";
+import {computed, onMounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {$var, handleRecoverLiteShow, LIST_VIEW, UPDATE_VIEW} from "../js/store";
 import {languages} from "../js/utils/common";
@@ -322,6 +322,9 @@ const handleKeyDown = (e)=>{
         +char
         +codeTemplate.code.slice(start)
   }
+}
+const handleTabDown = (e)=>{
+
 }
 
 

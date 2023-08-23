@@ -1,5 +1,5 @@
 import {nextTick} from "vue";
-import hljs from "highlight.js";
+import hljs from "../dep/highlight-dep";
 import {formatManager} from "../core";
 
 /**
@@ -87,7 +87,6 @@ export function calculateTime(time){
 
 
 const rootLanguages = hljs.listLanguages();
-rootLanguages.push("vue","html")
 rootLanguages.sort()
 /**
  * 用在FormView来选择代码片段类型
@@ -120,14 +119,29 @@ export const languages = rootLanguages.map(v=>{
  */
 function _alias(type){
     switch (type){
+        case 'c#':
+            return 'csharp';
+        case 'c++':
+            return 'cpp';
+        case 'f#':
+            return 'fsharp';
         case 'js':
             return 'javascript';
+        case 'kt':
+            return 'kotlin'
         case 'md':
             return 'markdown';
+        case 'objective-c':
+        case 'object-c':
+            return 'objectivec';
         case 'py':
             return 'python';
+        case 'ts':
+            return 'typescript';
         case 'txt':
             return 'plaintext';
+        case 'yml':
+            return 'yaml';
         default:
             return type;
     }
@@ -146,8 +160,9 @@ export function getRealTypeAndValidStatus(type){
         if(type.length>2 && type.startsWith('x-')){
             type = type.slice(2)
         }
+        type = _alias(type) // alias
         return {
-            type: _alias(type),  // alias
+            type: type,  
             valid: rootLanguages.includes(type)
         }
     }else{

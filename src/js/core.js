@@ -875,7 +875,7 @@ const formatManager = {
     },
     contain(raw){
         raw = raw.trim()
-        return Object.keys(this.data.pairs).includes(raw);
+        return raw in this.data.pairs;
     },
     _initForEachRegex(){
         const now = new Date();
