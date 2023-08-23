@@ -829,6 +829,7 @@ const formatManager = {
         }
         const data = utools.db.get(GLOBAL_FORMAT)?.data ?? {};
         this.data.pairs = data.pairs??{};
+        this.pairBuffer = {...this.data.pairs}
         this.data.inputs = data.inputs??[];
         console.log('formatManager init')
         this._initForEachRegex();
@@ -860,6 +861,8 @@ const formatManager = {
             }
         }
         this.data.pairs[raw] = target;
+        // sync for contain func
+        this.pairBuffer[raw] = target;
         if(multi){
             return;
         }
@@ -868,6 +871,8 @@ const formatManager = {
     del(raw){
         raw = raw.trim()
         delete  this.data.pairs[raw];
+        // sync for contain func
+        delete  this.pairBuffer[raw]
         const index = this.data.inputs.indexOf(raw)
         if(index!== -1){
             this.data.inputs.splice(index,1)
@@ -876,7 +881,7 @@ const formatManager = {
     },
     contain(raw){
         raw = raw.trim()
-        return raw in this.data.pairs;
+        return raw in this.pairBuffer;
     },
     _initForEachRegex(){
         this.pairBuffer = {...this.data.pairs};
@@ -888,7 +893,6 @@ const formatManager = {
         this.pairBuffer.date = now.toLocaleDateString();
         this.pairBuffer.time = now.toLocaleTimeString();
         this.pairBuffer.uuid = this._uuid();
-        this.pairBuffer.now = now.getUTCMilliseconds();
     },
     _uuid() {
         const s = [];
@@ -930,7 +934,7 @@ const formatManager = {
                     exp: true,
                     code: name
                 })
-            }else if(name in this.data.pairs){
+            }else if(name in this.pairBuffer){
                 if(this.data.inputs.includes(name)){
                     inputVars.add(name)
                     target.push({
@@ -1026,50 +1030,11 @@ const formatManager = {
             return result.code;
         }
     },
-
-    // /**
-    //  *
-    //  * @param {string} code
-    //  * @returns {string}
-    //  */
-    // format(code){
-    //     this._initForEachRegex()
-    //     return code.replace(/#{.+?}#/g,(substring, args)=>{
-    //         let temp = substring.slice(2,-2);
-    //         if(!temp.startsWith('@')){
-    //             // 替换
-    //             if( temp in this.data.pairs){
-    //                 if(this.data.inputs.includes(temp)){
-    //
-    //                 }
-    //             }
-    //
-    //
-    //             temp = this._replaceVar(temp);
-    //             if(temp === undefined){
-    //                 return substring;
-    //             }
-    //         }
-    //         if(temp && (typeof temp === 'string') && temp.startsWith('@')){
-    //             try{
-    //                 const func = new Function('$','return '+temp.slice(1))
-    //                 return func(this.pairs);
-    //             }catch (e){
-    //                 // TODO:
-    //                 $message.error("在"+args+"处发生解析错误,原因为"+e.message)
-    //                 return substring;
-    //             }
-    //         }else{
-    //             return temp
-    //         }
-    //     })
-    // },
     all(){
         const p = {...this.data.pairs}
         p.random = '(内置)随机数[0,1)';
         p.rand10m = '(内置)随机数[0,10]';
         p.rand100m = '(内置)随机数[0,100]';
-        p.now = '(内置)当前时间戳';
         p.date = '(内置)当前日期';
         p.time = '(内置)当前时刻'
         p.uuid = '(内置)唯一标识符'

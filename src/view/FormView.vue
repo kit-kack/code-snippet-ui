@@ -87,6 +87,7 @@
                         :options="languages"
                         :default-value="configManager.get('defaultLanguage')??'plaintext'"
                         tag
+                        :render-tag="renderTag"
                         :theme-overrides="selectThemeOverrides"
                     />
                   </div>
@@ -110,6 +111,7 @@
                         :options="languages"
                         default-value="plaintext"
                         tag
+                        :render-tag="renderTag"
                         :theme-overrides="selectThemeOverrides"
                     />
                     <n-button @click="handleClearPath" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error">
@@ -198,6 +200,13 @@ const tabOptions = [
   {label: '2个空格',value: 2},
   {label: '4个空格',value: 4}
 ]
+const renderTag = ({option})=>{
+  if(option.value.length > 2 && option.value.startsWith('x-')){
+    return option.label + ' （ 启用解析⚡）'
+  }else{
+    return option.label;
+  }
+}
 
 const rules = {
   "name":[
