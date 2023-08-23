@@ -4,7 +4,7 @@ import App from './App.vue'
 import {codeSnippetManager, configManager, init} from "./js/core.js";
 import {$var, CREATE_VIEW} from "./js/store";
 import initNU from "./js/dep/naiveui-dep";
-import initVH from "./js/dep/vmd&highlight-dep";
+import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
@@ -109,11 +109,13 @@ utools.onPluginEnter((data)=>{
             }
         }
     },"搜索代码片段, 双击Tab切换UI模式")
-    if(data.type==='over'){
+    if(data.code==='code-snippet-save'){
         $var.currentMode = CREATE_VIEW;
         $var.others.code = data.payload;
         // fix: liteShow模式下高度统一
         utools.setExpendHeight(545)
+    }else if(data.code=== 'code-snippet-paste'){
+        utools.subInputBlur();
     }
     setTimeout(()=>{
         try{
@@ -146,7 +148,7 @@ try{
     },({code,type,payload,option})=>{
         $var.currentName = option.name;
         $var.utools.selectedIndex = 0;
-        copyCode(true,undefined,true)
+        return copyCode(true,undefined,true)
     })
 }catch (_){}
 

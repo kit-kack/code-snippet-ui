@@ -12,6 +12,7 @@
       <shortcut-pane/>
     </n-scrollbar>
   </n-drawer>
+  <variable-input-alert v-if="$var.view.variableActive"/>
 </template>
 
 <script setup>
@@ -26,6 +27,7 @@ import ShortcutPane from "../components/ShortcutPane.vue";
 import {$var} from "../js/store"
 import {ref} from "vue";
 import {useMessage} from 'naive-ui'
+import VariableInputAlert from "../components/VariableInputAlert.vue";
 
 
 const Tabs = [

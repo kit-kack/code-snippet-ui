@@ -2,6 +2,8 @@
 
 import {defaultHelpSnippet} from "./some";
 import { fuzzyCompare } from "./utils/fuzzy";
+import {$var, switchToFullUIMode} from "./store";
+import {copyOrPaste} from "./utils/copy";
 
 const utools = window.utools;
 const getDBItem = utools.dbStorage.getItem
@@ -769,9 +771,6 @@ const configManager = {
         this.configs[(utools.isDarkColors()? 'dark':'light')+key] = value;
         this.writeToDB();
     },
-    getDefaultColor(){
-        return this.configs["defaultColor"]??'#707070FF';
-    },
     getGlobalColor(){
         if(utools.isDarkColors()){
             return this.configs["darkGlobalColor"]??'#F4B23CEB'; //'#b4a0ff';
@@ -820,6 +819,8 @@ const formatManager = {
         pairs:{},
         inputs:[]
     },
+    codeBuffer: null,
+    pairBuffer: null,
     isInited: false,
 
     init(){
@@ -878,14 +879,16 @@ const formatManager = {
         return raw in this.data.pairs;
     },
     _initForEachRegex(){
+        this.pairBuffer = {...this.data.pairs};
         const now = new Date();
         const random = Math.random();
-        this.data.pairs.random = random;
-        this.data.pairs.rand10m = Math.trunc(random*11)
-        this.data.pairs.rand100m = Math.trunc(random*101)
-        this.data.pairs.date = now.toLocaleDateString();
-        this.data.pairs.time = now.toLocaleTimeString();
-        this.data.pairs.uuid = this._uuid();
+        this.pairBuffer.random = random;
+        this.pairBuffer.rand10m = Math.trunc(random*11)
+        this.pairBuffer.rand100m = Math.trunc(random*101)
+        this.pairBuffer.date = now.toLocaleDateString();
+        this.pairBuffer.time = now.toLocaleTimeString();
+        this.pairBuffer.uuid = this._uuid();
+        this.pairBuffer.now = now.getUTCMilliseconds();
     },
     _uuid() {
         const s = [];
@@ -939,7 +942,7 @@ const formatManager = {
                     // 直接替换
                     target.push({
                         exp: true,  // 后续可能会解析表达式
-                        code: this.data.pairs[name]
+                        code: this.pairBuffer[name]
                     })
                 }
             }else{
@@ -979,7 +982,7 @@ const formatManager = {
     _expression(codes){
         return codes.map(element=>{
             if(element.inp){
-                element.code = this.data.pairs[element.code]
+                element.code = this.pairBuffer[element.code]
                 if(typeof element.code === 'string'){
                     element.code = element.code?.trim();
                 }
@@ -988,7 +991,7 @@ const formatManager = {
                 if(element.code && (typeof element.code === 'string') && element.code.startsWith('@')){
                     try{
                         const func = new Function('$','return '+element.code.slice(1))
-                        return func(this.data.pairs);
+                        return func(this.pairBuffer);
                     }catch (e){
                         // TODO:
                         element.code = `#{${element.code}}#`
@@ -1004,34 +1007,17 @@ const formatManager = {
      * @param {string} code
      * @param {boolean} isPaste
      * @return {string | any[] | any | null}
+     * @param {boolean} noView
      */
-    parse(code,isPaste){
+    parse(code,isPaste,noView){
+        this._initForEachRegex();
         const result = this._format(code)
         if(result.parse){
             if(result.vars){
-                let uBrower = utools.createBrowserWindow('/helloworld.html',{
-                    show:false,
-                    title: '输入变量',
-                    width: 320,
-                    height: 340,
-                    maxWidth: 340,
-                    minWidth: 340,
-                    // minHeight: 100,
-                    maxHeight: 500,
-                    modal: true,
-                    spellcheck:false,
-                    // titleBarStyle: 'hidden',
-
-                    webPreferences: {
-                        nodeIntegration: true, // 设置开启nodejs环境
-                        enableRemoteModule: true, // enableRemoteModule保证renderer.js可以可以正常require('electron').remote，此选项默认关闭且网上很多资料没有提到
-                        preload: '/preload.js'
-                    }
-                },()=>{
-                    uBrower.show();
-                    uBrower.focus()
-                    uBrower.webContents.send('message',[result.vars,this.data.pairs,result.code,isPaste])
-                })
+                switchToFullUIMode()
+                this.codeBuffer = result.code;
+                $var.others.variables = result.vars;
+                $var.view.variableActive = true;
                 return null;
             }else{
                 return this._expression(result.code);
@@ -1083,6 +1069,7 @@ const formatManager = {
         p.random = '(内置)随机数[0,1)';
         p.rand10m = '(内置)随机数[0,10]';
         p.rand100m = '(内置)随机数[0,100]';
+        p.now = '(内置)当前时间戳';
         p.date = '(内置)当前日期';
         p.time = '(内置)当前时刻'
         p.uuid = '(内置)唯一标识符'
@@ -1091,6 +1078,13 @@ const formatManager = {
             p[input] = p[input]? '#{input:'+p[input]+'}#' : '#{input}#'
         }
         return p;
+    },
+    continueFormat(){
+        if(this.codeBuffer){
+            let code = this._expression(this.codeBuffer)
+            this.codeBuffer = null;
+            copyOrPaste(code)
+        }
     }
 }
 function init(){

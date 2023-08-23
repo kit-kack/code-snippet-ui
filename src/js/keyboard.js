@@ -1,6 +1,15 @@
 import {nextTick} from "vue";
 import {codeSnippetManager, configManager} from "./core.js";
-import {$var, CODE_VIEW, CREATE_VIEW, handleRecoverLiteShow, LIST_VIEW, refreshListView, UPDATE_VIEW} from "./store"
+import {
+    $var,
+    CODE_VIEW,
+    CREATE_VIEW,
+    handleRecoverLiteShow,
+    LIST_VIEW,
+    refreshListView,
+    switchToFullUIMode,
+    UPDATE_VIEW
+} from "./store"
 import {defaultHelpSnippet} from "./some";
 import {debounce} from "./utils/common";
 import {Direction, doScrollForCodeView, doScrollForHelpView, doScrollForListView} from "./utils/scroller";
@@ -166,11 +175,7 @@ function dealWithListView(e,list){
         case "Space":
             if($var.utools.subItemSelectedIndex === -1){
                 if(e.repeat){
-                    if(!$var.view.fullScreenShow){
-                        $var.view.fullScreenShow = true;
-                        $var.view.recoverLiteShow= true;
-                        utools.setExpendHeight(545)
-                    }
+                    switchToFullUIMode();
                     $var.lastQueryCodeSnippetName = $var.currentName;
                     $var.currentSnippet = codeSnippetManager.get($var.currentName)
                     $var.currentMode = CODE_VIEW;
@@ -208,11 +213,7 @@ function dealWithListView(e,list){
             $var.view.isDel = true;
             break;
         case 'KeyV':
-                if(!$var.view.fullScreenShow){
-                    $var.view.fullScreenShow = true;
-                    $var.view.recoverLiteShow= true;
-                    utools.setExpendHeight(545)
-                }
+                switchToFullUIMode();
                 $var.lastQueryCodeSnippetName = $var.currentName;
                 $var.currentSnippet = codeSnippetManager.get($var.currentName)
                 $var.currentMode = CODE_VIEW;
@@ -339,11 +340,7 @@ function dealWithCommonView(e){
                 $message.warning("内置文档，无法修改");
                 return;
             }
-            if(!$var.view.fullScreenShow){
-                $var.view.fullScreenShow = true;
-                $var.view.recoverLiteShow= true;
-                utools.setExpendHeight(545)
-            }
+            switchToFullUIMode();
             if($var.view.helpActive){
                 $var.view.helpActive = false;
             }
@@ -406,7 +403,7 @@ function init(list) {
                 $var.view.settingActive = false;
             }
             return;
-        }else if($var.view.customActive){
+        }else if($var.view.customActive || $var.view.variableActive){
             return;
         }
         // super key
@@ -448,11 +445,7 @@ function init(list) {
         if (e.ctrlKey || e.metaKey) {
             switch (e.code){
                 case 'KeyN':
-                    if (!$var.view.fullScreenShow) {
-                        $var.view.fullScreenShow = true;
-                        $var.view.recoverLiteShow = true;
-                        utools.setExpendHeight(545)
-                    }
+                    switchToFullUIMode()
                     $var.currentMode = CREATE_VIEW;
                     return;
                 case 'KeyR':
@@ -464,10 +457,10 @@ function init(list) {
                     if($var.currentMode === LIST_VIEW){
                         if (configManager.get("enabledFuzzySymbolQuery")) {
                             configManager.set("enabledFuzzySymbolQuery", false)
-                            $message.info("退出【模糊符号查询】模式")
+                            $message.info("退出【进阶模糊查询】模式")
                         } else {
                             configManager.set("enabledFuzzySymbolQuery", true)
-                            $message.success("进入【模糊符号查询】模式")
+                            $message.success("进入【进阶模糊查询】模式")
                         }
                     }
                     return;

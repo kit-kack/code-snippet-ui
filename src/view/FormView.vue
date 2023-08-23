@@ -169,7 +169,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, reactive, ref, toRaw} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {$var, handleRecoverLiteShow, LIST_VIEW, UPDATE_VIEW} from "../js/store";
 import {languages} from "../js/utils/common";
@@ -285,18 +285,22 @@ const handleUpdate = ()=>{
     window.$message.warning("请按要求填写")
   })
 }
+const keyDownHandler = (e)=>{
+  if(e.ctrlKey){
+    if(e.code === 'KeyQ'){
+      handleCancel();
+    }else if(e.code === 'KeyS'){
+      handleUpdate();
+      e.preventDefault();
+    }
+  }
+}
 
 onMounted(()=>{
-  document.addEventListener('keydown',e=>{
-    if(e.ctrlKey){
-      if(e.code === 'KeyQ'){
-        handleCancel();
-      }else if(e.code === 'KeyS'){
-        handleUpdate();
-        e.preventDefault();
-      }
-    }
-  })
+  document.addEventListener('keydown',keyDownHandler)
+})
+onUnmounted(()=>{
+  document.removeEventListener('keydown',keyDownHandler)
 })
 
 const handleKeyDown = (e)=>{
@@ -323,10 +327,6 @@ const handleKeyDown = (e)=>{
         +codeTemplate.code.slice(start)
   }
 }
-const handleTabDown = (e)=>{
-
-}
-
 
 const selectThemeOverrides = {
   peers:{

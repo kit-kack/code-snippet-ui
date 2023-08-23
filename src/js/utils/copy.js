@@ -2,6 +2,8 @@ import {$var} from "../store";
 import {codeSnippetManager, configManager, formatManager} from "../core";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
+let lastCachedMsg = null;
+let isLastPasted = false;
 function getCode(path,local,noView){
     if(local){
         try{
@@ -23,17 +25,26 @@ function getCode(path,local,noView){
     }
 }
 
-function copyOrPaste(isPasted,text,type,msg){
+function copyOrPasteWithType(isPasted,text,type,msg,noView){
     if(type && type.length>2 && type.startsWith('x-')){
-        text = formatManager.parse(text,isPasted);
+        text = formatManager.parse(text,isPasted,noView);
     }
+    lastCachedMsg = msg;
+    isLastPasted = isPasted;
     if(text === null){
-        return;
+        return true;
     }
-    if(msg){
-        $message.success(msg)
+    copyOrPaste(text)
+}
+
+/**
+ * @param text
+ */
+export function copyOrPaste(text){
+    if(lastCachedMsg){
+        $message.success(lastCachedMsg);
     }
-    if(isPasted){
+    if(isLastPasted){
         try{
             // utools新API
             utools.hideMainWindowPasteText(text)
@@ -45,7 +56,7 @@ function copyOrPaste(isPasted,text,type,msg){
     }
     utools.copyText(text)
     // 粘贴
-    if(isPasted){
+    if(isLastPasted){
         utools.hideMainWindow();
         utools.simulateKeyboardTap('v',ctrlKey);
         if(configManager.get('exitAfterPaste')){
@@ -103,7 +114,10 @@ export function copyCode(isPasted,num,noView){
         codeSnippet.count = (codeSnippet.count??0) +1;
         codeSnippetManager.update(codeSnippet)
         // 复制
-        copyOrPaste(isPasted,$var.currentCode,codeSnippet.type,noView?undefined:`已复制代码片段${codeSnippet.name}的内容`)
+        if(copyOrPasteWithType(isPasted,$var.currentCode,codeSnippet.type,`已复制代码片段${codeSnippet.name}的内容`,noView)){
+            return noView;
+        }
+
     }else{
         if(codeSnippet.sections && codeSnippet.sections.length >= num){
             const  [start,end] = codeSnippet.sections[num-1]
@@ -125,7 +139,9 @@ export function copyCode(isPasted,num,noView){
             codeSnippet.count = (codeSnippet.count??0) +1;
             codeSnippetManager.update(codeSnippet)
             // 复制
-            copyOrPaste(isPasted,str.slice(0,-1),codeSnippet.type,`已复制${codeSnippet.name}#${num}号子代码片段的内容`)
+            if(copyOrPasteWithType(isPasted,str.slice(0,-1),codeSnippet.type,`已复制${codeSnippet.name}#${num}号子代码片段的内容`,false)){
+                return noView;
+            }
         }else{
             $message.warning(`当前没有 ${num}号 子代码片段`)
         }
