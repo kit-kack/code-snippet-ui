@@ -12,7 +12,7 @@
             size="small"
             content-style="padding: 0 10px"
             header-style="height:28px;"
-            :style="getSelectedStyle(props.selected,isHover&&$var.view.cursorShow)"
+            :style="getSelectedStyle(props.selected,isHover&&$reactive.view.cursorShow)"
     >
       <div class="snippet-item__top"
            :style="{
@@ -51,7 +51,7 @@
       </template>
       <template v-else>
         <template v-if="configManager.get('fullItemCodeShow')">
-          <multi-line-code :type="pair.type" :code="pair.code" :active="$var.utools.selectedIndex === index"/>
+          <multi-line-code :type="pair.type" :code="pair.code" :active="$reactive.utools.selectedIndex === index"/>
         </template>
         <template v-else>
           <single-line-code :type="pair.type" :code="pair.code"/>
@@ -66,10 +66,10 @@
     </n-card>
 
     <transition>
-      <template v-if="$var.view.isDel && selected">
+      <template v-if="$reactive.view.isDel && selected">
         <div id="child">
           <span style="color: gray">确认删除?</span>
-          <selectable-button  :mid="395" lite type="primary" tip="搞错了" :index="0" @invoke="$var.view.isDel = false;" >
+          <selectable-button  :mid="395" lite type="primary" tip="搞错了" :index="0" @invoke="$reactive.view.isDel = false;" >
             ✗
           </selectable-button>
           <selectable-button :mid="440" lite type="error" tip="真的删" :index="1" @invoke="handleDelete" >
@@ -89,7 +89,7 @@
             <selectable-button :mid="395" lite type="info" tip="复制" :index="2" @invoke="copyCode(false)" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M5.503 4.627L5.5 6.75v10.504a3.25 3.25 0 0 0 3.25 3.25h8.616a2.251 2.251 0 0 1-2.122 1.5H8.75A4.75 4.75 0 0 1 4 17.254V6.75c0-.98.627-1.815 1.503-2.123zM17.75 2A2.25 2.25 0 0 1 20 4.25v13a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-13A2.25 2.25 0 0 1 8.75 2h9zm0 1.5h-9a.75.75 0 0 0-.75.75v13c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75v-13a.75.75 0 0 0-.75-.75z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <selectable-button :mid="440" lite type="error" tip="删除" :index="3" @invoke="$var.view.isDel = true;$var.utools.subItemSelectedIndex=1">
+            <selectable-button :mid="440" lite type="error" tip="删除" :index="3" @invoke="$reactive.view.isDel = true;$reactive.utools.subItemSelectedIndex=1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
             </selectable-button>
             <template v-if="topIndex === -1">
@@ -113,22 +113,24 @@
 import {computed, onMounted, ref} from "vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
-import {$var, CODE_VIEW, refreshListView, UPDATE_VIEW} from "../js/store";
+import {$normal, $reactive, refreshListView} from "../js/store";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
 import {copyCode} from "../js/utils/copy";
 import {calculateTime} from "../js/utils/common";
+import {useRouter} from "vue-router";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','debug'])
 const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
 const item = ref()
+const router = useRouter();
 const isShowBtn = computed(()=>{
   if(showBtnModal.value){
     return true;
   }
-  return !!(props.selected && $var.utools.subItemSelectedIndex > -1);
+  return !!(props.selected && $reactive.utools.subItemSelectedIndex > -1);
 })
 const isHover = ref(false)
 let topIndex = configManager.getTopList().indexOf(props.snippet.name)
@@ -164,7 +166,7 @@ const getSelectedStyle =(selected,isHoverRef)=>{
   if(selected){
     style = `background: ${configManager.getColor('SelectedColor')}`
     // 保存当前滚动距离
-    if($var.utools.focused){
+    if($reactive.utools.focused){
       return `border: 2px solid transparent !important; ${style};`
     }
     return `border: 2px solid ${configManager.getGlobalColor()} !important; ${style}`;
@@ -180,22 +182,22 @@ const getTitleStyle = (selected,flag) =>{
   }
 }
 onMounted(()=>{
-  $var.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
+  $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
 })
 
 const handleDelete = ()=>{
   codeSnippetManager.del(props.snippet.name)
-  $var.utools.selectedIndex--;
-  $var.utools.keepSelectedStatus = true;
-  $var.view.isDel = false;
+  $reactive.utools.selectedIndex--;
+  $normal.keepSelectedStatus = true;
+  $reactive.view.isDel = false;
   doItemRefresh()
 }
 
 const handleClick = (e)=>{
   if(configManager.get("enabledAutoVim")){
-    $var.utools.focused = false;
+    $reactive.utools.focused = false;
   }
-  $var.utools.subItemSelectedIndex = -1;
+  $reactive.utools.subItemSelectedIndex = -1;
   if(e.ctrlKey || e.metaKey){
     doViewCode()
   }
@@ -206,7 +208,7 @@ const handleClick = (e)=>{
 }
 const handleContextMenu = ()=>{
   showBtnModal.value=true;
-  $var.utools.subItemSelectedIndex = -1;
+  $reactive.utools.subItemSelectedIndex = -1;
   if(!props.selected){
     emit('userClick',props.index)
   }
@@ -219,20 +221,20 @@ const handleDoubleClick = ()=>{
 }
 const handleCancelTop = ()=>{
   configManager.delTopItem(topIndex)
-  $var.utools.selectedIndex = props.index;
+  $reactive.utools.selectedIndex = props.index;
   doItemRefresh()
 }
 const handleSetTop = ()=>{
   if(props.debug){
     return;
   }
-  $var.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
+  $reactive.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
   doItemRefresh()
 }
 
 const handleMouseLeave = (e)=>{
   if(showBtnModal.value){
-    if($var.others.onlyOne){
+    if($reactive.others.onlyOne){
       if(e.relatedTarget!=null){
         if(e.relatedTarget.classList.contains("n-popover") || e.relatedTarget.classList.contains("n-popover-arrow")){
           return;
@@ -240,22 +242,32 @@ const handleMouseLeave = (e)=>{
       }
     }
     showBtnModal.value=false;
-    $var.view.isDel=false
+    $reactive.view.isDel=false
   }
   isHover.value = false;
 }
 const doViewCode = ()=>{//TODO
-  $var.currentName = props.snippet.name;
-  $var.lastQueryCodeSnippetName = $var.currentName;
-  $var.currentSnippet = codeSnippetManager.get(props.snippet.name)
-  $var.currentMode = CODE_VIEW;
+  $normal.lastQueryCodeSnippetName = props.snippet.name;
+  router.replace({
+    name: 'code',
+    params:{
+      name: props.snippet.name
+    }
+  })
 }
 const doEdit = ()=>{//TODO
-  $var.currentName = props.snippet.name;
-  $var.currentMode = UPDATE_VIEW;
+  // $reactive.currentName = props.snippet.name;
+  // $va r.currentMode = UPDATE_VIEW;
+  router.replace({
+    name: 'form',
+    query:{
+      update: true,
+      name: props.snippet.name
+    }
+  })
 }
 const doItemRefresh = ()=>{
-  $var.utools.keepSelectedStatus = true;
+  $normal.keepSelectedStatus = true;
   refreshListView();
 }
 

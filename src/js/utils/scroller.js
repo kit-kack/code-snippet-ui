@@ -1,4 +1,5 @@
-import {$var} from "../store";
+import {$normal} from "../store";
+
 
 export const Direction = {
     RESET:-1,
@@ -42,7 +43,7 @@ function _controlScrollBar(scrollBar,direction,fast){
  * @param {number} direction
  */
 export function doScrollForListView(direction){
-    _controlScrollBar($var.scroll.itemCodeInvoker,direction,false)
+    _controlScrollBar($normal.scroll.itemCodeInvoker,direction,false)
 }
 
 /**
@@ -51,7 +52,7 @@ export function doScrollForListView(direction){
  * @param {boolean} fast
  */
 export function doScrollForCodeView(direction,fast){
-    _controlScrollBar($var.scroll.codeInvoker,direction,fast)
+    _controlScrollBar($normal.scroll.codeInvoker,direction,fast)
 }
 
 /**
@@ -59,6 +60,6 @@ export function doScrollForCodeView(direction,fast){
  * @param {number} direction
  */
 export function doScrollForHelpView(direction){
-    _controlScrollBar($var.scroll.helpInvoker,direction,false);
+    _controlScrollBar($normal.scroll.helpInvoker,direction,false);
 }
 

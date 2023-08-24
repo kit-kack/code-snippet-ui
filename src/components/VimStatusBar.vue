@@ -1,10 +1,10 @@
 <template>
-  <div id="extra-left" v-if="!$var.utools.focused && $var.view.fullScreenShow" >
+  <div id="extra-left" v-if="!$reactive.utools.focused && $reactive.view.fullScreenShow" >
     <n-tooltip trigger="hover" >
       <template #trigger>
         <n-button  round strong  :="getBtnStyle()" @click="handleVimStatusBarClick()">
           <template #icon>
-            <svg :fill="$var.currentMode <= CODE_VIEW? configManager.getGlobalColor():'white'"
+            <svg :fill="$reactive.currentMode < FORM_VIEW? configManager.getGlobalColor():'white'"
                  version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 512 512"
                  enable-background="new 0 0 512 512" xml:space="preserve"><path d="M476.9,114c-5-23.4-17.5-38.8-40.6-46.3s-64.9-4.5-94.1,16.8c-29.9,21.8-47.6,59.7-53.8,83.8c14.7-6.3,24-7.7,39-6.9
 	s24.5,12,24.9,25.3c0.3,9.8-0.2,18.7-3.6,27.7c-10.8,28.7-27.7,56.5-47.6,80.8c-2.9,3.6-6.4,6.9-10,9.9c-10.2,8.3-18.8,6.1-25.4-5.2
@@ -14,10 +14,10 @@
 	c19.3,26.6,39.6,32.7,70.9,21.5c25.4-9.1,46.6-26.2,66-43.9c33.1-30.2,59.1-65.4,85.5-101.2c20.4-27.7,37.3-55.7,51.4-87
 	C478.5,179.8,484,147.3,476.9,114z"></path></svg>
           </template>
-          {{$var.utools.selectedIndex}}{{$var.utools.subItemSelectedIndex > -1? `#${$var.utools.subItemSelectedIndex}`:''}}
+          {{$reactive.utools.selectedIndex}}{{$reactive.utools.subItemSelectedIndex > -1? `#${$reactive.utools.subItemSelectedIndex}`:''}}
         </n-button>
       </template>
-      {{($var.currentMode <= CODE_VIEW)? 'Utool输入框失去焦点，才能成功启用Vim模式':'Vim模式不适用当前场景'}}
+      {{($reactive.currentMode <= CODE_VIEW)? 'Utool输入框失去焦点，才能成功启用Vim模式':'Vim模式不适用当前场景'}}
     </n-tooltip>
   </div>
 
@@ -25,10 +25,10 @@
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {$var, CODE_VIEW, LIST_VIEW} from "../js/store";
+import {$normal, $reactive, CODE_VIEW, FORM_VIEW, LIST_VIEW} from "../js/store";
 import {toRaw} from "vue";
 const getBtnStyle = ()=>{
-  if($var.currentMode<= CODE_VIEW){
+  if($reactive.currentMode<= CODE_VIEW){
     return {
       color: utools.isDarkColors()? '#444444':'#e3e3e3',
       textColor: configManager.getGlobalColor()
@@ -45,23 +45,23 @@ let showCount = 0 // 必须要到达 7
 let clearCount = 0
 let lastTime = 0  // 时间
 const handleVimStatusBarClick = ()=>{
-  if($var.currentMode === LIST_VIEW){
+  if($reactive.currentMode === LIST_VIEW){
     if(showCount === 7){
       $message.success("花点时间去看看外面的风景吧")
       showCount = 0;
     }else{
       showCount++;
     }
-  }else if($var.currentMode === CODE_VIEW){
+  }else if($reactive.currentMode === CODE_VIEW){
     let now = Date.now();
     if(now - lastTime < 500){
       if(clearCount === 3){
         $message.info("清除 所有高亮行")
-        $var.currentSnippet.sections = [];
-        if($var.currentSnippet.help){
+        $normal.currentSnippet.sections = [];
+        if($normal.currentSnippet.help){
           return;
         }
-        codeSnippetManager.update(toRaw(($var.currentSnippet)))
+        codeSnippetManager.update($normal.currentSnippet)
         clearCount = 0;
       }else{
         clearCount++;

@@ -65,7 +65,7 @@
         <config-switch title="关闭显示入门手册" config="closeHelpSnippet" @refresh="refreshListView()"/>
         <n-tooltip placement="left" trigger="hover">
           <template #trigger>
-            <n-button id="diy"  circle  @click="$var.view.settingActive = false;$var.view.customActive = true">
+            <n-button id="diy"  circle  @click="$reactive.view.settingActive = false;$reactive.view.customActive = true">
               <template #icon>
                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><rect fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" x="280.48" y="122.9" width="63.03" height="378.2" rx="31.52" transform="rotate(-45 312.002 311.994)"></rect><path d="M178.38 178.38a31.64 31.64 0 0 0 0 44.75L223.25 268L268 223.25l-44.87-44.87a31.64 31.64 0 0 0-44.75 0z" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M48 192h48" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M90.18 90.18l33.94 33.94" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M192 48v48" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M293.82 90.18l-33.94 33.94" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M124.12 259.88l-33.94 33.94" fill="currentColor"></path></svg>                </template>
             </n-button>
@@ -101,12 +101,12 @@ import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {ref} from "vue";
 import NormalTag from "../components/NormalTag.vue";
-import {$var, refreshListView} from "../js/store";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
 import {backupFilePath} from "../js/some";
 import VariablePane from "../components/VariablePane.vue";
+import {$reactive, refreshListView} from "../js/store";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);

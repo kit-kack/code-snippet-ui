@@ -7,9 +7,8 @@
       <n-list-item v-for="(value,key) in formatManager.all()"
         @mouseenter="activeKey = key"
       >
-        {{key}}——
-        <n-ellipsis :tooltip="false" style="max-width: 210px">
-          {{value}}
+        <n-ellipsis :tooltip="false" style="max-width: 280px">
+          {{key}} —— {{value}}
         </n-ellipsis>
         <template #suffix>
           <n-space v-if="activeKey === key && isValid(key)" :wrap="false" style="margin-right: -16px;margin-top: 5px">
@@ -123,5 +122,8 @@
 
 </script>
 <style scoped>
-
+.n-list-item{
+  height: 40px;
+  padding: 0 5px
+}
 </style>

@@ -2,15 +2,15 @@
   <div  id="code-view">
     <n-scrollbar
         style="max-height: 100vh"
-        :x-scrollable="!pair.renderable || !$var.view.isRendering"
+        :x-scrollable="!pair.renderable || !$reactive.view.isRendering"
         trigger="hover" ref="scrollBar">
       <template v-if="refreshFlag">
-        <template v-if="pair.renderable && $var.view.isRendering">
+        <template v-if="pair.renderable && $reactive.view.isRendering">
           <template v-if="pair.type === 'image'">
             <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 100vw;">
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
-            <v-md-preview :text="$var.currentCode" ></v-md-preview>
+            <v-md-preview :text="$reactive.currentCode" ></v-md-preview>
           </template>
           <template v-else>
             未知渲染类型
@@ -50,14 +50,14 @@
         </template>
         <template v-if="pair.renderable">
           <n-button quaternary
-                    @click=" $var.view.isRendering = !$var.view.isRendering"
+                    @click=" $reactive.view.isRendering = !$reactive.view.isRendering"
                     :color="configManager.getGlobalColor()"
                     :disabled="pair.type === 'image' && snippet.path"
           >
-            {{ $var.view.isRendering? '✨已渲染 [R]': '未渲染 [R]' }}
+            {{ $reactive.view.isRendering? '✨已渲染 [R]': '未渲染 [R]' }}
           </n-button>
         </template>
-        <n-popover trigger="hover" :show="hover || $var.view.showCodeTip" placement="top" :show-arrow="false" style="padding:5px">
+        <n-popover trigger="hover" :show="hover || $reactive.view.codeTipActive" placement="top" :show-arrow="false" style="padding:5px">
           <template #trigger>
             <n-button
                 @mouseenter="hover = true"
@@ -97,31 +97,34 @@
 </template>
 
 <script setup>
-import {codeSnippetManager, configManager, formatManager} from "../js/core.js";
-import {computed, onMounted, ref, toRaw, watch} from "vue";
-import {$var, handleRecoverLiteShow, LIST_VIEW} from "../js/store";
+import {codeSnippetManager, configManager} from "../js/core.js";
+import {computed, onMounted, reactive, ref, toRaw, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
+import {useRouter} from "vue-router";
+import {$normal, $reactive} from "../js/store";
 
+const props = defineProps(['name'])
 const scrollBar = ref(null)
-const snippet = $var.currentSnippet;
-$var.currentCode = getCode()
+const snippet = reactive(codeSnippetManager.get(props.name));
+$reactive.currentCode = getCode()
 const hover = ref(false)
 const refreshFlag = ref(true)
+const router = useRouter();
 const pair = computed(()=>{
   // 分析类型
   const result = getRealTypeAndValidStatus(snippet.type);
   if(result.type === 'image'){
-    $var.view.isRendering = true;
+    $reactive.view.isRendering = true;
   }
   result.renderable = (result.type === 'markdown' || result.type === 'image')
-  if($var.currentCode){
-    result.count = $var.currentCode.length;
-    if($var.currentCode.length > 100000){
+  if($reactive.currentCode){
+    result.count = $reactive.currentCode.length;
+    if($reactive.currentCode.length > 100000){
       $message.info("代码长度超限，只会显示前100000个字符")
-      result.code = $var.currentCode.slice(0,100000)
+      result.code = $reactive.currentCode.slice(0,100000)
     }else{
-      result.code = $var.currentCode;
+      result.code = $reactive.currentCode;
     }
   }else{
     result.count = 0;
@@ -132,7 +135,7 @@ const pair = computed(()=>{
 
 const doRefresh = getRefreshFunc(refreshFlag,()=>{
   // 滚动条重新绑定
-  $var.scroll.codeInvoker = scrollBar.value;
+  $normal.scroll.codeInvoker = scrollBar.value;
 })
 function getCode(){
   if(snippet.path){
@@ -157,28 +160,29 @@ function getCodeFromPath(){
       if(resp.ok){
         resp.text().then(value=>{
           // 刷新页面
-          $var.currentCode = value;
+          $reactive.currentCode = value;
           doRefresh();
         })
       }else{
-        $var.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
+        $reactive.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
       }
     })
     return "网络文件[ "+snippet.path +" ]数据正在获取中..."
   }
 }
 const handleClose = ()=>{
-  $var.view.showCodeTip = false;
-  $var.utools.keepSelectedStatus = true;
-  handleRecoverLiteShow();
-  $var.currentMode = LIST_VIEW;
+  $reactive.view.codeTipActive = false;
+  $normal.keepSelectedStatus = true;
+  router.replace({
+    name: 'list'
+  })
 }
 function updateCachedCode(){
   if(snippet.code){   // 清除缓存
     snippet.code = undefined;
-    $var.currentCode = getCodeFromPath();  // 抓取数据
+    $reactive.currentCode = getCodeFromPath();  // 抓取数据
   }else{  // 添加缓存
-    snippet.code = $var.currentCode;
+    snippet.code = $reactive.currentCode;
   }
   codeSnippetManager.update(toRaw(snippet))
 }
@@ -187,11 +191,11 @@ function getNumShow(num){
 }
 
 onMounted(()=>{
-    $var.others.updateCacheCodeFunc = updateCachedCode
-    $var.scroll.codeInvoker = scrollBar.value;
+    $normal.updateCacheCodeFunc = updateCachedCode
+    $normal.scroll.codeInvoker = scrollBar.value;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
-      renderFormatBlock(pair.value.renderable && $var.view.isRendering)
-      watch(()=>$var.view.isRendering,(newValue)=>{
+      renderFormatBlock(pair.value.renderable && $reactive.view.isRendering)
+      watch(()=>$reactive.view.isRendering,(newValue)=>{
         renderFormatBlock(newValue)
       },{
         flush:'post',

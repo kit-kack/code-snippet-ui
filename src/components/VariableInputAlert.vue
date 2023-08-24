@@ -1,5 +1,5 @@
 <template>
-  <n-modal v-model:show="$var.view.variableActive"
+  <n-modal v-model:show="$reactive.view.variableActive"
            preset="card"
            title="输入变量"
            style="width: 60%"
@@ -28,10 +28,10 @@
 </template>
 
 <script setup>
-import {$var, handleRecoverLiteShow} from "../js/store";
+import {$normal, $reactive, handleRecoverLiteShow} from "../js/store";
 import {onMounted, onUnmounted, ref} from "vue";
 import {configManager, formatManager} from "../js/core";
-const templates = ref( $var.others.variables.map(v =>{
+const templates = ref( $normal.variables.map(v =>{
   return {
     label: v,
     value: formatManager.data.pairs[v]
@@ -39,7 +39,7 @@ const templates = ref( $var.others.variables.map(v =>{
 }))
 
 function doCancel(){
-  $var.view.variableActive = false;
+  $reactive.view.variableActive = false;
   handleRecoverLiteShow();
 }
 
@@ -51,7 +51,7 @@ function doYes(){
   // 继续进行解析
   formatManager.continueFormat();
   // 关闭
-  $var.view.variableActive = false;
+  $reactive.view.variableActive = false;
   handleRecoverLiteShow();
 }
 const keyDownHandler = (e)=>{

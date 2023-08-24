@@ -15,7 +15,7 @@
 <script setup>
 
 import {configManager} from "../../js/core";
-import {$var} from "../../js/store";
+import {$normal} from "../../js/store";
 import {onMounted, onUpdated, ref} from "vue";
 import {getRealTypeAndValidStatus} from "../../js/utils/common";
 
@@ -32,12 +32,12 @@ const getCodeStyle = () =>{
 }
 onUpdated(()=>{
   if(props.active){
-    $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
+    $normal.scroll.itemCodeInvoker = itemCodeScrollBar.value;
   }
 })
 onMounted(()=>{
   if(props.active){
-    $var.scroll.itemCodeInvoker = itemCodeScrollBar.value;
+    $normal.scroll.itemCodeInvoker = itemCodeScrollBar.value;
   }
 })
 </script>

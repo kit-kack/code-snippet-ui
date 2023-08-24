@@ -2,7 +2,7 @@
 
 import {defaultHelpSnippet} from "./some";
 import { fuzzyCompare } from "./utils/fuzzy";
-import {$var, switchToFullUIMode} from "./store";
+import {$normal, $reactive, switchToFullUIMode} from "./store";
 import {copyOrPaste} from "./utils/copy";
 
 const utools = window.utools;
@@ -1049,8 +1049,8 @@ const formatManager = {
             if(result.vars){
                 switchToFullUIMode()
                 this.codeBuffer = result.code;
-                $var.others.variables = result.vars;
-                $var.view.variableActive = true;
+                $normal.variables = result.vars;
+                $reactive.view.variableActive = true;
                 return null;
             }else{
                 return this._expression(result.code);

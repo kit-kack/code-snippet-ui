@@ -173,13 +173,15 @@
 <script setup>
 import {computed, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
-import {$var, handleRecoverLiteShow, LIST_VIEW, UPDATE_VIEW} from "../js/store";
 import {languages} from "../js/utils/common";
-
+import {useRoute, useRouter} from "vue-router";
+import {$normal} from "../js/store";
+const router = useRouter();
+const route = useRoute();
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()
-const codeTemplate = reactive(($var.currentMode === UPDATE_VIEW)? {...codeSnippetManager.get($var.currentName)} :{
-  code: $var.others.code
+const codeTemplate = reactive(route.query.update?{...codeSnippetManager.get(route.query.name)} :{
+  code: route.query.code
 })
 const tempTag = ref()
 const tags = computed(()=>{
@@ -221,7 +223,7 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if($var.currentMode === UPDATE_VIEW && $var.currentName === value){
+        if(route.query.update && route.query.name === value){
           return true;
         }
         return !codeSnippetManager.contain(value)
@@ -241,9 +243,10 @@ const rules = {
   }
 }
 const handleCancel = ()=>{
-  $var.utools.keepSelectedStatus = true;
-  handleRecoverLiteShow()
-  $var.currentMode = LIST_VIEW;
+  $normal.keepSelectedStatus = true;
+  router.replace({
+    name: 'list'
+  })
 }
 const handleUpdate = ()=>{
   form.value.validate().then(error=>{
@@ -266,29 +269,32 @@ const handleUpdate = ()=>{
         if(codeTemplate.type === undefined){
           codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
         }
-        if($var.currentMode === UPDATE_VIEW){
-          if(codeTemplate.name === $var.lastQueryCodeSnippetName){
+        if(route.query.update){
+          if(codeTemplate.name === $normal.lastQueryCodeSnippetName){
             // 发生修改，缓存失效
-            $var.lastQueryCodeSnippetName = null;
+            $normal.lastQueryCodeSnippetName = null;
           } 
-          if($var.currentName === codeTemplate.name){
-            $var.utools.keepSelectedStatus = true;
+          if(route.query.name === codeTemplate.name){
+            $normal.keepSelectedStatus = true;
             codeSnippetManager.update(toRaw(codeTemplate))
           }else{
-            $var.utools.keepSelectedStatus = null;
+            $normal.keepSelectedStatus = null;
             // 这里清理查询缓存
             let codeSnippet = toRaw(codeTemplate);
             delete codeSnippet.query;
-            codeSnippetManager.replace($var.currentName,codeSnippet)
+            codeSnippetManager.replace(route.query.name,codeSnippet)
           }
         }else{
-          $var.utools.keepSelectedStatus = null;
+          $normal.keepSelectedStatus = null;
           codeSnippetManager.add(toRaw(codeTemplate))
         }
         window.$message.success("操作成功")
-        handleRecoverLiteShow()
-        $var.currentMode = LIST_VIEW;
-        $var.others.code = null;
+        // handleRecoverLiteShow()
+        // $var.currentMode = LIST_VIEW;
+        // $var.others.code = null;
+        router.replace({
+          name: 'list'
+        })
       }
   },()=>{
     window.$message.warning("请按要求填写")

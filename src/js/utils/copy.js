@@ -1,4 +1,4 @@
-import {$var} from "../store";
+import {$normal, $reactive} from "../store";
 import {codeSnippetManager, configManager, formatManager} from "../core";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
@@ -87,45 +87,43 @@ function _notify(msg,noView){
  */
 export function copyCode(isPasted,num,noView){
     // 校验
-    if ($var.utools.selectedIndex < 0){
+    if ($reactive.utools.selectedIndex < 0){
         return;
     }
-    // 获取当前文本
-    const codeSnippet = codeSnippetManager.get($var.currentName);
     // 获取代码
-    if($var.lastQueryCodeSnippetName !== codeSnippet.name){  // 获取代码
-        if(!codeSnippet.code && codeSnippet.path){
-            const temp = getCode(codeSnippet.path,codeSnippet.local,noView);
+    if($normal.lastQueryCodeSnippetName !== $normal.currentSnippet.name){  // 获取代码
+        if(!$normal.currentSnippet.code && $normal.currentSnippet.path){
+            const temp = getCode($normal.currentSnippet.path,$normal.currentSnippet.local,noView);
             if(temp === null){
                 _notify("当前代码片段加载失败，无法复制粘贴",noView)
                 return;
             }else{
-                $var.currentCode = temp??'';
-                $var.lastQueryCodeSnippetName = codeSnippet.name;
+                $reactive.currentCode = temp??'';
+                $normal.lastQueryCodeSnippetName = $normal.currentSnippet.name;
             }
         }else{
-            $var.currentCode = codeSnippet.code??'';
+            $reactive.currentCode = $normal.currentSnippet.code??'';
         }
     }
     // 复制操作
     if(num === undefined){
         // 更新次数和时间
-        codeSnippet.time = Date.now();
-        codeSnippet.count = (codeSnippet.count??0) +1;
-        codeSnippetManager.update(codeSnippet)
+        $normal.currentSnippet.time = Date.now();
+        $normal.currentSnippet.count = ($normal.currentSnippet.count??0) +1;
+        codeSnippetManager.update($normal.currentSnippet)
         // 复制
-        if(copyOrPasteWithType(isPasted,$var.currentCode,codeSnippet.type,`已复制代码片段${codeSnippet.name}的内容`,noView)){
+        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$normal.currentSnippet.type,`已复制代码片段${$normal.currentSnippet.name}的内容`,noView)){
             return noView;
         }
 
     }else{
-        if(codeSnippet.sections && codeSnippet.sections.length >= num){
-            const  [start,end] = codeSnippet.sections[num-1]
-            if(!$var.currentCode){
+        if($normal.currentSnippet.sections && $normal.currentSnippet.sections.length >= num){
+            const  [start,end] = $normal.currentSnippet.sections[num-1]
+            if(!$reactive.currentCode){
                 $message.warning("当前代码片段不支持")
                 return;
             }
-            const lines = $var.currentCode.split('\n',end)
+            const lines = $reactive.currentCode.split('\n',end)
             if(lines.length < start){
                 $message.warning("区间值超出代码片段区间，请更新或清除旧区间值")
                 return;
@@ -135,11 +133,11 @@ export function copyCode(isPasted,num,noView){
                 str += (lines[i-1]+'\n')
             }
             // 更新次数和时间
-            codeSnippet.time = Date.now();
-            codeSnippet.count = (codeSnippet.count??0) +1;
-            codeSnippetManager.update(codeSnippet)
+            $normal.currentSnippet.time = Date.now();
+            $normal.currentSnippet.count = ($normal.currentSnippet.count??0) +1;
+            codeSnippetManager.update($normal.currentSnippet)
             // 复制
-            if(copyOrPasteWithType(isPasted,str.slice(0,-1),codeSnippet.type,`已复制${codeSnippet.name}#${num}号子代码片段的内容`,false)){
+            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$normal.currentSnippet.type,`已复制${$normal.currentSnippet.name}#${num}号子代码片段的内容`,false)){
                 return noView;
             }
         }else{

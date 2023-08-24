@@ -1,66 +1,58 @@
 import {nextTick} from "vue";
 import {codeSnippetManager, configManager} from "./core.js";
-import {
-    $var,
-    CODE_VIEW,
-    CREATE_VIEW,
-    handleRecoverLiteShow,
-    LIST_VIEW,
-    refreshListView,
-    switchToFullUIMode,
-    UPDATE_VIEW
-} from "./store"
+import {$normal, $reactive, FORM_VIEW, LIST_VIEW, refreshListView,} from "./store"
 import {defaultHelpSnippet} from "./some";
 import {debounce} from "./utils/common";
 import {Direction, doScrollForCodeView, doScrollForHelpView, doScrollForListView} from "./utils/scroller";
 import {copyCode} from "./utils/copy";
+import {router} from "../router/index";
 
 // 控制长按键
 let longKeyDown = false;
 let lastTabTime = 0;  // 计算上次按下Tab时间
 
 const debMoveDown = debounce(function(){
-    $var.utools.selectedIndex++;
-    $var.utools.subItemSelectedIndex = -1;
+    $reactive.utools.selectedIndex++;
+    $reactive.utools.subItemSelectedIndex = -1;
     gotoTheLastPosition();
 })
 const debMoveUp = debounce(function(){
-    $var.utools.selectedIndex--;
-    $var.utools.subItemSelectedIndex = -1;
+    $reactive.utools.selectedIndex--;
+    $reactive.utools.subItemSelectedIndex = -1;
     // $var.scroll.listInvoker?.("up")
     gotoTheLastPosition();
 })
 const debItemMoveLeft = debounce(function(){
-    if($var.view.isDel){
-        $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
+    if($reactive.view.isDel){
+        $reactive.utools.subItemSelectedIndex = $reactive.utools.subItemSelectedIndex === 0? 1:0;
     }else{
-        if($var.utools.subItemSelectedIndex === -1){
-            $var.utools.subItemSelectedIndex = 4;
+        if($reactive.utools.subItemSelectedIndex === -1){
+            $reactive.utools.subItemSelectedIndex = 4;
         }else{
-            $var.utools.subItemSelectedIndex --;
+            $reactive.utools.subItemSelectedIndex --;
         }
     }
 })
 const debItemMoveRight = debounce(function(){
-    if($var.view.isDel){
-        $var.utools.subItemSelectedIndex = $var.utools.subItemSelectedIndex === 0? 1:0;
+    if($reactive.view.isDel){
+        $reactive.utools.subItemSelectedIndex = $reactive.utools.subItemSelectedIndex === 0? 1:0;
     }else{
-        if($var.utools.subItemSelectedIndex === 4){
-            $var.utools.subItemSelectedIndex = -1;
+        if($reactive.utools.subItemSelectedIndex === 4){
+            $reactive.utools.subItemSelectedIndex = -1;
         }else{
-            $var.utools.subItemSelectedIndex ++;
+            $reactive.utools.subItemSelectedIndex ++;
         }
     }
 })
 
 const gotoTheLastPosition = ()=>{
     // 校准位置
-    if($var.utools.selectedIndex > -1 ){
-        let distance = $var.scroll.itemOffsetArray[$var.utools.selectedIndex] -200;
+    if($reactive.utools.selectedIndex > -1 ){
+        let distance = $normal.scroll.itemOffsetArray[$reactive.utools.selectedIndex] -200;
         if(distance < 0){
             distance = 0;
         }
-        $var.scroll.listInvoker?.scrollTo({top:+distance,left:0})
+        $normal.scroll.listInvoker?.scrollTo({top:+distance,left:0})
         // $var.scroll.listInvoker?.(distance)
     }
 }
@@ -77,7 +69,7 @@ function dealWithHelpViewOnly(e){
             break;
         case 'KeyZ':
         case 'KeyQ':
-            $var.view.helpActive = false;
+            $reactive.view.helpActive = false;
             break;
     }
 }
@@ -88,21 +80,21 @@ function dealWithHelpViewOnly(e){
  */
 function dealWithListView(e,list){
     // vim操作下隐藏鼠标
-    $var.view.cursorShow = false;
+    $reactive.view.cursorShow = false;
     switch (e.code){
         case "Slash": // / ?
-            $var.view.fullScreenShow = true;
-            $var.view.settingActive = true;
+            $reactive.view.fullScreenShow = true;
+            $reactive.view.settingActive = true;
             break;
         case "KeyS":
             utools.setSubInputValue('')
             utools.subInputFocus();
-            $var.utools.focused = true;
+            $reactive.utools.focused = true;
             break;
         case "KeyH":
         case "ArrowLeft":
             // 校验是否有效
-            if($var.utools.selectedIndex=== -1){
+            if($reactive.utools.selectedIndex=== -1){
                 if(configManager.get("enabledBeep")){
                     utools.shellBeep();
                 }
@@ -114,11 +106,11 @@ function dealWithListView(e,list){
             break;
         case "KeyJ":
         case "ArrowDown":
-            if($var.view.isDel){
-                $var.view.isDel = false;
+            if($reactive.view.isDel){
+                $reactive.view.isDel = false;
             }
             if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                if ($var.utools.selectedIndex === -1) { // -1 >= 0-1
+                if ($reactive.utools.selectedIndex === -1) { // -1 >= 0-1
                     if(configManager.get("enabledBeep")){
                         utools.shellBeep();
                     }
@@ -126,7 +118,7 @@ function dealWithListView(e,list){
                     doScrollForListView(Direction.DOWN);
                 }
             }else{
-                if ($var.utools.selectedIndex >= list.value.length -1) { // -1 >= 0-1
+                if ($reactive.utools.selectedIndex >= list.value.length -1) { // -1 >= 0-1
                     if(configManager.get("enabledBeep")){
                         utools.shellBeep();
                     }
@@ -137,11 +129,11 @@ function dealWithListView(e,list){
             break;
         case "KeyK":
         case "ArrowUp":
-            if($var.view.isDel){
-                $var.view.isDel = false;
+            if($reactive.view.isDel){
+                $reactive.view.isDel = false;
             }
             if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                if ($var.utools.selectedIndex === -1) {
+                if ($reactive.utools.selectedIndex === -1) {
                     if (configManager.get("enabledBeep")) {
                         utools.shellBeep();
                     }
@@ -149,7 +141,7 @@ function dealWithListView(e,list){
                     doScrollForListView(Direction.UP);
                 }
             }else{
-                if ($var.utools.selectedIndex <= 0) {
+                if ($reactive.utools.selectedIndex <= 0) {
                     if (configManager.get("enabledBeep")) {
                         utools.shellBeep();
                     }
@@ -162,7 +154,7 @@ function dealWithListView(e,list){
         case "KeyL":
         case "ArrowRight":
             // 校验是否有效
-            if($var.utools.selectedIndex=== -1 ){
+            if($reactive.utools.selectedIndex=== -1 ){
                 if(configManager.get("enabledBeep")){
                     utools.shellBeep();
                 }
@@ -173,35 +165,37 @@ function dealWithListView(e,list){
             }
             break;
         case "Space":
-            if($var.utools.subItemSelectedIndex === -1){
+            if($reactive.utools.subItemSelectedIndex === -1){
                 if(e.repeat){
-                    switchToFullUIMode();
-                    $var.lastQueryCodeSnippetName = $var.currentName;
-                    $var.currentSnippet = codeSnippetManager.get($var.currentName)
-                    $var.currentMode = CODE_VIEW;
+                    router.replace({
+                        name: 'code',
+                        params:{
+                            name: $normal.currentSnippet.name
+                        }
+                    })
                     longKeyDown = true;
                 }
             }
             break;
         case "Digit0":
-            if($var.utools.selectedIndex === -1){
+            if($reactive.utools.selectedIndex === -1){
                 if(configManager.get("enabledBeep")){
                     utools.shellBeep();
                 }
             }else if(e.shiftKey){
                 doScrollForListView(Direction.RESET);
             }else{
-                $var.utools.selectedIndex = 0;
-                $var.scroll.listInvoker?.scrollTo({top:0,left:0})
+                $reactive.utools.selectedIndex = 0;
+                $normal.scroll.listInvoker?.scrollTo({top:0,left:0})
             }
             break;
         case 'KeyT':
-            if($var.currentName === defaultHelpSnippet.name){
+            if($normal.currentSnippet.name === defaultHelpSnippet.name){
                 return;
             }
-            let index = configManager.getTopList().indexOf($var.currentName)
+            let index = configManager.getTopList().indexOf($normal.currentSnippet.name)
             if(index === -1){
-                $var.utools.selectedIndex = configManager.addTopItem($var.currentName);
+                $reactive.utools.selectedIndex = configManager.addTopItem($normal.currentSnippet.name);
             }else{
                 configManager.delTopItem(index)
             }
@@ -209,18 +203,21 @@ function dealWithListView(e,list){
             break;
         case 'KeyD':
         case 'KeyX':
-            $var.utools.subItemSelectedIndex = 1;
-            $var.view.isDel = true;
+            $reactive.utools.subItemSelectedIndex = 1;
+            $reactive.view.isDel = true;
             break;
         case 'KeyV':
-                switchToFullUIMode();
-                $var.lastQueryCodeSnippetName = $var.currentName;
-                $var.currentSnippet = codeSnippetManager.get($var.currentName)
-                $var.currentMode = CODE_VIEW;
+                $normal.lastQueryCodeSnippetName = $normal.currentSnippet.name;
+                router.replace({
+                    name: 'code',
+                    params:{
+                        name: $normal.currentSnippet.name
+                    }
+                })
                 return;
         case 'KeyQ':
-            $var.utools.subItemSelectedIndex = -1;
-            $var.view.isDel = false;
+            $reactive.utools.subItemSelectedIndex = -1;
+            $reactive.view.isDel = false;
             break;
         default:
             dealWithCommonView(e)
@@ -258,6 +255,7 @@ function handleMdHorizonMove(left,fast){
             }else{
                 pre.scrollLeft += distance;
             }
+
             return;
         }
     }
@@ -267,8 +265,8 @@ function dealWithCodeView(e){
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
-            if($var.currentSnippet.type === 'markdown'){
-                if($var.view.isRendering){
+            if($normal.currentSnippet.type === 'markdown'){
+                if($reactive.view.isRendering){
                     handleMdHorizonMove(true,e.shiftKey)
                     break;
                 }
@@ -285,8 +283,8 @@ function dealWithCodeView(e){
             break;
         case "KeyL":
         case "ArrowRight":
-            if($var.currentSnippet.type === 'markdown'){
-                if($var.view.isRendering){
+            if($normal.currentSnippet.type === 'markdown'){
+                if($reactive.view.isRendering){
                     handleMdHorizonMove(false,e.shiftKey)
                     break;
                 }
@@ -294,25 +292,27 @@ function dealWithCodeView(e){
             doScrollForCodeView(Direction.RIGHT,e.shiftKey);
             break;
         case 'KeyS':
-            $var.view.showCodeTip = !$var.view.showCodeTip;
+            $reactive.view.codeTipActive = !$reactive.view.codeTipActive;
             break;
         case 'KeyQ':
-            handleRecoverLiteShow();
-            $var.currentMode = LIST_VIEW;
-            $var.utools.keepSelectedStatus = true;
+            $reactive.utools.keepSelectedStatus = true;
+            router.replace({
+                name: 'list'
+            })
+            console.log('exit')
             break;
         case 'Digit0':
             doScrollForCodeView(Direction.RESET,false);
             break;
         case 'KeyR':
-            if($var.currentSnippet.path && $var.currentSnippet.type === 'image'){
+            if($normal.currentSnippet.path && $normal.currentSnippet.type === 'image'){
                 return;
             }
-            $var.view.isRendering = !$var.view.isRendering;
+            $reactive.view.isRendering = !$reactive.view.isRendering;
             break;
         case 'KeyB':
-            if($var.currentSnippet.path){
-                $var.others.updateCacheCodeFunc?.()
+            if($normal.currentSnippet.path){
+                $normal.updateCacheCodeFunc?.()
             }
             break;
         default:
@@ -336,15 +336,20 @@ function dealWithCommonView(e){
             // handleCopy(true)
             break;
         case 'KeyE':
-            if($var.currentName === defaultHelpSnippet.name){
+            if($normal.currentSnippet.name === defaultHelpSnippet.name){
                 $message.warning("内置文档，无法修改");
                 return;
             }
-            switchToFullUIMode();
-            if($var.view.helpActive){
-                $var.view.helpActive = false;
+            if($reactive.view.helpActive){
+                $reactive.view.helpActive = false;
             }
-            $var.currentMode = UPDATE_VIEW;
+            router.replace({
+                name: 'form',
+                query:{
+                    update: true,
+                    name: $normal.currentSnippet.name
+                }
+            })
             break;
         case 'Digit1':
         case 'Digit2':
@@ -358,26 +363,25 @@ function dealWithCommonView(e){
             copyCode(e.shiftKey || e.altKey,+e.code[5])
             break;
         case 'KeyZ':
-            if(!$var.view.fullScreenShow){
-                $var.view.fullScreenShow = true;
+            if(!$reactive.view.fullScreenShow){
+                $reactive.view.fullScreenShow = true;
                 utools.setExpendHeight(545)
             }
-            $var.view.helpActive = !$var.view.helpActive;
+            $reactive.view.helpActive = !$reactive.view.helpActive;
             break
         case 'KeyO':
-            if($var.currentName === defaultHelpSnippet.name){
+            if($normal.currentSnippet.name === defaultHelpSnippet.name){
                 return;
             }
-            const snippet = codeSnippetManager.get($var.currentName);
-            if(snippet.path){
-                if(snippet.local){
+            if($normal.currentSnippet.path){
+                if($normal.currentSnippet.local){
                     if(e.shiftKey){
-                        utools.shellOpenPath(snippet.path);
+                        utools.shellOpenPath($normal.currentSnippet.path);
                     }else{
-                        utools.shellShowItemInFolder(snippet.path)
+                        utools.shellShowItemInFolder($normal.currentSnippet.path)
                     }
                 }else{
-                    utools.shellOpenExternal(snippet.path)
+                    utools.shellOpenExternal($normal.currentSnippet.path)
                 }
             }
             break
@@ -391,19 +395,19 @@ function dealWithCommonView(e){
 function init(list) {
     document.onkeydown = e => {
         // ignore  update view or create view
-        if ($var.currentMode > CODE_VIEW) {
+        if ($reactive.currentMode === FORM_VIEW) {
             return;
         }
         // dialog or sideview
-        if ($var.view.settingActive) {
+        if ($reactive.view.settingActive) {
             // prevent any possible event
             if ( e.code === 'Enter' || e.code === 'Tab') {
                 e.preventDefault();
             } else if (e.code === 'KeyQ' || e.code === 'Slash') {
-                $var.view.settingActive = false;
+                $reactive.view.settingActive = false;
             }
             return;
-        }else if($var.view.customActive || $var.view.variableActive){
+        }else if($reactive.view.customActive || $reactive.view.variableActive){
             return;
         }
         // super key
@@ -415,18 +419,18 @@ function init(list) {
             e.preventDefault();
             let gap = e.timeStamp - lastTabTime;
             if (gap < 300) {
-                $var.view.fullScreenShow = !$var.view.fullScreenShow;
-                $var.utools.focused = true;
+                $reactive.view.fullScreenShow = !$reactive.view.fullScreenShow;
+                $reactive.utools.focused = true;
                 utools.subInputFocus();
             } else {
-                if ($var.utools.focused && $var.utools.selectedIndex > -1) {
-                    $var.utools.focused = false;
-                    $var.view.cursorShow = false;
+                if ($reactive.utools.focused && $reactive.utools.selectedIndex > -1) {
+                    $reactive.utools.focused = false;
+                    $reactive.view.cursorShow = false;
                     utools.subInputBlur();
                     gotoTheLastPosition();
                 } else {
                     utools.subInputFocus();
-                    $var.utools.focused = true;
+                    $reactive.utools.focused = true;
                 }
             }
             lastTabTime = e.timeStamp;
@@ -434,27 +438,31 @@ function init(list) {
         }else if(e.code === 'Space'){
             e.preventDefault();
         }else if(e.code === 'KeyZ'){
-            $var.view.helpActive = !$var.view.helpActive;
+            $reactive.view.helpActive = !$reactive.view.helpActive;
             return;
         }
         // 其他键无法触发
-        if ($var.utools.focused) {
+        if ($reactive.utools.focused) {
             return;
         }
         // 处理Ctrl键
         if (e.ctrlKey || e.metaKey) {
             switch (e.code){
                 case 'KeyN':
-                    switchToFullUIMode()
-                    $var.currentMode = CREATE_VIEW;
+                    router.replace({
+                        name: 'form',
+                        query:{
+                            update: false
+                        }
+                    })
                     return;
                 case 'KeyR':
-                    if($var.currentMode === LIST_VIEW){
+                    if($reactive.currentMode === LIST_VIEW){
                         refreshListView()
                     }
                     return;
                 case 'KeyF':
-                    if($var.currentMode === LIST_VIEW){
+                    if($reactive.currentMode === LIST_VIEW){
                         if (configManager.get("enabledFuzzySymbolQuery")) {
                             configManager.set("enabledFuzzySymbolQuery", false)
                             $message.info("退出【进阶模糊查询】模式")
@@ -478,38 +486,39 @@ function init(list) {
             }
             return;
         }
-        if($var.view.helpActive){
+        if($reactive.view.helpActive){
             dealWithHelpViewOnly(e);
             return;
         }
         // 剩余处理
-        if ($var.currentMode === LIST_VIEW) {
+        if ($reactive.currentMode === LIST_VIEW) {
             dealWithListView(e, list)
         } else {
             dealWithCodeView(e)
         }
     }
     document.onkeyup = e => {
-        if ($var.view.settingActive | $var.utools.focused || $var.utools.selectedIndex < 0 || $var.currentMode > CODE_VIEW) {
+        if ($reactive.view.settingActive | $reactive.utools.focused || $reactive.utools.selectedIndex < 0 || $reactive.currentMode === FORM_VIEW) {
             return;
         }
         if (e.code === 'Space') {
             e.preventDefault();
             if (longKeyDown) {
                 longKeyDown = false;
-                handleRecoverLiteShow();
-                $var.currentMode = LIST_VIEW;
-                $var.utools.keepSelectedStatus = true;
+                router.replace({
+                    name: 'list'
+                })
+                $normal.keepSelectedStatus = true;
                 return;
             }
-            if ($var.currentMode === LIST_VIEW) {
-                if ($var.utools.subItemSelectedIndex === -1) {
+            if ($reactive.currentMode === LIST_VIEW) {
+                if ($reactive.utools.subItemSelectedIndex === -1) {
                     // // 校准位置
                     // console.log('space invoke to the last position')
                     // gotoTheLastPosition();
                 } else {
                     // 处理 Vim 操作
-                    $var.scroll.spaceInvoker[$var.utools.subItemSelectedIndex]?.()
+                    $normal.scroll.spaceInvoker[$reactive.utools.subItemSelectedIndex]?.()
                 }
             }
         }
@@ -530,7 +539,7 @@ function parseSearchWord(searchWord){
         configManager.set('closeHelpSnippet',false)
     }
     if(searchWord == null || searchWord.length === 0){
-        if($var.view.fullScreenShow  || !configManager.get('noShowForEmptySearch')){
+        if($reactive.view.fullScreenShow  || !configManager.get('noShowForEmptySearch')){
             array = codeSnippetManager.queryForMany(null,null,null)
         }else{
             if(!configManager.get('closeHelpSnippet')){
@@ -565,20 +574,20 @@ function parseSearchWord(searchWord){
     // 判断 keepSelectedStatus ，如果为true，需要保留selectIndex位置
     // 由于默认keepSelectedStatus为true，则selectIndex可能为非法，这时候需要忽视keepSelectedStatus
     // 只有当 删除/添加/搜索操作时，会将keepSelectedStatus置为false
-    if( $var.utools.selectedIndex<0 || $var.utools.selectedIndex>=array.length ||   $var.utools.keepSelectedStatus===null){
-        $var.utools.selectedIndex = (array.length===0)? -1: 0;
-    }else if($var.utools.keepSelectedStatus){
+    if( $reactive.utools.selectedIndex<0 || $reactive.utools.selectedIndex>=array.length ||   $normal.keepSelectedStatus===null){
+        $reactive.utools.selectedIndex = (array.length===0)? -1: 0;
+    }else if($normal.keepSelectedStatus){
         nextTick(()=>{
             // 校准位置
             console.log('go to the last position')
             gotoTheLastPosition();
         })
     }
-    $var.utools.subItemSelectedIndex = -1;
+    $reactive.utools.subItemSelectedIndex = -1;
     // 重置
-    $var.utools.keepSelectedStatus = false;
+    $normal.keepSelectedStatus = false;
     // 控制tip显示策略
-    $var.others.onlyOne =  array.length === 1;
+    $reactive.view.onlyOne =  array.length === 1;
     return array;
 }
 

@@ -1,19 +1,21 @@
-import {createApp, toRaw} from 'vue'
+import {createApp} from 'vue'
 import './style.css'
 import App from './App.vue'
 import {codeSnippetManager, configManager, init} from "./js/core.js";
-import {$var, CREATE_VIEW} from "./js/store";
 import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
+import {router} from "./router/index";
+import {$normal, $reactive} from "./js/store";
 
 // init
 init()
 
 function bindApp(){
     const app = createApp(App)
+    app.use(router)
     initNU(app)
     initVH(app)
     app.directive("code", {
@@ -36,37 +38,37 @@ function bindApp(){
                 let target = event.target;
                 if(target && target.value){
                     console.log(target.value)
-                    if($var.currentSnippet.sections){
-                        if(section_contain($var.currentSnippet.sections,target.value)){
-                            section_del($var.currentSnippet.sections,target.value,false)
+                    if($normal.currentSnippet.sections){
+                        if(section_contain($normal.currentSnippet.sections,target.value)){
+                            section_del($normal.currentSnippet.sections,target.value,false)
                         }else{
-                            section_add($var.currentSnippet.sections,target.value,false)
+                            section_add($normal.currentSnippet.sections,target.value,false)
                         }
                     }else{
-                        $var.currentSnippet.sections = [[target.value,target.value]]
+                        $normal.currentSnippet.sections = [[target.value,target.value]]
                     }
                     // 保存
-                    if($var.currentSnippet.help){
+                    if($normal.currentSnippet.help){
                         return;
                     }
-                    codeSnippetManager.update(toRaw($var.currentSnippet))
+                    codeSnippetManager.update($normal.currentSnippet)
                 }
             }
             ul.oncontextmenu = (event) =>{
                 let target = event.target;
                 if(target && target.value){
                     console.log(target.value)
-                    if($var.currentSnippet.sections){
-                        if(section_contain($var.currentSnippet.sections,target.value)){
-                            section_del($var.currentSnippet.sections,target.value,true)
+                    if($normal.currentSnippet.sections){
+                        if(section_contain($normal.currentSnippet.sections,target.value)){
+                            section_del($normal.currentSnippet.sections,target.value,true)
                         }else{
-                            section_add($var.currentSnippet.sections,target.value,true)
+                            section_add($normal.currentSnippet.sections,target.value,true)
                         }
                     }else{
-                        $var.currentSnippet.sections = [[0,target.value]]
+                        $normal.currentSnippet.sections = [[0,target.value]]
                     }
                     // 保存
-                    codeSnippetManager.update(toRaw($var.currentSnippet))
+                    codeSnippetManager.update($normal.currentSnippet)
                 }
             }
             ul.classList.add('hljs-code-number')
@@ -87,8 +89,9 @@ utools.onPluginEnter((data)=>{
     console.log('Enter App ...')
     console.log('The Following is Your [code type payload]')
     console.log(data)
+    bindApp()
     if(configManager.get('enabledLiteShow')){
-        $var.view.fullScreenShow = false;
+        $reactive.view.fullScreenShow = false;
         if(configManager.get('noShowForEmptySearch')){
             utools.setExpendHeight(0)
         }
@@ -98,20 +101,25 @@ utools.onPluginEnter((data)=>{
     utools.setSubInput(({text}) =>{
         text = text.trim();
         if(text.length === 0){
-            $var.utools.search = null;
+            $reactive.utools.search = null;
         }else{
-            if($var.utools.search !== text){
-                $var.utools.search = text;
-                $var.utools.keepSelectedStatus = null;
-                $var.scroll.itemOffsetArray = [];
+            if($reactive.utools.search !== text){
+                $reactive.utools.search = text;
+                $normal.keepSelectedStatus = null;
+                $normal.itemOffsetArray = [];
                 // fix: 修复删除界面不移除
-                $var.view.isDel = false;
+                $reactive.view.isDel = false;
             }
         }
     },"搜索代码片段, 双击Tab切换UI模式")
     if(data.code==='code-snippet-save'){
-        $var.currentMode = CREATE_VIEW;
-        $var.others.code = data.payload;
+        router.push({
+            name: 'code',
+            query:{
+                update: false,
+                code: data.payload
+            }
+        })
         // fix: liteShow模式下高度统一
         utools.setExpendHeight(545)
     }else if(data.code=== 'code-snippet-paste'){
@@ -129,7 +137,6 @@ utools.onPluginEnter((data)=>{
             }
         }catch (_){}
     },100)
-    bindApp()
 })
 
 try{
@@ -146,8 +153,8 @@ try{
         })
 
     },({code,type,payload,option})=>{
-        $var.currentName = option.name;
-        $var.utools.selectedIndex = 0;
+        $normal.currentSnippet = codeSnippetManager.get(option.name);
+        $reactive.utools.selectedIndex = 0;
         return copyCode(true,undefined,true)
     })
 }catch (_){}

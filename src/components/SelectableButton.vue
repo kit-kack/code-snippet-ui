@@ -1,7 +1,7 @@
 <template>
   <n-tooltip trigger="manual"
              :show="hover || (selected && show)"
-             :placement="$var.others.onlyOne&&!$var.view.fullScreenShow?(flag? 'right':'left'):'top'"
+             :placement="$reactive.others.onlyOne&&!$reactive.view.fullScreenShow?(flag? 'right':'left'):'top'"
              :delay="0"
   >
     <template #trigger>
@@ -26,7 +26,7 @@
 <script setup>
 import {computed, onMounted, ref} from "vue";
 import {configManager} from "../js/core.js";
-import {$var} from "../js/store";
+import {$normal, $reactive} from "../js/store";
 
 const props = defineProps({
   "tip": String,
@@ -43,8 +43,8 @@ const emit = defineEmits(['invoke'])
 const hover = ref(false)
 const flag = ref(false)
 const selected = computed(()=>{
-  if($var.utools.subItemSelectedIndex === props.index){
-    if($var.others.onlyOne &&  !$var.view.fullScreenShow){
+  if($reactive.utools.subItemSelectedIndex === props.index){
+    if($reactive.others.onlyOne &&  !$reactive.view.fullScreenShow){
       show.value = true;
       setTimeout(()=>{
         show.value = false
@@ -58,16 +58,16 @@ const selected = computed(()=>{
 })
 
 const operate = ()=>{
-  if(!(props.lite || $var.view.fullScreenShow)){
-    $var.view.fullScreenShow = true;
-    $var.view.recoverLiteShow = true;
+  if(!(props.lite || $reactive.view.fullScreenShow)){
+    $reactive.view.fullScreenShow = true;
+    $normal.recoverLiteShow = true;
     utools.setExpendHeight(545)
   }
   emit('invoke')
 }
 
 onMounted(()=>{
-  $var.scroll.spaceInvoker[props.index] = ()=> {
+  $normal.scroll.spaceInvoker[props.index] = ()=> {
     if(!props.disabled){
       operate()
     }
