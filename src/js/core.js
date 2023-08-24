@@ -917,6 +917,7 @@ const formatManager = {
         // helloworlddfad
         const target = [];
         const inputVars = new Set();
+        const preInvokeVars = new Set();
         let last = 0;
         for (const formatBlock of formatBlocks) {
             // 判断是否为inputVar
@@ -929,7 +930,7 @@ const formatManager = {
             last = formatBlock.index + name.length;
             // current
             name = name.slice(2,-2).trim()
-            if(name.startsWith('@')){  // exp
+            if(name.startsWith('@')) {  // exp
                 target.push({
                     exp: true,
                     code: name
@@ -943,6 +944,26 @@ const formatManager = {
                         code: name
                     })
                 }else{
+                    /**
+                     * @type string
+                     */
+                    const code = this.pairBuffer[name];
+                    if(preInvokeVars.has(name)){
+                        target.push({
+                            code: code
+                        })
+                        continue;
+                    }
+                    if(code && code.startsWith('#')){
+                        // pre invoker
+                        this.pairBuffer[name] = this._expression_invoker(code)
+                        // for next get
+                        preInvokeVars.add(name);
+                        target.push({
+                            code: this.pairBuffer[name]
+                        })
+                        continue;
+                    }
                     // 直接替换
                     target.push({
                         exp: true,  // 后续可能会解析表达式
@@ -980,6 +1001,22 @@ const formatManager = {
     },
     /**
      *
+     * @param {string} expression
+     * @private
+     */
+    _expression_invoker(expression){
+        try{
+            const func = new Function('$','return '+expression.slice(1))
+            return func(this.pairBuffer);
+        }catch (e){
+            // TODO:
+            const result  = `#{${expression}}#`
+            $message.error("解析"+result+"错误,原因为"+e.message)
+            return result;
+        }
+    },
+    /**
+     *
      * @param {any[]} codes
      * @return {string}
      */
@@ -993,15 +1030,7 @@ const formatManager = {
             }
             if(element.exp){
                 if(element.code && (typeof element.code === 'string') && element.code.startsWith('@')){
-                    try{
-                        const func = new Function('$','return '+element.code.slice(1))
-                        return func(this.pairBuffer);
-                    }catch (e){
-                        // TODO:
-                        element.code = `#{${element.code}}#`
-                        $message.error("解析"+element.code+"错误,原因为"+e.message)
-                        return element.code;
-                    }
+                    element.code = this._expression_invoker(element.code)
                 }
             }
             return element.code;
@@ -1030,6 +1059,7 @@ const formatManager = {
             return result.code;
         }
     },
+
     all(){
         const p = {...this.data.pairs}
         p.random = '(内置)随机数[0,1)';

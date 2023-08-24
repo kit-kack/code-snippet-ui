@@ -11,7 +11,6 @@ import '@kangc/v-md-editor/lib/plugins/mermaid/mermaid.css';
 import createKatexPlugin from '@kangc/v-md-editor/lib/plugins/katex/cdn';
 import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
-// highlight
 
 VMdPreview.use(githubTheme,{
     Hljs: hljs

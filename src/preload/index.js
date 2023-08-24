@@ -1,8 +1,9 @@
 const fs = require('fs')
-const {ipcRenderer} = require('electron')
+const path = require('path')
 
 export const readConfig = (path) => fs.readFileSync(path).toString();
 export const writeConfig = (path,str)=> fs.appendFileSync(path,str);
+export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.md')).toString();
 
 /*
  * 暂未使用到
@@ -24,13 +25,6 @@ export const writeConfig = (path,str)=> fs.appendFileSync(path,str);
 //     });
 //     return result;
 // }
-
-export function listen(callback){
-    ipcRenderer.on('message',(event,message)=>{
-        callback?.(message);
-    })
-}
-
 export function encodeBase64(str){
     return new Buffer(str).toString('base64')
 }
