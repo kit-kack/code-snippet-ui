@@ -15,7 +15,7 @@ export default defineConfig({
         path:'src/preload/index.js'
       }),
         createUpxPlugin(({
-            outFileName:'one-2.3.0.upx'
+            outFileName:'code-snippet-'+process.env.npm_package_version+'.upx'
         }))
     ],
 })
