@@ -225,38 +225,46 @@ function dealWithListView(e,list){
     }
 
 }
-const isElementVisible = (el) => {
-    const rect = el.getBoundingClientRect()
-    const vWidth = window.innerWidth || document.documentElement.clientWidth
-    const vHeight = window.innerHeight || document.documentElement.clientHeight
-    if (
-        rect.right < 0 ||
-        rect.bottom < 0 ||
-        rect.left > vWidth ||
-        rect.top > vHeight
-    ) {
-        return false
-    }
-
-    return true
-}
 function handleMdHorizonMove(left,fast){
-    let pres  = document.querySelectorAll(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre")
-    let distance = fast? 50 : 10;
+    const pres  = document.querySelectorAll(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre")
+    // const distance = fast? 50 : 10;
+    // 获取窗口大小
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight
+    const windowWidth = window.innerWidth || document.documentElement.clientWidth
+    const middleHeight = windowHeight / 2;
+    let finalPre = null
+    let minDistance = null
     // 判断视口
-    for (let pre of pres) {
-        if(isElementVisible(pre)){
-            if(left){
-                if(pre.scrollLeft < distance){
-                    pre.scrollLeft = 0;
-                }else{
-                    pre.scrollLeft -= distance;
-                }
+    for (const pre of pres) {
+        // 判断是否可见
+        const rect = pre.getBoundingClientRect();
+        // before - continue
+        if(rect.bottom < 0){
+            continue;
+        }
+        if(rect.top > windowHeight){
+            break;  // 后面的代码块已经不可见
+        }
+        if(rect.right < 0 || rect.left > windowWidth){
+            continue;  // 再次校验
+        }
+        const distance = Math.min(Math.abs(rect.top - middleHeight),Math.abs(rect.bottom - middleHeight));
+        if(minDistance === null || distance < minDistance){
+            minDistance = distance;
+            finalPre = pre;
+        }
+    }
+    // controll invoker
+    if(finalPre){
+        const distance = fast? 50 : 10;
+        if(left){
+            if(finalPre.scrollLeft < distance){
+                finalPre.scrollLeft = 0;
             }else{
-                pre.scrollLeft += distance;
+                finalPre.scrollLeft -= distance;
             }
-
-            return;
+        }else{
+            finalPre.scrollLeft += distance;
         }
     }
 }
