@@ -227,34 +227,33 @@ function dealWithListView(e,list){
 }
 function handleMdHorizonMove(left,fast){
     const pres  = document.querySelectorAll(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre")
-    // const distance = fast? 50 : 10;
     // 获取窗口大小
-    const windowHeight = window.innerHeight || document.documentElement.clientHeight
-    const windowWidth = window.innerWidth || document.documentElement.clientWidth
+    const windowWidth = window.innerWidth || document.documentElement.clientWidth;
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
     const middleHeight = windowHeight / 2;
-    let finalPre = null
-    let minDistance = null
+    let finalPre = null;
+    let minDistance =  null;
     // 判断视口
     for (const pre of pres) {
-        // 判断是否可见
         const rect = pre.getBoundingClientRect();
-        // before - continue
+        // before
         if(rect.bottom < 0){
             continue;
         }
+        // after: break
         if(rect.top > windowHeight){
-            break;  // 后面的代码块已经不可见
+            break;
         }
+        // optional check
         if(rect.right < 0 || rect.left > windowWidth){
-            continue;  // 再次校验
+            continue;
         }
         const distance = Math.min(Math.abs(rect.top - middleHeight),Math.abs(rect.bottom - middleHeight));
         if(minDistance === null || distance < minDistance){
-            minDistance = distance;
             finalPre = pre;
+            minDistance = distance;
         }
     }
-    // controll invoker
     if(finalPre){
         const distance = fast? 50 : 10;
         if(left){
