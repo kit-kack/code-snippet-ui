@@ -1,12 +1,15 @@
 {
   "name": "code-snippet-ui",
   "private": true,
-  "version": "2.3.0",
+  "version": "2.3.1",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "release": "standard-version"
+    "release": "standard-version",
+    "release-major": "standard-version --release-as major",
+    "release-minor": "standard-version --release-as minor",
+    "release-patch": "standard-version --release-as patch"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
