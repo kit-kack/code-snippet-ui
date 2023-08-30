@@ -87,6 +87,7 @@
                         :options="languages"
                         :default-value="configManager.get('defaultLanguage')??'plaintext'"
                         tag
+                        @update:value="handleTypeChange()"
                         :render-tag="renderTag"
                         :theme-overrides="selectThemeOverrides"
                     />
@@ -111,6 +112,7 @@
                         :options="languages"
                         default-value="plaintext"
                         tag
+                        @update:value="handleTypeChange()"
                         :render-tag="renderTag"
                         :theme-overrides="selectThemeOverrides"
                     />
@@ -173,9 +175,10 @@
 <script setup>
 import {computed, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
-import {languages} from "../js/utils/common";
+import {fullAlias, languages} from "../js/utils/common";
 import {useRoute, useRouter} from "vue-router";
 import {$normal} from "../js/store";
+
 const router = useRouter();
 const route = useRoute();
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
@@ -205,7 +208,7 @@ const tabOptions = [
 ]
 const renderTag = ({option})=>{
   if(option.value.length > 2 && option.value.startsWith('x-')){
-    return option.label + ' （ 启用解析⚡）'
+    return option.label + ' （解析⚡）'
   }else{
     return option.label;
   }
@@ -311,6 +314,9 @@ const keyDownHandler = (e)=>{
       e.preventDefault();
     }
   }
+}
+const handleTypeChange = ()=>{
+  codeTemplate.type = fullAlias(codeTemplate.type)
 }
 
 onMounted(()=>{

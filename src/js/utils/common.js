@@ -123,8 +123,12 @@ function _alias(type){
             return 'csharp';
         case 'c++':
             return 'cpp';
+        case 'dt':
+            return 'dart';
         case 'f#':
             return 'fsharp';
+        case 'img':
+            return 'image';
         case 'js':
             return 'javascript';
         case 'kt':
@@ -138,6 +142,7 @@ function _alias(type){
             return 'python';
         case 'ts':
             return 'typescript';
+        case 'text':
         case 'txt':
             return 'plaintext';
         case 'yml':
@@ -147,7 +152,13 @@ function _alias(type){
     }
 }
 
-
+export function fullAlias(type){
+    if(type.length>2 && type.startsWith('x-')){
+        return 'x-'+_alias(type.slice(2))
+    }else {
+        return _alias(type);
+    }
+}
 
 
 /**
