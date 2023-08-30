@@ -1,7 +1,7 @@
 <template>
   <n-tooltip trigger="manual"
              :show="hover || (selected && show)"
-             :placement="$reactive.others.onlyOne&&!$reactive.view.fullScreenShow?(flag? 'right':'left'):'top'"
+             :placement="$reactive.view.onlyOne&&!$reactive.view.fullScreenShow?(flag? 'right':'left'):'top'"
              :delay="0"
   >
     <template #trigger>
@@ -44,7 +44,7 @@ const hover = ref(false)
 const flag = ref(false)
 const selected = computed(()=>{
   if($reactive.utools.subItemSelectedIndex === props.index){
-    if($reactive.others.onlyOne &&  !$reactive.view.fullScreenShow){
+    if($reactive.view.onlyOne &&  !$reactive.view.fullScreenShow){
       show.value = true;
       setTimeout(()=>{
         show.value = false
