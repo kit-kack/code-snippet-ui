@@ -1,5 +1,6 @@
 import {$normal, $reactive} from "../store";
 import {codeSnippetManager, configManager, formatManager} from "../core";
+import {toRaw} from "vue";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
 let lastCachedMsg = null;
@@ -91,34 +92,34 @@ export function copyCode(isPasted,num,noView){
         return;
     }
     // 获取代码
-    if($normal.lastQueryCodeSnippetName !== $normal.currentSnippet.name){  // 获取代码
-        if(!$normal.currentSnippet.code && $normal.currentSnippet.path){
-            const temp = getCode($normal.currentSnippet.path,$normal.currentSnippet.local,noView);
+    if($normal.lastQueryCodeSnippetName !== $reactive.currentSnippet.name){  // 获取代码
+        if(!$reactive.currentSnippet.code && $reactive.currentSnippet.path){
+            const temp = getCode($reactive.currentSnippet.path,$reactive.currentSnippet.local,noView);
             if(temp === null){
                 _notify("当前代码片段加载失败，无法复制粘贴",noView)
                 return;
             }else{
                 $reactive.currentCode = temp??'';
-                $normal.lastQueryCodeSnippetName = $normal.currentSnippet.name;
+                $normal.lastQueryCodeSnippetName = $reactive.currentSnippet.name;
             }
         }else{
-            $reactive.currentCode = $normal.currentSnippet.code??'';
+            $reactive.currentCode = $reactive.currentSnippet.code??'';
         }
     }
     // 复制操作
     if(num === undefined){
         // 更新次数和时间
-        $normal.currentSnippet.time = Date.now();
-        $normal.currentSnippet.count = ($normal.currentSnippet.count??0) +1;
-        codeSnippetManager.update($normal.currentSnippet)
+        $reactive.currentSnippet.time = Date.now();
+        $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
+        codeSnippetManager.update(toRaw($reactive.currentSnippet))
         // 复制
-        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$normal.currentSnippet.type,`已复制代码片段${$normal.currentSnippet.name}的内容`,noView)){
+        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`,noView)){
             return noView;
         }
 
     }else{
-        if($normal.currentSnippet.sections && $normal.currentSnippet.sections.length >= num){
-            const  [start,end] = $normal.currentSnippet.sections[num-1]
+        if($reactive.currentSnippet.sections && $reactive.currentSnippet.sections.length >= num){
+            const  [start,end] = $reactive.currentSnippet.sections[num-1]
             if(!$reactive.currentCode){
                 $message.warning("当前代码片段不支持")
                 return;
@@ -133,11 +134,11 @@ export function copyCode(isPasted,num,noView){
                 str += (lines[i-1]+'\n')
             }
             // 更新次数和时间
-            $normal.currentSnippet.time = Date.now();
-            $normal.currentSnippet.count = ($normal.currentSnippet.count??0) +1;
-            codeSnippetManager.update($normal.currentSnippet)
+            $reactive.currentSnippet.time = Date.now();
+            $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
+            codeSnippetManager.update(toRaw($reactive.currentSnippet))
             // 复制
-            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$normal.currentSnippet.type,`已复制${$normal.currentSnippet.name}#${num}号子代码片段的内容`,false)){
+            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`,false)){
                 return noView;
             }
         }else{

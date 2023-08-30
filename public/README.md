@@ -101,18 +101,11 @@
 > 可以在设置界面中配置 默认UI模式
 - 查询代码片段
   在utools的子输入框进行输入
-  ```js
-  [name] [#tag] [@type]
-  // [...]表示可选部分
-  // name: 代码片段名（模糊匹配）
-  // tag: 标签，可以指定多个
-  // type: 代码片段类型
-  ```
+```js
+[name] [#tag] [@type]
+// [...]表示可选部分
+// name: 代码片段名（模糊匹配）
+// tag: 标签，可以指定多个
+// type: 代码片段类型
+```
 > 上面的查询中三个部分都是可选的，要以空格间隔，并不限制顺序
-
-## 3.补充
-本插件使用的技术如下：
-- 基于[Vue3](https://cn.vuejs.org)和[Naive UI](https://www.naiveui.com)基础开发
-- 基于[vite-plugin-utools-helper](https://github.com/csj8520/vite-plugin-utools-helper)构建插件
-- 基于[v-md-editor](https://github.com/code-farmer-i/vue-markdown-editor)提供Markdown渲染
-> 在这里很感谢您的使用，由于自己在前端方面仍是一个小白，插件可能会出现一些未知问题，若您遇到了，希望能够反馈

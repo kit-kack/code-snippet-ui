@@ -5,10 +5,6 @@ const CODE_VIEW = 1;
 const FORM_VIEW = 2;
 
 const $normal = {
-    /**
-     * @type CodeSnippet
-     */
-    currentSnippet: null,
     lastQueryCodeSnippetName: null,
     recoverLiteShow: false,   // 是否恢复为 列表UI
     recoverLiteHeight: 0,      // 恢复为列表UI的高度
@@ -28,6 +24,7 @@ const $normal = {
 const $reactive = reactive({
     currentCode: null,
     currentMode: LIST_VIEW,
+    currentSnippet: null,
     view:{
         fullScreenShow: true,     // 是否为完整UI模式
         helpActive: false,        // 快速方式界面是否显示

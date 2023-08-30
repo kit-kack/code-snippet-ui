@@ -31,3 +31,10 @@ export function encodeBase64(str){
 export function decodeBase64(str){
     return new Buffer(str,'base64').toString()
 }
+
+export function getDirname(p){
+    return path.dirname(p)
+}
+export function getFinalPath(dir,p){
+    return path.join(dir,p)
+}

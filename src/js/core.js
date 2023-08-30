@@ -452,18 +452,17 @@ const codeSnippetManager = {
             return false;
         }
     },
-    replace(newName,codeSnippet){
+    replace(oldName,codeSnippet){
         // 先查询是否存在
-        if(this.codeMap.has(codeSnippet.name)){
-            utools.db.remove(CODE_PREFIX+codeSnippet.name)
+        if(this.codeMap.has(oldName)){
+            utools.db.remove(CODE_PREFIX+oldName)
             // 处理 topList
-            let index = configManager.getTopList().indexOf(codeSnippet.name);
+            let index = configManager.getTopList().indexOf(oldName);
             if(index!==-1){
-                configManager.replaceTopItem(index,newName)
+                configManager.replaceTopItem(index,codeSnippet.name)
             }
             // 替换 codeMap
-            this.codeMap.delete(codeSnippet.name)
-            codeSnippet.name = newName;
+            this.codeMap.delete(oldName)
             this.codeMap.set(codeSnippet.name,codeSnippet);
             funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.name,codeSnippet)
             this.writeToDB();

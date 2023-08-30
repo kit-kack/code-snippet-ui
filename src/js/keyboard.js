@@ -170,7 +170,7 @@ function dealWithListView(e,list){
                     router.replace({
                         name: 'code',
                         params:{
-                            name: $normal.currentSnippet.name
+                            name: $reactive.currentSnippet.name
                         }
                     })
                     longKeyDown = true;
@@ -190,12 +190,12 @@ function dealWithListView(e,list){
             }
             break;
         case 'KeyT':
-            if($normal.currentSnippet.name === defaultHelpSnippet.name){
+            if($reactive.currentSnippet.name === defaultHelpSnippet.name){
                 return;
             }
-            let index = configManager.getTopList().indexOf($normal.currentSnippet.name)
+            let index = configManager.getTopList().indexOf($reactive.currentSnippet.name)
             if(index === -1){
-                $reactive.utools.selectedIndex = configManager.addTopItem($normal.currentSnippet.name);
+                $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.name);
             }else{
                 configManager.delTopItem(index)
             }
@@ -207,11 +207,11 @@ function dealWithListView(e,list){
             $reactive.view.isDel = true;
             break;
         case 'KeyV':
-                $normal.lastQueryCodeSnippetName = $normal.currentSnippet.name;
+                $normal.lastQueryCodeSnippetName = $reactive.currentSnippet.name;
                 router.replace({
                     name: 'code',
                     params:{
-                        name: $normal.currentSnippet.name
+                        name: $reactive.currentSnippet.name
                     }
                 })
                 return;
@@ -272,7 +272,7 @@ function dealWithCodeView(e){
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
-            if($normal.currentSnippet.type === 'markdown'){
+            if($reactive.currentSnippet.type === 'markdown'){
                 if($reactive.view.isRendering){
                     handleMdHorizonMove(true,e.shiftKey)
                     break;
@@ -290,7 +290,7 @@ function dealWithCodeView(e){
             break;
         case "KeyL":
         case "ArrowRight":
-            if($normal.currentSnippet.type === 'markdown'){
+            if($reactive.currentSnippet.type === 'markdown'){
                 if($reactive.view.isRendering){
                     handleMdHorizonMove(false,e.shiftKey)
                     break;
@@ -312,13 +312,13 @@ function dealWithCodeView(e){
             doScrollForCodeView(Direction.RESET,false);
             break;
         case 'KeyR':
-            if($normal.currentSnippet.path && $normal.currentSnippet.type === 'image'){
+            if($reactive.currentSnippet.path && $reactive.currentSnippet.type === 'image'){
                 return;
             }
             $reactive.view.isRendering = !$reactive.view.isRendering;
             break;
         case 'KeyB':
-            if($normal.currentSnippet.path){
+            if($reactive.currentSnippet.path){
                 $normal.updateCacheCodeFunc?.()
             }
             break;
@@ -343,7 +343,7 @@ function dealWithCommonView(e){
             // handleCopy(true)
             break;
         case 'KeyE':
-            if($normal.currentSnippet.name === defaultHelpSnippet.name){
+            if($reactive.currentSnippet.name === defaultHelpSnippet.name){
                 $message.warning("内置文档，无法修改");
                 return;
             }
@@ -353,8 +353,8 @@ function dealWithCommonView(e){
             router.replace({
                 name: 'form',
                 query:{
-                    update: true,
-                    name: $normal.currentSnippet.name
+                    mode: 'edit',
+                    name: $reactive.currentSnippet.name
                 }
             })
             break;
@@ -377,18 +377,18 @@ function dealWithCommonView(e){
             $reactive.view.helpActive = !$reactive.view.helpActive;
             break
         case 'KeyO':
-            if($normal.currentSnippet.name === defaultHelpSnippet.name){
+            if($reactive.currentSnippet.name === defaultHelpSnippet.name){
                 return;
             }
-            if($normal.currentSnippet.path){
-                if($normal.currentSnippet.local){
+            if($reactive.currentSnippet.path){
+                if($reactive.currentSnippet.local){
                     if(e.shiftKey){
-                        utools.shellOpenPath($normal.currentSnippet.path);
+                        utools.shellOpenPath($reactive.currentSnippet.path);
                     }else{
-                        utools.shellShowItemInFolder($normal.currentSnippet.path)
+                        utools.shellShowItemInFolder($reactive.currentSnippet.path)
                     }
                 }else{
-                    utools.shellOpenExternal($normal.currentSnippet.path)
+                    utools.shellOpenExternal($reactive.currentSnippet.path)
                 }
             }
             break
@@ -459,7 +459,7 @@ function init(list) {
                     router.replace({
                         name: 'form',
                         query:{
-                            update: false
+                            mode: 'new'
                         }
                     })
                     return;

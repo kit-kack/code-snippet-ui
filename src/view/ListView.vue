@@ -1,7 +1,6 @@
 <template>
-  <div v-if="$reactive.view.refresh" :style="{
-    cursor: ($reactive.view.cursorShow)? '': 'none'
-  }" @mousemove="$reactive.view.cursorShow = true">
+  <div v-if="$reactive.view.refresh" :style="{cursor: ($reactive.view.cursorShow)? '': 'none'}"
+       @mousemove="$reactive.view.cursorShow = true">
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" ref="scrollBar">
         <div ref="listViewAspect">
@@ -101,7 +100,7 @@ const expanded = ref(false)
 const router = useRouter();
 const handleSelect = (index,name)=>{
   if(index === $reactive.utools.selectedIndex){
-    $normal.currentSnippet = codeSnippetManager.get(name)
+    $reactive.currentSnippet = codeSnippetManager.get(name)
     return true;
   }else{
     return false;
@@ -141,7 +140,7 @@ function goToCreateView(){
   router.replace({
     name: 'form',
     query:{
-      update: false
+      mode: 'new'
     }
   })
 }

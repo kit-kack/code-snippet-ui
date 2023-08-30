@@ -57,11 +57,11 @@ const handleVimStatusBarClick = ()=>{
     if(now - lastTime < 500){
       if(clearCount === 3){
         $message.info("清除 所有高亮行")
-        $normal.currentSnippet.sections = [];
-        if($normal.currentSnippet.help){
+        $reactive.currentSnippet.sections = [];
+        if($reactive.currentSnippet.help){
           return;
         }
-        codeSnippetManager.update($normal.currentSnippet)
+        codeSnippetManager.update(toRaw($reactive.currentSnippet))
         clearCount = 0;
       }else{
         clearCount++;

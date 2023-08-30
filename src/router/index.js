@@ -1,5 +1,6 @@
 import {$reactive, CODE_VIEW, FORM_VIEW, handleRecoverLiteShow, LIST_VIEW, switchToFullUIMode} from "../js/store";
 import {createRouter, createWebHashHistory} from 'vue-router'
+import ListView from "../view/ListView.vue";
 
 /**
  * @type Array<import('vue-router').RouteRecordRaw>
@@ -8,7 +9,7 @@ const routes = [
     {
         name: 'list',
         path: '/',
-        component: ()=> import('../view/ListView.vue'),
+        component: ListView,
         alias: '/list',
         meta:{
             ban: false

@@ -180,7 +180,8 @@ const router = useRouter();
 const route = useRoute();
 const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()
-const codeTemplate = reactive(route.query.update?{...codeSnippetManager.get(route.query.name)} :{
+const update = route.query.mode === 'edit';
+const codeTemplate = reactive(update?{...codeSnippetManager.get(route.query.name)} :{
   code: route.query.code
 })
 const tempTag = ref()
@@ -223,7 +224,7 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if(route.query.update && route.query.name === value){
+        if(update && route.query.name === value){
           return true;
         }
         return !codeSnippetManager.contain(value)
@@ -269,12 +270,13 @@ const handleUpdate = ()=>{
         if(codeTemplate.type === undefined){
           codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
         }
-        if(route.query.update){
+        if(update){
           if(codeTemplate.name === $normal.lastQueryCodeSnippetName){
             // 发生修改，缓存失效
             $normal.lastQueryCodeSnippetName = null;
           } 
           if(route.query.name === codeTemplate.name){
+            console.log(route.query.name)
             $normal.keepSelectedStatus = true;
             codeSnippetManager.update(toRaw(codeTemplate))
           }else{

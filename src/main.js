@@ -1,4 +1,4 @@
-import {createApp} from 'vue'
+import {createApp, toRaw} from 'vue'
 import './style.css'
 import App from './App.vue'
 import {codeSnippetManager, configManager, init} from "./js/core.js";
@@ -38,37 +38,37 @@ function bindApp(){
                 let target = event.target;
                 if(target && target.value){
                     console.log(target.value)
-                    if($normal.currentSnippet.sections){
-                        if(section_contain($normal.currentSnippet.sections,target.value)){
-                            section_del($normal.currentSnippet.sections,target.value,false)
+                    if($reactive.currentSnippet.sections){
+                        if(section_contain($reactive.currentSnippet.sections,target.value)){
+                            section_del($reactive.currentSnippet.sections,target.value,false)
                         }else{
-                            section_add($normal.currentSnippet.sections,target.value,false)
+                            section_add($reactive.currentSnippet.sections,target.value,false)
                         }
                     }else{
-                        $normal.currentSnippet.sections = [[target.value,target.value]]
+                        $reactive.currentSnippet.sections = [[target.value,target.value]]
                     }
                     // 保存
-                    if($normal.currentSnippet.help){
+                    if($reactive.currentSnippet.help){
                         return;
                     }
-                    codeSnippetManager.update($normal.currentSnippet)
+                    codeSnippetManager.update(toRaw($reactive.currentSnippet))
                 }
             }
             ul.oncontextmenu = (event) =>{
                 let target = event.target;
                 if(target && target.value){
                     console.log(target.value)
-                    if($normal.currentSnippet.sections){
-                        if(section_contain($normal.currentSnippet.sections,target.value)){
-                            section_del($normal.currentSnippet.sections,target.value,true)
+                    if($reactive.currentSnippet.sections){
+                        if(section_contain($reactive.currentSnippet.sections,target.value)){
+                            section_del($reactive.currentSnippet.sections,target.value,true)
                         }else{
-                            section_add($normal.currentSnippet.sections,target.value,true)
+                            section_add($reactive.currentSnippet.sections,target.value,true)
                         }
                     }else{
-                        $normal.currentSnippet.sections = [[0,target.value]]
+                        $reactive.currentSnippet.sections = [[0,target.value]]
                     }
                     // 保存
-                    codeSnippetManager.update($normal.currentSnippet)
+                    codeSnippetManager.update(toRaw($reactive.currentSnippet))
                 }
             }
             ul.classList.add('hljs-code-number')
@@ -87,8 +87,6 @@ utools.onPluginEnter((data)=>{
     }
 
     console.log('Enter App ...')
-    console.log('The Following is Your [code type payload]')
-    console.log(data)
     bindApp()
     if(configManager.get('enabledLiteShow')){
         $reactive.view.fullScreenShow = false;
@@ -116,7 +114,7 @@ utools.onPluginEnter((data)=>{
         router.push({
             name: 'code',
             query:{
-                update: false,
+                mode: 'new',
                 code: data.payload
             }
         })
@@ -153,7 +151,7 @@ try{
         })
 
     },({code,type,payload,option})=>{
-        $normal.currentSnippet = codeSnippetManager.get(option.name);
+        $reactive.currentSnippet = codeSnippetManager.get(option.name);
         $reactive.utools.selectedIndex = 0;
         return copyCode(true,undefined,true)
     })

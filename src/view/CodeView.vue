@@ -10,7 +10,7 @@
             <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 100vw;">
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
-            <v-md-preview :text="$reactive.currentCode" ></v-md-preview>
+            <v-md-preview :beforeChange="beforeChangeFunc" @change="whenRender" :text="$reactive.currentCode" ></v-md-preview>
           </template>
           <template v-else>
             未知渲染类型
@@ -94,11 +94,14 @@
       </n-space>
     </div>
   </div>
+  <n-modal v-model:show="show">
+    <img :src="url" alt="图片加载失败了哦" style="max-height: 90vh;">
+  </n-modal>
 </template>
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {computed, onMounted, reactive, ref, toRaw, watch} from "vue";
+import {computed, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
 import {useRouter} from "vue-router";
@@ -106,14 +109,16 @@ import {$normal, $reactive} from "../js/store";
 
 const props = defineProps(['name'])
 const scrollBar = ref(null)
-const snippet = reactive(codeSnippetManager.get(props.name));
+const snippet = ref(codeSnippetManager.get(props.name));
 $reactive.currentCode = getCode()
 const hover = ref(false)
 const refreshFlag = ref(true)
 const router = useRouter();
+const show = ref(false)
+const url = ref()
 const pair = computed(()=>{
   // 分析类型
-  const result = getRealTypeAndValidStatus(snippet.type);
+  const result = getRealTypeAndValidStatus(snippet.value.type);
   if(result.type === 'image'){
     $reactive.view.isRendering = true;
   }
@@ -138,25 +143,25 @@ const doRefresh = getRefreshFunc(refreshFlag,()=>{
   $normal.scroll.codeInvoker = scrollBar.value;
 })
 function getCode(){
-  if(snippet.path){
-    if(snippet.code){
-      return snippet.code;
+  if(snippet.value.path){
+    if(snippet.value.code){
+      return snippet.value.code;
     }else{
       return getCodeFromPath();
     }
   }
-  return snippet.code;
+  return snippet.value.code;
 }
 function getCodeFromPath(){
-  if(snippet.local){
+  if(snippet.value.local){
     try{
-      return window.preload.readConfig(snippet.path)?? '[本地内容为空]'
+      return window.preload.readConfig(snippet.value.path)?? '[本地内容为空]'
     }catch (e){
       $message.error(e.message)
-      return `😅加载失败: 本地文件[ ${snippet.path} ]`
+      return `😅加载失败: 本地文件[ ${snippet.value.path} ]`
     }
-  }else if(snippet.type !== 'image' && snippet.type !== 'x-image'){
-    fetch(snippet.path).then(resp=>{
+  }else if(snippet.value.type !== 'image' && snippet.value.type !== 'x-image'){
+    fetch(snippet.value.path).then(resp=>{
       if(resp.ok){
         resp.text().then(value=>{
           // 刷新页面
@@ -164,10 +169,10 @@ function getCodeFromPath(){
           doRefresh();
         })
       }else{
-        $reactive.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
+        $reactive.currentCode = "网络文件[ "+snippet.value.path +" ]数据抓取失败!"
       }
     })
-    return "网络文件[ "+snippet.path +" ]数据正在获取中..."
+    return "网络文件[ "+snippet.value.path +" ]数据正在获取中..."
   }
 }
 const handleClose = ()=>{
@@ -178,22 +183,90 @@ const handleClose = ()=>{
   })
 }
 function updateCachedCode(){
-  if(snippet.code){   // 清除缓存
-    snippet.code = undefined;
+  if(snippet.value.code){   // 清除缓存
+    snippet.value.code = undefined;
     $reactive.currentCode = getCodeFromPath();  // 抓取数据
   }else{  // 添加缓存
-    snippet.code = $reactive.currentCode;
+    snippet.value.code = $reactive.currentCode;
   }
   codeSnippetManager.update(toRaw(snippet))
 }
 function getNumShow(num){
   return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
 }
+const handleClickUrl = (e)=>{
+  e.preventDefault();
+  const a = e.target.closest('.github-markdown-body a')
+  if(a){
+    if(a.href ){
+      console.log(a.href)
+      if(a.href.startsWith('https://file:::')){
+        url.value = window.preload.decodeBase64(a.href.slice(15))
+        show.value  = true;
+      }else{
+        if(e.ctrlKey || e.metaKey){
+          utools.shellOpenExternal(a.href)
+        }
+      }
+    }
+  }
+
+
+}
+
+/**
+ * 实现渲染本地相对图片
+ * @param {string} text
+ * @param {(string)=> void} next
+ */
+const beforeChangeFunc = (text,next) =>{
+  if(snippet.value.path && snippet.value.local){
+    const localDir = window.preload.getDirname(snippet.value.path)
+    text = text.replace(/!\[(.*?)]\((.*?)\)/g,(match,p1,p2)=>{
+      if(p2 && (p2.startsWith('./') || p2.startsWith('../'))){
+        const abs = window.preload.encodeBase64(window.preload.getFinalPath(localDir,p2))
+        return `<a href="https://file:::${abs}">${p1}[本地图片需要预览显示]</a>`
+      }
+      return match
+    })
+    console.log(text)
+
+  }
+
+  next(text)
+}
+/**
+ * 实现渲染本地相对图片
+ *
+ */
+function whenRender(text,html){
+  console.log('text: '+text)
+  console.log('html: '+html)
+  // if(snippet.value.path && snippet.value.local){
+  //   console.log('local')
+  //   const images = document.querySelectorAll('.github-markdown-body img')
+  //   if(images && images.length > 0){
+  //     console.log(window.preload)
+  //     const localDir = window.preload.pathModule.dirname(snippet.value.path)
+  //     console.log(localDir)
+  //     images.forEach(image=>{
+  //       const src = image.getAttribute('src')
+  //       if(src && src.startsWith('./') && src.startsWith('../')){
+  //         const abs = window.preload.pathModule.join(localDir,src);
+  //         console.log(abs)
+  //         image.setAttribute("src", abs);
+  //       }
+  //     })
+  //   }
+  // }
+  // document.querySelector('.github-markdown-body img')
+  // html.value = '<p>Hello World</p>'
+}
 
 onMounted(()=>{
     $normal.updateCacheCodeFunc = updateCachedCode
     $normal.scroll.codeInvoker = scrollBar.value;
-    if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
+    if(snippet.value.type && snippet.value.type.length>2 && snippet.value.type.startsWith('x-')){
       renderFormatBlock(pair.value.renderable && $reactive.view.isRendering)
       watch(()=>$reactive.view.isRendering,(newValue)=>{
         renderFormatBlock(newValue)
@@ -201,17 +274,17 @@ onMounted(()=>{
         flush:'post',
         immediate:true
       })
-
     }
+    document.addEventListener('click',handleClickUrl)
+})
+onUnmounted(()=>{
+  document.removeEventListener('click',handleClickUrl)
 })
 
 
 </script>
 
 <style >
-#bg{
-  background-color: white;
-}
 #code-view{
   position: relative;
 }
@@ -232,6 +305,7 @@ onMounted(()=>{
 #code-view .hljs-container pre{
   width: 100%;
   padding-left: 10px;
+  padding-right: 10px;
   z-index: 1;
   background: transparent;
 }

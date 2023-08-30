@@ -261,7 +261,7 @@ const doEdit = ()=>{//TODO
   router.replace({
     name: 'form',
     query:{
-      update: true,
+      mode: 'edit',
       name: props.snippet.name
     }
   })
