@@ -101,7 +101,7 @@
 
 <script setup>
 import {codeSnippetManager, configManager} from "../js/core.js";
-import {computed, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
+import {computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
 import {useRouter} from "vue-router";
@@ -195,44 +195,47 @@ function getNumShow(num){
   return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
 }
 const handleClickUrl = (e)=>{
-  e.preventDefault();
   const a = e.target.closest('.github-markdown-body a')
-  if(a){
-    if(a.href ){
-      console.log(a.href)
-      if(a.href.startsWith('https://file:::')){
-        url.value = window.preload.decodeBase64(a.href.slice(15))
-        show.value  = true;
-      }else{
-        if(e.ctrlKey || e.metaKey){
-          utools.shellOpenExternal(a.href)
-        }
-      }
+  if(a && a.href){
+    if(e.ctrlKey || e.metaKey){
+      e.preventDefault();
+      utools.shellOpenExternal(a.href)
     }
   }
-
-
 }
 
+let cachedImageUrls = null;
+let count = -1;
 /**
  * 实现渲染本地相对图片
  * @param {string} text
  * @param {(string)=> void} next
  */
 const beforeChangeFunc = (text,next) =>{
-  if(snippet.value.path && snippet.value.local){
+  count = -1;
+  if(snippet.value.path && snippet.value.local) {
+    cachedImageUrls = new Map();
     const localDir = window.preload.getDirname(snippet.value.path)
-    text = text.replace(/!\[(.*?)]\((.*?)\)/g,(match,p1,p2)=>{
-      if(p2 && (p2.startsWith('./') || p2.startsWith('../'))){
-        const abs = window.preload.encodeBase64(window.preload.getFinalPath(localDir,p2))
-        return `<a href="https://file:::${abs}">${p1}[本地图片需要预览显示]</a>`
+    text = text.replace(/!\[(.*?)]\((.*?)\)/g, (match, name, url) => {
+      count ++;
+      if(url){
+        if(url.startsWith('http://') || url.startsWith('https://')){
+          return match
+        }else if(url.startsWith('./') || url.startsWith('../')){
+          // 本地相对路径
+          cachedImageUrls.set(count,window.preload.getFinalPath(localDir, url))
+          // const abs = window.preload.encodeBase64(window.preload.getFinalPath(localDir, url))
+          // return `<a href="https://file:::${abs}">${name}[本地图片需要预览显示]</a>`
+        }else{
+          // 本地绝对路径
+          cachedImageUrls.set(count,url);
+        }
       }
       return match
     })
-    console.log(text)
-
+  }else{
+      cachedImageUrls = null;
   }
-
   next(text)
 }
 /**
@@ -240,27 +243,18 @@ const beforeChangeFunc = (text,next) =>{
  *
  */
 function whenRender(text,html){
-  console.log('text: '+text)
-  console.log('html: '+html)
-  // if(snippet.value.path && snippet.value.local){
-  //   console.log('local')
-  //   const images = document.querySelectorAll('.github-markdown-body img')
-  //   if(images && images.length > 0){
-  //     console.log(window.preload)
-  //     const localDir = window.preload.pathModule.dirname(snippet.value.path)
-  //     console.log(localDir)
-  //     images.forEach(image=>{
-  //       const src = image.getAttribute('src')
-  //       if(src && src.startsWith('./') && src.startsWith('../')){
-  //         const abs = window.preload.pathModule.join(localDir,src);
-  //         console.log(abs)
-  //         image.setAttribute("src", abs);
-  //       }
-  //     })
-  //   }
-  // }
-  // document.querySelector('.github-markdown-body img')
-  // html.value = '<p>Hello World</p>'
+  if(count === -1){
+    return
+  }
+  nextTick(()=>{
+    document.querySelectorAll('.github-markdown-body img').forEach((value,index)=>{
+      value.parentElement.style.textAlign = 'center'
+      if(cachedImageUrls && cachedImageUrls.has(index)){
+        value.src = cachedImageUrls.get(index)
+      }
+    })
+  })
+
 }
 
 onMounted(()=>{
