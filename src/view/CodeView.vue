@@ -1,7 +1,7 @@
 <template>
   <div  id="code-view">
     <n-scrollbar
-        style="max-height: 100vh"
+        style="max-height:100vh"
         :x-scrollable="!pair.renderable || !$reactive.view.isRendering"
         trigger="hover" ref="scrollBar">
       <template v-if="refreshFlag">

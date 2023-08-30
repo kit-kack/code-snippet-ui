@@ -88,6 +88,10 @@ const datas = [
         shortcut: "1 ~ 9",
         tooltip: "粘贴请结合Shift/Alt/Ctrl(Command)键"
       },{
+        feature: "系统应用打开Open（仅适用于链接文件）",
+        shortcut: "O",
+        tooltip: "本地关联文件默认会文件管理器打开，结合Shift键来系统应用打开"
+      },{
         feature: "退出Quit",
         shortcut: "Q",
         tooltip: "该功能也适用于退出元素功能菜单"

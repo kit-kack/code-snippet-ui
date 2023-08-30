@@ -377,9 +377,6 @@ function dealWithCommonView(e){
             $reactive.view.helpActive = !$reactive.view.helpActive;
             break
         case 'KeyO':
-            if($reactive.currentSnippet.name === defaultHelpSnippet.name){
-                return;
-            }
             if($reactive.currentSnippet.path){
                 if($reactive.currentSnippet.local){
                     if(e.shiftKey){
@@ -390,6 +387,8 @@ function dealWithCommonView(e){
                 }else{
                     utools.shellOpenExternal($reactive.currentSnippet.path)
                 }
+            }else{
+                $message.warning("当前文件不为【链接文件】")
             }
             break
     }
