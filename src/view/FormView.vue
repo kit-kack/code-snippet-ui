@@ -178,10 +178,10 @@ import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js"
 import {fullAlias, languages} from "../js/utils/common";
 import {useRoute, useRouter} from "vue-router";
 import {$normal} from "../js/store";
+import {CtrlStr} from "../js/some";
 
 const router = useRouter();
 const route = useRoute();
-const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 const form = ref()
 const update = route.query.mode === 'edit';
 const codeTemplate = reactive(update?{...codeSnippetManager.get(route.query.name)} :{
@@ -379,7 +379,15 @@ const handleImport = ()=>{
     ]
   })
   if (realPathList != null) {
-    codeTemplate.path = realPathList[0]
+    const path = realPathList[0];
+    codeTemplate.path = path;
+    // 解析类型
+    const index = path.lastIndexOf('.');
+    if(index === -1){
+      codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
+    }else{
+      codeTemplate.type = fullAlias(path.slice(index +1).toLowerCase())
+    }
     codeTemplate.local = true;
   }
 }

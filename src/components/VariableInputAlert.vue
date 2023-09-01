@@ -1,29 +1,38 @@
 <template>
   <n-modal v-model:show="$reactive.view.variableActive"
-           preset="card"
-           title="输入变量"
-           style="width: 60%"
-           :mask-closable="false"
-           :auto-focus="false"
-
-  >
-    <n-scrollbar style="max-height: 60vh">
-      <div style="padding-right: 6px">
-        <template v-for="(template,index) in templates">
-          <p style="font-size: 12px;margin: 5px">{{template.label}}</p>
-          <n-input v-model:value="template.value" clearable placeholder="替换值" :autofocus="index === 0"/>
-        </template>
-      </div>
-    </n-scrollbar>
-    <template #footer>
-      <div style="width: 100%;position: relative">
-        <n-space style="position: absolute; right: 3px">
-          <n-button quaternary @click="doCancel()">取消</n-button>
-          <n-button quaternary type="success" @click="doYes()" :color="configManager.getGlobalColor()">确定</n-button>
-        </n-space>
-      </div>
-      <br/>
-    </template>
+           :mask-closable="false">
+    <n-card
+        title="输入变量"
+        style="width: 60%"
+        size="medium">
+      <n-scrollbar style="max-height: 60vh">
+        <div style="padding-right: 6px">
+          <template v-for="(template,index) in templates">
+            <p style="font-size: 13px;margin: 5px">{{template.label}}</p>
+            <n-input v-model:value="template.value" clearable placeholder="替换值" :autofocus="index === 0"/>
+          </template>
+        </div>
+      </n-scrollbar>
+      <template #footer>
+        <div style="width: 100%;position: relative">
+          <n-space style="position: absolute; right: 3px">
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-button quaternary @click="doCancel()">取消</n-button>
+              </template>
+              {{CtrlStr+'+Q'}}
+            </n-tooltip>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-button quaternary type="success" @click="doYes()" :color="configManager.getGlobalColor()">确定</n-button>
+              </template>
+              {{CtrlStr+'+S'}}
+            </n-tooltip>
+          </n-space>
+        </div>
+        <br/>
+      </template>
+    </n-card>
   </n-modal>
 </template>
 
@@ -31,6 +40,7 @@
 import {$normal, $reactive, handleRecoverLiteShow} from "../js/store";
 import {onMounted, onUnmounted, ref} from "vue";
 import {configManager, formatManager} from "../js/core";
+import {CtrlStr} from "../js/some";
 const templates = ref( $normal.variables.map(v =>{
   return {
     label: v,

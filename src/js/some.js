@@ -1,5 +1,7 @@
 export const backupFilePath = utools.getPath('home')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
 
+export const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
+
 export const defaultHelpSnippet = {
     version: 'v2.3.1',
     name: '🎉入门手册&新功能介绍🎉',
