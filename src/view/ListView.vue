@@ -3,13 +3,21 @@
        @mousemove="$reactive.view.cursorShow = true">
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" ref="scrollBar">
-        <div ref="listViewAspect">
-          <div style="width: 100%; height: 2px; background-color: transparent"/>
-          <list-item
-              v-for="(snippet,index) in list"
-              :index="index"   :snippet="snippet" :key="index"
-              :selected="handleSelect(index,snippet.name)"
-              @user-click="ind => $reactive.utools.selectedIndex = ind"/>
+        <div ref="listViewAspect" style="padding-top: 2px">
+          <template  v-for="(snippet,index) in list">
+            <template v-if="index < 8">
+              <list-item
+                  :index="index"   :snippet="snippet" :key="index"
+                  :selected="handleSelect(index,snippet.name)"
+                  @user-click="ind => $reactive.utools.selectedIndex = ind"/>
+            </template>
+            <template v-else>
+              <list-item-async
+                  :index="index"   :snippet="snippet" :key="index"
+                  :selected="handleSelect(index,snippet.name)"
+                  @user-click="ind => $reactive.utools.selectedIndex = ind"/>
+            </template>
+          </template>
           <div id="info" v-if="$reactive.view.fullScreenShow">
             <p style="color:gray;">~共有{{list.length}}条数据~</p>
           </div>
@@ -86,12 +94,16 @@
 </template>
 
 <script setup>
-import ListItem from "../components/ListItem.vue";
-import {computed, onMounted, onUpdated, ref} from "vue";
+import {computed, defineAsyncComponent, onMounted, onUpdated, ref} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
 import {$normal, $reactive, refreshListView} from "../js/store";
 import {codeSnippetManager, configManager} from "../js/core";
 import {useRouter} from "vue-router";
+import ListItem from "../components/ListItem.vue";
+const ListItemAsync = defineAsyncComponent({
+  loader: () => import("../components/ListItem.vue"),
+  delay: 1000
+})
 
 const scrollBar = ref()
 const listViewAspect = ref()

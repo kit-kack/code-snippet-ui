@@ -1,5 +1,5 @@
 <template>
-  <n-scrollbar style="max-height: 88px" x-scrollable trigger="hover" class="item-code" ref="itemCodeScrollBar">
+  <n-scrollbar style="max-height: 180px" x-scrollable trigger="hover" class="item-code" ref="itemCodeScrollBar">
     <template v-if="configManager.get('rawLineCode')">
       <pre :style="getCodeStyle()">{{code}}</pre>
     </template>

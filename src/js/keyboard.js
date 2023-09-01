@@ -3,7 +3,13 @@ import {codeSnippetManager, configManager} from "./core.js";
 import {$normal, $reactive, FORM_VIEW, LIST_VIEW, refreshListView,} from "./store"
 import {defaultHelpSnippet} from "./some";
 import {debounce} from "./utils/common";
-import {Direction, doScrollForCodeView, doScrollForHelpView, doScrollForListView} from "./utils/scroller";
+import {
+    Direction,
+    doScrollForCodeView,
+    doScrollForHelpView,
+    doScrollForListView,
+    gotoTheLastPosition
+} from "./utils/scroller";
 import {copyCode} from "./utils/copy";
 import {router} from "../router/index";
 
@@ -45,17 +51,6 @@ const debItemMoveRight = debounce(function(){
     }
 })
 
-const gotoTheLastPosition = ()=>{
-    // 校准位置
-    if($reactive.utools.selectedIndex > -1 ){
-        let distance = $normal.scroll.itemOffsetArray[$reactive.utools.selectedIndex] -200;
-        if(distance < 0){
-            distance = 0;
-        }
-        $normal.scroll.listInvoker?.scrollTo({top:+distance,left:0})
-        // $var.scroll.listInvoker?.(distance)
-    }
-}
 function dealWithHelpViewOnly(e){
     switch (e.code){
         case 'KeyJ':

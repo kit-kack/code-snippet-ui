@@ -1,4 +1,4 @@
-import {$normal} from "../store";
+import {$normal, $reactive} from "../store";
 
 
 export const Direction = {
@@ -63,3 +63,17 @@ export function doScrollForHelpView(direction){
     _controlScrollBar($normal.scroll.helpInvoker,direction,false);
 }
 
+/**
+ * @param {boolean} [smooth]
+ */
+export const gotoTheLastPosition = (smooth)=>{
+    // 校准位置
+    if($reactive.utools.selectedIndex > -1 ){
+        let distance = $normal.scroll.itemOffsetArray[$reactive.utools.selectedIndex] -200;
+        if(distance < 0){
+            distance = 0;
+        }
+        $normal.scroll.listInvoker?.scrollTo({top:+distance,left:0,behavior:smooth?'smooth':'auto'})
+        // $var.scroll.listInvoker?.(distance)
+    }
+}
