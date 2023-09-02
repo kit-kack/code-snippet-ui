@@ -104,8 +104,8 @@ import {codeSnippetManager, configManager} from "../js/core.js";
 import {computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
-import {useRouter} from "vue-router";
 import {$normal, $reactive} from "../js/store";
+import {switchToListView} from "../router";
 
 const scrollBar = ref(null)
 /**
@@ -115,7 +115,6 @@ const snippet = $reactive.currentSnippet;
 $reactive.currentCode = getCode()
 const hover = ref(false)
 const refreshFlag = ref(true)
-const router = useRouter();
 const show = ref(false)
 const url = ref()
 const pair = computed(()=>{
@@ -180,9 +179,7 @@ function getCodeFromPath(){
 const handleClose = ()=>{
   $reactive.view.codeTipActive = false;
   $normal.keepSelectedStatus = true;
-  router.replace({
-    name: 'list'
-  })
+  switchToListView()
 }
 function updateCachedCode(){
   if(snippet.code){   // 清除缓存

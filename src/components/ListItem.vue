@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, nextTick, onMounted, ref} from "vue";
 import {codeSnippetManager, configManager} from "../js/core.js";
 import SelectableButton from "./SelectableButton.vue";
 import {$normal, $reactive, refreshListView} from "../js/store";
@@ -120,9 +120,10 @@ import MultiLineCode from "./item/MultiLineCode.vue";
 import {copyCode} from "../js/utils/copy";
 import {calculateTime} from "../js/utils/common";
 import {useRouter} from "vue-router";
+import {gotoTheLastPosition} from "../js/utils/scroller";
 
 const showBtnModal = ref(false)
-const props = defineProps(['snippet','selected','index','debug'])
+const props = defineProps(['snippet','selected','index','last'])
 const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
 const item = ref()
 const router = useRouter();
@@ -182,7 +183,18 @@ const getTitleStyle = (selected,flag) =>{
   }
 }
 onMounted(()=>{
+  console.log(props.index+' - '+props.last)
   $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
+  if(props.last){
+    if($normal.keepSelectedStatus){
+      console.log('rollback to last position');
+      nextTick(()=>{
+        gotoTheLastPosition();
+      })
+    }
+    // 重置
+    $normal.keepSelectedStatus = false;
+  }
 })
 
 const handleDelete = ()=>{
@@ -225,9 +237,6 @@ const handleCancelTop = ()=>{
   doItemRefresh()
 }
 const handleSetTop = ()=>{
-  if(props.debug){
-    return;
-  }
   $reactive.utools.selectedIndex = configManager.addTopItem(props.snippet.id)
   doItemRefresh()
 }
@@ -264,7 +273,7 @@ const doEdit = ()=>{
 }
 const doItemRefresh = ()=>{
   $normal.keepSelectedStatus = true;
-  refreshListView();
+  refreshListView()
 }
 
 </script>

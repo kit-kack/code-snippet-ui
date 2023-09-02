@@ -1,4 +1,12 @@
-import {$reactive, CODE_VIEW, FORM_VIEW, handleRecoverLiteShow, LIST_VIEW, switchToFullUIMode} from "../js/store";
+import {
+    $normal,
+    $reactive,
+    CODE_VIEW,
+    FORM_VIEW,
+    handleRecoverLiteShow,
+    LIST_VIEW,
+    switchToFullUIMode
+} from "../js/store";
 import {createRouter, createWebHashHistory} from 'vue-router'
 import ListView from "../view/ListView.vue";
 import {gotoTheLastPosition} from "../js/utils/scroller";
@@ -8,10 +16,13 @@ import {gotoTheLastPosition} from "../js/utils/scroller";
  */
 const routes = [
     {
+      path:'/',
+      redirect: '/list/0'
+    },
+    {
         name: 'list',
-        path: '/',
+        path: '/list/:count',
         component: ListView,
-        alias: '/list',
         meta:{
             ban: false
         }
@@ -38,14 +49,7 @@ const routes = [
 
 const router = createRouter({
     history: createWebHashHistory(),
-    routes: routes,
-    scrollBehavior(to,from){
-        if(to.name === 'list'){
-            setTimeout(()=>{
-                gotoTheLastPosition(true);
-            })
-        }
-    }
+    routes: routes
 })
 
 
@@ -60,7 +64,18 @@ router.afterEach((to,from)=>{
     }
 })
 
+/**
+ *
+ * @param {boolean} [refresh]
+ */
+function switchToListView(refresh){
+    if(refresh){
+        ++$normal.listViewVisitedCount;
+    }
+    router.replace('/list/'+$normal.listViewVisitedCount)
+}
+
 
 export {
-    router
+    router,switchToListView
 }

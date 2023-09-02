@@ -1,10 +1,12 @@
 import {nextTick, reactive} from "vue";
+import {gotoTheLastPosition} from "./utils/scroller";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
 const FORM_VIEW = 2;
 
 const $normal = {
+    listViewVisitedCount: 0,
     lastQueryCodeSnippetId: null,
     recoverLiteShow: false,   // 是否恢复为 列表UI
     recoverLiteHeight: 0,      // 恢复为列表UI的高度

@@ -403,6 +403,7 @@ const codeSnippetManager = {
             $message.error(defaultHelpSnippet.name+"属于内置名，无法被使用")
             return;
         }
+        codeSnippet.id = nanoid();
         codeSnippet.count = codeSnippet.count??0;
         codeSnippet.time = codeSnippet.time??Date.now();
         this.codeMap.set(codeSnippet.id,codeSnippet);
@@ -604,8 +605,8 @@ const codeSnippetManager = {
                 try{
                     const data = JSON.parse(window.preload.decodeBase64(temp))
                     if(data.tags){
-                        for (const tag in data.tags) {
-                            tagColorManager.tags.tag = data.tags[tag]
+                        for (const tag of data.tags) {
+                            tagColorManager.tags[tag] = data.tags[tag]
                         }
                         tagColorManager.writeToDB()
                     }

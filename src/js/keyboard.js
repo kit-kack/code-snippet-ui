@@ -11,7 +11,7 @@ import {
     gotoTheLastPosition
 } from "./utils/scroller";
 import {copyCode} from "./utils/copy";
-import {router} from "../router/index";
+import {router, switchToListView} from "../router/index";
 
 // 控制长按键
 let longKeyDown = false;
@@ -186,10 +186,15 @@ function dealWithListView(e,list){
             }
             let index = configManager.getTopList().indexOf($reactive.currentSnippet.id)
             if(index === -1){
-                $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.id);
+                if(configManager.get('closeHelpSnippet')){
+                    $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.id);
+                }else{
+                    $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.id) +1;
+                }
             }else{
                 configManager.delTopItem(index)
             }
+            $normal.keepSelectedStatus = true;
             refreshListView()
             break;
         case 'KeyD':
@@ -289,9 +294,7 @@ function dealWithCodeView(e){
             break;
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
-            router.replace({
-                name: 'list'
-            })
+            switchToListView()
             console.log('exit')
             break;
         case 'Digit0':
@@ -449,6 +452,7 @@ function init(list) {
                     return;
                 case 'KeyR':
                     if($reactive.currentMode === LIST_VIEW){
+                        $normal.keepSelectedStatus = null;
                         refreshListView()
                     }
                     return;
@@ -496,10 +500,8 @@ function init(list) {
             e.preventDefault();
             if (longKeyDown) {
                 longKeyDown = false;
-                router.replace({
-                    name: 'list'
-                })
-                $normal.keepSelectedStatus = true;
+                // $normal.keepSelectedStatus = true;
+                switchToListView()
                 return;
             }
             if ($reactive.currentMode === LIST_VIEW) {
@@ -567,16 +569,19 @@ function parseSearchWord(searchWord){
     // 只有当 删除/添加/搜索操作时，会将keepSelectedStatus置为false
     if( $reactive.utools.selectedIndex<0 || $reactive.utools.selectedIndex>=array.length ||   $normal.keepSelectedStatus===null){
         $reactive.utools.selectedIndex = (array.length===0)? -1: 0;
-    }else if($normal.keepSelectedStatus){
-        nextTick(()=>{
-            // 校准位置
-            console.log('go to the last position')
-            gotoTheLastPosition();
-        })
     }
+    // else if($normal.keepSelectedStatus){
+        // nextTick(()=>{
+        //     // 校准位置
+        //     console.log('go to the last position')
+        //     setTimeout(()=>{
+        //         gotoTheLastPosition();
+        //     })
+        // })
+    // }
     $reactive.utools.subItemSelectedIndex = -1;
     // 重置
-    $normal.keepSelectedStatus = false;
+    // $normal.keepSelectedStatus = false;
     // 控制tip显示策略
     $reactive.view.onlyOne =  array.length === 1;
     return array;

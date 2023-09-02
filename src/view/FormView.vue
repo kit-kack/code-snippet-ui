@@ -173,14 +173,16 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
+import {computed, nextTick, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {fullAlias, languages} from "../js/utils/common";
-import {useRoute, useRouter} from "vue-router";
-import {$normal, $reactive} from "../js/store";
+import {useRoute} from "vue-router";
+import {$normal, $reactive, refreshListView} from "../js/store";
 import {CtrlStr} from "../js/some";
+import {switchToListView} from "../router";
+import {gotoTheLastPosition} from "../js/utils/scroller";
 
-const router = useRouter();
+
 const route = useRoute();
 const form = ref()
 const update = route.query.mode === 'edit';
@@ -248,9 +250,7 @@ const rules = {
 }
 const handleCancel = ()=>{
   $normal.keepSelectedStatus = true;
-  router.replace({
-    name: 'list'
-  })
+  switchToListView()
 }
 const handleUpdate = ()=>{
   form.value.validate().then(error=>{
@@ -290,9 +290,7 @@ const handleUpdate = ()=>{
         // handleRecoverLiteShow()
         // $var.currentMode = LIST_VIEW;
         // $var.others.code = null;
-        router.replace({
-          name: 'list'
-        })
+        switchToListView(true)
       }
   },()=>{
     window.$message.warning("请按要求填写")
