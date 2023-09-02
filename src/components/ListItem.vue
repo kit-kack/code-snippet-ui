@@ -16,7 +16,7 @@
     >
       <div class="snippet-item__top"
            :style="{
-              backgroundColor: configManager.getTopList().includes(snippet.name)? configManager.getGlobalColor(): ''
+              backgroundColor: configManager.getTopList().includes(snippet.id)? configManager.getGlobalColor(): ''
            }"
       ></div>
       <span class="snippet-item__index"  :style="getTitleStyle(props.selected,false)">{{index}}</span>
@@ -133,7 +133,7 @@ const isShowBtn = computed(()=>{
   return !!(props.selected && $reactive.utools.subItemSelectedIndex > -1);
 })
 const isHover = ref(false)
-let topIndex = configManager.getTopList().indexOf(props.snippet.name)
+let topIndex = configManager.getTopList().indexOf(props.snippet.id)
 const pair = computed(()=>{
   let txt = (props.snippet.type?? 'plaintext') + ' | ';
   if(props.snippet.count){
@@ -186,7 +186,7 @@ onMounted(()=>{
 })
 
 const handleDelete = ()=>{
-  codeSnippetManager.del(props.snippet.name)
+  codeSnippetManager.del(props.snippet.id)
   $reactive.utools.selectedIndex--;
   $normal.keepSelectedStatus = true;
   $reactive.view.isDel = false;
@@ -228,13 +228,13 @@ const handleSetTop = ()=>{
   if(props.debug){
     return;
   }
-  $reactive.utools.selectedIndex = configManager.addTopItem(props.snippet.name)
+  $reactive.utools.selectedIndex = configManager.addTopItem(props.snippet.id)
   doItemRefresh()
 }
 
 const handleMouseLeave = (e)=>{
   if(showBtnModal.value){
-    if($reactive.others.onlyOne){
+    if($reactive.view.onlyOne){
       if(e.relatedTarget!=null){
         if(e.relatedTarget.classList.contains("n-popover") || e.relatedTarget.classList.contains("n-popover-arrow")){
           return;
@@ -246,23 +246,19 @@ const handleMouseLeave = (e)=>{
   }
   isHover.value = false;
 }
-const doViewCode = ()=>{//TODO
-  $normal.lastQueryCodeSnippetName = props.snippet.name;
+const doViewCode = ()=>{
+  $normal.lastQueryCodeSnippetId = props.snippet.id;
   router.replace({
-    name: 'code',
-    params:{
-      name: props.snippet.name
-    }
+    name: 'code'
   })
 }
-const doEdit = ()=>{//TODO
+const doEdit = ()=>{
   // $reactive.currentName = props.snippet.name;
   // $va r.currentMode = UPDATE_VIEW;
   router.replace({
     name: 'form',
     query:{
-      mode: 'edit',
-      name: props.snippet.name
+      mode: 'edit'
     }
   })
 }

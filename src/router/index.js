@@ -18,9 +18,8 @@ const routes = [
     },
     {
         name: 'code',
-        path: '/code/:name',
+        path: '/code',
         component: ()=> import('../view/CodeView.vue'),
-        props: true,
         meta:{
             ban: false
         }
@@ -44,7 +43,7 @@ const router = createRouter({
         if(to.name === 'list'){
             setTimeout(()=>{
                 gotoTheLastPosition(true);
-            },100)
+            })
         }
     }
 })

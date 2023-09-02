@@ -5,7 +5,7 @@ const CODE_VIEW = 1;
 const FORM_VIEW = 2;
 
 const $normal = {
-    lastQueryCodeSnippetName: null,
+    lastQueryCodeSnippetId: null,
     recoverLiteShow: false,   // 是否恢复为 列表UI
     recoverLiteHeight: 0,      // 恢复为列表UI的高度
     // 控制滚动
@@ -24,6 +24,9 @@ const $normal = {
 const $reactive = reactive({
     currentCode: null,
     currentMode: LIST_VIEW,
+    /**
+     * @type CodeSnippet
+     */
     currentSnippet: null,
     view:{
         fullScreenShow: true,     // 是否为完整UI模式

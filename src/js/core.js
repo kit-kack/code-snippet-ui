@@ -4,13 +4,17 @@ import {defaultHelpSnippet} from "./some";
 import { fuzzyCompare } from "./utils/fuzzy";
 import {$normal, $reactive, switchToFullUIMode} from "./store";
 import {copyOrPaste} from "./utils/copy";
+import {nanoid} from "nanoid";
 
 const utools = window.utools;
 const getDBItem = utools.dbStorage.getItem
 const removeDBItem = utools.dbStorage.removeItem
 
 // 新版存储 键前缀
-const CODE_PREFIX = "code#";
+const CODE_PREFIX = "code/";
+/**
+ * @deprecated
+ */
 const GLOBAL_ROOT_TAGS = "root";
 const GLOBAL_TAGS = "tags";
 const GLOBAL_CONFIG = "config"
@@ -231,7 +235,7 @@ const funcUtils = {
         let topSnippets = [];
         let topList = configManager.getTopList();
         list = list.filter(snippet =>{
-            let index = topList.indexOf(snippet.name);
+            let index = topList.indexOf(snippet.id);
             if(index === -1){
                 return true;
             }else{
@@ -290,7 +294,7 @@ const funcUtils = {
 
 
 const codeSnippetManager = {
-    // Code Snippet Map (key is its name)
+    // Code Snippet Map (key is its id)
     codeMap: new Map(),
     isInited: false,
 
@@ -314,6 +318,8 @@ const codeSnippetManager = {
                 if (code != null) {  // v1
                     payload.name = name;
                     payload.code = code;
+                    // refactor: id
+                    payload.id = nanoid();
                     removeDBItem(CS_MARK_ID + name)
                     let doc = getDBItem(CS_DOC_ID + name)
                     if (doc != null) {
@@ -323,43 +329,62 @@ const codeSnippetManager = {
                     // 标签处理
                     this.addTagInfo(payload)
                     // 设置 新标签
-                    funcUtils.createOrUpdate(CODE_PREFIX+name,payload)
+                    funcUtils.createOrUpdate(CODE_PREFIX+payload.id,payload)
                 } else {    // v2
                     payload = JSON.parse(getDBItem(CS_CODE_ID + name));
                     if(payload != null){
+                        // refactor: id
+                        payload.id = nanoid();
                         // 标签处理
                         this.addTagInfo(payload)
                         // 移除旧标签，转移到新标签
-                        funcUtils.createOrUpdate(CODE_PREFIX+name,payload)
+                        funcUtils.createOrUpdate(CODE_PREFIX+payload.id,payload)
                         removeDBItem(CS_CODE_ID+name)
                     }else{
-                        payload = utools.db.get(CODE_PREFIX+name).data;
+                        payload = utools.db.get("code#"+name).data;
+                        // refactor: id
+                        payload.id = nanoid();
+                        funcUtils.createOrUpdate(CODE_PREFIX+payload.id,payload)
+                        removeDBItem("code#"+name);
                     }
                 }
                 if (payload.count == null) {
                     payload.count = 0;
                 }
-                this.codeMap.set(name, payload)
+                this.codeMap.set(payload.id, payload)
                 // 新版本过渡
                 removeDBItem(CS_ROOT_ID)
-                this.writeToDB();
                 tagColorManager.writeToDB();
             }
         }else{
-            data = utools.db.get(GLOBAL_ROOT_TAGS)?.data ?? [];
-            for (let name of data) {
-                let payload = utools.db.get(CODE_PREFIX+name).data;
-                if (payload.count == null) {
-                    payload.count = 0;
+            data = utools.db.get(GLOBAL_ROOT_TAGS)?.data;
+            if( data != null){// v2
+                for (let name of data) {
+                    let payload = utools.db.get("code#"+name).data;
+                    if (payload.count == null) {
+                        payload.count = 0;
+                    }
+                    delete payload.query;
+                    // refactor: id
+                    payload.id = nanoid();
+                    removeDBItem("code#"+name)
+                    funcUtils.createOrUpdate(CODE_PREFIX+payload.id,payload)
+
+                    this.codeMap.set(payload.id, payload)
                 }
-                this.codeMap.set(name, payload)
+                removeDBItem(GLOBAL_ROOT_TAGS)
+            }else{ // new version
+                for (const doc of utools.db.allDocs(CODE_PREFIX)) {
+                    const payload = doc.data;
+                    if(payload.count == null){
+                        payload.count = 0;
+                    }
+                    this.codeMap.set(payload.id, payload)
+                }
             }
         }
         console.log('codeSnippetManager init, and size is '+this.codeMap.size)
         this.isInited = true;
-    },
-    writeToDB(){
-        funcUtils.createOrUpdate(GLOBAL_ROOT_TAGS,Array.from(this.codeMap.keys()))
     },
     addTagInfo(payload,flag){
         if(payload.tags != null){
@@ -380,31 +405,28 @@ const codeSnippetManager = {
         }
         codeSnippet.count = codeSnippet.count??0;
         codeSnippet.time = codeSnippet.time??Date.now();
-        this.codeMap.set(codeSnippet.name,codeSnippet);
-        funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.name,codeSnippet)
-        this.writeToDB();
+        this.codeMap.set(codeSnippet.id,codeSnippet);
+        funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
         this.addTagInfo(codeSnippet,true)
         console.log('now code snippet size: '+this.codeMap.size)
     },
 
     /**
      *
-     * @param {string} name
+     * @param {string} id
      * @returns {boolean} - is success
      */
-    del(name){
-        if(name === defaultHelpSnippet.name){
+    del(id){
+        if(id === defaultHelpSnippet.id){
             configManager.set('closeHelpSnippet',true)
             return true;
         }
         // 先查询是否存在
-        if(this.codeMap.has(name)){
-            utools.db.remove(CODE_PREFIX+name)
-            this.codeMap.delete(name)
-            this.writeToDB();
-
+        if(this.codeMap.has(id)){
+            utools.db.remove(CODE_PREFIX+id)
+            this.codeMap.delete(id)
             // 处理 topList
-            let index = configManager.getTopList().indexOf(name)
+            let index = configManager.getTopList().indexOf(id)
             if(index !== -1){
                 configManager.delTopItem(index)
             }
@@ -415,14 +437,14 @@ const codeSnippetManager = {
     },
     /**
      *
-     * @param {string} name
+     * @param {string} id
      * @return {CodeSnippet}
      */
-    get(name){
-        if(name === defaultHelpSnippet.name){
+    get(id){
+        if(id === defaultHelpSnippet.id){
             return defaultHelpSnippet;
         }
-        return this.codeMap.get(name);
+        return this.codeMap.get(id);  // TODO:改造codeMap
     },
 
     /**
@@ -434,7 +456,12 @@ const codeSnippetManager = {
         if(name === defaultHelpSnippet.name){
             return true;
         }
-        return this.codeMap.has(name)
+        for (const snippet of this.codeMap.values()) {
+            if(snippet.name === name){
+                return true
+            }
+        }
+        return false
     },
     /**
      *
@@ -443,29 +470,9 @@ const codeSnippetManager = {
      */
     update(codeSnippet){
         // 先查询是否存在
-        if(this.codeMap.has(codeSnippet.name)){
-            funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.name,codeSnippet)
-            this.codeMap.set(codeSnippet.name,codeSnippet)
-            this.addTagInfo(codeSnippet,true)
-            return true;
-        }else{
-            return false;
-        }
-    },
-    replace(oldName,codeSnippet){
-        // 先查询是否存在
-        if(this.codeMap.has(oldName)){
-            utools.db.remove(CODE_PREFIX+oldName)
-            // 处理 topList
-            let index = configManager.getTopList().indexOf(oldName);
-            if(index!==-1){
-                configManager.replaceTopItem(index,codeSnippet.name)
-            }
-            // 替换 codeMap
-            this.codeMap.delete(oldName)
-            this.codeMap.set(codeSnippet.name,codeSnippet);
-            funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.name,codeSnippet)
-            this.writeToDB();
+        if(this.codeMap.has(codeSnippet.id)){
+            funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
+            this.codeMap.set(codeSnippet.id,codeSnippet)
             this.addTagInfo(codeSnippet,true)
             return true;
         }else{
@@ -487,18 +494,14 @@ const codeSnippetManager = {
         if(name !== null){
             // 0. 搜索词需要同样被替换
             for (const codeSnippet of this.codeMap.values()) {
-                // 1.首先检查 查询缓存
-                if(codeSnippet.query == null){
-                    // 1.1 不存在查询缓存时生成缓存名
-                    codeSnippet.query = codeSnippet.name.trim().toLowerCase();
-                }
+                const query = codeSnippet.name.trim().toLowerCase();
                 // 2.比较 查询缓存
                 if(configManager.get('enabledFuzzySymbolQuery')){
-                    if(fuzzyCompare(name,codeSnippet.query)){
+                    if(fuzzyCompare(name,query)){
                         list.push(codeSnippet)
                     }
                 }else{
-                    if(codeSnippet.query.includes(name)){
+                    if(query.includes(name)){
                         list.push(codeSnippet);
                     }
                 }
@@ -565,7 +568,7 @@ const codeSnippetManager = {
                 }
                 str+='\n';
             }
-            if(configManager.getTopList().includes(codeSnippet.name)){
+            if(configManager.getTopList().includes(codeSnippet.id)){
                 str += '> 🔰top \n';
             }
             // output code
@@ -632,7 +635,7 @@ const codeSnippetManager = {
                 }
                 this.add(result.snippet)
                 if(result.top){
-                    configManager.addTopItem(result.snippet.name)
+                    configManager.addTopItem(result.snippet.id)
                 }
                 cur = result.cur+1;
             }else{
@@ -730,6 +733,11 @@ const configManager = {
             delete this.configs['defaultColor']
             this.writeToDB()
         }
+        // refactor: id
+        if(this.configs["topList"]){
+            delete this.configs["topList"]
+            this.writeToDB();
+        }
         console.log('configManager init')
         this.isInited = true;
     },
@@ -789,25 +797,25 @@ const configManager = {
         return this.configs["sortKey"]?? 0;
     },
     getTopList(){
-        return this.configs["topList"]??[];
+        return this.configs["topIdList"]??[];
     },
-    addTopItem(name){
+    addTopItem(id){
         let list = this.getTopList();
-        list.push(name)
-        this.configs["topList"] =list;
+        list.push(id)
+        this.configs["topIdList"] =list;
         this.writeToDB();
         return list.length-1;
     },
     delTopItem(index){
         let list = this.getTopList();
         list.splice(index,1);
-        this.configs["topList"] =list;
+        this.configs["topIdList"] =list;
         this.writeToDB();
     },
     replaceTopItem(index,name){
         let list = this.getTopList();
         list.splice(index,1,name)
-        this.configs["topList"] =list;
+        this.configs["topIdList"] =list;
         this.writeToDB();
     }
 

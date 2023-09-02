@@ -162,12 +162,7 @@ function dealWithListView(e,list){
         case "Space":
             if($reactive.utools.subItemSelectedIndex === -1){
                 if(e.repeat){
-                    router.replace({
-                        name: 'code',
-                        params:{
-                            name: $reactive.currentSnippet.name
-                        }
-                    })
+                    router.replace('/code')
                     longKeyDown = true;
                 }
             }
@@ -184,14 +179,14 @@ function dealWithListView(e,list){
                 $normal.scroll.listInvoker?.scrollTo({top:0,left:0})
             }
             break;
-        case 'KeyT':
-            if($reactive.currentSnippet.name === defaultHelpSnippet.name){
+        case 'KeyT':// TODO:处理置顶ID情况
+            if($reactive.currentSnippet.id === defaultHelpSnippet.id){
                 $message.warning('内置文档无法置顶');
                 return;
             }
-            let index = configManager.getTopList().indexOf($reactive.currentSnippet.name)
+            let index = configManager.getTopList().indexOf($reactive.currentSnippet.id)
             if(index === -1){
-                $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.name);
+                $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.id);
             }else{
                 configManager.delTopItem(index)
             }
@@ -203,13 +198,8 @@ function dealWithListView(e,list){
             $reactive.view.isDel = true;
             break;
         case 'KeyV':
-                $normal.lastQueryCodeSnippetName = $reactive.currentSnippet.name;
-                router.replace({
-                    name: 'code',
-                    params:{
-                        name: $reactive.currentSnippet.name
-                    }
-                })
+                $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id;
+                router.replace('/code')
                 return;
         case 'KeyQ':
             $reactive.utools.subItemSelectedIndex = -1;
@@ -339,7 +329,7 @@ function dealWithCommonView(e){
             // handleCopy(true)
             break;
         case 'KeyE':
-            if($reactive.currentSnippet.name === defaultHelpSnippet.name){
+            if($reactive.currentSnippet.id === defaultHelpSnippet.id){
                 $message.warning("内置文档，无法修改");
                 return;
             }
@@ -349,8 +339,7 @@ function dealWithCommonView(e){
             router.replace({
                 name: 'form',
                 query:{
-                    mode: 'edit',
-                    name: $reactive.currentSnippet.name
+                    mode: 'edit'
                 }
             })
             break;

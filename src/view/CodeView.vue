@@ -107,9 +107,11 @@ import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBl
 import {useRouter} from "vue-router";
 import {$normal, $reactive} from "../js/store";
 
-const props = defineProps(['name'])
 const scrollBar = ref(null)
-const snippet = ref(codeSnippetManager.get(props.name));
+/**
+ * @type CodeSnippet
+ */
+const snippet = $reactive.currentSnippet;
 $reactive.currentCode = getCode()
 const hover = ref(false)
 const refreshFlag = ref(true)
@@ -118,7 +120,7 @@ const show = ref(false)
 const url = ref()
 const pair = computed(()=>{
   // 分析类型
-  const result = getRealTypeAndValidStatus(snippet.value.type);
+  const result = getRealTypeAndValidStatus(snippet.type);
   if(result.type === 'image'){
     $reactive.view.isRendering = true;
   }
@@ -143,25 +145,25 @@ const doRefresh = getRefreshFunc(refreshFlag,()=>{
   $normal.scroll.codeInvoker = scrollBar.value;
 })
 function getCode(){
-  if(snippet.value.path){
-    if(snippet.value.code){
-      return snippet.value.code;
+  if(snippet.path){
+    if(snippet.code){
+      return snippet.code;
     }else{
       return getCodeFromPath();
     }
   }
-  return snippet.value.code;
+  return snippet.code;
 }
 function getCodeFromPath(){
-  if(snippet.value.local){
+  if(snippet.local){
     try{
-      return window.preload.readConfig(snippet.value.path)?? '[本地内容为空]'
+      return window.preload.readConfig(snippet.path)?? '[本地内容为空]'
     }catch (e){
       $message.error(e.message)
-      return `😅加载失败: 本地文件[ ${snippet.value.path} ]`
+      return `😅加载失败: 本地文件[ ${snippet.path} ]`
     }
-  }else if(snippet.value.type !== 'image' && snippet.value.type !== 'x-image'){
-    fetch(snippet.value.path).then(resp=>{
+  }else if(snippet.type !== 'image' && snippet.type !== 'x-image'){
+    fetch(snippet.path).then(resp=>{
       if(resp.ok){
         resp.text().then(value=>{
           // 刷新页面
@@ -169,10 +171,10 @@ function getCodeFromPath(){
           doRefresh();
         })
       }else{
-        $reactive.currentCode = "网络文件[ "+snippet.value.path +" ]数据抓取失败!"
+        $reactive.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
       }
     })
-    return "网络文件[ "+snippet.value.path +" ]数据正在获取中..."
+    return "网络文件[ "+snippet.path +" ]数据正在获取中..."
   }
 }
 const handleClose = ()=>{
@@ -183,11 +185,11 @@ const handleClose = ()=>{
   })
 }
 function updateCachedCode(){
-  if(snippet.value.code){   // 清除缓存
-    snippet.value.code = undefined;
+  if(snippet.code){   // 清除缓存
+    snippet.code = undefined;
     $reactive.currentCode = getCodeFromPath();  // 抓取数据
   }else{  // 添加缓存
-    snippet.value.code = $reactive.currentCode;
+    snippet.code = $reactive.currentCode;
   }
   codeSnippetManager.update(toRaw(snippet))
 }
@@ -213,9 +215,9 @@ let count = -1;
  */
 const beforeChangeFunc = (text,next) =>{
   count = -1;
-  if(snippet.value.path && snippet.value.local) {
+  if(snippet.path && snippet.local) {
     cachedImageUrls = new Map();
-    const localDir = window.preload.getDirname(snippet.value.path)
+    const localDir = window.preload.getDirname(snippet.path)
     text = text.replace(/!\[(.*?)]\((.*?)\)/g, (match, name, url) => {
       count ++;
       if(url){
@@ -260,7 +262,7 @@ function whenRender(text,html){
 onMounted(()=>{
     $normal.updateCacheCodeFunc = updateCachedCode
     $normal.scroll.codeInvoker = scrollBar.value;
-    if(snippet.value.type && snippet.value.type.length>2 && snippet.value.type.startsWith('x-')){
+    if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
       renderFormatBlock(pair.value.renderable && $reactive.view.isRendering)
       watch(()=>$reactive.view.isRendering,(newValue)=>{
         renderFormatBlock(newValue)

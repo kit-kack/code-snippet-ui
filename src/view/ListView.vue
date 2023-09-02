@@ -7,14 +7,14 @@
           <template  v-for="(snippet,index) in list">
             <template v-if="index < 8">
               <list-item
-                  :index="index"   :snippet="snippet" :key="index"
-                  :selected="handleSelect(index,snippet.name)"
+                  :index="index"   :snippet="snippet" :key="snippet.id"
+                  :selected="handleSelect(index,snippet.id)"
                   @user-click="ind => $reactive.utools.selectedIndex = ind"/>
             </template>
             <template v-else>
               <list-item-async
-                  :index="index"   :snippet="snippet" :key="index"
-                  :selected="handleSelect(index,snippet.name)"
+                  :index="index"   :snippet="snippet" :key="snippet.id"
+                  :selected="handleSelect(index,snippet.id)"
                   @user-click="ind => $reactive.utools.selectedIndex = ind"/>
             </template>
           </template>
@@ -100,19 +100,16 @@ import {$normal, $reactive, refreshListView} from "../js/store";
 import {codeSnippetManager, configManager} from "../js/core";
 import {useRouter} from "vue-router";
 import ListItem from "../components/ListItem.vue";
-const ListItemAsync = defineAsyncComponent({
-  loader: () => import("../components/ListItem.vue"),
-  delay: 1000
-})
+const ListItemAsync = defineAsyncComponent(() => import("../components/ListItem.vue"))
 
 const scrollBar = ref()
 const listViewAspect = ref()
 const list = computed(()=>parseSearchWord($reactive.utools.search,$reactive.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
 const router = useRouter();
-const handleSelect = (index,name)=>{
+const handleSelect = (index,id)=>{
   if(index === $reactive.utools.selectedIndex){
-    $reactive.currentSnippet = codeSnippetManager.get(name)
+    $reactive.currentSnippet = codeSnippetManager.get(id)
     return true;
   }else{
     return false;

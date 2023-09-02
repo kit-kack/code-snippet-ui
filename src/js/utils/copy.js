@@ -92,7 +92,7 @@ export function copyCode(isPasted,num,noView){
         return;
     }
     // 获取代码
-    if($normal.lastQueryCodeSnippetName !== $reactive.currentSnippet.name){  // 获取代码
+    if($normal.lastQueryCodeSnippetId !== $reactive.currentSnippet.id){  // 获取代码
         if(!$reactive.currentSnippet.code && $reactive.currentSnippet.path){
             const temp = getCode($reactive.currentSnippet.path,$reactive.currentSnippet.local,noView);
             if(temp === null){
@@ -100,7 +100,7 @@ export function copyCode(isPasted,num,noView){
                 return;
             }else{
                 $reactive.currentCode = temp??'';
-                $normal.lastQueryCodeSnippetName = $reactive.currentSnippet.name;
+                $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id;
             }
         }else{
             $reactive.currentCode = $reactive.currentSnippet.code??'';

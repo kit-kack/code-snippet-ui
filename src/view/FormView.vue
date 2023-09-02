@@ -177,14 +177,14 @@ import {computed, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
 import {fullAlias, languages} from "../js/utils/common";
 import {useRoute, useRouter} from "vue-router";
-import {$normal} from "../js/store";
+import {$normal, $reactive} from "../js/store";
 import {CtrlStr} from "../js/some";
 
 const router = useRouter();
 const route = useRoute();
 const form = ref()
 const update = route.query.mode === 'edit';
-const codeTemplate = reactive(update?{...codeSnippetManager.get(route.query.name)} :{
+const codeTemplate = reactive(update?{...toRaw($reactive.currentSnippet)} :{
   code: route.query.code
 })
 const tempTag = ref()
@@ -227,7 +227,7 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if(update && route.query.name === value){
+        if(update && $reactive.currentSnippet.name === value){
           return true;
         }
         return !codeSnippetManager.contain(value)
@@ -274,21 +274,14 @@ const handleUpdate = ()=>{
           codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
         }
         if(update){
-          if(codeTemplate.name === $normal.lastQueryCodeSnippetName){
+          if(codeTemplate.id === $normal.lastQueryCodeSnippetId){
             // 发生修改，缓存失效
-            $normal.lastQueryCodeSnippetName = null;
-          } 
-          if(route.query.name === codeTemplate.name){
-            console.log(route.query.name)
-            $normal.keepSelectedStatus = true;
-            codeSnippetManager.update(toRaw(codeTemplate))
-          }else{
-            $normal.keepSelectedStatus = null;
-            // 这里清理查询缓存
-            let codeSnippet = toRaw(codeTemplate);
-            delete codeSnippet.query;
-            codeSnippetManager.replace(route.query.name,codeSnippet)
+            $normal.lastQueryCodeSnippetId = null;
           }
+          // 更新
+          codeSnippetManager.update(toRaw(codeTemplate))
+          // 是否维持选中
+          $normal.keepSelectedStatus = (codeTemplate.name === $reactive.currentSnippet.name)? true : null;
         }else{
           $normal.keepSelectedStatus = null;
           codeSnippetManager.add(toRaw(codeTemplate))

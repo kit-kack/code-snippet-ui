@@ -18,7 +18,10 @@ declare interface CodeSnippet{
     tags?: Array<string>,
     // 代码片段 语言类型
     type?: string,
-    // 高级查询词，存储来提升查询效率
+    /**
+     * 高级查询词，存储来提升查询效率
+     * @deprecated - 模糊符号匹配改进为 进阶符号匹配，后续版本会删除
+     */
     query?: string,
     // 高亮行
     sections?: Array<[number,number]>,

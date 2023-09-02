@@ -145,13 +145,13 @@ try{
             flag = !flag;
             return {
                 text: cs.desc? (cs.name+'📢'+cs.desc):cs.name,
-                name: cs.name,
+                id: cs.id,
                 icon: '/code.png'
             }
         })
 
     },({code,type,payload,option})=>{
-        $reactive.currentSnippet = codeSnippetManager.get(option.name);
+        $reactive.currentSnippet = codeSnippetManager.get(option.id);
         $reactive.utools.selectedIndex = 0;
         return copyCode(true,undefined,true)
     })

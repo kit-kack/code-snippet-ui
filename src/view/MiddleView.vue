@@ -1,5 +1,10 @@
 <template>
-  <router-view/>
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
+
   <vim-status-bar/>
   <n-drawer v-model:show="$reactive.view.settingActive" :width="380" placement="right">
     <side-view/>
