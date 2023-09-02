@@ -186,6 +186,7 @@ function dealWithListView(e,list){
             break;
         case 'KeyT':
             if($reactive.currentSnippet.name === defaultHelpSnippet.name){
+                $message.warning('内置文档无法置顶');
                 return;
             }
             let index = configManager.getTopList().indexOf($reactive.currentSnippet.name)
@@ -375,9 +376,9 @@ function dealWithCommonView(e){
             if($reactive.currentSnippet.path){
                 if($reactive.currentSnippet.local){
                     if(e.shiftKey){
-                        utools.shellOpenPath($reactive.currentSnippet.path);
-                    }else{
                         utools.shellShowItemInFolder($reactive.currentSnippet.path)
+                    }else{
+                        utools.shellOpenPath($reactive.currentSnippet.path);
                     }
                 }else{
                     utools.shellOpenExternal($reactive.currentSnippet.path)

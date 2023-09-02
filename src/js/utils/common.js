@@ -22,8 +22,8 @@ export function debounce(fn, wait=150){
 
 /**
  * 刷新操作
- * @param {Ref<UnwrapRef<boolean>>} ref_flag
- * @param {Function | undefined} fn
+ * @param {import('vue').Ref<boolean>} ref_flag
+ * @param {Function} [fn]
  */
 export function getRefreshFunc(ref_flag,fn){
     if(fn){

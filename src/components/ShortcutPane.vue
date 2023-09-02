@@ -55,7 +55,7 @@ const datas = [
         feature: "切换完整/列表UI模式",
         shortcut: "Tab快速双击"
       },{
-        feature: "开启/关闭模糊符号查询",
+        feature: "开启/关闭进阶符号查询",
         shortcut: "C-F"
       }]
   },
@@ -68,7 +68,7 @@ const datas = [
         feature: "预览代码片段",
         shortcut: "C-点击"
       },{
-        feature: "处理",
+        feature: "菜单",
         shortcut: "右击"
       }]
   },
@@ -90,7 +90,7 @@ const datas = [
       },{
         feature: "系统应用打开Open（仅适用于链接文件）",
         shortcut: "O",
-        tooltip: "本地关联文件默认会文件管理器打开，结合Shift键来系统应用打开"
+        tooltip: "若为本地关联文件，结合Shift键会文件管理器打开"
       },{
         feature: "退出Quit",
         shortcut: "Q",

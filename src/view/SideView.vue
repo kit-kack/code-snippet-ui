@@ -30,7 +30,7 @@
             <template #trigger>
               <config-check-tag title="💡启用进阶模糊查询" config="enabledFuzzySymbolQuery"/>
             </template>
-            启用后，使用最长公共子序列方式来进行匹配,例如 hw 能够匹配到 hello@World ,支持C-f来切换
+            启用后，使用最长公共子序列方式来进行匹配,例如 hw 能够匹配到 hello@World ,支持C-F来切换
           </n-tooltip>
           <n-tooltip trigger="hover">
             <template #trigger>

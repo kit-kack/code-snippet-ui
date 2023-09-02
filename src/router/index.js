@@ -1,12 +1,4 @@
-import {
-    $normal,
-    $reactive,
-    CODE_VIEW,
-    FORM_VIEW,
-    handleRecoverLiteShow,
-    LIST_VIEW,
-    switchToFullUIMode
-} from "../js/store";
+import {$reactive, CODE_VIEW, FORM_VIEW, handleRecoverLiteShow, LIST_VIEW, switchToFullUIMode} from "../js/store";
 import {createRouter, createWebHashHistory} from 'vue-router'
 import ListView from "../view/ListView.vue";
 import {gotoTheLastPosition} from "../js/utils/scroller";
