@@ -195,8 +195,18 @@ function getNumShow(num){
 }
 const handleClickUrl = (e)=>{
   const a = e.target.closest('.github-markdown-body a')
-  if(a && a.href){
-    if(e.ctrlKey || e.metaKey){
+  if(a){
+    console.dir(a)
+    if(a.dataset['vMdAnchor']){
+      // const heading = document.querySelector('.github-markdown-body').querySelector()
+      const heading = document.querySelector(`.github-markdown-body [data-v-md-heading=${a.dataset['vMdAnchor']}]`)
+      if(heading){
+        $normal.scroll.codeInvoker?.scrollTo({
+          top: heading.getBoundingClientRect().y - 100,
+          behavior: 'smooth'
+        })
+      }
+    }else if(a.href && (e.ctrlKey || e.metaKey)){
       e.preventDefault();
       utools.shellOpenExternal(a.href)
     }
@@ -232,6 +242,7 @@ const beforeChangeFunc = (text,next) =>{
       }
       return match
     })
+    text = text.replace(/^\[TOC\]$/gm,"[[TOC]]")
   }else{
       cachedImageUrls = null;
   }
@@ -375,6 +386,16 @@ onUnmounted(()=>{
   text-align: center;
   z-index: 2;
 }
+.github-markdown-body h1{
+  text-align: center;
+  border-bottom-color: transparent;
+}
+.github-markdown-body h2{
+  border-bottom-color: transparent;
+}
+.github-markdown-body img{
+  background-color: transparent;
+}
 
 #dark-app .v-md-editor {
   background-color: transparent !important;
@@ -390,8 +411,13 @@ onUnmounted(()=>{
   background-color: transparent;
   color: #ddd !important;
 }
-
+.github-markdown-body{
+  background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
+  background-size: 20px 20px;
+  background-position: 50%;
+}
 #dark-app .github-markdown-body  {
+  background-image: linear-gradient(90deg, rgba(145, 142, 142, 0.04) 3%, transparent 0), linear-gradient(1turn, rgba(201, 194, 197, 0.04) 3%, transparent 0);
   color: #ccc !important;
 }
 #dark-app .github-markdown-body table{
@@ -413,7 +439,7 @@ onUnmounted(()=>{
 #dark-app .github-markdown-body blockquote{
   border-left-color: #515154;
 }
-#dark-app .github-markdown-body h1, #dark-app .github-markdown-body h2{
+#dark-app .github-markdown-body h1{
   border-bottom-color: #515154;
 }
 #dark-app .github-markdown-body code:not(pre) {
