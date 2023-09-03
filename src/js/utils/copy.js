@@ -29,9 +29,9 @@ function getCode(path,local,noView){
     }
 }
 
-function copyOrPasteWithType(isPasted,text,type,msg,noView){
+function copyOrPasteWithType(isPasted,text,type,msg){
     if(type && type.length>2 && type.startsWith('x-')){
-        text = formatManager.parse(text,isPasted,noView);
+        text = formatManager.parse(text);
     }
     lastCachedMsg = msg;
     isLastPasted = isPasted;
@@ -116,7 +116,7 @@ export function copyCode(isPasted,num,noView){
         $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
         codeSnippetManager.update(toRaw($reactive.currentSnippet))
         // 复制
-        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`,noView)){
+        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`)){
             return noView;
         }
 
@@ -141,7 +141,7 @@ export function copyCode(isPasted,num,noView){
             $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
             codeSnippetManager.update(toRaw($reactive.currentSnippet))
             // 复制
-            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`,false)){
+            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`)){
                 return noView;
             }
         }else{

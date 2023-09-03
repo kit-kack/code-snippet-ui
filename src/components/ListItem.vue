@@ -184,11 +184,9 @@ const getTitleStyle = (selected,flag) =>{
   }
 }
 onMounted(()=>{
-  console.log(props.index+' - '+props.last)
   $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
   if(props.last){
     if($normal.keepSelectedStatus){
-      console.log('rollback to last position');
       nextTick(()=>{
         gotoTheLastPosition();
       })

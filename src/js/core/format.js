@@ -1,14 +1,16 @@
 import {$normal, $reactive, switchToFullUIMode} from "../store";
 import {copyOrPaste} from "../utils/copy";
-import {createOrUpdate, GLOBAL_FORMAT} from "./common";
+import {createOrUpdate, GLOBAL_FORMAT, removeDBItem} from "./common";
+import {nanoid} from "nanoid";
 
 export const formatManager = {
     data:{
-        pairs:{},
-        inputs:[]
+        pairs:{}, // 存放变量替换值
+        inputs:[] // 表明是否为输入变量
     },
-    codeBuffer: null,
-    pairBuffer: null,
+    initedVarSet : new Set(), // 变量是否已经解析
+    codeBuffer : null,  // 为输入变量设置的暂时缓存
+    pairBuffer : {},  // 每次解析时，存放上述pairs变量值解析结果
     isInited: false,
 
     init(){
@@ -16,12 +18,18 @@ export const formatManager = {
             return;
         }
         const data = utools.db.get(GLOBAL_FORMAT)?.data ?? {};
-        this.data.pairs = data.pairs??{};
-        this.pairBuffer = {...this.data.pairs}
+        this.data.pairs = data.pairs??{
+            'now': '#Date.now()',
+            'date': '#new Date($.now).toLocaleDateString()',
+            'time': '#new Date($.now).toLocaleTimeString()',
+            'random': '#Math.random()',
+            'rand10m': '#Math.trunc($.random*11)',
+            'rand100m': '#Math.trunc($.random*101)',
+            'nanoid': '#$._nanoid()',
+        };
         this.data.inputs = data.inputs??[];
-        console.log('formatManager init')
-        this._initForEachRegex();
         this.isInited = true;
+        console.log('formatManager init');
     },
     /**
      *
@@ -49,8 +57,6 @@ export const formatManager = {
             }
         }
         this.data.pairs[raw] = target;
-        // sync for contain func
-        this.pairBuffer[raw] = target;
         if(multi){
             return;
         }
@@ -59,8 +65,6 @@ export const formatManager = {
     del(raw){
         raw = raw.trim()
         delete  this.data.pairs[raw];
-        // sync for contain func
-        delete  this.pairBuffer[raw]
         const index = this.data.inputs.indexOf(raw)
         if(index!== -1){
             this.data.inputs.splice(index,1)
@@ -69,29 +73,41 @@ export const formatManager = {
     },
     contain(raw){
         raw = raw.trim()
-        return raw in this.pairBuffer;
+        return raw in this.data.pairs;
+    },
+    /**
+     * 执行表达式
+     * @param {string} expression
+     * @private
+     */
+    _expression_invoker(expression){
+        try{
+            const func = new Function('$','return '+expression.slice(1))
+            return func(this.pairBuffer);
+        }catch (e){
+            // TODO:
+            const result  = `#{${expression}}#`
+            $message.error("解析"+result+"错误,原因为"+e.message)
+            console.error(e)
+            return result;
+        }
     },
     _initForEachRegex(){
+        this.initedVarSet.clear();
         this.pairBuffer = {...this.data.pairs};
-        const now = new Date();
-        const random = Math.random();
-        this.pairBuffer.random = random;
-        this.pairBuffer.rand10m = Math.trunc(random*11)
-        this.pairBuffer.rand100m = Math.trunc(random*101)
-        this.pairBuffer.date = now.toLocaleDateString();
-        this.pairBuffer.time = now.toLocaleTimeString();
-        this.pairBuffer.uuid = this._uuid();
-    },
-    _uuid() {
-        const s = [];
-        const x = "0123456789abcdef";
-        for (let i = 0; i < 36; i++) {
-            s[i] = x.substr(Math.floor(Math.random() * 0x10), 1);
-        }
-        s[14] = "4";
-        s[19] = x.substr((s[19] & 0x3) | 0x8, 1);
-        s[8] = s[13] = s[18] = s[23] = "-";
-        return s.join("");
+        this.pairBuffer._nanoid = nanoid;
+        this.pairBuffer = new Proxy(this.pairBuffer,{
+            get(target, prop, receiver) {
+                if(!formatManager.initedVarSet.has(prop)){
+                    let value = target[prop];
+                    if(value && (typeof value === 'string') &&  value.startsWith('#')){
+                        target[prop] = formatManager._expression_invoker(value);
+                    }
+                    formatManager.initedVarSet.add(prop);
+                }
+                return target[prop]
+            }
+        })
     },
 
     /**
@@ -102,10 +118,8 @@ export const formatManager = {
     _format(code){
         const formatBlocks = code.matchAll(/#{.+?}#/g)
         // 判断是否存在inputVars，并且同时进行切分
-        // helloworlddfad
         const target = [];
         const inputVars = new Set();
-        const preInvokeVars = new Set();
         let last = 0;
         for (const formatBlock of formatBlocks) {
             // 判断是否为inputVar
@@ -123,7 +137,7 @@ export const formatManager = {
                     exp: true,
                     code: name
                 })
-            }else if(name in this.pairBuffer){
+            }else if(name in this.data.pairs){
                 if(this.data.inputs.includes(name)){
                     inputVars.add(name)
                     target.push({
@@ -132,30 +146,10 @@ export const formatManager = {
                         code: name
                     })
                 }else{
-                    /**
-                     * @type string
-                     */
-                    const code = this.pairBuffer[name];
-                    if(preInvokeVars.has(name)){
-                        target.push({
-                            code: code
-                        })
-                        continue;
-                    }
-                    if(code && code.startsWith('#')){
-                        // pre invoker
-                        this.pairBuffer[name] = this._expression_invoker(code)
-                        // for next get
-                        preInvokeVars.add(name);
-                        target.push({
-                            code: this.pairBuffer[name]
-                        })
-                        continue;
-                    }
                     // 直接替换
                     target.push({
                         exp: true,  // 后续可能会解析表达式
-                        code: this.pairBuffer[name]
+                        code: this.pairBuffer[name] // 使用Proxy后， 普通变量和表达式变量都会返回其结果，但结果可能以@开头
                     })
                 }
             }else{
@@ -187,22 +181,7 @@ export const formatManager = {
             }
         }
     },
-    /**
-     *
-     * @param {string} expression
-     * @private
-     */
-    _expression_invoker(expression){
-        try{
-            const func = new Function('$','return '+expression.slice(1))
-            return func(this.pairBuffer);
-        }catch (e){
-            // TODO:
-            const result  = `#{${expression}}#`
-            $message.error("解析"+result+"错误,原因为"+e.message)
-            return result;
-        }
-    },
+
     /**
      *
      * @param {any[]} codes
@@ -225,12 +204,10 @@ export const formatManager = {
         }).join('')
     },
     /**
-     * @param {string} code
-     * @param {boolean} isPaste
-     * @return {string | any[] | any | null}
-     * @param {boolean} noView
+     * 解析
+     * @param {string} code - 待解析的代码
      */
-    parse(code,isPaste,noView){
+    parse(code){
         this._initForEachRegex();
         const result = this._format(code)
         if(result.parse){
@@ -250,13 +227,6 @@ export const formatManager = {
 
     all(){
         const p = {...this.data.pairs}
-        p.random = '(内置)随机数[0,1)';
-        p.rand10m = '(内置)随机数[0,10]';
-        p.rand100m = '(内置)随机数[0,100]';
-        p.date = '(内置)当前日期';
-        p.time = '(内置)当前时刻'
-        p.uuid = '(内置)唯一标识符'
-        // input var
         for (let input of this.data.inputs) {
             p[input] = p[input]? '#{input:'+p[input]+'}#' : '#{input}#'
         }
@@ -264,9 +234,22 @@ export const formatManager = {
     },
     continueFormat(){
         if(this.codeBuffer){
-            let code = this._expression(this.codeBuffer)
+            const code = this._expression(this.codeBuffer)
             this.codeBuffer = null;
             copyOrPaste(code)
         }
+    },
+    reset() {
+        this.data.pairs = {
+            'now': '#Date.now()',
+            'date': '#new Date($.now).toLocaleDateString()',
+            'time': '#new Date($.now).toLocaleTimeString()',
+            'random': '#Math.random()',
+            'rand10m': '#Math.trunc($.random*11)',
+            'rand100m': '#Math.trunc($.random*101)',
+            'nanoid': '#$._nanoid()',
+        };
+        this.data.inputs = [];
+        removeDBItem(GLOBAL_FORMAT)
     }
 }

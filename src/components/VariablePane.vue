@@ -11,7 +11,7 @@
           {{key}} —— {{value}}
         </n-ellipsis>
         <template #suffix>
-          <n-space v-if="activeKey === key && isValid(key)" :wrap="false" style="margin-right: -16px;margin-top: 5px">
+          <n-space v-if="activeKey === key" :wrap="false" style="margin-right: -16px;margin-top: 5px">
             <n-button circle size="tiny" type="info" quaternary @click="enterEditView(key,value)">
               <template #icon>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M20.998 6.25A3.25 3.25 0 0 0 17.748 3H6.25A3.25 3.25 0 0 0 3 6.25v11.499a3.25 3.25 0 0 0 3.25 3.25h4.914l.356-1.424l.02-.076H6.25a1.75 1.75 0 0 1-1.75-1.75v-9.25h14.998v2.733c.48-.19.994-.264 1.5-.22V6.25zM6.25 4.5h11.499c.966 0 1.75.783 1.75 1.75V7h-15v-.75c0-.967.784-1.75 1.75-1.75zm12.848 8.169l-5.901 5.901a2.685 2.685 0 0 0-.707 1.248l-.457 1.83c-.2.797.522 1.518 1.318 1.319l1.83-.458a2.685 2.685 0 0 0 1.248-.706L22.33 15.9a2.286 2.286 0 0 0-3.233-3.232z" fill="currentColor"></path></g></svg>
@@ -26,9 +26,8 @@
         </template>
       </n-list-item>
     </n-list>
-    <n-button size="small" style="margin:5px;"
-      @click="enterAddView"
-    >添加</n-button>
+    <n-button size="small" style="margin:5px;" @click="enterAddView">添加</n-button>
+    <n-button size="small" style="margin:5px;" @click="doReset()">重置</n-button>
     <n-modal v-model:show="showModal"
              preset="card"
              :title="pair.flag?'修改变量映射': '新增变量映射'"
@@ -60,14 +59,6 @@
   const pair = ref({})
   const refreshFlag = ref(true)
   const doRefresh = getRefreshFunc(refreshFlag)
-  const list = [
-      'random',
-      'rand10m',
-      'rand100m',
-      'date',
-      'time',
-      'uuid'
-  ]
   function enterAddView(){
     pair.value = {
       flag: false
@@ -77,6 +68,10 @@
   }
   function doDel(key){
     formatManager.del(key)
+    doRefresh()
+  }
+  function doReset(){
+    formatManager.reset();
     doRefresh()
   }
   function enterEditView(key,value){
@@ -115,9 +110,6 @@
     }else{
       $message.error("变量名不能设置为空字符串")
     }
-  }
-  function isValid(key){
-    return !list.includes(key)
   }
 
 </script>
