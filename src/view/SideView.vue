@@ -98,7 +98,9 @@
 
 <script setup>
 import ConfigSwitch from "../components/ConfigSwitch.vue";
-import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
+import {tagColorManager} from "../js/core/tag";
+import {codeSnippetManager} from "../js/core/snippet";
+import {configManager} from "../js/core/config";
 import {ref} from "vue";
 import NormalTag from "../components/NormalTag.vue";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";

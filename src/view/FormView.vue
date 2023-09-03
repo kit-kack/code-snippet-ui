@@ -173,14 +173,15 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
-import {codeSnippetManager, configManager, tagColorManager} from "../js/core.js";
+import {computed, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
+import {tagColorManager} from "../js/core/tag";
+import {codeSnippetManager} from "../js/core/snippet";
+import {configManager} from "../js/core/config";
 import {fullAlias, languages} from "../js/utils/common";
 import {useRoute} from "vue-router";
-import {$normal, $reactive, refreshListView} from "../js/store";
+import {$normal, $reactive} from "../js/store";
 import {CtrlStr} from "../js/some";
 import {switchToListView} from "../router";
-import {gotoTheLastPosition} from "../js/utils/scroller";
 
 
 const route = useRoute();

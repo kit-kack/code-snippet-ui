@@ -24,9 +24,11 @@
 </template>
 
 <script setup>
-import {codeSnippetManager, configManager} from "../js/core.js";
-import {$normal, $reactive, CODE_VIEW, FORM_VIEW, LIST_VIEW} from "../js/store";
+import {configManager} from "../js/core/config";
+import {codeSnippetManager} from "../js/core/snippet";
+import {$reactive, CODE_VIEW, FORM_VIEW, LIST_VIEW} from "../js/store";
 import {toRaw} from "vue";
+
 const getBtnStyle = ()=>{
   if($reactive.currentMode<= CODE_VIEW){
     return {

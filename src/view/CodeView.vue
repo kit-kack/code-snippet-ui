@@ -100,7 +100,8 @@
 </template>
 
 <script setup>
-import {codeSnippetManager, configManager} from "../js/core.js";
+import {codeSnippetManager} from "../js/core/snippet";
+import {configManager} from "../js/core/config";
 import {computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";

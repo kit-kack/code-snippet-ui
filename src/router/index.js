@@ -9,7 +9,6 @@ import {
 } from "../js/store";
 import {createRouter, createWebHashHistory} from 'vue-router'
 import ListView from "../view/ListView.vue";
-import {gotoTheLastPosition} from "../js/utils/scroller";
 
 /**
  * @type Array<import('vue-router').RouteRecordRaw>

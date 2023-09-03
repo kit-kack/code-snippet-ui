@@ -44,7 +44,7 @@
 <script setup>
 import {h, onMounted, ref} from "vue";
 import ColorPicker from "../components/ColorPicker.vue";
-import {configManager} from "../js/core";
+import {configManager} from "../js/core/config";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../js/theme";
 import {useMessage} from "naive-ui";

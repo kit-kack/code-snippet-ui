@@ -21,7 +21,7 @@
 
 import {reactive} from "vue";
 import Color from "../js/lib/color.js";
-import {tagColorManager} from "../js/core.js";
+import {tagColorManager} from "../js/core/tag";
 import ColorPicker from "./ColorPicker.vue";
 
 const props = defineProps({

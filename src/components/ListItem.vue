@@ -111,7 +111,8 @@
 
 <script setup>
 import {computed, nextTick, onMounted, ref} from "vue";
-import {codeSnippetManager, configManager} from "../js/core.js";
+import {codeSnippetManager} from "../js/core/snippet";
+import {configManager} from "../js/core/config";
 import SelectableButton from "./SelectableButton.vue";
 import {$normal, $reactive, refreshListView} from "../js/store";
 import NormalTag from "./NormalTag.vue";

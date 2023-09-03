@@ -1,7 +1,6 @@
 import {createApp, toRaw} from 'vue'
 import './style.css'
 import App from './App.vue'
-import {codeSnippetManager, configManager, init} from "./js/core.js";
 import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
@@ -9,9 +8,21 @@ import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
 import {router} from "./router/index";
 import {$normal, $reactive} from "./js/store";
+import {tagColorManager}  from "./js/core/tag";
+import {codeSnippetManager} from "./js/core/snippet";
+import {configManager} from "./js/core/config";
+import {formatManager} from "./js/core/format";
 
 // init
-init()
+try{
+    configManager.init()
+    tagColorManager.init()
+    formatManager.init()
+    codeSnippetManager.init()
+}catch (e){
+    console.error(e)
+    alert(e)
+}
 
 function bindApp(){
     const app = createApp(App)

@@ -1,6 +1,6 @@
 import {darkTheme} from "naive-ui";
 import {ref} from "vue";
-import {configManager} from "./core";
+import {configManager} from "./core/config";
 import {refreshListView} from "./store";
 
 const theme = utools.isDarkColors()? darkTheme:null;

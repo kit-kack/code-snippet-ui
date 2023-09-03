@@ -1,5 +1,8 @@
 import {$normal, $reactive} from "../store";
-import {codeSnippetManager, configManager, formatManager} from "../core";
+import {configManager} from "../core/config";
+import {codeSnippetManager} from "../core/snippet";
+import {formatManager} from "../core/format";
+
 import {toRaw} from "vue";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'

@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import {configManager} from "../../js/core";
+import {configManager} from "../../js/core/config";
 import {getRealTypeAndValidStatus} from "../../js/utils/common";
 
 const props = defineProps(['code','type']);

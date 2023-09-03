@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import {configManager} from "../js/core";
+import {configManager} from "../js/core/config";
 import {ref} from "vue";
 
 const props = defineProps(['title','config','icon'])

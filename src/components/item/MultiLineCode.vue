@@ -14,7 +14,7 @@
 
 <script setup>
 
-import {configManager} from "../../js/core";
+import {configManager} from "../../js/core/config";
 import {$normal} from "../../js/store";
 import {onMounted, onUpdated, ref} from "vue";
 import {getRealTypeAndValidStatus} from "../../js/utils/common";

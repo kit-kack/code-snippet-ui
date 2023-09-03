@@ -39,7 +39,8 @@
 <script setup>
 import {$normal, $reactive, handleRecoverLiteShow} from "../js/store";
 import {onMounted, onUnmounted, ref} from "vue";
-import {configManager, formatManager} from "../js/core";
+import {configManager} from '../js/core/config';
+import {formatManager} from "../js/core/format";
 import {CtrlStr} from "../js/some";
 const templates = ref( $normal.variables.map(v =>{
   return {

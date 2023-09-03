@@ -1,5 +1,5 @@
-import {nextTick} from "vue";
-import {codeSnippetManager, configManager} from "./core.js";
+import {codeSnippetManager} from "./core/snippet";
+import {configManager} from "./core/config";
 import {$normal, $reactive, FORM_VIEW, LIST_VIEW, refreshListView,} from "./store"
 import {defaultHelpSnippet} from "./some";
 import {debounce} from "./utils/common";

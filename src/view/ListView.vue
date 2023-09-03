@@ -100,13 +100,14 @@
 </template>
 
 <script setup>
-import {computed, defineAsyncComponent, onActivated, onBeforeUpdate, onMounted, onUpdated, ref} from "vue";
+import {computed, defineAsyncComponent, onActivated, onMounted, onUpdated, ref} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
 import {$normal, $reactive, refreshListView} from "../js/store";
-import {codeSnippetManager, configManager} from "../js/core";
-import {onBeforeRouteUpdate, useRouter} from "vue-router";
-import ListItem from "../components/ListItem.vue";
+import {codeSnippetManager} from "../js/core/snippet";
+import {configManager} from "../js/core/config";
+import {useRouter} from "vue-router";
 import {gotoTheLastPosition} from "../js/utils/scroller";
+
 const ListItemAsync = defineAsyncComponent({
   loader:() => import("../components/ListItem.vue"),
   delay: 0

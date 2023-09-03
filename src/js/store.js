@@ -1,5 +1,4 @@
 import {nextTick, reactive} from "vue";
-import {gotoTheLastPosition} from "./utils/scroller";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;

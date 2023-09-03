@@ -25,7 +25,7 @@
 
 <script setup>
 import {computed, onMounted, ref} from "vue";
-import {configManager} from "../js/core.js";
+import {configManager} from "../js/core/config";
 import {$normal, $reactive} from "../js/store";
 
 const props = defineProps({
