@@ -391,9 +391,7 @@ onUnmounted(()=>{
   text-align: center;
   border-bottom-color: transparent;
 }
-.github-markdown-body h2{
-  border-bottom-color: transparent;
-}
+
 .github-markdown-body img{
   background-color: transparent;
 }
@@ -440,7 +438,7 @@ onUnmounted(()=>{
 #dark-app .github-markdown-body blockquote{
   border-left-color: #515154;
 }
-#dark-app .github-markdown-body h1{
+#dark-app .github-markdown-body h2{
   border-bottom-color: #515154;
 }
 #dark-app .github-markdown-body code:not(pre) {
@@ -448,6 +446,9 @@ onUnmounted(()=>{
 }
 #dark-app .github-markdown-body pre code {
   background-color: unset;
+}
+#dark-app .github-markdown-body a {
+  color: #1c84f9;
 }
 
 </style>
