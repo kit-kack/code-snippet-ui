@@ -9,8 +9,7 @@
                 :index="index"
                 :snippet="snippet"
                 :last="index === list.length - 1"
-                :selected="handleSelect(index,snippet.id)"
-                @user-click="ind => $reactive.utools.selectedIndex = ind"/>
+                :selected="handleSelect(index,snippet.id,$reactive.utools.selectedIndex)"/>
 <!--            <template v-if="index < 8">-->
 <!--              <list-item-->
 <!--                  :index="index"   :snippet="snippet" :key="snippet.id"-->
@@ -117,8 +116,8 @@ const listViewAspect = ref()
 const list = computed(()=>parseSearchWord($reactive.utools.search,$reactive.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
 const router = useRouter();
-const handleSelect = (index,id)=>{
-  if(index === $reactive.utools.selectedIndex){
+const handleSelect = (index,id,selectedIndex)=>{
+  if(index === selectedIndex){
     $reactive.currentSnippet = codeSnippetManager.get(id)
     return true;
   }else{

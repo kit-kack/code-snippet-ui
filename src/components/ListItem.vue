@@ -125,7 +125,6 @@ import {gotoTheLastPosition} from "../js/utils/scroller";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
-const emit = defineEmits(['editItem','itemRefresh','viewCode','userClick'])
 const item = ref()
 const router = useRouter();
 const isShowBtn = computed(()=>{
@@ -215,13 +214,13 @@ const handleClick = (e)=>{
   if(props.selected){
     return;
   }
-  emit('userClick',props.index)
+  $reactive.utools.selectedIndex = props.index;
 }
 const handleContextMenu = ()=>{
   showBtnModal.value=true;
   $reactive.utools.subItemSelectedIndex = -1;
   if(!props.selected){
-    emit('userClick',props.index)
+    $reactive.utools.selectedIndex = props.index;
   }
 }
 const handleDoubleClick = ()=>{
