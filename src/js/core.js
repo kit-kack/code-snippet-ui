@@ -223,6 +223,28 @@ const funcUtils = {
             return 0;
         }
     },
+    /**
+     * 排序
+     * @param {string} property
+     * @private
+     */
+    _compare(property){
+        return function (a,b){
+            if(a[property] == null){
+                return (b[property] == null)? a.name.localeCompare(b.name) : 1;
+            }else if(b[property] == null){
+                return -1;
+            }else{
+                if( a[property] > b[property]){
+                    return -1;
+                }else if(a[property] < b[property]){
+                    return 1;
+                }else{
+                    return a.name.localeCompare(b.name);
+                }
+            }
+        }
+    },
 
 
     /**
@@ -248,41 +270,13 @@ const funcUtils = {
         topSnippets.sort((a,b)=> a.index - b.index)
         switch (configManager.getSortKey()){
             case 0:   // 创建时间
-                list = list.reverse()
+                list.sort(this._compare('createTime'))
                 break;
             case 1:   // 最近访问时间
-                list.sort((a,b)=>{
-                    if(a.time == null){
-                        return (b.time == null)? a.name.localeCompare(b.name) : 1;
-                    }else if(b.time == null){
-                        return -1;
-                    }else{
-                        if( a.time > b.time){
-                            return -1;
-                        }else if(a.time < b.time){
-                            return 1;
-                        }else{
-                            return a.name.localeCompare(b.name);
-                        }
-                    }
-                })
+                list.sort(this._compare('time'))
                 break;
             case 2:  // 粘贴使用次数
-                list.sort((a,b)=>{
-                    if(a.count == null){
-                        return (b.count == null)? a.name.localeCompare(b.name) : 1;
-                    }else if(b.count == null){
-                        return -1;
-                    }else{
-                        if( a.count > b.count){
-                            return -1;
-                        }else if(a.count < b.count){
-                            return 1;
-                        }else{
-                            return a.name.localeCompare(b.name);
-                        }
-                    }
-                })
+                list.sort(this._compare('count'))
                 break;
             default:  // 自然排序
                 list.sort((a,b)=>a.name.localeCompare(b.name))
@@ -344,6 +338,7 @@ const codeSnippetManager = {
                         payload = utools.db.get("code#"+name).data;
                         // refactor: id
                         payload.id = nanoid();
+                        payload.createTime = Date.now();
                         funcUtils.createOrUpdate(CODE_PREFIX+payload.id,payload)
                         removeDBItem("code#"+name);
                     }
@@ -358,6 +353,8 @@ const codeSnippetManager = {
             }
         }else{
             data = utools.db.get(GLOBAL_ROOT_TAGS)?.data;
+            // 保持原有顺序
+            let time = 100;
             if( data != null){// v2
                 for (let name of data) {
                     let payload = utools.db.get("code#"+name).data;
@@ -367,10 +364,12 @@ const codeSnippetManager = {
                     delete payload.query;
                     // refactor: id
                     payload.id = nanoid();
+                    payload.createTime = time;
                     removeDBItem("code#"+name)
                     funcUtils.createOrUpdate(CODE_PREFIX+payload.id,payload)
 
                     this.codeMap.set(payload.id, payload)
+                    time+=100;
                 }
                 removeDBItem(GLOBAL_ROOT_TAGS)
             }else{ // new version
@@ -378,6 +377,9 @@ const codeSnippetManager = {
                     const payload = doc.data;
                     if(payload.count == null){
                         payload.count = 0;
+                    }
+                    if(payload.createTime == null){
+                        payload.createTime = Date.now();
                     }
                     this.codeMap.set(payload.id, payload)
                 }
@@ -405,7 +407,8 @@ const codeSnippetManager = {
         }
         codeSnippet.id = nanoid();
         codeSnippet.count = codeSnippet.count??0;
-        codeSnippet.time = codeSnippet.time??Date.now();
+        codeSnippet.createTime = Date.now()
+        codeSnippet.time = codeSnippet.time??codeSnippet.createTime;
         this.codeMap.set(codeSnippet.id,codeSnippet);
         funcUtils.createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
         this.addTagInfo(codeSnippet,true)

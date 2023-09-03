@@ -116,7 +116,7 @@ const dealWithTagRefresh = ()=>{
 }
 const sortKeyOptions = [
   {
-    label: "创建次序",
+    label: "创建时间排序",
     value: 0
   },
   {
@@ -128,7 +128,7 @@ const sortKeyOptions = [
     value: 2
   },
   {
-    label: "自然排序",
+    label: "名字自然排序",
     value: 3
   }
 ]

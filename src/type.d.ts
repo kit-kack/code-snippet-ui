@@ -2,9 +2,9 @@ declare interface Window{
     preload?: typeof import('./preload/index')
 }
 declare interface CodeSnippet{
-    // TODO: 后续版本重构
+    // nanoid：表示唯一
     id?: string,
-    // 代码片段名，唯一
+    // 代码片段名，后续不一定唯一
     name: string,
     // 代码片段内容
     code: string,
@@ -12,6 +12,8 @@ declare interface CodeSnippet{
     desc?: string,
     // 上次访问代码片段时间, 使用时间戳表示
     time?: number,
+    // 创建时间
+    createTime?: number,
     // 代码片段粘贴使用次数
     count?: number,
     // 标签
