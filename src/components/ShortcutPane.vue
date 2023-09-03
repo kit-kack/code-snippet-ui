@@ -55,7 +55,7 @@ const datas = [
         feature: "切换完整/列表UI模式",
         shortcut: "Tab快速双击"
       },{
-        feature: "开启/关闭进阶符号查询",
+        feature: "开启/关闭进阶模糊查询",
         shortcut: "C-F"
       }]
   },
@@ -63,7 +63,7 @@ const datas = [
     title: '元素',
     items:[{
         feature: "粘贴使用",
-        shortcut: ["双击(手动开启功能)","搜索框Enter"]
+        shortcut: ["双击","搜索框Enter"]
       },{
         feature: "预览代码片段",
         shortcut: "C-点击"

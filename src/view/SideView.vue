@@ -41,38 +41,21 @@
         </n-space>
       </n-space>
       <n-divider title-placement="center">
-        其他设置
+        个性化设置
       </n-divider>
       <n-space vertical align="center">
         <n-space>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <config-check-tag title="💡启用自动备份" config="autoBackup"/>
-            </template>
-            启用后将每三天自动备份一次，备份文件位置：{{backupFilePath}}
-          </n-tooltip>
           <n-tooltip trigger="hover">
             <template #trigger>
               <config-check-tag title="💡默认启用列表UI模式" config="enabledLiteShow"/>
             </template>
             这里是指初进入插件时的默认显示策略
           </n-tooltip>
+          <config-check-tag title="关闭显示入门手册" config="closeHelpSnippet" @refresh="refreshListView()"/>
         </n-space>
-        <config-switch title="粘贴后插件是否退出" config="exitAfterPaste"/>
-        <config-switch title="双击元素启用粘贴代码片段功能" config="doubleClickPaste"/>
-        <config-switch title="点击元素是否自动进入Vim模式" config="enabledAutoVim"/>
-        <config-switch title="无法上下浏览时是否播放哔哔声" config="enabledBeep"/>
-        <config-switch title="关闭显示入门手册" config="closeHelpSnippet" @refresh="refreshListView()"/>
-        <n-tooltip placement="left" trigger="hover">
-          <template #trigger>
-            <n-button id="diy"  circle  @click="$reactive.view.settingActive = false;$reactive.view.customActive = true">
-              <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"><rect fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" x="280.48" y="122.9" width="63.03" height="378.2" rx="31.52" transform="rotate(-45 312.002 311.994)"></rect><path d="M178.38 178.38a31.64 31.64 0 0 0 0 44.75L223.25 268L268 223.25l-44.87-44.87a31.64 31.64 0 0 0-44.75 0z" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M48 192h48" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M90.18 90.18l33.94 33.94" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M192 48v48" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M293.82 90.18l-33.94 33.94" fill="currentColor"></path><path stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M124.12 259.88l-33.94 33.94" fill="currentColor"></path></svg>                </template>
-            </n-button>
-          </template>
-          个性化定制
-        </n-tooltip>
-
+        <n-space>
+          <custom-view/>
+        </n-space>
       </n-space>
     </n-tab-pane>
     <n-tab-pane :name="1" tab="标签与变量">
@@ -97,7 +80,6 @@
 </template>
 
 <script setup>
-import ConfigSwitch from "../components/ConfigSwitch.vue";
 import {tagColorManager} from "../js/core/tag";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
@@ -106,9 +88,9 @@ import NormalTag from "../components/NormalTag.vue";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import {backupFilePath} from "../js/some";
 import VariablePane from "../components/VariablePane.vue";
-import {$reactive, refreshListView} from "../js/store";
+import {refreshListView} from "../js/store";
+import CustomView from "./CustomView.vue";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);

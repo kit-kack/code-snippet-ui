@@ -1,5 +1,4 @@
 import {$normal, $reactive} from "../store";
-import {configManager} from "../core/config";
 import {codeSnippetManager} from "../core/snippet";
 import {formatManager} from "../core/format";
 
@@ -29,7 +28,7 @@ function getCode(path,local,noView){
     }
 }
 
-function copyOrPasteWithType(isPasted,text,type,msg){
+function copyOrPasteWithType(isPasted,text,type,msg,isNotExit){
     if(type && type.length>2 && type.startsWith('x-')){
         text = formatManager.parse(text);
     }
@@ -38,13 +37,14 @@ function copyOrPasteWithType(isPasted,text,type,msg){
     if(text === null){
         return true;
     }
-    copyOrPaste(text)
+    copyOrPaste(text,isNotExit);
 }
 
 /**
  * @param text
+ * @param {boolean} [isNotExit]
  */
-export function copyOrPaste(text){
+export function copyOrPaste(text,isNotExit){
     if(lastCachedMsg){
         $message.success(lastCachedMsg);
     }
@@ -52,7 +52,7 @@ export function copyOrPaste(text){
         try{
             // utools新API
             utools.hideMainWindowPasteText(text)
-            if(configManager.get('exitAfterPaste')){
+            if(!isNotExit){
                 utools.outPlugin();
             }
             return;
@@ -63,7 +63,7 @@ export function copyOrPaste(text){
     if(isLastPasted){
         utools.hideMainWindow();
         utools.simulateKeyboardTap('v',ctrlKey);
-        if(configManager.get('exitAfterPaste')){
+        if(!isNotExit){
             utools.outPlugin();
         }
     }
@@ -88,8 +88,9 @@ function _notify(msg,noView){
  * @param {boolean} isPasted - 是否粘贴
  * @param {number} [num] - 子代码片段,若为undefined，则为复制粘贴整体代码
  * @param {boolean} [noView] - 适用于没有UI的场景
+ * @param {boolean} [isNotExit] - 目前只适用于双击场景不退出
  */
-export function copyCode(isPasted,num,noView){
+export function copyCode(isPasted,num,noView,isNotExit){
     // 校验
     if ($reactive.utools.selectedIndex < 0){
         return;
@@ -116,7 +117,7 @@ export function copyCode(isPasted,num,noView){
         $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
         codeSnippetManager.update(toRaw($reactive.currentSnippet))
         // 复制
-        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`)){
+        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`,isNotExit)){
             return noView;
         }
 
@@ -141,7 +142,7 @@ export function copyCode(isPasted,num,noView){
             $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
             codeSnippetManager.update(toRaw($reactive.currentSnippet))
             // 复制
-            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`)){
+            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`,isNotExit)){
                 return noView;
             }
         }else{

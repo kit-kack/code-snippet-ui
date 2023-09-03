@@ -204,9 +204,7 @@ const handleDelete = ()=>{
 }
 
 const handleClick = (e)=>{
-  if(configManager.get("enabledAutoVim")){
-    $reactive.utools.focused = false;
-  }
+  $reactive.utools.focused = false;
   $reactive.utools.subItemSelectedIndex = -1;
   if(e.ctrlKey || e.metaKey){
     doViewCode()
@@ -224,10 +222,7 @@ const handleContextMenu = ()=>{
   }
 }
 const handleDoubleClick = ()=>{
-  if(configManager.get("doubleClickPaste")){
-    copyCode(true)
-    // handleCopy(true)
-  }
+  copyCode(true,undefined,undefined,true)
 }
 const handleCancelTop = ()=>{
   configManager.delTopItem(topIndex)

@@ -33,7 +33,7 @@ const $reactive = reactive({
         fullScreenShow: true,     // 是否为完整UI模式
         helpActive: false,        // 快速方式界面是否显示
         settingActive: false,     // 侧边栏是否开启，禁止其他按键操作
-        customActive: false,      // 自定义底边栏
+// @deprecated        customActive: false,      // 自定义底边栏
         variableActive: false,    // 输入自定义变量界面是否显示
         codeTipActive: false,      // 是否展示 CodeView中的 Tip
         isDel: false,             // 当前是否为 删除操作

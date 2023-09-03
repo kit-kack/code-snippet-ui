@@ -90,9 +90,7 @@ function dealWithListView(e,list){
         case "ArrowLeft":
             // 校验是否有效
             if($reactive.utools.selectedIndex=== -1){
-                if(configManager.get("enabledBeep")){
-                    utools.shellBeep();
-                }
+                $message.error("没有可选择的元素")
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 doScrollForListView(Direction.LEFT);
             }else{
@@ -106,17 +104,13 @@ function dealWithListView(e,list){
             }
             if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 if ($reactive.utools.selectedIndex === -1) { // -1 >= 0-1
-                    if(configManager.get("enabledBeep")){
-                        utools.shellBeep();
-                    }
+                    $message.error("没有可选择的元素")
                 }else {
                     doScrollForListView(Direction.DOWN);
                 }
             }else{
                 if ($reactive.utools.selectedIndex >= list.value.length -1) { // -1 >= 0-1
-                    if(configManager.get("enabledBeep")){
-                        utools.shellBeep();
-                    }
+                    // $message.info("施主收手吧，已经到底了");
                 }else {
                     debMoveDown()
                 }
@@ -129,17 +123,13 @@ function dealWithListView(e,list){
             }
             if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 if ($reactive.utools.selectedIndex === -1) {
-                    if (configManager.get("enabledBeep")) {
-                        utools.shellBeep();
-                    }
+                    $message.error("没有可选择的元素")
                 }else {
                     doScrollForListView(Direction.UP);
                 }
             }else{
                 if ($reactive.utools.selectedIndex <= 0) {
-                    if (configManager.get("enabledBeep")) {
-                        utools.shellBeep();
-                    }
+                    // $message.info("施主收手吧，已经到顶了");
                 }else {
                     debMoveUp()
                 }
@@ -150,9 +140,7 @@ function dealWithListView(e,list){
         case "ArrowRight":
             // 校验是否有效
             if($reactive.utools.selectedIndex=== -1 ){
-                if(configManager.get("enabledBeep")){
-                    utools.shellBeep();
-                }
+                $message.error("没有可选择的元素")
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 doScrollForListView(Direction.RIGHT);
             }else{
@@ -169,9 +157,9 @@ function dealWithListView(e,list){
             break;
         case "Digit0":
             if($reactive.utools.selectedIndex === -1){
-                if(configManager.get("enabledBeep")){
-                    utools.shellBeep();
-                }
+                // if(configManager.get("enabledBeep")){
+                //     utools.shellBeep();
+                // }
             }else if(e.shiftKey){
                 doScrollForListView(Direction.RESET);
             }else{
@@ -401,7 +389,7 @@ function init(list) {
                 $reactive.view.settingActive = false;
             }
             return;
-        }else if($reactive.view.customActive || $reactive.view.variableActive){
+        }else if( $reactive.view.variableActive){
             return;
         }
         // super key

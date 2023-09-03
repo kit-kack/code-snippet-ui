@@ -38,7 +38,7 @@ declare type ConfigItem =
     | "showCountTag"                                 // 是否展示 内置计数标签
     | "showLanguageTag"                              // 是否展示 内置类型标签
     | "showOriginTag"                                // 是否展示 来源类型（普通、本地文件、网络文件)标签
-    | "enabledAutoVim"                               // 点击元素是否自动进入Vim模式
+// @deprecated:默认行为     | "enabledAutoVim"        // 点击元素是否自动进入Vim模式
     | "darkTagColor" | "lightTagColor"               // 给定 自定义标签颜色
     | "darkGlobalColor" | "lightGlobalColor"         // 全局颜色 （依据平台暗黑模式而定）
     | "darkSelectedColor" | "lightSelectedColor"     // 被选中元素 背景颜色
@@ -47,9 +47,9 @@ declare type ConfigItem =
     | "shiftTagPosition"                             // 内置标签 位置切换
     | "showTagIcon"                                  // 内置标签 显示图标策略： true则使用图标，否则使用颜色
     | "whatTabDo"                       // 在CREATE/UPDATE VIEW中代码输入框监听Tab键的行为， 0-原生 1-\t 2-2个空格 4-4个空格
-    | "doubleClickPaste"                             // 双击元素 来粘贴代码片段
-    | "enabledBeep"                                  // 是否启用Beep声
-    | "exitAfterPaste"                               // 粘贴后退出插件
+// @deprecated:默认行为    | "doubleClickPaste"       // 双击元素 来粘贴代码片段
+// @deprecated:默认行为    | "enabledBeep"            // 是否启用Beep声
+// @deprecated:默认行为    | "exitAfterPaste"         // 粘贴后退出插件
     | "enabledFuzzySymbolQuery"                      //模糊符号查询
     | "topList"                                      //置顶列表
     | "rawLineCode"                                  // 原始行内代码，不进行高亮
@@ -62,6 +62,6 @@ declare type ConfigItem =
     | "colorSchema" | "darkColorSchema"              // 颜色方案
     | "renderApi"                                   // 可选渲染选项
     | "defaultLanguage"                             // 默认选择语言
-    | "autoBackup"                                  // 自动备份
+// @deprecated:默认行为    | "autoBackup"            // 自动备份
     | "lastAutoBackupTime"                          // 上次自动备份时间
     | "closeHelpSnippet"                            // 关闭defaultHelpSnippet
