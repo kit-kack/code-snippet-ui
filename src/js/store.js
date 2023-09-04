@@ -41,7 +41,9 @@ const $reactive = reactive({
         cursorShow: true,
         buttonFixed: false,
         isRendering: false,
-        onlyOne: false           // 当前查询结果是否仅有一条记录
+        onlyOne: false,           // 当前查询结果是否仅有一条记录
+        backStageShow: false,
+        listViewRef: null
     },
     // 控制utool及Vim模式
     utools:{

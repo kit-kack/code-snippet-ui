@@ -182,9 +182,32 @@ const getTitleStyle = (selected,flag) =>{
     'zIndex': 20
   }
 }
+const handleAppHeight = ()=>{
+  if($reactive.view.fullScreenShow){
+    utools.setExpendHeight(545)
+  }else{
+    if($reactive.view.listViewRef == null){
+      utools.setExpendHeight(0)
+      $normal.recoverLiteHeight = 0;
+    }else{
+      let offset = $reactive.view.listViewRef.offsetHeight;
+      if(offset == null){
+        utools.setExpendHeight(0)
+        $normal.recoverLiteHeight = 0;
+      }else if(offset > 535){
+        utools.setExpendHeight(545)
+        $normal.recoverLiteHeight = 545;
+      }else{
+        utools.setExpendHeight(offset+6)
+        $normal.recoverLiteHeight = offset+6;
+      }
+    }
+  }
+}
 onMounted(()=>{
   $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
   if(props.last){
+    handleAppHeight()
     if($normal.keepSelectedStatus){
       nextTick(()=>{
         gotoTheLastPosition();

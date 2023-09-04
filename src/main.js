@@ -6,26 +6,28 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
-import {router} from "./router/index";
-import {$normal, $reactive} from "./js/store";
+import {router, switchToListView} from "./router/index";
+import {$normal, $reactive, refreshListView} from "./js/store";
 import {tagColorManager}  from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/format";
-
-// init
-try{
-    configManager.init()
-    tagColorManager.init()
-    formatManager.init()
-    codeSnippetManager.init()
-}catch (e){
-    console.error(e)
-    alert(e)
+// error
+window.onerror = function (message, source, lineno, colno, error) {
+    utools.showNotification(`[${source}](${lineno}:${colno}): ${message}`)
 }
+// init
+configManager.init()
+tagColorManager.init()
+formatManager.init()
+codeSnippetManager.init()
 
 function bindApp(){
     const app = createApp(App)
+    // error
+    app.config.errorHandler = function (err, instance, info){
+        utools.showNotification(`[${instance?.$options?.__file || instance?.$options?.name}]: ${err} - ${info}`)
+    }
     app.use(router)
     initNU(app)
     initVH(app)
@@ -88,6 +90,13 @@ function bindApp(){
     })
     app.mount('#app')
 }
+utools.onPluginOut(processExit => {
+    if(processExit){
+        return;
+    }
+    $reactive.view.backStageShow = true;
+    $reactive.utools.search = null
+})
 
 utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
@@ -108,6 +117,11 @@ utools.onPluginEnter((data)=>{
         utools.setExpendHeight(545)
     }
     utools.setSubInput(({text}) =>{
+        if($reactive.view.backStageShow){
+            console.log("插件重新前台运行")
+            $reactive.view.backStageShow = false;
+            switchToListView(true)
+        }
         text = text.trim();
         if(text.length === 0){
             $reactive.utools.search = null;

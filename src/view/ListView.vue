@@ -106,6 +106,7 @@ import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import {useRouter} from "vue-router";
 import {gotoTheLastPosition} from "../js/utils/scroller";
+// import ListItem from "../components/ListItem.vue";
 
 const ListItemAsync = defineAsyncComponent({
   loader:() => import("../components/ListItem.vue"),
@@ -127,7 +128,8 @@ const handleSelect = (index,id,selectedIndex)=>{
 
 onMounted(()=>{
   parseSearchWord($reactive.utools.search)
-  handleAppHeight()
+  $reactive.view.listViewRef = listViewAspect.value;
+  // handleAppHeight()
   init(list)
 })
 
