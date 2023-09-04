@@ -3,7 +3,7 @@
        @mousemove="$reactive.view.cursorShow = true">
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" :ref="(el)=>{ $normal.scroll.listInvoker = el}">
-        <div ref="listViewAspect" style="padding-top: 2px">
+        <div :ref="(el)=>{ $reactive.view.listViewRef = el}" style="padding-top: 2px">
           <template  v-for="(snippet,index) in list" :key="snippet.id">
             <list-item-async
                 :index="index"
@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import {computed, defineAsyncComponent, onActivated, onMounted, onUpdated, ref} from "vue";
+import {computed, defineAsyncComponent, onActivated, onBeforeUpdate, onMounted, onUpdated, ref, watch} from "vue";
 import {init, parseSearchWord,} from "../js/keyboard.js";
 import {$normal, $reactive, refreshListView} from "../js/store";
 import {codeSnippetManager} from "../js/core/snippet";
@@ -113,7 +113,6 @@ const ListItemAsync = defineAsyncComponent({
   delay: 0
 })
 
-const listViewAspect = ref()
 const list = computed(()=>parseSearchWord($reactive.utools.search,$reactive.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
 const router = useRouter();
@@ -125,10 +124,14 @@ const handleSelect = (index,id,selectedIndex)=>{
     return false;
   }
 }
+watch(list,(newValue,oldValue)=>{
+ handleAppHeight()
+},{
+  flush: 'post'
+})
 
 onMounted(()=>{
   parseSearchWord($reactive.utools.search)
-  $reactive.view.listViewRef = listViewAspect.value;
   // handleAppHeight()
   init(list)
 })
@@ -145,11 +148,11 @@ const handleAppHeight = ()=>{
   if($reactive.view.fullScreenShow){
     utools.setExpendHeight(545)
   }else{
-    if(listViewAspect.value == null){
+    if($reactive.view.listViewRef == null){
       utools.setExpendHeight(0)
       $normal.recoverLiteHeight = 0;
     }else{
-      let offset = listViewAspect.value.offsetHeight;
+      let offset = $reactive.view.listViewRef.offsetHeight;
       if(offset == null){
         utools.setExpendHeight(0)
         $normal.recoverLiteHeight = 0;
@@ -171,10 +174,6 @@ function goToCreateView(){
     }
   })
 }
-
-onUpdated(()=>{
-  handleAppHeight()
-})
 
 
 

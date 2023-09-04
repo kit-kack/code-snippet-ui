@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onMounted, ref} from "vue";
+import {computed, nextTick, onActivated, onMounted, ref} from "vue";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import SelectableButton from "./SelectableButton.vue";
@@ -190,7 +190,7 @@ const handleAppHeight = ()=>{
       utools.setExpendHeight(0)
       $normal.recoverLiteHeight = 0;
     }else{
-      let offset = $reactive.view.listViewRef.offsetHeight;
+      let offset = $reactive.view.listViewRef?.offsetHeight;
       if(offset == null){
         utools.setExpendHeight(0)
         $normal.recoverLiteHeight = 0;
@@ -206,6 +206,7 @@ const handleAppHeight = ()=>{
 }
 onMounted(()=>{
   $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
+  console.log(props.index + ' mounted')
   if(props.last){
     handleAppHeight()
     if($normal.keepSelectedStatus){

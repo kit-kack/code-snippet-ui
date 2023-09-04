@@ -95,7 +95,6 @@ utools.onPluginOut(processExit => {
         return;
     }
     $reactive.view.backStageShow = true;
-    $reactive.utools.search = null
 })
 
 utools.onPluginEnter((data)=>{
@@ -118,7 +117,7 @@ utools.onPluginEnter((data)=>{
     }
     utools.setSubInput(({text}) =>{
         if($reactive.view.backStageShow){
-            console.log("插件重新前台运行")
+            // utools.showNotification("插件重新前台运行")
             $reactive.view.backStageShow = false;
             switchToListView(true)
         }
