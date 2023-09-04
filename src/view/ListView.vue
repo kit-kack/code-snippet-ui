@@ -4,7 +4,7 @@
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" :ref="(el)=>{ $normal.scroll.listInvoker = el}">
         <div :ref="(el)=>{ $reactive.view.listViewRef = el}" style="padding-top: 2px">
-          <template  v-for="(snippet,index) in list" :key="snippet.id">
+          <template  v-for="(snippet,index) in list" :key="snippet.id+index">
             <list-item-async
                 :index="index"
                 :snippet="snippet"

@@ -18,8 +18,10 @@ let longKeyDown = false;
 let lastTabTime = 0;  // 计算上次按下Tab时间
 
 const debMoveDown = debounce(function(){
-    $reactive.utools.selectedIndex++;
+    let old = $reactive.utools.selectedIndex??0;
+    $reactive.utools.selectedIndex = old +1;
     $reactive.utools.subItemSelectedIndex = -1;
+    // console.log($reactive.utools.selectedIndex)
     gotoTheLastPosition();
 })
 const debMoveUp = debounce(function(){
