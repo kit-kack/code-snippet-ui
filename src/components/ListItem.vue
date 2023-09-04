@@ -246,7 +246,7 @@ const handleContextMenu = ()=>{
   }
 }
 const handleDoubleClick = ()=>{
-  copyCode(true,undefined,undefined,true)
+  copyCode(true)
 }
 const handleCancelTop = ()=>{
   configManager.delTopItem(topIndex)

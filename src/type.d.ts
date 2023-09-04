@@ -49,7 +49,7 @@ declare type ConfigItem =
     | "whatTabDo"                       // 在CREATE/UPDATE VIEW中代码输入框监听Tab键的行为， 0-原生 1-\t 2-2个空格 4-4个空格
 // @deprecated:默认行为    | "doubleClickPaste"       // 双击元素 来粘贴代码片段
 // @deprecated:默认行为    | "enabledBeep"            // 是否启用Beep声
-// @deprecated:默认行为    | "exitAfterPaste"         // 粘贴后退出插件
+// @deprecated:被废弃    | "exitAfterPaste"          // 粘贴后退出插件
     | "enabledFuzzySymbolQuery"                      //模糊符号查询
     | "topList"                                      //置顶列表
     | "rawLineCode"                                  // 原始行内代码，不进行高亮
