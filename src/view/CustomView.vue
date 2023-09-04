@@ -18,7 +18,7 @@
     <n-space>
       元素代码块：
       <n-select  v-model:value="codeBlockRef" :options="codeBlockOptions" size="tiny" @update-value="handleCodeBlockChange"/>
-      <config-check-tag v-if="!configManager.get('noItemCodeShow')" @refresh="refreshListView()" title="不高亮展示" config="rawLineCode"/>
+      <config-check-tag v-if="!configManager.get('noItemCodeShow')" @refresh="refreshListView(true)" title="不高亮展示" config="rawLineCode"/>
     </n-space>
     <n-space align="center" vertical v-if="colorSchemaRef === -1">
       <n-space>
@@ -69,7 +69,7 @@ function handleCodeBlockChange(v){
       configManager.set('fullItemCodeShow', v===1);
       break;
   }
-  refreshListView()
+  refreshListView(true)
 }
 const colorInstances = [{
   title: "全局主题 颜色",
@@ -77,21 +77,21 @@ const colorInstances = [{
   handleConfirm: v=>{
     configManager.setGlobalColor(v)
     globalThemeRefresh();
-    refreshListView()
+    refreshListView(true)
   }
 },{
   title: "被选中元素 背景颜色",
   color: configManager.getColor('SelectedColor'),
   handleConfirm: v=>{
     configManager.setColor('SelectedColor',v)
-    refreshListView()
+    refreshListView(true)
   }
 },{
   title: "自定义标签 默认颜色",
   color: configManager.getColor('TagColor'),
   handleConfirm: v=>{
     configManager.setColor('TagColor',v)
-    refreshListView()
+    refreshListView(true)
   }
 },{
   title: '代码高亮行颜色',
@@ -154,7 +154,7 @@ const handleColorSchema = (v)=>{
   }
   adjustTheme(v)
   globalThemeRefresh()
-  refreshListView()
+  refreshListView(true)
 }
 
 </script>

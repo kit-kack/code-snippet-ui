@@ -440,12 +440,12 @@ function init(list) {
                         }
                     })
                     return;
-                case 'KeyR':
-                    if($reactive.currentMode === LIST_VIEW){
-                        $normal.keepSelectedStatus = null;
-                        refreshListView()
-                    }
-                    return;
+                // case 'KeyR':
+                //     if($reactive.currentMode === LIST_VIEW){
+                //         $normal.keepSelectedStatus = null;
+                //         refreshListView()
+                //     }
+                //     return;
                 case 'KeyF':
                     if($reactive.currentMode === LIST_VIEW){
                         if (configManager.get("enabledFuzzySymbolQuery")) {

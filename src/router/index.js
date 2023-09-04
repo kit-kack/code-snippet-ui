@@ -52,14 +52,14 @@ const router = createRouter({
 })
 
 
-router.afterEach((to,from)=>{
+router.beforeResolve((to,from)=>{
     if(to.name === 'list'){
+        $reactive.currentMode = LIST_VIEW
         console.log('enter listview')
         handleRecoverLiteShow();
-        $reactive.currentMode = LIST_VIEW
     }else{
-        switchToFullUIMode();
         $reactive.currentMode = (to.name==='code'? CODE_VIEW:FORM_VIEW)
+        switchToFullUIMode();
     }
 })
 

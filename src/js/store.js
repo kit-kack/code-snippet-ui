@@ -38,6 +38,7 @@ const $reactive = reactive({
         codeTipActive: false,      // 是否展示 CodeView中的 Tip
         isDel: false,             // 当前是否为 删除操作
         refresh: true,             // // 控制ListView刷新
+        deepRefresh: true,
         cursorShow: true,
         buttonFixed: false,
         isRendering: false,
@@ -78,11 +79,18 @@ const switchToFullUIMode = ()=>{
 }
 
 
-const refreshListView = ()=>{
-    $reactive.view.refresh = false;
-    nextTick(()=>{
-        $reactive.view.refresh = true
-    })
+const refreshListView = (deepFlag)=>{
+    if(deepFlag){
+        $reactive.view.deepRefresh = false;
+        nextTick(()=>{
+            $reactive.view.deepRefresh = true
+        })
+    }else{
+        $reactive.view.refresh = false;
+        nextTick(()=>{
+            $reactive.view.refresh = true
+        })
+    }
 }
 
 export {

@@ -46,9 +46,9 @@ const datas = [
         feature: "创建代码片段",
         shortcut:"C-N"
       },{
-        feature: "刷新",
-        shortcut: "C-R"
-      },{
+      //   feature: "刷新",
+      //   shortcut: "C-R"
+      // },{
         feature: "启用/关闭Vim模式，utool输入框失聚焦",
         shortcut:"Tab"
       },{
