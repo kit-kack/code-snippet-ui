@@ -5,16 +5,16 @@ import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
-import {backupFilePath} from "./js/some";
+import {backupFilePath, log} from "./js/some";
 import {router, switchToListView} from "./router/index";
-import {$normal, $reactive, refreshListView} from "./js/store";
+import {$normal, $reactive} from "./js/store";
 import {tagColorManager}  from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/format";
 // error
 window.onerror = function (message, source, lineno, colno, error) {
-    utools.showNotification(`[${source}](${lineno}:${colno}): ${message}`)
+    log(`${new Date().toISOString()}-[${source}](${lineno}:${colno}): ${message}\n`)
 }
 // init
 configManager.init()
@@ -26,7 +26,7 @@ function bindApp(){
     const app = createApp(App)
     // error
     app.config.errorHandler = function (err, instance, info){
-        utools.showNotification(`[${instance?.$options?.__file || instance?.$options?.name}]: ${err} - ${info}`)
+        log(`${new Date().toISOString()}-[${instance?.$options?.__file || instance?.$options?.name}]: ${err} - ${info}\n`)
     }
     app.use(router)
     initNU(app)

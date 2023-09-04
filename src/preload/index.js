@@ -2,7 +2,13 @@ const fs = require('fs')
 const path = require('path')
 
 export const readConfig = (path) => fs.readFileSync(path).toString();
-export const writeConfig = (path,str)=> fs.appendFileSync(path,str);
+export const writeConfig = (path,str,flag)=> {
+    if(flag){
+        return fs.writeFileSync(path,str);
+    }else{
+        return fs.appendFileSync(path,str);
+    }
+}
 export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.md')).toString();
 
 /*

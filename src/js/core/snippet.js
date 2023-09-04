@@ -508,7 +508,7 @@ export const codeSnippetManager = {
             vars: formatManager.all()
         }
         header = window.preload.encodeBase64(JSON.stringify(header))
-        window.preload.writeConfig(path,'---\n'+header+'\n---\n> 上面为Base64编码后的 变量与标签 数据\n\n');
+        window.preload.writeConfig(path,'---\n'+header+'\n---\n> 上面为Base64编码后的 变量与标签 数据\n\n',true);
 
         // snippet
         for (let codeSnippet of this.codeMap.values()) {
