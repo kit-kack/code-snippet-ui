@@ -206,7 +206,6 @@ const handleAppHeight = ()=>{
 }
 onMounted(()=>{
   $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
-  console.log(props.index + ' mounted')
   if(props.last){
     handleAppHeight()
     if($normal.keepSelectedStatus){

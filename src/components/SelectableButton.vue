@@ -1,6 +1,6 @@
 <template>
-  <n-tooltip trigger="manual"
-             :show="hover || (selected && show)"
+  <!--             :show="hover || (selected && show)"-->
+  <n-tooltip trigger="hover"
              :placement="$reactive.view.onlyOne&&!$reactive.view.fullScreenShow?(flag? 'right':'left'):'top'"
              :delay="0"
   >
