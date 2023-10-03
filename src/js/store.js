@@ -66,6 +66,14 @@ const handleRecoverLiteShow = ()=>{
     if($normal.recoverLiteShow){
         $normal.recoverLiteShow= false;
         $reactive.view.fullScreenShow = false;
+        let offset = $reactive.view.listViewRef?.offsetHeight;
+        if(offset == null){
+            $normal.recoverLiteHeight = 0;
+        }else if(offset > 535){
+            $normal.recoverLiteHeight = 545;
+        }else{
+            $normal.recoverLiteHeight = offset - 16;
+        }
         utools.setExpendHeight($normal.recoverLiteHeight)
     }
 }
@@ -103,8 +111,10 @@ const refreshListView = (deepFlag)=>{
  */
 const navigateView = (view,refresh) =>{
     if( view === LIST_VIEW){
-        handleRecoverLiteShow();
         $reactive.currentMode = view;
+        nextTick(()=>{
+            handleRecoverLiteShow();
+        })
         if(refresh){
             $reactive.view.deepRefresh = false;
             nextTick(()=>{

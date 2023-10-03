@@ -96,22 +96,6 @@ utools.onPluginOut(processExit => {
     $reactive.view.backStageShow = true;
 })
 
-const dealWithSearchWord = debounce(function(text){
-    text = text.trim();
-    if(text.length === 0){
-        $reactive.utools.search = null;
-    }else{
-        if($reactive.utools.search !== text){
-            $reactive.utools.search = text;
-            $normal.keepSelectedStatus = null;
-            // $normal.itemOffsetArray = [];
-            // fix: 修复删除界面不移除
-            $reactive.view.isDel = false;
-            $reactive.view.helpActive = false;
-            refreshListView(true)
-        }
-    }
-},250)
 
 utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
@@ -137,7 +121,20 @@ utools.onPluginEnter((data)=>{
             $reactive.view.backStageShow = false;
             navigateView(LIST_VIEW,true)
         }
-        dealWithSearchWord(text)
+        text = text.trim();
+        if(text.length === 0){
+            $reactive.utools.search = null;
+        }else{
+            if($reactive.utools.search !== text){
+                $reactive.utools.search = text;
+                $normal.keepSelectedStatus = null;
+                // $normal.itemOffsetArray = [];
+                // fix: 修复删除界面不移除
+                $reactive.view.isDel = false;
+                $reactive.view.helpActive = false;
+                refreshListView(true)
+            }
+        }
     },"搜索代码片段, 双击Tab切换UI模式")
     if(data.code==='code-snippet-save'){
         $normal.quickCode = data.payload;
