@@ -13,7 +13,7 @@ export function log(msg){
 
 export const defaultHelpSnippet = {
     id: 'default',
-    version: 'v2.3.1',
+    version: 'v2.3.2',
     name: '🎉入门手册&新功能介绍🎉',
     desc: '右键该元素选择预览代码，懂的人已经用v打开了',
     type: 'markdown',

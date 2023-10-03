@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.2](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.1...v2.3.2) (2023-10-03)
+
+
+### Features
+
+* 恢复自动备份配置 ([90c2dfb](https://github.com/littledot-kit/code-snippet-ui/commit/90c2dfbf325324ed2b9775d85908d1ad786b9c0f))
+* 完善基本日志功能 ([0352187](https://github.com/littledot-kit/code-snippet-ui/commit/035218772de727b592816720546fda487eff35d3))
+* 移除没有意义的配置项 ([9227b0c](https://github.com/littledot-kit/code-snippet-ui/commit/9227b0ce007826a3adacd3277b7e2c4d931eedb2))
+* 移除粘贴后主动退出后台效果 ([64d157f](https://github.com/littledot-kit/code-snippet-ui/commit/64d157fb3ffab9ff1595295904cbcc0088326aac))
+
+
+### Bug Fixes
+
+* 莫名奇怪，不知解法，只能缓解一下 ([0d99bce](https://github.com/littledot-kit/code-snippet-ui/commit/0d99bce942e5038ff12e62d8e85a4f0c69546242))
+* 修复后台转前台运行后不响应的问题 ([403c517](https://github.com/littledot-kit/code-snippet-ui/commit/403c5176191dd6cd3fe51c9f17711a12b896ad7e))
+* 修复后台转前台运行后不响应的问题v2 ([d4d56d2](https://github.com/littledot-kit/code-snippet-ui/commit/d4d56d2ac16d7afde54d382ec75a6b0997c6beac))
+* 修复元素选择bug ([5a49704](https://github.com/littledot-kit/code-snippet-ui/commit/5a49704844064e0c9f85ac850a79224c76edeab3))
+* 修复v-for中缓存导致vim jk键不响应的问题 ([de4e405](https://github.com/littledot-kit/code-snippet-ui/commit/de4e405c287a6659b84b41b0a502d5a42561c0ba))
+* 移除vim模式下的tooltip控制显示，从而缓解上次commit的bug ([9c23072](https://github.com/littledot-kit/code-snippet-ui/commit/9c23072b74788f199d46fe0114ab90317e128785))
+* 移除vue-router，修复滚动条控制bug ([2415ad3](https://github.com/littledot-kit/code-snippet-ui/commit/2415ad398903f7d27542e2e8d1f0b163b66b37b3))
+
 ### [2.3.1](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.0...v2.3.1) (2023-09-03)
 
 

@@ -75,10 +75,7 @@
               <div>{{"🔖 "+snippet.tags.join()}}</div>
             </n-list-item >
             <n-list-item >
-              <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0}`}}</div>
-            </n-list-item>
-            <n-list-item >
-              <div>{{`📃 ${pair.count}字`}}</div>
+              <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0} 📃${pair.count}字`}}</div>
             </n-list-item>
             <n-list-item  v-if="snippet.sections && snippet.sections.length > 0">
               <div>{{`🧩 ${snippet.sections.length}个子代码片段`}}</div>
