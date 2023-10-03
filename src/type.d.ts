@@ -62,6 +62,6 @@ declare type ConfigItem =
     | "colorSchema" | "darkColorSchema"              // 颜色方案
     | "renderApi"                                   // 可选渲染选项
     | "defaultLanguage"                             // 默认选择语言
-// @deprecated:默认行为    | "autoBackup"            // 自动备份
+    | "autoBackup"                                  // 自动备份
     | "lastAutoBackupTime"                          // 上次自动备份时间
     | "closeHelpSnippet"                            // 关闭defaultHelpSnippet

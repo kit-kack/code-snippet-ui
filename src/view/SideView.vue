@@ -44,6 +44,7 @@
         个性化设置
       </n-divider>
       <n-space vertical align="center">
+        <config-switch title="自动本地备份" config="closeHelpSnippet"/>
         <n-space>
           <n-tooltip trigger="hover">
             <template #trigger>
@@ -91,6 +92,7 @@ import {getRefreshFunc} from "../js/utils/common";
 import VariablePane from "../components/VariablePane.vue";
 import {refreshListView} from "../js/store";
 import CustomView from "./CustomView.vue";
+import ConfigSwitch from "../components/ConfigSwitch.vue";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
