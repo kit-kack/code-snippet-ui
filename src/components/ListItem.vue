@@ -51,7 +51,7 @@
       </template>
       <template v-else>
         <template v-if="configManager.get('fullItemCodeShow')">
-          <multi-line-code :type="pair.type" :code="pair.code" :active="$reactive.utools.selectedIndex === index"/>
+          <multi-line-code :type="pair.type" :code="pair.code" :active="$index === index"/>
         </template>
         <template v-else>
           <single-line-code :type="pair.type" :code="pair.code"/>
@@ -110,23 +110,21 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onActivated, onMounted, ref} from "vue";
+import {computed, nextTick, onMounted, ref} from "vue";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import SelectableButton from "./SelectableButton.vue";
-import {$normal, $reactive, refreshListView} from "../js/store";
+import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, navigateView, refreshListView} from "../js/store";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
 import {copyCode} from "../js/utils/copy";
 import {calculateTime} from "../js/utils/common";
-import {useRouter} from "vue-router";
 import {gotoTheLastPosition} from "../js/utils/scroller";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
 const item = ref()
-const router = useRouter();
 const isShowBtn = computed(()=>{
   if(showBtnModal.value){
     return true;
@@ -205,7 +203,7 @@ const handleAppHeight = ()=>{
   }
 }
 onMounted(()=>{
-  $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
+  // $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
   if(props.last){
     handleAppHeight()
     if($normal.keepSelectedStatus){
@@ -220,7 +218,7 @@ onMounted(()=>{
 
 const handleDelete = ()=>{
   codeSnippetManager.del(props.snippet.id)
-  $reactive.utools.selectedIndex--;
+  $index.value--;
   $normal.keepSelectedStatus = true;
   $reactive.view.isDel = false;
   doItemRefresh()
@@ -235,13 +233,13 @@ const handleClick = (e)=>{
   if(props.selected){
     return;
   }
-  $reactive.utools.selectedIndex = props.index;
+  $index.value = props.index;
 }
 const handleContextMenu = ()=>{
   showBtnModal.value=true;
   $reactive.utools.subItemSelectedIndex = -1;
   if(!props.selected){
-    $reactive.utools.selectedIndex = props.index;
+    $index.value = props.index;
   }
 }
 const handleDoubleClick = ()=>{
@@ -249,11 +247,11 @@ const handleDoubleClick = ()=>{
 }
 const handleCancelTop = ()=>{
   configManager.delTopItem(topIndex)
-  $reactive.utools.selectedIndex = props.index;
+  $index.value = props.index;
   doItemRefresh()
 }
 const handleSetTop = ()=>{
-  $reactive.utools.selectedIndex = configManager.addTopItem(props.snippet.id)
+  $index.value = configManager.addTopItem(props.snippet.id)
   doItemRefresh()
 }
 
@@ -273,23 +271,25 @@ const handleMouseLeave = (e)=>{
 }
 const doViewCode = ()=>{
   $normal.lastQueryCodeSnippetId = props.snippet.id;
-  router.replace({
-    name: 'code'
-  })
+  navigateView(CODE_VIEW);
+  // router.replace({
+  //   name: 'code'
+  // })
 }
 const doEdit = ()=>{
   // $reactive.currentName = props.snippet.name;
   // $va r.currentMode = UPDATE_VIEW;
-  router.replace({
-    name: 'form',
-    query:{
-      mode: 'edit'
-    }
-  })
+  navigateView(EDIT_VIEW);
+  // router.replace({
+  //   name: 'form',
+  //   query:{
+  //     mode: 'edit'
+  //   }
+  // })
 }
 const doItemRefresh = ()=>{
   $normal.keepSelectedStatus = true;
-  refreshListView()
+  refreshListView(true)
 }
 
 </script>

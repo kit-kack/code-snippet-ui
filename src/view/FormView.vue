@@ -178,17 +178,15 @@ import {tagColorManager} from "../js/core/tag";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import {fullAlias, languages} from "../js/utils/common";
-import {useRoute} from "vue-router";
-import {$normal, $reactive} from "../js/store";
+import {$normal, $reactive, EDIT_VIEW, LIST_VIEW, navigateView} from "../js/store";
 import {CtrlStr} from "../js/some";
-import {switchToListView} from "../router";
 
 
-const route = useRoute();
+
 const form = ref()
-const update = route.query.mode === 'edit';
-const codeTemplate = reactive(update?{...toRaw($reactive.currentSnippet)} :{
-  code: route.query.code
+const edit = $reactive.currentMode === EDIT_VIEW;
+const codeTemplate = reactive(edit?{...toRaw($reactive.currentSnippet)} :{
+  code: $normal.quickCode
 })
 const tempTag = ref()
 const tags = computed(()=>{
@@ -230,7 +228,7 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if(update && $reactive.currentSnippet.name === value){
+        if(edit && $reactive.currentSnippet.name === value){
           return true;
         }
         return !codeSnippetManager.contain(value)
@@ -251,7 +249,7 @@ const rules = {
 }
 const handleCancel = ()=>{
   $normal.keepSelectedStatus = true;
-  switchToListView()
+  navigateView(LIST_VIEW)
 }
 const handleUpdate = ()=>{
   form.value.validate().then(error=>{
@@ -274,7 +272,7 @@ const handleUpdate = ()=>{
         if(codeTemplate.type === undefined){
           codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
         }
-        if(update){
+        if(edit){
           if(codeTemplate.id === $normal.lastQueryCodeSnippetId){
             // 发生修改，缓存失效
             $normal.lastQueryCodeSnippetId = null;
@@ -291,7 +289,8 @@ const handleUpdate = ()=>{
         // handleRecoverLiteShow()
         // $var.currentMode = LIST_VIEW;
         // $var.others.code = null;
-        switchToListView(true)
+        navigateView(LIST_VIEW,true)
+        // switchToListView(true)
       }
   },()=>{
     window.$message.warning("请按要求填写")

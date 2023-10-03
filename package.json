@@ -23,7 +23,6 @@
     "@kangc/v-md-editor": "^2.3.17",
     "highlight.js": "^11.8.0",
     "nanoid": "^4.0.2",
-    "vue": "^3.2.47",
-    "vue-router": "^4.2.4"
+    "vue": "^3.2.47"
   }
 }

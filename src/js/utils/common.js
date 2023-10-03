@@ -8,12 +8,12 @@ import {formatManager} from "../core/format";
  * @param wait
  * @returns {(function(): void)|*}
  */
-export function debounce(fn, wait=150){
+export function debounce(fn, wait=180){
     let timer = null;
-    return function(){
+    return function(param){
         if(!timer){
             timer = setTimeout(function(){
-                fn()
+                fn(param)
                 timer = null
             },wait)
         }

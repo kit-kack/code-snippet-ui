@@ -1,6 +1,16 @@
 import {codeSnippetManager} from "./core/snippet";
 import {configManager} from "./core/config";
-import {$normal, $reactive, FORM_VIEW, LIST_VIEW, refreshListView,} from "./store"
+import {
+    $index,
+    $normal,
+    $reactive,
+    CODE_VIEW,
+    CREATE_VIEW,
+    EDIT_VIEW,
+    LIST_VIEW,
+    navigateView,
+    refreshListView,
+} from "./store"
 import {defaultHelpSnippet} from "./some";
 import {debounce} from "./utils/common";
 import {
@@ -11,25 +21,31 @@ import {
     gotoTheLastPosition
 } from "./utils/scroller";
 import {copyCode} from "./utils/copy";
-import {router, switchToListView} from "../router/index";
+import {nextTick} from "vue";
 
 // 控制长按键
 let longKeyDown = false;
 let lastTabTime = 0;  // 计算上次按下Tab时间
 
 const debMoveDown = debounce(function(){
-    let old = $reactive.utools.selectedIndex??0;
-    $reactive.utools.selectedIndex = old +1;
     $reactive.utools.subItemSelectedIndex = -1;
+    // bug: $index变量有时修改不生效
+    const old = $index.value;
+    $index.value++;
     // console.log($reactive.utools.selectedIndex)
-    gotoTheLastPosition();
+    gotoTheLastPosition(true);
+    nextTick(()=>{
+        if(old === $index.value){
+            refreshListView(true)
+        }
+    })
 })
 const debMoveUp = debounce(function(){
-    $reactive.utools.selectedIndex--;
+    $index.value--;
     $reactive.utools.subItemSelectedIndex = -1;
     // $var.scroll.listInvoker?.("up")
-    gotoTheLastPosition();
-})
+    gotoTheLastPosition(true,true);
+},)
 const debItemMoveLeft = debounce(function(){
     if($reactive.view.isDel){
         $reactive.utools.subItemSelectedIndex = $reactive.utools.subItemSelectedIndex === 0? 1:0;
@@ -91,7 +107,7 @@ function dealWithListView(e,list){
         case "KeyH":
         case "ArrowLeft":
             // 校验是否有效
-            if($reactive.utools.selectedIndex=== -1){
+            if($index.value=== -1){
                 $message.error("没有可选择的元素")
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 doScrollForListView(Direction.LEFT);
@@ -105,13 +121,13 @@ function dealWithListView(e,list){
                 $reactive.view.isDel = false;
             }
             if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                if ($reactive.utools.selectedIndex === -1) { // -1 >= 0-1
+                if ($index.value === -1) { // -1 >= 0-1
                     $message.error("没有可选择的元素")
                 }else {
                     doScrollForListView(Direction.DOWN);
                 }
             }else{
-                if ($reactive.utools.selectedIndex >= list.value.length -1) { // -1 >= 0-1
+                if ($index.value >= list.value.length -1) { // -1 >= 0-1
                     // $message.info("施主收手吧，已经到底了");
                 }else {
                     debMoveDown()
@@ -124,13 +140,13 @@ function dealWithListView(e,list){
                 $reactive.view.isDel = false;
             }
             if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                if ($reactive.utools.selectedIndex === -1) {
+                if ($index.value === -1) {
                     $message.error("没有可选择的元素")
                 }else {
                     doScrollForListView(Direction.UP);
                 }
             }else{
-                if ($reactive.utools.selectedIndex <= 0) {
+                if ($index.value <= 0) {
                     // $message.info("施主收手吧，已经到顶了");
                 }else {
                     debMoveUp()
@@ -141,7 +157,7 @@ function dealWithListView(e,list){
         case "KeyL":
         case "ArrowRight":
             // 校验是否有效
-            if($reactive.utools.selectedIndex=== -1 ){
+            if($index.value=== -1 ){
                 $message.error("没有可选择的元素")
             }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
                 doScrollForListView(Direction.RIGHT);
@@ -152,20 +168,21 @@ function dealWithListView(e,list){
         case "Space":
             if($reactive.utools.subItemSelectedIndex === -1){
                 if(e.repeat){
-                    router.replace('/code')
+                    navigateView(CODE_VIEW);
+                    // router.replace('/code')
                     longKeyDown = true;
                 }
             }
             break;
         case "Digit0":
-            if($reactive.utools.selectedIndex === -1){
+            if($index.value === -1){
                 // if(configManager.get("enabledBeep")){
                 //     utools.shellBeep();
                 // }
             }else if(e.shiftKey){
                 doScrollForListView(Direction.RESET);
             }else{
-                $reactive.utools.selectedIndex = 0;
+                $index.value = 0;
                 $normal.scroll.listInvoker?.scrollTo({top:0,left:0})
             }
             break;
@@ -177,9 +194,9 @@ function dealWithListView(e,list){
             let index = configManager.getTopList().indexOf($reactive.currentSnippet.id)
             if(index === -1){
                 if(configManager.get('closeHelpSnippet')){
-                    $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.id);
+                    $index.value = configManager.addTopItem($reactive.currentSnippet.id);
                 }else{
-                    $reactive.utools.selectedIndex = configManager.addTopItem($reactive.currentSnippet.id) +1;
+                    $index.value = configManager.addTopItem($reactive.currentSnippet.id) +1;
                 }
             }else{
                 configManager.delTopItem(index)
@@ -194,7 +211,8 @@ function dealWithListView(e,list){
             break;
         case 'KeyV':
                 $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id;
-                router.replace('/code')
+                navigateView(CODE_VIEW)
+                // router.replace('/code')
                 return;
         case 'KeyQ':
             $reactive.utools.subItemSelectedIndex = -1;
@@ -250,6 +268,7 @@ function handleMdHorizonMove(left,fast){
 }
 
 function dealWithCodeView(e){
+    console.log('codeview: '+e.code)
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
@@ -284,7 +303,8 @@ function dealWithCodeView(e){
             break;
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
-            switchToListView()
+            navigateView(LIST_VIEW)
+            // switchToListView()
             console.log('exit')
             break;
         case 'Digit0':
@@ -329,12 +349,13 @@ function dealWithCommonView(e){
             if($reactive.view.helpActive){
                 $reactive.view.helpActive = false;
             }
-            router.replace({
-                name: 'form',
-                query:{
-                    mode: 'edit'
-                }
-            })
+            navigateView(EDIT_VIEW)
+            // router.replace({
+            //     name: 'form',
+            //     query:{
+            //         mode: 'edit'
+            //     }
+            // })
             break;
         case 'Digit1':
         case 'Digit2':
@@ -379,7 +400,7 @@ function dealWithCommonView(e){
 function init(list) {
     document.onkeydown = e => {
         // ignore  update view or create view
-        if ($reactive.currentMode === FORM_VIEW) {
+        if ($reactive.currentMode >= EDIT_VIEW) {
             return;
         }
         // dialog or sideview
@@ -407,7 +428,7 @@ function init(list) {
                 $reactive.utools.focused = true;
                 utools.subInputFocus();
             } else {
-                if ($reactive.utools.focused && $reactive.utools.selectedIndex > -1) {
+                if ($reactive.utools.focused && $index.value > -1) {
                     $reactive.utools.focused = false;
                     $reactive.view.cursorShow = false;
                     utools.subInputBlur();
@@ -433,12 +454,13 @@ function init(list) {
         if (e.ctrlKey || e.metaKey) {
             switch (e.code){
                 case 'KeyN':
-                    router.replace({
-                        name: 'form',
-                        query:{
-                            mode: 'new'
-                        }
-                    })
+                    navigateView(CREATE_VIEW)
+                    // router.replace({
+                    //     name: 'form',
+                    //     query:{
+                    //         mode: 'new'
+                    //     }
+                    // })
                     return;
                 // case 'KeyR':
                 //     if($reactive.currentMode === LIST_VIEW){
@@ -483,7 +505,7 @@ function init(list) {
         }
     }
     document.onkeyup = e => {
-        if ($reactive.view.settingActive | $reactive.utools.focused || $reactive.utools.selectedIndex < 0 || $reactive.currentMode === FORM_VIEW) {
+        if ($reactive.view.settingActive | $reactive.utools.focused || $index.value < 0 || $reactive.currentMode >= EDIT_VIEW) {
             return;
         }
         if (e.code === 'Space') {
@@ -491,7 +513,8 @@ function init(list) {
             if (longKeyDown) {
                 longKeyDown = false;
                 // $normal.keepSelectedStatus = true;
-                switchToListView()
+                // switchToListView()
+                navigateView(LIST_VIEW)
                 return;
             }
             if ($reactive.currentMode === LIST_VIEW) {
@@ -557,8 +580,8 @@ function parseSearchWord(searchWord){
     // 判断 keepSelectedStatus ，如果为true，需要保留selectIndex位置
     // 由于默认keepSelectedStatus为true，则selectIndex可能为非法，这时候需要忽视keepSelectedStatus
     // 只有当 删除/添加/搜索操作时，会将keepSelectedStatus置为false
-    if( $reactive.utools.selectedIndex<0 || $reactive.utools.selectedIndex>=array.length ||   $normal.keepSelectedStatus===null){
-        $reactive.utools.selectedIndex = (array.length===0)? -1: 0;
+    if( $index.value<0 || $index.value>=array.length ||   $normal.keepSelectedStatus===null){
+        $index.value = (array.length===0)? -1: 0;
     }
     // else if($normal.keepSelectedStatus){
         // nextTick(()=>{

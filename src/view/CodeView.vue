@@ -1,5 +1,5 @@
 <template>
-  <div  id="code-view">
+  <div  id="code-view" class="kit-top">
     <n-scrollbar
         style="max-height:100vh"
         :x-scrollable="!pair.renderable || !$reactive.view.isRendering"
@@ -105,8 +105,7 @@ import {configManager} from "../js/core/config";
 import {computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
-import {$normal, $reactive} from "../js/store";
-import {switchToListView} from "../router";
+import {$normal, $reactive, LIST_VIEW, navigateView} from "../js/store";
 
 const scrollBar = ref(null)
 /**
@@ -180,7 +179,7 @@ function getCodeFromPath(){
 const handleClose = ()=>{
   $reactive.view.codeTipActive = false;
   $normal.keepSelectedStatus = true;
-  switchToListView()
+  navigateView(LIST_VIEW)
 }
 function updateCachedCode(){
   if(snippet.code){   // 清除缓存

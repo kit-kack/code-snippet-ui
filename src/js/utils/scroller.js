@@ -1,4 +1,4 @@
-import {$normal, $reactive} from "../store";
+import {$index, $normal, $reactive} from "../store";
 
 
 export const Direction = {
@@ -64,15 +64,21 @@ export function doScrollForHelpView(direction){
 }
 
 /**
- * @param {boolean} [smooth]
+ * @param {boolean} [smooth] - 平滑
+ * @param {boolean} [up] - 向上
  */
-export const gotoTheLastPosition = (smooth)=>{
+export const gotoTheLastPosition = (smooth,up)=>{
     // 校准位置
-    if($reactive.utools.selectedIndex > -1 ){
-        let distance = $normal.scroll.itemOffsetArray[$reactive.utools.selectedIndex] -200;
+    if($index.value > -1 ){
+        const element = document.querySelector('#list-view #list-view-container .snippet-item:nth-child('+($index.value+1)+')')
+        let distance = 0;
+        if(element){
+            distance = Math.trunc(element.offsetTop) -220;
+        }
         if(distance < 0){
             distance = 0;
         }
+
         $normal.scroll.listInvoker?.scrollTo({top:+distance,left:0,behavior:smooth?'smooth':'auto'})
         // $var.scroll.listInvoker?.(distance)
     }

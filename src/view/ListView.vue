@@ -3,13 +3,13 @@
        @mousemove="$reactive.view.cursorShow = true">
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" :ref="(el)=>{ $normal.scroll.listInvoker = el}">
-        <div :ref="(el)=>{ $reactive.view.listViewRef = el}" v-if="$reactive.view.deepRefresh" style="padding-top: 2px">
-          <template  v-for="(snippet,index) in list" :key="snippet.id+index">
+        <div id="list-view-container" :ref="(el)=>{ $reactive.view.listViewRef = el}"  style="padding-top: 2px">
+          <template  v-for="(snippet,index) in list" :key="snippet.id">
             <list-item-async
                 :index="index"
                 :snippet="snippet"
                 :last="index === list.length - 1"
-                :selected="handleSelect(index,snippet.id,$reactive.utools.selectedIndex)"/>
+                :selected="handleSelect(index,snippet.id,$index)"/>
           </template>
           <div id="info" v-if="$reactive.view.fullScreenShow">
             <p style="color:gray;">~共有{{list.length}}条数据~</p>
@@ -72,13 +72,11 @@
 </template>
 
 <script setup>
-import {computed, defineAsyncComponent, onActivated, onMounted, ref, watch} from "vue";
+import {computed, defineAsyncComponent, onMounted, ref, watch} from "vue";
 import {init, parseSearchWord} from "../js/keyboard.js";
-import {$normal, $reactive} from "../js/store";
+import {$index, $normal, $reactive, CREATE_VIEW, navigateView} from "../js/store";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
-import {useRouter} from "vue-router";
-import {gotoTheLastPosition} from "../js/utils/scroller";
 // import ListItem from "../components/ListItem.vue";
 
 const ListItemAsync = defineAsyncComponent({
@@ -86,9 +84,8 @@ const ListItemAsync = defineAsyncComponent({
   delay: 0
 })
 
-const list = computed(()=>parseSearchWord($reactive.utools.search,$reactive.view.refresh)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
+const list = computed(()=>parseSearchWord($reactive.utools.search,$reactive.view.refreshSearch)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)
-const router = useRouter();
 const handleSelect = (index,id,selectedIndex)=>{
   if(index === selectedIndex){
     $reactive.currentSnippet = codeSnippetManager.get(id)
@@ -109,14 +106,6 @@ onMounted(()=>{
   init(list)
 })
 
-onActivated(()=>{
-  console.log('activated')
-  if($normal.keepSelectedStatus){
-    setTimeout(()=>{
-      gotoTheLastPosition();
-    })
-  }
-})
 const handleAppHeight = ()=>{
   if($reactive.view.fullScreenShow){
     utools.setExpendHeight(545)
@@ -140,12 +129,7 @@ const handleAppHeight = ()=>{
   }
 }
 function goToCreateView(){
-  router.replace({
-    name: 'form',
-    query:{
-      mode: 'new'
-    }
-  })
+  navigateView(CREATE_VIEW)
 }
 
 

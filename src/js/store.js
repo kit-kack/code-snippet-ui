@@ -1,8 +1,9 @@
-import {nextTick, reactive} from "vue";
+import {nextTick, reactive, ref} from "vue";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
-const FORM_VIEW = 2;
+const EDIT_VIEW = 2;
+const CREATE_VIEW = 3;
 
 const $normal = {
     listViewVisitedCount: 0,
@@ -20,7 +21,8 @@ const $normal = {
     },
     keepSelectedStatus: null,  // null false true  // 控制 选中元素 保持记忆功能
     updateCacheCodeFunc: null,      // 调整缓存函数
-    variables: {}        // 后续会映射类型
+    variables: {},        // 后续会映射类型
+    quickCode: null,      // 快速记录代码
 }
 const $reactive = reactive({
     currentCode: null,
@@ -37,7 +39,7 @@ const $reactive = reactive({
         variableActive: false,    // 输入自定义变量界面是否显示
         codeTipActive: false,      // 是否展示 CodeView中的 Tip
         isDel: false,             // 当前是否为 删除操作
-        refresh: true,             // // 控制ListView刷新
+        refreshSearch: true,             // // 控制ListView刷新
         deepRefresh: true,
         cursorShow: true,
         buttonFixed: false,
@@ -54,7 +56,7 @@ const $reactive = reactive({
         subItemSelectedIndex: -1,  // 选择元素子索引，控制右键菜单（Vim模式）
     }
 })
-
+const $index = ref(0)
 
 
 /**
@@ -86,15 +88,38 @@ const refreshListView = (deepFlag)=>{
             $reactive.view.deepRefresh = true
         })
     }else{
-        $reactive.view.refresh = false;
+        $reactive.view.refreshSearch = false;
         nextTick(()=>{
-            $reactive.view.refresh = true
+            $reactive.view.refreshSearch = true
         })
     }
 }
 
+
+/**
+ * 切换界面
+ * @param {number} view
+ * @param {boolean} [refresh]
+ */
+const navigateView = (view,refresh) =>{
+    if( view === LIST_VIEW){
+        handleRecoverLiteShow();
+        $reactive.currentMode = view;
+        if(refresh){
+            $reactive.view.deepRefresh = false;
+            nextTick(()=>{
+                $reactive.view.deepRefresh = true
+            })
+        }
+    }else{
+        switchToFullUIMode();
+        $reactive.currentMode = view;
+    }
+
+}
+
 export {
-    $normal,$reactive,
-    LIST_VIEW,CODE_VIEW,FORM_VIEW,
-    handleRecoverLiteShow,refreshListView,switchToFullUIMode
+    $normal,$reactive,$index,
+    LIST_VIEW,CODE_VIEW,EDIT_VIEW,CREATE_VIEW,
+    handleRecoverLiteShow,refreshListView,switchToFullUIMode,navigateView
 }

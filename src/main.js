@@ -6,12 +6,12 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath, log} from "./js/some";
-import {router, switchToListView} from "./router/index";
-import {$normal, $reactive} from "./js/store";
+import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, navigateView, refreshListView} from "./js/store";
 import {tagColorManager}  from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/format";
+import {debounce} from "./js/utils/common";
 // error
 window.onerror = function (message, source, lineno, colno, error) {
     log(`${new Date().toISOString()}-[${source}](${lineno}:${colno}): ${message}\n`)
@@ -28,7 +28,6 @@ function bindApp(){
     app.config.errorHandler = function (err, instance, info){
         log(`${new Date().toISOString()}-[${instance?.$options?.__file || instance?.$options?.name}]: ${err} - ${info}\n`)
     }
-    app.use(router)
     initNU(app)
     initVH(app)
     app.directive("code", {
@@ -97,6 +96,23 @@ utools.onPluginOut(processExit => {
     $reactive.view.backStageShow = true;
 })
 
+const dealWithSearchWord = debounce(function(text){
+    text = text.trim();
+    if(text.length === 0){
+        $reactive.utools.search = null;
+    }else{
+        if($reactive.utools.search !== text){
+            $reactive.utools.search = text;
+            $normal.keepSelectedStatus = null;
+            // $normal.itemOffsetArray = [];
+            // fix: 修复删除界面不移除
+            $reactive.view.isDel = false;
+            $reactive.view.helpActive = false;
+            refreshListView(true)
+        }
+    }
+},250)
+
 utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
         codeSnippetManager.store(backupFilePath)
@@ -117,31 +133,15 @@ utools.onPluginEnter((data)=>{
     }
     utools.setSubInput(({text}) =>{
         if($reactive.view.backStageShow){
-            // utools.showNotification("插件重新前台运行")
+            utools.showNotification("插件重新前台运行")
             $reactive.view.backStageShow = false;
-            switchToListView(true)
+            navigateView(LIST_VIEW,true)
         }
-        text = text.trim();
-        if(text.length === 0){
-            $reactive.utools.search = null;
-        }else{
-            if($reactive.utools.search !== text){
-                $reactive.utools.search = text;
-                $normal.keepSelectedStatus = null;
-                $normal.itemOffsetArray = [];
-                // fix: 修复删除界面不移除
-                $reactive.view.isDel = false;
-            }
-        }
+        dealWithSearchWord(text)
     },"搜索代码片段, 双击Tab切换UI模式")
     if(data.code==='code-snippet-save'){
-        router.push({
-            name: 'code',
-            query:{
-                mode: 'new',
-                code: data.payload
-            }
-        })
+        $normal.quickCode = data.payload;
+        navigateView(CREATE_VIEW)
         // fix: liteShow模式下高度统一
         utools.setExpendHeight(545)
     }else if(data.code=== 'code-snippet-paste'){
@@ -173,7 +173,8 @@ try{
 
     },({code,type,payload,option})=>{
         $reactive.currentSnippet = codeSnippetManager.get(option.id);
-        $reactive.utools.selectedIndex = 0;
+        // $reactive.utools.selectedIndex = 0;
+        $index.value = 0;
         return copyCode(true,undefined,true)
     })
 }catch (_){}

@@ -1,4 +1,4 @@
-import {$normal, $reactive} from "../store";
+import {$index, $normal, $reactive} from "../store";
 import {codeSnippetManager} from "../core/snippet";
 import {formatManager} from "../core/format";
 
@@ -91,7 +91,7 @@ function _notify(msg,noView){
  */
 export function copyCode(isPasted,num,noView){
     // 校验
-    if ($reactive.utools.selectedIndex < 0){
+    if ($index.value < 0){
         return;
     }
     // 获取代码
