@@ -35,7 +35,7 @@ function getThemeOverrides(){
             colorCheckedPressed:gc
         },
         Input:{
-            borderFocus: borderVar,
+            borderFocus: hoverBorderVar,
             boxShadowFocus: 'none',
             borderHover: hoverBorderVar,
             border: inputBorderVar,

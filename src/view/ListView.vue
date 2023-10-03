@@ -53,6 +53,21 @@
             </template>
             查看更多
           </n-tooltip>
+          <n-tooltip trigger="hover" placement="left">
+            <template #trigger>
+              <n-button strong circle secondary type="primary"  :color="configManager.getGlobalColor()"  @contextmenu="$reactive.view.buttonFixed = !$reactive.view.buttonFixed" @click="refreshListView(true)">
+                <template #icon>
+                  <template v-if="$reactive.view.buttonFixed">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M21.25 7.5a.75.75 0 0 1 .743.648L22 8.25v8.5a3.25 3.25 0 0 1-3.066 3.245L18.75 20H6.061l.72.72a.75.75 0 0 1 .072.976l-.073.084a.75.75 0 0 1-.976.073l-.084-.073l-2-2l-.064-.072a1.213 1.213 0 0 1-.007-.01l.07.082a.753.753 0 0 1-.127-.89a.775.775 0 0 1 .128-.17l2-2a.75.75 0 0 1 1.133.976l-.073.084l-.72.72h12.69a1.75 1.75 0 0 0 1.744-1.607l.006-.143v-8.5a.75.75 0 0 1 .75-.75zm-3.054-5.353l.084.073l2 2a.75.75 0 0 1 .071.081l-.07-.081a.752.752 0 0 1 .004 1.056l-.005.004l-2 2a.75.75 0 0 1-1.133-.976l.073-.084l.718-.72H5.25a1.75 1.75 0 0 0-1.744 1.606L3.5 7.25v8.5a.75.75 0 0 1-1.493.102L2 15.75v-8.5a3.25 3.25 0 0 1 3.066-3.245L5.25 4h12.689l-.72-.72a.75.75 0 0 1-.072-.976l.073-.084a.75.75 0 0 1 .976-.073zM12 8a4 4 0 1 1 0 8a4 4 0 0 1 0-8z" fill="currentColor"></path></g></svg>
+                  </template>
+                  <template v-else>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M14.854 2.146a.5.5 0 0 0-.708.708L15.293 4H4a2 2 0 0 0-2 2v6.5a.5.5 0 0 0 1 0V6a1 1 0 0 1 1-1h11.293l-1.147 1.146a.5.5 0 0 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2zM16 15a1 1 0 0 0 1-1V7.5a.5.5 0 0 1 1 0V14a2 2 0 0 1-2 2H4.707l1.147 1.146a.5.5 0 0 1-.708.708l-2-2a.5.5 0 0 1 0-.708l2-2a.5.5 0 0 1 .708.708L4.707 15H16zm-3-5a3 3 0 1 1-6 0a3 3 0 0 1 6 0zm-1 0a2 2 0 1 0-4 0a2 2 0 0 0 4 0z" fill="currentColor"></path></g></svg>
+                  </template>
+                </template>
+              </n-button>
+            </template>
+            左击刷新，右击{{$reactive.view.buttonFixed? '取消固定':'固定'}}
+          </n-tooltip>
         </n-space>
       </template>
       <template v-else>
@@ -74,9 +89,10 @@
 <script setup>
 import {computed, defineAsyncComponent, onMounted, ref, watch} from "vue";
 import {init, parseSearchWord} from "../js/keyboard.js";
-import {$index, $normal, $reactive, CREATE_VIEW, navigateView} from "../js/store";
+import {$index, $normal, $reactive, CREATE_VIEW, navigateView, refreshListView} from "../js/store";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
+import {NButton} from "naive-ui";
 // import ListItem from "../components/ListItem.vue";
 
 const ListItemAsync = defineAsyncComponent({

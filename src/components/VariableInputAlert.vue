@@ -1,6 +1,6 @@
 <template>
   <n-modal v-model:show="$reactive.view.variableActive"
-           :mask-closable="false">
+           :mask-closable="false" :auto-focus="false">
     <n-card
         title="输入变量"
         style="width: 60%"
@@ -9,7 +9,7 @@
         <div style="padding-right: 6px">
           <template v-for="(template,index) in templates">
             <p style="font-size: 13px;margin: 5px">{{template.label}}</p>
-            <n-input v-model:value="template.value" clearable placeholder="替换值" :autofocus="index === 0"/>
+            <n-input v-model:value="template.value" clearable placeholder="替换值"/>
           </template>
         </div>
       </n-scrollbar>

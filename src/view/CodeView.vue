@@ -437,7 +437,7 @@ onUnmounted(()=>{
 #dark-app .github-markdown-body blockquote{
   border-left-color: #515154;
 }
-#dark-app .github-markdown-body h2{
+#dark-app .github-markdown-body h2, #dark-app .github-markdown-body h1{
   border-bottom-color: #515154;
 }
 #dark-app .github-markdown-body code:not(pre) {
