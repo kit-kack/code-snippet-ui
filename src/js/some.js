@@ -1,4 +1,4 @@
-export const backupFilePath = utools.getPath('home')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
+export const backupFilePath = utools.getPath('desktop')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.md';
 export const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 
 let logCount = 0;

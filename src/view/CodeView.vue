@@ -446,5 +446,7 @@ onUnmounted(()=>{
 #dark-app .github-markdown-body a {
   color: #1c84f9;
 }
-
+#dark-app .github-markdown-body pre.v-md-mermaid{
+  background-color: #737373;
+}
 </style>

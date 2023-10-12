@@ -46,9 +46,9 @@ const datas = [
         feature: "创建代码片段",
         shortcut:"C-N"
       },{
-      //   feature: "刷新",
-      //   shortcut: "C-R"
-      // },{
+        feature: "刷新",
+        shortcut: "C-R"
+      },{
         feature: "启用/关闭Vim模式，utool输入框失聚焦",
         shortcut:"Tab"
       },{
@@ -93,8 +93,7 @@ const datas = [
         tooltip: "若为本地关联文件，结合Shift键会文件管理器打开"
       },{
         feature: "退出Quit",
-        shortcut: "Q",
-        tooltip: "该功能也适用于退出元素功能菜单"
+        shortcut: "Q"
       },{
         feature: '回到开始',
         shortcut: ["0"],

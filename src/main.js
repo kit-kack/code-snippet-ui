@@ -99,7 +99,7 @@ utools.onPluginOut(processExit => {
 utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
         codeSnippetManager.store(backupFilePath)
-        configManager.set('lastAutoBackupTime',Date.now())
+        // configManager.set('lastAutoBackupTime',Date.now())
         utools.showNotification('备份成功，备份数据文件位于：'+backupFilePath)
         return;
     }
@@ -143,17 +143,17 @@ utools.onPluginEnter((data)=>{
     }else if(data.code=== 'code-snippet-paste'){
         utools.subInputBlur();
     }
-    if(configManager.get('autoBackup')){
-        const now = Date.now();
-        const time = configManager.get('lastAutoBackupTime')??0;
-        if(now - time >= 432000000){
-            setTimeout(()=>{
-                codeSnippetManager.store(backupFilePath)
-                configManager.set('lastAutoBackupTime',now)
-                utools.showNotification('自动备份触发（周期为每5天），备份数据文件位于:'+backupFilePath)
-            },1000)
-        }
-    }
+    // if(configManager.get('autoBackup')){
+    //     const now = Date.now();
+    //     const time = configManager.get('lastAutoBackupTime')??0;
+    //     if(now - time >= 432000000){
+    //         setTimeout(()=>{
+    //             codeSnippetManager.store(backupFilePath)
+    //             configManager.set('lastAutoBackupTime',now)
+    //             utools.showNotification('自动备份触发（周期为每5天），备份数据文件位于:'+backupFilePath)
+    //         },1000)
+    //     }
+    // }
 })
 
 try{

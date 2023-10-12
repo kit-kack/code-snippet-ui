@@ -20,16 +20,16 @@
       <n-select  v-model:value="codeBlockRef" :options="codeBlockOptions" size="tiny" @update-value="handleCodeBlockChange"/>
       <config-check-tag v-if="!configManager.get('noItemCodeShow')" @refresh="refreshListView(true)" title="不高亮展示" config="rawLineCode"/>
     </n-space>
-    <n-space align="center" vertical v-if="colorSchemaRef === -1">
-      <n-space>
-        <color-picker :instance="colorInstances[0]"/>
-        <color-picker :instance="colorInstances[1]"/>
-      </n-space>
-      <n-space>
-        <color-picker :instance="colorInstances[2]"/>
-        <color-picker :instance="colorInstances[3]"/>
-      </n-space>
-    </n-space>
+<!--    <n-space align="center" vertical v-if="colorSchemaRef === -1">-->
+<!--      <n-space>-->
+<!--        <color-picker :instance="colorInstances[0]"/>-->
+<!--        <color-picker :instance="colorInstances[1]"/>-->
+<!--      </n-space>-->
+<!--      <n-space>-->
+<!--        <color-picker :instance="colorInstances[2]"/>-->
+<!--        <color-picker :instance="colorInstances[3]"/>-->
+<!--      </n-space>-->
+<!--    </n-space>-->
   </n-space>
 </template>
 
@@ -71,35 +71,35 @@ function handleCodeBlockChange(v){
   }
   refreshListView(true)
 }
-const colorInstances = [{
-  title: "全局主题 颜色",
-  color: configManager.getGlobalColor(),
-  handleConfirm: v=>{
-    configManager.setGlobalColor(v)
-    globalThemeRefresh();
-    refreshListView(true)
-  }
-},{
-  title: "被选中元素 背景颜色",
-  color: configManager.getColor('SelectedColor'),
-  handleConfirm: v=>{
-    configManager.setColor('SelectedColor',v)
-    refreshListView(true)
-  }
-},{
-  title: "自定义标签 默认颜色",
-  color: configManager.getColor('TagColor'),
-  handleConfirm: v=>{
-    configManager.setColor('TagColor',v)
-    refreshListView(true)
-  }
-},{
-  title: '代码高亮行颜色',
-  color: configManager.getColor('HighlightColor'),
-  handleConfirm: v=>{
-    configManager.setColor('HighlightColor',v)
-  }
-}];
+// const colorInstances = [{
+//   title: "全局主题 颜色",
+//   color: configManager.getGlobalColor(),
+//   handleConfirm: v=>{
+//     configManager.setGlobalColor(v)
+//     globalThemeRefresh();
+//     refreshListView(true)
+//   }
+// },{
+//   title: "被选中元素 背景颜色",
+//   color: configManager.getColor('SelectedColor'),
+//   handleConfirm: v=>{
+//     configManager.setColor('SelectedColor',v)
+//     refreshListView(true)
+//   }
+// },{
+//   title: "自定义标签 默认颜色",
+//   color: configManager.getColor('TagColor'),
+//   handleConfirm: v=>{
+//     configManager.setColor('TagColor',v)
+//     refreshListView(true)
+//   }
+// },{
+//   title: '代码高亮行颜色',
+//   color: configManager.getColor('HighlightColor'),
+//   handleConfirm: v=>{
+//     configManager.setColor('HighlightColor',v)
+//   }
+// }];
 
 const colorSchemaOptions = [
   {
@@ -127,11 +127,11 @@ const colorSchemaOptions = [
   },{
     label: '红色',
     value: 6
-  },
-  {
-    label: '自定义(取色方式)',
-    value: -1
   }
+  // {
+  //   label: '自定义(取色方式)',
+  //   value: -1
+  // }
 ]
 const renderLabel = (option) => {
     return h(
