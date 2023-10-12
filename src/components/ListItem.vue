@@ -14,19 +14,25 @@
             header-style="height:28px;"
             :style="getSelectedStyle(props.selected,isHover&&$reactive.view.cursorShow)"
     >
+      <!-- 置顶 圆心 -->
       <div class="snippet-item__top"
            :style="{
               backgroundColor: configManager.getTopList().includes(snippet.id)? configManager.getGlobalColor(): ''
            }"
       ></div>
+      <!-- 右侧 序号 -->
       <span class="snippet-item__index"  :style="getTitleStyle(props.selected,false)">{{index}}</span>
       <template #header>
         <n-scrollbar x-scrollable>
           <div class="snippet-item-head__left">
             <n-ellipsis >
-              <span :style="getTitleStyle(props.selected,true)"  >{{props.snippet.name}}</span>
+              <!-- 标题 -->
+              <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
+              <!-- 本地&网络 -->
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="snippet.path&& configManager.get('noItemCodeShow')">{{snippet.local? '本地':'网络'}}</span>
+              <!-- 描述（标题右侧） -->
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="!configManager.get('noItemCodeShow')">{{snippet.desc}}</span>
+              <!-- 子代码片段 -->
               <span class="snippet-item__desc"  style="margin-left: 10px;" v-if="configManager.get('noItemCodeShow')">
                 {{(snippet.sections?.length> 0? snippet.sections.length+'个子代码片段': '') ??''}}
               </span>
@@ -34,6 +40,7 @@
           </div>
         </n-scrollbar>
       </template>
+      <!-- 标签 -->
       <template #header-extra >
         <n-scrollbar x-scrollable :size="10" style="max-width: 250px;margin-left: 5px">
           <div class="sub">
@@ -44,11 +51,13 @@
         </n-scrollbar>
       </template>
 
+      <!-- 描述（标题下方） -->
       <template v-if="configManager.get('noItemCodeShow')">
         <n-ellipsis :tooltip="false">
           <span class="snippet-item__desc" style="margin-left: 6px">{{snippet.desc}}</span>
         </n-ellipsis>
       </template>
+      <!-- 代码 -->
       <template v-else>
         <template v-if="configManager.get('fullItemCodeShow')">
           <multi-line-code :type="pair.type" :code="pair.code" :active="$index === index"/>
@@ -56,10 +65,12 @@
         <template v-else>
           <single-line-code :type="pair.type" :code="pair.code"/>
         </template>
+        <!-- 子代码片段 -->
         <span  class="snippet-item-info sub-item-code" style="left: 0px;z-index: 20;" >
               {{(snippet.sections?.length> 0? snippet.sections.length+'个子代码片段': '') ??''}}
         </span>
       </template>
+      <!-- 右侧下方 （语言类型|使用次数|上次使用时间） -->
       <span v-if="selected" class="snippet-item-info" style="right: -5px" :style="{color: configManager.getGlobalColor()}">
               {{pair.txt}}
       </span>
@@ -379,6 +390,14 @@ const doItemRefresh = ()=>{
 }
 #light-app .sub-item-code{
   color:#bdbfc0;
+}
+.snippet-item__title{
+  font-weight: bold;
+  z-index: 20;
+  color: #505050;
+}
+#dark-app .snippet-item__title{
+  color: #E0E0E0;
 }
 
 

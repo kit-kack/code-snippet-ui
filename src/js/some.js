@@ -4,6 +4,7 @@ export const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 let logCount = 0;
 const logFilePath = utools.getPath('temp')+(utools.isWindows()? "\\":'/') +'code-snippet-log.txt';
 export function log(msg){
+    console.error(msg)
     logCount++;
     if(logCount === 1000){
         logCount = 0

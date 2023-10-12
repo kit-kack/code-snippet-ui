@@ -465,20 +465,31 @@ export const codeSnippetManager = {
         if(name !== null){
             // 0. 搜索词需要同样被替换
             for (const codeSnippet of this.codeMap.values()) {
-                const query = codeSnippet.name.trim().toLowerCase();
+                const query = codeSnippet.name.toLowerCase();
                 // 2.比较 查询缓存
                 if(configManager.get('enabledFuzzySymbolQuery')){
-                    if(fuzzyCompare(name,query)){
+                    const offsets = fuzzyCompare(name,query);
+                    if(offsets){
+                        // 拆分替换
+                        const charArray = codeSnippet.name.split('')
+                        for (let offset of offsets) {
+                            charArray[offset] = `<span style="color: ${configManager.getGlobalColor()}">${charArray[offset]}</span>`
+                        }
+                        codeSnippet.temp = charArray.join('');
                         list.push(codeSnippet)
                     }
                 }else{
                     if(query.includes(name)){
-                        list.push(codeSnippet);
+                        codeSnippet.temp = codeSnippet.name.replace(new RegExp(name,"i"),`<span style="color: ${configManager.getGlobalColor()}">${name}</span>`)
+                        list.push(codeSnippet)
                     }
                 }
             }
         }else{
-            list = Array.from(this.codeMap.values())
+            for (let codeSnippet of this.codeMap.values()) {
+                codeSnippet.temp = undefined;
+                list.push(codeSnippet)
+            }
         }
         if(tags !== null && tags.length > 0){
             tags = tags.map(value => value.toLowerCase())

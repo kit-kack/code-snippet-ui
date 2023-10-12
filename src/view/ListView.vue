@@ -4,8 +4,8 @@
     <template v-if="list.length > 0">
       <n-scrollbar style="max-height: 99vh" :ref="(el)=>{ $normal.scroll.listInvoker = el}">
         <div id="list-view-container" :ref="(el)=>{ $reactive.view.listViewRef = el}"  style="padding-top: 2px">
-          <template  v-for="(snippet,index) in list" :key="snippet.id">
-            <list-item-async
+          <template  v-for="(snippet,index) in list" :key="snippet.id+snippet.temp">
+            <list-item
                 :index="index"
                 :snippet="snippet"
                 :last="index === list.length - 1"
@@ -87,12 +87,13 @@
 </template>
 
 <script setup>
-import {computed, defineAsyncComponent, onMounted, ref, watch} from "vue";
+import {computed, defineAsyncComponent, nextTick, onMounted, onUpdated, ref, watch} from "vue";
 import {init, parseSearchWord} from "../js/keyboard.js";
 import {$index, $normal, $reactive, CREATE_VIEW, navigateView, refreshListView} from "../js/store";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import {NButton} from "naive-ui";
+import ListItem from "../components/ListItem.vue";
 // import ListItem from "../components/ListItem.vue";
 
 const ListItemAsync = defineAsyncComponent({
@@ -110,11 +111,11 @@ const handleSelect = (index,id,selectedIndex)=>{
     return false;
   }
 }
-watch(list,(newValue,oldValue)=>{
- handleAppHeight()
-},{
-  flush: 'post'
-})
+// watch(list,(newValue,oldValue)=>{
+//  handleAppHeight()
+// },{
+//   flush: 'post'
+// })
 
 onMounted(()=>{
   parseSearchWord($reactive.utools.search)

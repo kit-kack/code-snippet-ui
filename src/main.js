@@ -7,11 +7,10 @@ import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath, log} from "./js/some";
 import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, navigateView, refreshListView} from "./js/store";
-import {tagColorManager}  from "./js/core/tag";
+import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/format";
-import {debounce} from "./js/utils/common";
 // error
 window.onerror = function (message, source, lineno, colno, error) {
     log(`${new Date().toISOString()}-[${source}](${lineno}:${colno}): ${message}\n`)
@@ -121,7 +120,7 @@ utools.onPluginEnter((data)=>{
             $reactive.view.backStageShow = false;
             navigateView(LIST_VIEW,true)
         }
-        text = text.trim();
+        text = text.trim().toLowerCase();
         if(text.length === 0){
             $reactive.utools.search = null;
         }else{

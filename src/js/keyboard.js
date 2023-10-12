@@ -548,9 +548,11 @@ function parseSearchWord(searchWord){
         if($reactive.view.fullScreenShow  || !configManager.get('noShowForEmptySearch')){
             array = codeSnippetManager.queryForMany(null,null,null)
         }else{
+            // lite & empty show
             if(!configManager.get('closeHelpSnippet')){
                 return [defaultHelpSnippet];
             }
+            utools.setExpendHeight(0)
             return [];
         }
     }else{
@@ -597,6 +599,15 @@ function parseSearchWord(searchWord){
     // $normal.keepSelectedStatus = false;
     // 控制tip显示策略
     $reactive.view.onlyOne =  array.length === 1;
+
+    // 控制界面高度
+    if(array.length === 0){
+        if(!$reactive.view.fullScreenShow  && configManager.get('noShowForEmptySearch')){
+            utools.setExpendHeight(0)
+        }
+    }
+
+
     return array;
 }
 
