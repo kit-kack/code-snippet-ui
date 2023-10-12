@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.4](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.3...v2.3.4) (2023-10-12)
+
+
+### Features
+
+* 移除自定义配色；移除自动备份 ([a24814d](https://github.com/littledot-kit/code-snippet-ui/commit/a24814d662a1bf50350ea57c9d732b9f4d6c67a1))
+* 支持标题高亮搜索显示 ([fed1950](https://github.com/littledot-kit/code-snippet-ui/commit/fed1950de266f6500072962bba0e54672eba07d5))
+
+
+### Bug Fixes
+
+* 修复一些显示bug ([b595319](https://github.com/littledot-kit/code-snippet-ui/commit/b595319f789da95a9b8b851f4d2ab465103f0b5c))
+* 修复vim按钮z-index问题；修复高亮搜索词覆盖问题 ([df7e156](https://github.com/littledot-kit/code-snippet-ui/commit/df7e15643b85c2568c306ed02bd7cbd6b62016d7))
+
 ### [2.3.3](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.2...v2.3.3) (2023-10-03)
 - 与uTools保持版本号同步
 ### [2.3.2](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.1...v2.3.2) (2023-10-03)
