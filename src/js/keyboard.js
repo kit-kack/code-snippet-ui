@@ -601,7 +601,7 @@ function parseSearchWord(searchWord){
 
     // 控制界面高度
     if(array.length === 0){
-        if(!$reactive.view.fullScreenShow  && configManager.get('noShowForEmptySearch')){
+        if(!$reactive.view.fullScreenShow){
             utools.setExpendHeight(0)
         }
     }
