@@ -480,7 +480,7 @@ export const codeSnippetManager = {
                     }
                 }else{
                     if(query.includes(name)){
-                        codeSnippet.temp = codeSnippet.name.replace(new RegExp(name,"i"),`<span style="color: ${configManager.getGlobalColor()}">${name}</span>`)
+                        codeSnippet.temp = codeSnippet.name.replace(new RegExp(name,"i"),`<span style="color: ${configManager.getGlobalColor()}">$&</span>`)
                         list.push(codeSnippet)
                     }
                 }

@@ -21,7 +21,7 @@
            }"
       ></div>
       <!-- 右侧 序号 -->
-      <span class="snippet-item__index"  :style="getTitleStyle(props.selected,false)">{{index}}</span>
+      <span class="snippet-item__index snippet-item__title">{{index}}</span>
       <template #header>
         <n-scrollbar x-scrollable>
           <div class="snippet-item-head__left">
@@ -184,13 +184,7 @@ const getSelectedStyle =(selected,isHoverRef)=>{
     return `border: 2px solid transparent !important; ${style}`;
   }
 }
-const getTitleStyle = (selected,flag) =>{
-  return {
-    color: selected? configManager.getGlobalColor():(utools.isDarkColors()?'#E0E0E0':'#505050'),
-    fontWeight: flag?'bold':'normal',
-    'zIndex': 20
-  }
-}
+
 const handleAppHeight = ()=>{
   if($reactive.view.fullScreenShow){
     utools.setExpendHeight(545)

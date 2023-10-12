@@ -83,6 +83,6 @@ const handleVimStatusBarClick = ()=>{
   left:20px;
   bottom: 12px;
   font-size: 12px;
-  z-index: 20;
+  z-index: 2000;
 }
 </style>
