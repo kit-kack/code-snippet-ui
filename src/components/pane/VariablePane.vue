@@ -51,8 +51,8 @@
 </template>
 <script setup>
   import {ref} from "vue";
-  import {formatManager} from "../js/core/format";
-  import {getRefreshFunc} from "../js/utils/common";
+  import {formatManager} from "../../js/core/format";
+  import {getRefreshFunc} from "../../js/utils/common";
 
   const activeKey = ref(null)
   const showModal = ref(false)

@@ -45,6 +45,19 @@ export function getRefreshFunc(ref_flag,fn){
 
 }
 
+/**
+ * 检查是否存在字符串（忽略大小写匹配）
+ * @param {string[]} array
+ * @param {string} target
+ */
+export function lowercaseIncludes(array, target){
+    for (let str of array) {
+        if(target === str.toLowerCase()){
+            return true;
+        }
+    }
+    return false;
+}
 
 /**
  * 计算与当前的相差时间

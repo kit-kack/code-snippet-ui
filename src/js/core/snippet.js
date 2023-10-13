@@ -14,6 +14,7 @@ import {
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./format";
+import {lowercaseIncludes} from "../utils/common";
 
 
 /**
@@ -368,8 +369,8 @@ export const codeSnippetManager = {
      * @param {CodeSnippet} codeSnippet
      */
     add(codeSnippet){
-        if(codeSnippet.name === defaultHelpSnippet.name){
-            $message.error(defaultHelpSnippet.name+"属于内置名，无法被使用")
+        if(codeSnippet.help){
+            $message.error("用户无法主动创建内置说明片段")
             return;
         }
         codeSnippet.id = nanoid();
@@ -424,9 +425,6 @@ export const codeSnippetManager = {
      * @return {boolean}
      */
     contain(name){
-        if(name === defaultHelpSnippet.name){
-            return true;
-        }
         for (const snippet of this.codeMap.values()) {
             if(snippet.name === name){
                 return true
@@ -498,11 +496,11 @@ export const codeSnippetManager = {
                     return false;
                 }
                 for(const tag of tags){
-                    if(!codeSnippet.tags.includes(tag)){
-                        return false;
+                    if(lowercaseIncludes(codeSnippet.tags,tag)){
+                        return true;
                     }
                 }
-                return true;
+                return false;
             })
         }
         if(type !== null){

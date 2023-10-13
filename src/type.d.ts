@@ -30,7 +30,9 @@ declare interface CodeSnippet{
     // 路径 (本地 或者 网络)
     path?: string,
     // 是否为本地
-    local?: boolean
+    local?: boolean,
+    // 是否为内置说明文档，无法修改使用
+    help?: boolean
 }
 
 declare type ConfigItem =
@@ -65,3 +67,4 @@ declare type ConfigItem =
     | "autoBackup"                                  // 自动备份
     | "lastAutoBackupTime"                          // 上次自动备份时间
     | "closeHelpSnippet"                            // 关闭defaultHelpSnippet
+    | "aidTagSelect"                               // 标签辅助选择

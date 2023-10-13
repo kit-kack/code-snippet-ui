@@ -187,7 +187,7 @@ function dealWithListView(e,list){
             }
             break;
         case 'KeyT':// TODO:处理置顶ID情况
-            if($reactive.currentSnippet.id === defaultHelpSnippet.id){
+            if($reactive.currentSnippet.help){
                 $message.warning('内置文档无法置顶');
                 return;
             }
@@ -342,7 +342,7 @@ function dealWithCommonView(e){
             // handleCopy(true)
             break;
         case 'KeyE':
-            if($reactive.currentSnippet.id === defaultHelpSnippet.id){
+            if($reactive.currentSnippet.help){
                 $message.warning("内置文档，无法修改");
                 return;
             }
@@ -544,6 +544,8 @@ function parseSearchWord(searchWord){
         configManager.set('closeHelpSnippet',false)
     }
     if(searchWord == null || searchWord.length === 0){
+        $reactive.view.aidTagActive = false;
+        $normal.tempTags = [];
         if($reactive.view.fullScreenShow  || !configManager.get('noShowForEmptySearch')){
             array = codeSnippetManager.queryForMany(null,null,null)
         }else{
@@ -559,6 +561,7 @@ function parseSearchWord(searchWord){
         let name = null;
         let type = null;
         let tags = [];
+        let tagFlag = false;
         for (let word of words) {
             if(word[0] === '@'){
                 if(word.length !== 1){
@@ -567,11 +570,15 @@ function parseSearchWord(searchWord){
             }else if(word[0] === '#'){
                 if(word.length !== 1){
                     tags.push(word.slice(1))
+                }else{
+                    tagFlag = true;
                 }
             }else{
                 name = word;
             }
         }
+        $reactive.view.aidTagActive = (tagFlag && configManager.get('aidTagSelect'));
+        $normal.tempTags = tags;
         array = codeSnippetManager.queryForMany(name,tags,type)
     }
     if(!configManager.get('closeHelpSnippet')){
@@ -602,11 +609,9 @@ function parseSearchWord(searchWord){
     // 控制界面高度
     if(array.length === 0){
         if(!$reactive.view.fullScreenShow){
-            utools.setExpendHeight(0)
+            utools.setExpendHeight($reactive.view.aidTagActive? 65:0)
         }
     }
-
-
     return array;
 }
 

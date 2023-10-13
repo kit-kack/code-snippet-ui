@@ -39,6 +39,12 @@
             本功能只在 列表UI模式下 生效
           </n-tooltip>
         </n-space>
+        <n-tooltip trigger="hover">
+          <template #trigger>
+            <config-check-tag title="💡标签辅助选择" config="aidTagSelect"/>
+          </template>
+          开启后，输入框输入#后，会辅助提示选择标签
+        </n-tooltip>
       </n-space>
       <n-divider title-placement="center">
         个性化设置
@@ -89,7 +95,7 @@ import NormalTag from "../components/NormalTag.vue";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import VariablePane from "../components/VariablePane.vue";
+import VariablePane from "../components/pane/VariablePane.vue";
 import {refreshListView} from "../js/store";
 import CustomView from "./CustomView.vue";
 import ConfigSwitch from "../components/ConfigSwitch.vue";

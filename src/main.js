@@ -120,7 +120,7 @@ utools.onPluginEnter((data)=>{
             $reactive.view.backStageShow = false;
             navigateView(LIST_VIEW,true)
         }
-        text = text.trim().toLowerCase();
+        text = text.trim();
         if(text.length === 0){
             $reactive.utools.search = null;
         }else{

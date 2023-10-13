@@ -23,6 +23,7 @@ const $normal = {
     updateCacheCodeFunc: null,      // 调整缓存函数
     variables: {},        // 后续会映射类型
     quickCode: null,      // 快速记录代码
+    tempTags: []          // tags缓存
 }
 const $reactive = reactive({
     currentCode: null,
@@ -33,6 +34,7 @@ const $reactive = reactive({
     currentSnippet: null,
     view:{
         fullScreenShow: true,     // 是否为完整UI模式
+        aidTagActive: false,
         helpActive: false,        // 快速方式界面是否显示
         settingActive: false,     // 侧边栏是否开启，禁止其他按键操作
 // @deprecated        customActive: false,      // 自定义底边栏
