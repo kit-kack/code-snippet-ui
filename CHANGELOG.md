@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.4...v2.4.0) (2023-10-13)
+
+
+### Features
+
+* 标签辅助选择 ([5e4f496](https://github.com/littledot-kit/code-snippet-ui/commit/5e4f496afa845fb2205fc46017ade721a8d25f49))
+* 支持清空所有代码片段 ([ac38e62](https://github.com/littledot-kit/code-snippet-ui/commit/ac38e628caf041f21ecd88e9f203f5ba30c55039))
+* 支持注册关键字 ([caa2314](https://github.com/littledot-kit/code-snippet-ui/commit/caa2314240045a763309d84c7d8b725fa45a188b))
+* 主题简化；修复文档 ([db997e8](https://github.com/littledot-kit/code-snippet-ui/commit/db997e868ab53a9ca6facc1251a12cbd18d9048c))
+
+
+### Bug Fixes
+
+* 完善 注册关键字功能 ([b0340c7](https://github.com/littledot-kit/code-snippet-ui/commit/b0340c74e155d2934f0a0e0173bdef6bdaa81c7f))
+* 修复卡顿情况 ([aeac50f](https://github.com/littledot-kit/code-snippet-ui/commit/aeac50f3ae48c201b328942c662d9249c757d4b1))
+* 修复lite模式显示空时的bug ([4865830](https://github.com/littledot-kit/code-snippet-ui/commit/4865830ac1f1d46672f28ed454bd8b9a40a20731))
+* 修缮一些说明 ([e879c12](https://github.com/littledot-kit/code-snippet-ui/commit/e879c1290f6e4f66c87a3f3655bb569fe330862b))
+
 ### [2.3.4](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.3...v2.3.4) (2023-10-12)
 
 
