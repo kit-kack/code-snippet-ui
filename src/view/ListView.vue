@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import {computed, defineAsyncComponent, nextTick, onMounted, onUpdated, ref, watch} from "vue";
+import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {init, parseSearchWord} from "../js/keyboard.js";
 import {$index, $normal, $reactive, CREATE_VIEW, navigateView, refreshListView} from "../js/store";
 import {codeSnippetManager} from "../js/core/snippet";
@@ -96,10 +96,10 @@ import {NButton} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
 // import ListItem from "../components/ListItem.vue";
 
-const ListItemAsync = defineAsyncComponent({
-  loader:() => import("../components/ListItem.vue"),
-  delay: 0
-})
+// const ListItemAsync = defineAsyncComponent({
+//   loader:() => import("../components/ListItem.vue"),
+//   delay: 0
+// })
 
 const list = computed(()=>parseSearchWord($reactive.utools.search,$reactive.view.refreshSearch)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 const expanded = ref(false)

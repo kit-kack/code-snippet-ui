@@ -1,7 +1,9 @@
 <template>
   <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
     <n-message-provider>
+      <n-dialog-provider>
         <middle-view/>
+      </n-dialog-provider>
     </n-message-provider>
   </n-config-provider>
 </template>

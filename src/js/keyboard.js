@@ -21,7 +21,6 @@ import {
     gotoTheLastPosition
 } from "./utils/scroller";
 import {copyCode} from "./utils/copy";
-import {nextTick} from "vue";
 
 // 控制长按键
 let longKeyDown = false;

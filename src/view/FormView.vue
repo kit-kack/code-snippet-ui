@@ -16,24 +16,24 @@
         <n-input v-model:value="codeTemplate.desc" clearable/>
       </n-form-item>
       <n-form-item label="标签" path="tags">
-<!--        <n-select-->
-<!--            v-model:value="codeTemplate.tags"-->
-<!--            filterable-->
-<!--            multiple-->
-<!--            tag-->
-<!--            :options="tags"-->
-<!--        />-->
-        <n-dynamic-tags v-model:value="codeTemplate.tags">
-          <template #input="{ submit, deactivate }">
-            <n-select
-                v-model:value="tempTag"
-                filterable tag
-                @blur="submit(tempTag);tempTag=null"
-                :options="tags"
-                placeholder="请选择或输入标签"
-            />
-          </template>
-        </n-dynamic-tags>
+        <n-select
+            v-model:value="codeTemplate.tags"
+            filterable
+            multiple
+            tag
+            :options="tags"
+        />
+<!--        <n-dynamic-tags v-model:value="codeTemplate.tags">-->
+<!--          <template #input="{ submit, deactivate }">-->
+<!--            <n-select-->
+<!--                v-model:value="tempTag"-->
+<!--                filterable tag-->
+<!--                @blur="submit(tempTag);tempTag=null"-->
+<!--                :options="tags"-->
+<!--                placeholder="请选择或输入标签"-->
+<!--            />-->
+<!--          </template>-->
+<!--        </n-dynamic-tags>-->
       </n-form-item>
       <n-form-item label="代码片段" path="code">
         <template #default>

@@ -628,5 +628,10 @@ export const codeSnippetManager = {
         }else{
             utools.showNotification('已导入'+count+'条数据;'+msg+'，导致后续的数据不能被导入')
         }
+    },
+    empty() {
+        for (let id of this.codeMap.keys()) {
+            this.del(id)
+        }
     }
 }

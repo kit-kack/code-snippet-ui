@@ -32,18 +32,17 @@ import SideView from "./SideView.vue";
 import VimStatusBar from "../components/VimStatusBar.vue";
 import ShortcutPane from "../components/pane/ShortcutPane.vue";
 import {ref} from "vue";
-import {useMessage} from 'naive-ui'
+import {useMessage,useDialog} from 'naive-ui'
 import VariableInputAlert from "../components/VariableInputAlert.vue";
 import {$normal, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import ListView from "./ListView.vue";
 import CodeView from "./CodeView.vue";
 import FormView from "./FormView.vue";
-import {tagColorManager} from "../js/core/tag";
-import NormalTag from "../components/NormalTag.vue";
 import AidTagPane from "../components/pane/AidTagPane.vue";
 
 const helpViewScorllerRef = ref(null)
 window.$message = useMessage();
+window.$dialog = useDialog();
 
 function onShow(){
   if($normal.scroll.helpInvoker === null){
