@@ -1,12 +1,7 @@
 <template>
   <n-space vertical align="center">
     <n-space>
-      <n-tooltip>
-        <template #trigger>
-          <span>&nbsp;💡配色方案：</span>
-        </template>
-        亮色和暗色场景独立保存，互不影响
-      </n-tooltip>
+      <span>&nbsp;配色方案：</span>
       <n-select
           v-model:value="colorSchemaRef"
           :options="colorSchemaOptions"
@@ -107,26 +102,20 @@ const colorSchemaOptions = [
     value: 0
   },
   {
-    label: '青色',
+    label: '蓝色',
     value: 1
   },
   {
-    label: '蓝色',
-    value: 2
-  },
-  {
     label: '紫色',
-    value: 3
+    value: 2
   },  {
     label: '粉色',
-    value: 4
-  },
+    value: 3
+  }
+,
   {
     label: '金色',
-    value: 5
-  },{
-    label: '红色',
-    value: 6
+    value: 4
   }
   // {
   //   label: '自定义(取色方式)',
@@ -149,7 +138,7 @@ const renderLabel = (option) => {
 }
 const handleColorSchema = (v)=>{
   configManager.set(utools.isDarkColors()? 'darkColorSchema': 'colorSchema',v);
-  if(v < 0){
+  if(v < 0 || v >= colorSchemaOptions.length){
     return;
   }
   adjustTheme(v)

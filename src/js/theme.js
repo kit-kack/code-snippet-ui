@@ -100,12 +100,12 @@ const colorSchemaStyleOptions = [
         tagColor: '#18a057ff',
         highColor: '#d1f8e3aa'
     },
-    {
-        globalColor: '#36cfc9ff',
-        selectedColor: '#e6fffbff',
-        tagColor: '#10d5d5ff',
-        highColor: '#cbf3f199'
-    },
+    // {
+    //     globalColor: '#36cfc9ff',
+    //     selectedColor: '#e6fffbff',
+    //     tagColor: '#10d5d5ff',
+    //     highColor: '#cbf3f199'
+    // },
     {
         globalColor: '#40a9ffff',
         selectedColor: '#e6f2ffff',
@@ -121,56 +121,62 @@ const colorSchemaStyleOptions = [
         selectedColor: '#fff0f6ff',
         tagColor: '#d41678ff',
         highColor: '#fdd8eaaa'
-    },{
-        globalColor: '#f8c76dff',
+    }
+    ,{
+        globalColor: '#fdb83aff',
         selectedColor: '#fffbe6ff',
         tagColor: '#d9950dff',
         highColor: '#f6e6c8aa'
-    },{
-        globalColor: '#ff7875ff',
-        selectedColor: '#fff1f0ff',
-        tagColor: '#d41619ff',
-        highColor: '#fcd0cfaa'
-    }];
+    }
+    // , {
+    //     globalColor: '#ff7875ff',
+    //     selectedColor: '#fff1f0ff',
+    //     tagColor: '#d41619ff',
+    //     highColor: '#fcd0cfaa'
+    // }
+    ];
 const darkColorSchemaStyleOptions = [
     {
-        globalColor: '#479a6dff',
+        globalColor: '#5ccb8fff',
         selectedColor: '#343c38ff',
         tagColor: '#1e5237ff',
         highColor: '#1A49319E'
     },
+    // {
+    //     globalColor: '#069898ff',
+    //     selectedColor: '#3a4547ff',
+    //     tagColor: '#0f5252ff',
+    //     highColor: '#154D4DAA'
+    // },
     {
-        globalColor: '#069898ff',
-        selectedColor: '#3a4547ff',
-        tagColor: '#0f5252ff',
-        highColor: '#154D4DAA'
-    },
-    {
-        globalColor: '#0266caff',
+        globalColor: '#90caf9ff',
         selectedColor: '#2d3945ff',
-        tagColor: '#1f4061ff',
-        highColor: '#0241855B'
+        tagColor: '#076DBFFF',
+        highColor: '#90caf955'
     },{
-        globalColor: '#8a63bbff',
+        globalColor: '#9f72d7ff',
         selectedColor: '#3e3747ff',
         tagColor: '#4a3861ff',
         highColor: '#4a386155'
     },{
-        globalColor: '#aa467aff',
+        globalColor: '#d25696ff',
         selectedColor: '#4d3641ff',
         tagColor: '#68314eff',
         highColor: '#562940AF'
-    },{
-        globalColor: '#ffa600ff',
+    }
+    ,{
+        globalColor: '#f2c55cff',
         selectedColor: '#524b3fff',
         tagColor: '#8a610fff',
         highColor: '#EC9E0721'
-    },{
-        globalColor: '#ff7875ff',
-        selectedColor: '#4d3636ff',
-        tagColor: '#84393aff',
-        highColor: '#FF78753D'
-    }];
+    }
+    // ,{
+    //     globalColor: '#ff7875ff',
+    //     selectedColor: '#4d3636ff',
+    //     tagColor: '#84393aff',
+    //     highColor: '#FF78753D'
+    // }
+    ];
 
 function initTheme(){
     let flag = false;

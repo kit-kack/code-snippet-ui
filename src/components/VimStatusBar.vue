@@ -17,7 +17,7 @@
           {{$index}}{{$reactive.utools.subItemSelectedIndex > -1? `#${$reactive.utools.subItemSelectedIndex}`:''}}
         </n-button>
       </template>
-      {{($reactive.currentMode <= CODE_VIEW)? 'Utool输入框失去焦点，才能成功启用Vim模式':'Vim模式不适用当前场景'}}
+      {{($reactive.currentMode <= CODE_VIEW)? 'uTools子输入框失去焦点，才能成功启用Vim模式':'Vim模式不适用当前场景'}}
     </n-tooltip>
   </div>
 
