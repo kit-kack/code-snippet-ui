@@ -10,11 +10,11 @@
         ref="form"
     >
       <n-form-item label="代码片段名" path="name">
-        <n-input v-model:value="codeTemplate.name" clearable autofocus/>
+        <n-input v-model:value="codeTemplate.name" placeholder="起个好名字呗~"  clearable autofocus/>
         <n-tag style="margin-left: 10px;user-select: none" checkable v-model:checked="codeTemplate.feature" >设置为uTools关键字</n-tag>
       </n-form-item>
       <n-form-item label="代码描述" path="desc">
-        <n-input v-model:value="codeTemplate.desc" clearable/>
+        <n-input v-model:value="codeTemplate.desc" placeholder="可选：请输入描述" clearable />
       </n-form-item>
       <n-form-item label="标签" path="tags">
         <n-select
@@ -22,6 +22,7 @@
             filterable
             multiple
             tag
+            placeholder="可选：请选择或输入标签"
             :options="tags"
         />
 <!--        <n-dynamic-tags v-model:value="codeTemplate.tags">-->
