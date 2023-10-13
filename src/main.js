@@ -5,7 +5,7 @@ import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
-import {backupFilePath, log} from "./js/some";
+import {backupFilePath} from "./js/some";
 import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, navigateView, refreshListView} from "./js/store";
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
