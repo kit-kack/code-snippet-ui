@@ -95,6 +95,13 @@ utools.onPluginEnter((data)=>{
         // configManager.set('lastAutoBackupTime',Date.now())
         utools.showNotification('备份成功，备份数据文件位于：'+backupFilePath)
         return;
+    }else if(data.code === 'code-snippet-keyword'){
+        $reactive.currentSnippet = codeSnippetManager.getByName(data.payload);
+        // $reactive.utools.selectedIndex = 0;
+        $index.value = 0;
+        if(!copyCode(true,undefined,true)){
+            return;
+        }
     }
 
     console.log('Enter App ...')

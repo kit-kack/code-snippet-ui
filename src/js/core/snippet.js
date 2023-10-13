@@ -572,6 +572,7 @@ export const codeSnippetManager = {
         let msg = null;
         let count = 0;
         let header = false;
+        const repeatCodeSnippets = [];
 
         while (cur < lines.length){
             // 先识别 三级标题
@@ -584,7 +585,6 @@ export const codeSnippetManager = {
                     temp+= lines[cur]
                     cur++;
                 }
-                console.log(temp)
                 // parse
                 try{
                     const data = JSON.parse(window.preload.decodeBase64(temp))
@@ -615,18 +615,39 @@ export const codeSnippetManager = {
             let result = _recongzieCodeSnippet(lines,cur)
             if(result.snippet != null){
                 count++;
-                if(result.snippet.path){
+                if(result.snippet.path && result.snippet.code === "undefined"){
                     result.snippet.code = undefined;
                 }
-                this.add(result.snippet)
-                if(result.top){
-                    configManager.addTopItem(result.snippet.id)
+                if(this.contain(result.snippet.name)){
+                    result.snippet.top = result.top;
+                    repeatCodeSnippets.push(result.snippet)
+                }else{
+                    this.add(result.snippet)
+                    if(result.top){
+                        configManager.addTopItem(result.snippet.id)
+                    }
                 }
                 cur = result.cur+1;
             }else{
                 msg = result;
                 break;
             }
+        }
+        if(repeatCodeSnippets.length > 0){
+            $dialog.info({
+                title: '重复代码片段×'+repeatCodeSnippets.length,
+                content: '由于代码片段名不允许重复，所以请您选择下面对应操作',
+                positiveText: '全部覆盖',
+                negativeText: '全部丢弃',
+                onPositiveClick: ()=>{
+                    for (let repeatCodeSnippet of repeatCodeSnippets) {
+                        this.add(repeatCodeSnippet)
+                        if(repeatCodeSnippet.top){
+                            configManager.addTopItem(repeatCodeSnippet.id)
+                        }
+                    }
+                }
+            })
         }
         if(msg == null){
             utools.showNotification('共成功导入'+count+'条数据')
@@ -638,5 +659,13 @@ export const codeSnippetManager = {
         for (let id of this.codeMap.keys()) {
             this.del(id)
         }
+    },
+    getByName(name) {
+        for (let codeSnippet of this.codeMap.values()) {
+            if(codeSnippet.name === name){
+                return codeSnippet;
+            }
+        }
+        return null;
     }
 }

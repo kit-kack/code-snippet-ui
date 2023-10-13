@@ -80,6 +80,9 @@
             <n-list-item  v-if="snippet.sections && snippet.sections.length > 0">
               <div>{{`🧩 ${snippet.sections.length}个子代码片段`}}</div>
             </n-list-item >
+            <n-list-item  v-if="snippet.feature">
+              <div>🔰 已注册为uTools关键字</div>
+            </n-list-item >
           </n-list>
         </n-popover>
 

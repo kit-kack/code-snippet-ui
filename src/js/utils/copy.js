@@ -28,7 +28,7 @@ function getCode(path,local,noView){
     }
 }
 
-function copyOrPasteWithType(isPasted,text,type,msg){
+function copyOrPasteWithType(isPasted,text,type,msg,noView){
     if(type && type.length>2 && type.startsWith('x-')){
         text = formatManager.parse(text);
     }
@@ -37,16 +37,16 @@ function copyOrPasteWithType(isPasted,text,type,msg){
     if(text === null){
         return true;
     }
-    copyOrPaste(text);
+    copyOrPaste(text,noView);
 }
 
 /**
  * @param text
- * @param {boolean} [isNotExit]
+ * @param {boolean} [noView]
  */
-export function copyOrPaste(text){
+export function copyOrPaste(text,noView){
     if(lastCachedMsg){
-        $message.success(lastCachedMsg);
+        _notify(lastCachedMsg,noView)
     }
     if(isLastPasted){
         try{
@@ -116,7 +116,7 @@ export function copyCode(isPasted,num,noView){
         $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
         codeSnippetManager.update(toRaw($reactive.currentSnippet))
         // 复制
-        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`)){
+        if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`,noView)){
             return noView;
         }
 
@@ -124,12 +124,12 @@ export function copyCode(isPasted,num,noView){
         if($reactive.currentSnippet.sections && $reactive.currentSnippet.sections.length >= num){
             const  [start,end] = $reactive.currentSnippet.sections[num-1]
             if(!$reactive.currentCode){
-                $message.warning("当前代码片段不支持")
+                _notify("当前代码片段不支持",noView)
                 return;
             }
             const lines = $reactive.currentCode.split('\n',end)
             if(lines.length < start){
-                $message.warning("区间值超出代码片段区间，请更新或清除旧区间值")
+                _notify("区间值超出代码片段区间，请更新或清除旧区间值",noView)
                 return;
             }
             let str = '';
@@ -141,11 +141,11 @@ export function copyCode(isPasted,num,noView){
             $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
             codeSnippetManager.update(toRaw($reactive.currentSnippet))
             // 复制
-            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`)){
+            if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`,noView)){
                 return noView;
             }
         }else{
-            $message.warning(`当前没有 ${num}号 子代码片段`)
+            _notify(`当前没有 ${num}号 子代码片段`,noView)
         }
     }
 }

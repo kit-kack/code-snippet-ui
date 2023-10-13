@@ -145,7 +145,8 @@ const isShowBtn = computed(()=>{
 const isHover = ref(false)
 let topIndex = configManager.getTopList().indexOf(props.snippet.id)
 const pair = computed(()=>{
-  let txt = (props.snippet.type?? 'plaintext') + ' | ';
+  let txt = props.snippet.feature? '🔰 ':'';
+  txt += (props.snippet.type?? 'plaintext') + ' | ';
   if(props.snippet.count){
     txt += props.snippet.count +' | ';
   }
