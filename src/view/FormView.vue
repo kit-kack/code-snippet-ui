@@ -11,6 +11,7 @@
     >
       <n-form-item label="代码片段名" path="name">
         <n-input v-model:value="codeTemplate.name" clearable autofocus/>
+        <n-tag style="margin-left: 10px;user-select: none" checkable v-model:checked="codeTemplate.feature" >设置为uTools关键字</n-tag>
       </n-form-item>
       <n-form-item label="代码描述" path="desc">
         <n-input v-model:value="codeTemplate.desc" clearable/>
@@ -85,6 +86,7 @@
                           :theme-overrides="selectThemeOverrides"
                       />
                     </n-space>
+                    <config-switch title="默认是否注册uTools关键字" config="defaultUtoolFeatureEnable"/>
                   </n-popover>
                   <div id="select">
                     <n-select
@@ -187,15 +189,17 @@ import {configManager} from "../js/core/config";
 import {fullAlias, languages} from "../js/utils/common";
 import {$normal, $reactive, EDIT_VIEW, LIST_VIEW, navigateView} from "../js/store";
 import {CtrlStr} from "../js/some";
+import {utools_feature_add, utools_feature_del} from "../js/utils/feature";
+import ConfigSwitch from "../components/ConfigSwitch.vue";
 
 
 
 const form = ref()
 const edit = $reactive.currentMode === EDIT_VIEW;
 const codeTemplate = reactive(edit?{...toRaw($reactive.currentSnippet)} :{
-  code: $normal.quickCode
+  code: $normal.quickCode,
+  feature: configManager.get('defaultUtoolFeatureEnable')
 })
-const tempTag = ref()
 const tags = computed(()=>{
   return tagColorManager.all().map(v=>{
     return {
@@ -235,10 +239,10 @@ const rules = {
     {
       message: "代码片段名已重复",
       validator(rule, value) {
-        if(edit && $reactive.currentSnippet.name === value){
+        if(edit && $reactive.currentSnippet.name === value.trim()){
           return true;
         }
-        return !codeSnippetManager.contain(value)
+        return !codeSnippetManager.contain(value.trim())
       },
       trigger: ["input","blur"]
     }
@@ -263,6 +267,7 @@ const handleUpdate = ()=>{
       if(error!=null && error.length >= 0){
         window.$message.warning("请按要求填写")
       }else{
+        codeTemplate.name = codeTemplate.name.trim()
         //
         if(currentTab.value === 'path'){
           //
@@ -284,12 +289,22 @@ const handleUpdate = ()=>{
             // 发生修改，缓存失效
             $normal.lastQueryCodeSnippetId = null;
           }
+          // utools关键字处理
+          if(codeTemplate.feature){
+            utools_feature_del(codeTemplate.name)
+            utools_feature_add(codeTemplate.name)
+          }else{
+            utools_feature_del(codeTemplate.name)
+          }
           // 更新
           codeSnippetManager.update(toRaw(codeTemplate))
           // 是否维持选中
           $normal.keepSelectedStatus = (codeTemplate.name === $reactive.currentSnippet.name)? true : null;
         }else{
           $normal.keepSelectedStatus = null;
+          if(codeTemplate.feature){
+            utools_feature_add(codeTemplate.name)
+          }
           codeSnippetManager.add(toRaw(codeTemplate))
         }
         window.$message.success("操作成功")

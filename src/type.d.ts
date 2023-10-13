@@ -33,6 +33,8 @@ declare interface CodeSnippet{
     local?: boolean,
     // 是否为内置说明文档，无法修改使用
     help?: boolean
+    // 是否为功能关键字
+    feature?: boolean
 }
 
 declare type ConfigItem =
@@ -64,6 +66,7 @@ declare type ConfigItem =
     | "colorSchema" | "darkColorSchema"              // 颜色方案
     | "renderApi"                                   // 可选渲染选项
     | "defaultLanguage"                             // 默认选择语言
+    | "defaultUtoolFeatureEnable"                   // 默认是否注册uTools关键字
     | "autoBackup"                                  // 自动备份
     | "lastAutoBackupTime"                          // 上次自动备份时间
     | "closeHelpSnippet"                            // 关闭defaultHelpSnippet

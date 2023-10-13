@@ -15,6 +15,7 @@ import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./format";
 import {lowercaseIncludes} from "../utils/common";
+import {utools_feature_del} from "../utils/feature";
 
 
 /**
@@ -394,18 +395,22 @@ export const codeSnippetManager = {
             return true;
         }
         // 先查询是否存在
-        if(this.codeMap.has(id)){
+        const codeSnippet = this.codeMap.get(id);
+        if(codeSnippet){
             utools.db.remove(CODE_PREFIX+id)
             this.codeMap.delete(id)
+            if(codeSnippet.feature){
+                utools_feature_del(codeSnippet.name)
+            }
             // 处理 topList
             let index = configManager.getTopList().indexOf(id)
             if(index !== -1){
                 configManager.delTopItem(index)
             }
             return true;
-        }else{
-            return false;
         }
+        return false;
+
     },
     /**
      *
