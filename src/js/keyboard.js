@@ -34,11 +34,6 @@ const debMoveDown = debounce(function(){
     $index.value++;
     // console.log($reactive.utools.selectedIndex)
     gotoTheLastPosition(true);
-    nextTick(()=>{
-        if(old === $index.value){
-            refreshListView(true)
-        }
-    })
 })
 const debMoveUp = debounce(function(){
     $index.value--;

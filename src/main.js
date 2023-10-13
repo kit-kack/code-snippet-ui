@@ -11,10 +11,6 @@ import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/format";
-// error
-window.onerror = function (message, source, lineno, colno, error) {
-    log(`${new Date().toISOString()}-[${source}](${lineno}:${colno}): ${message}\n`)
-}
 // init
 configManager.init()
 tagColorManager.init()
@@ -23,10 +19,7 @@ codeSnippetManager.init()
 
 function bindApp(){
     const app = createApp(App)
-    // error
-    app.config.errorHandler = function (err, instance, info){
-        log(`${new Date().toISOString()}-[${instance?.$options?.__file || instance?.$options?.name}]: ${err} - ${info}\n`)
-    }
+
     initNU(app)
     initVH(app)
     app.directive("code", {

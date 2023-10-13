@@ -16,6 +16,13 @@
         <n-input v-model:value="codeTemplate.desc" clearable/>
       </n-form-item>
       <n-form-item label="标签" path="tags">
+<!--        <n-select-->
+<!--            v-model:value="codeTemplate.tags"-->
+<!--            filterable-->
+<!--            multiple-->
+<!--            tag-->
+<!--            :options="tags"-->
+<!--        />-->
         <n-dynamic-tags v-model:value="codeTemplate.tags">
           <template #input="{ submit, deactivate }">
             <n-select
