@@ -52,19 +52,19 @@ const handleVimStatusBarClick = ()=>{
     if(showCount === 7){
 
       $dialog.error({
-        title:'危险操作',
+        title:'危险清空操作',
         content: '当前操作将会清空插件所有代码片段，请您慎重考虑',
-        positiveText: '确认删除',
-        negativeText: '幸好没删',
+        positiveText: '确认清空',
+        negativeText: '幸好没清',
         onNegativeClick: ()=>{
           $message.success("花点时间去看看外面的风景吧")
         },
         onPositiveClick: ()=>{
           $dialog.warning({
-            title: '提示操作',
-            content: '所有代码片段即将被清空，是否进行最后的备份？',
+            title: '提示备份操作',
+            content: '所有代码片段即将被清空，是否进行最后的备份？（如果误点，请点击X退出清空操作）',
             positiveText: '备份',
-            negativeText: '忽略',
+            negativeText: '不备份',
             onNegativeClick: ()=>{
               // 删除数据
               codeSnippetManager.empty();

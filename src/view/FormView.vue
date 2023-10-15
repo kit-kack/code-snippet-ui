@@ -69,7 +69,7 @@
                       Tab键行为：
                       <n-select
                           :options="tabOptions"
-                          :default-value="configManager.get('whatTabDo')"
+                          :default-value="configManager.get('whatTabDo')??0"
                           :theme-overrides="selectThemeOverrides"
                           @update-value="v=> configManager.set('whatTabDo',v)"
                           style="width: 190px"
