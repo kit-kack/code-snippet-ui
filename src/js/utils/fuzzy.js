@@ -25,7 +25,6 @@ export function fuzzyCompare(query, target) {
             }
         }
     }
-    console.log(dp[m][n])
     // 先比较是否匹配
     if(dp[m][n] === query.length){
         const offsets = [];

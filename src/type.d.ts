@@ -37,6 +37,23 @@ declare interface CodeSnippet{
     feature?: boolean
 }
 
+declare interface Variable{
+    // 唯一标识
+    id: string,
+    // 描述
+    desc?: string
+    // 匹配名字
+    names?: string[],
+    // 表达式
+    expression: string,
+    // 是否为输入变量
+    inputable?: boolean,
+    // 输入变量默认值
+    defaultValue?: string,
+    // 是否可缓存: 对应表达式变量
+    cacheable?: boolean
+}
+
 declare type ConfigItem =
     "showTimeTag"                                    // 是否展示 内置时间标签
     | "showCountTag"                                 // 是否展示 内置计数标签
