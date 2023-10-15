@@ -14,7 +14,7 @@ import {
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./format";
-import {lowercaseIncludes} from "../utils/common";
+import {fullAlias, lowercaseIncludes} from "../utils/common";
 import {utools_feature_del} from "../utils/feature";
 
 
@@ -466,6 +466,7 @@ export const codeSnippetManager = {
          */
         let list = [];
         if(name !== null){
+            name = name.toLowerCase();
             // 0. 搜索词需要同样被替换
             for (const codeSnippet of this.codeMap.values()) {
                 const query = codeSnippet.name.toLowerCase();
@@ -509,8 +510,8 @@ export const codeSnippetManager = {
             })
         }
         if(type !== null){
-            type = type.toLowerCase();
-            list = list.filter(codeSnippet=>codeSnippet.type === type)
+            type = fullAlias(type.toLowerCase());
+            list = list.filter(codeSnippet=>fullAlias(codeSnippet.type) === type)
         }
         // 进行排序处理
         return _getSortedArray(list);
