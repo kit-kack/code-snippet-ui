@@ -71,3 +71,4 @@ declare type ConfigItem =
     | "lastAutoBackupTime"                          // 上次自动备份时间
     | "closeHelpSnippet"                            // 关闭defaultHelpSnippet
     | "aidTagSelect"                               // 标签辅助选择
+    | "allowTest"                                  // 测试版尝鲜

@@ -11,6 +11,6 @@ export const defaultHelpSnippet = {
     code: window.preload?.readREADME_MD(),
     help: true,
     sections: [
-        [78,88]
+        [101,108]
     ]
 }

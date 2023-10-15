@@ -292,7 +292,6 @@ const handleUpdate = ()=>{
           }
           // utools关键字处理
           if(codeTemplate.feature){
-            utools_feature_del(codeTemplate.name)
             utools_feature_add(codeTemplate.name)
           }else{
             utools_feature_del(codeTemplate.name)
