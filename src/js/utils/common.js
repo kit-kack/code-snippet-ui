@@ -210,10 +210,40 @@ export function renderFormatBlock(flag){
     const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
     if(codeViewer){
         codeViewer.innerHTML = codeViewer.innerHTML.replace(/{{.+?}}/g,(substring)=>{
-            const temp = substring.slice(2,-2).trim();
+            const name = substring.slice(2,-2).trim();
             let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
-            if(!temp.startsWith('@') && !formatManager.checkCommandRepeat(temp)){
-                style = _errorFormatBlockStyle;
+            if(!name.startsWith('@')){
+                // parse
+                let command;
+                let index = name.indexOf(':');
+                if(index !== -1){
+                    if(index === name.length-1){ // last
+                        // command : param
+                        command = name.slice(0,index)
+                    }else{
+                        if(name[index+1] === ':'){
+                            // variable :: command [:param]
+                            const newName = name.slice(index+2);
+                            index = newName.indexOf(':')
+                            if(index !== -1){
+                                // command: param
+                                command = newName.slice(0,index)
+                            }else{
+                                // command
+                                command = newName;
+                            }
+                        }else{
+                            // command : param
+                            command = name.slice(0,index)
+                        }
+                    }
+                }else{
+                    // only command
+                    command = name;
+                }
+                if(!formatManager.checkCommandRepeat(command)){
+                    style = _errorFormatBlockStyle;
+                }
             }
             return style+substring+'</span>'
         })

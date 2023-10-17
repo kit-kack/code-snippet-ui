@@ -45,7 +45,7 @@ import {CtrlStr} from "../js/some";
 const templates = ref( $normal.variables.map(v =>{
   return {
     label: v,
-    value: formatManager.data.pairs[v]
+    value: $normal.defaultValues[v]
   }
 }))
 
@@ -57,7 +57,7 @@ function doCancel(){
 function doYes(){
   // 将值写入到pairs中
   for (const template of templates.value) {
-      formatManager.pairBuffer[template.label] = template.value;
+      formatManager.globalVar['@'+template.label] = template.value;
   }
   // 继续进行解析
   formatManager.continueFormat();

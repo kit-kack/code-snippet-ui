@@ -22,6 +22,7 @@ const $normal = {
     keepSelectedStatus: null,  // null false true  // 控制 选中元素 保持记忆功能
     updateCacheCodeFunc: null,      // 调整缓存函数
     variables: {},        // 后续会映射类型
+    defaultValues: {},    // 默认值
     quickCode: null,      // 快速记录代码
     tempTags: []          // tags缓存
 }
