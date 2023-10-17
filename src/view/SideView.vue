@@ -95,7 +95,7 @@ import NormalTag from "../components/NormalTag.vue";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import VariablePane from "../components/pane/VariablePane.vue";
+import VariablePane from "../components/pane/FuncPane.vue";
 import {refreshListView} from "../js/store";
 import CustomView from "./CustomView.vue";
 

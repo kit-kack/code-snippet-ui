@@ -10,7 +10,7 @@ import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, navigateView, refres
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
-import {formatManager} from "./js/core/format";
+import {formatManager} from "./js/core/func";
 // init
 configManager.init()
 tagColorManager.init()

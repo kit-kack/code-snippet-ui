@@ -13,7 +13,7 @@ import {
 } from "./common";
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
-import {formatManager} from "./format";
+import {formatManager} from "./func";
 import {fullAlias, lowercaseIncludes} from "../utils/common";
 import {utools_feature_del} from "../utils/feature";
 

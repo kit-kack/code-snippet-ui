@@ -1,6 +1,6 @@
 import {nextTick} from "vue";
 import hljs from "../dep/highlight-dep";
-import {formatManager} from "../core/format";
+import {formatManager} from "../core/func";
 
 /**
  * 防抖函数

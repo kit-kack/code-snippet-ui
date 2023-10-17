@@ -398,7 +398,9 @@ function init(list) {
             return;
         }
         // dialog or sideview
-        if ($reactive.view.settingActive) {
+        if($reactive.view.funcEditActive){
+            return;
+        }else if ($reactive.view.settingActive) {
             // prevent any possible event
             if ( e.code === 'Enter' || e.code === 'Tab') {
                 e.preventDefault();

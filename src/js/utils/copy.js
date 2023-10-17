@@ -1,6 +1,6 @@
 import {$index, $normal, $reactive} from "../store";
 import {codeSnippetManager} from "../core/snippet";
-import {formatManager} from "../core/format";
+import {formatManager} from "../core/func";
 
 import {toRaw} from "vue";
 

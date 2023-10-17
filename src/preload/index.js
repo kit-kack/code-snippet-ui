@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-
+const {clipboard} = require('electron');
 export const readConfig = (path) => fs.readFileSync(path).toString();
 export const writeConfig = (path,str,flag)=> {
     if(flag){
@@ -44,3 +44,4 @@ export function getDirname(p){
 export function getFinalPath(dir,p){
     return path.join(dir,p)
 }
+export const _clipboard = clipboard;

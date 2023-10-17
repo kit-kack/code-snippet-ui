@@ -21,6 +21,7 @@
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
     "@kangc/v-md-editor": "^2.3.17",
+    "dayjs": "^1.11.10",
     "highlight.js": "^11.8.0",
     "nanoid": "^4.0.2",
     "vue": "^3.2.47"

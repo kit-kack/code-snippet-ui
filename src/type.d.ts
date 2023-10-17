@@ -37,21 +37,17 @@ declare interface CodeSnippet{
     feature?: boolean
 }
 
-declare interface Variable{
+declare interface Func {
     // 唯一标识
-    id: string,
+    name: string,
     // 描述
     desc?: string
     // 匹配名字
-    names?: string[],
+    commands: string[],
     // 表达式
     expression: string,
-    // 是否为输入变量
-    inputable?: boolean,
-    // 输入变量默认值
-    defaultValue?: string,
-    // 是否可缓存: 对应表达式变量
-    cacheable?: boolean
+    // 内置
+    default?: boolean
 }
 
 declare type ConfigItem =

@@ -9,8 +9,11 @@ const CODE_PREFIX = "code/";
 const GLOBAL_ROOT_TAGS = "root";
 const GLOBAL_TAGS = "tags";
 const GLOBAL_CONFIG = "config"
+/**
+ * @deprecated
+ */
 const GLOBAL_FORMAT = "format";
-
+const GLOBAL_FUNC = "func";
 
 // 存入数据库的 键前缀 旧版本标记，兼容性，后续版本可能会被移除
 const CS_ROOT_ID = "#kitkack.code-snippet-root#"; // 存储所有标签的键
@@ -42,7 +45,7 @@ function jsonToMap(jsonStr) {
 }
 
 export {
-    CODE_PREFIX,GLOBAL_ROOT_TAGS,GLOBAL_CONFIG,GLOBAL_FORMAT,GLOBAL_TAGS,
+    CODE_PREFIX,GLOBAL_ROOT_TAGS,GLOBAL_CONFIG,GLOBAL_FORMAT,GLOBAL_TAGS,GLOBAL_FUNC,
     CS_ROOT_ID,CS_CONFIG_ID,CS_CODE_ID,CS_HISTORY_ID,CS_TAG_COLOR_ID,CS_MARK_ID,CS_DOC_ID,
     createOrUpdate,jsonToMap,getDBItem,removeDBItem
 }

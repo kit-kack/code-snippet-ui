@@ -61,8 +61,7 @@
                     <template #trigger>
                       <n-button  quaternary style="position: absolute;">
                         <template #icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M7.77 6.76L6.23 5.48L.82 12l5.41 6.52l1.54-1.28L3.42 12l4.35-5.24zM7 13h2v-2H7v2zm10-2h-2v2h2v-2zm-6 2h2v-2h-2v2zm6.77-7.52l-1.54 1.28L20.58 12l-4.35 5.24l1.54 1.28L23.18 12l-5.41-6.52z" fill="currentColor"></path></svg>
-                        </template>
+                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M32 26v-2h-2.101a4.968 4.968 0 0 0-.732-1.753l1.49-1.49l-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 26 20.101V18h-2v2.101a4.968 4.968 0 0 0-1.753.732l-1.49-1.49l-1.414 1.414l1.49 1.49A4.968 4.968 0 0 0 20.101 24H18v2h2.101a4.968 4.968 0 0 0 .732 1.753l-1.49 1.49l1.414 1.414l1.49-1.49a4.968 4.968 0 0 0 1.753.732V32h2v-2.101a4.968 4.968 0 0 0 1.753-.732l1.49 1.49l1.414-1.414l-1.49-1.49A4.968 4.968 0 0 0 29.899 26zm-7 2a3 3 0 1 1 3-3a3.003 3.003 0 0 1-3 3z" fill="currentColor"></path><circle cx="7" cy="20" r="2" fill="currentColor"></circle><path d="M14 20a4 4 0 1 1 4-4a4.012 4.012 0 0 1-4 4zm0-6a2 2 0 1 0 2 2a2.006 2.006 0 0 0-2-2z" fill="currentColor"></path><circle cx="21" cy="12" r="2" fill="currentColor"></circle><path d="M13.02 28.271L3 22.427V9.574l11-6.416l11.496 6.706l1.008-1.728l-12-7a1 1 0 0 0-1.008 0l-12 7A1 1 0 0 0 1 9v14a1 1 0 0 0 .496.864L12.013 30z" fill="currentColor"></path></svg>                        </template>
                       </n-button>
                     </template>
                     <n-space align="center">
@@ -89,6 +88,15 @@
                     </n-space>
                     <config-switch title="默认是否注册uTools关键字" config="defaultUtoolFeatureEnable"/>
                   </n-popover>
+                  <n-tooltip v-if="codeTemplate.type && codeTemplate.type.startsWith('x-')">
+                    <template #trigger>
+                      <n-button  quaternary style="position: absolute; left: 50px" @click="showFuncModal = true" >
+                        <template #icon>
+                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"></path><path d="M12 9v6"></path><path d="M6 19a2 2 0 0 1-2-2v-4l-1-1l1-1V7a2 2 0 0 1 2-2"></path><path d="M18 19a2 2 0 0 0 2-2v-4l1-1l-1-1V7a2 2 0 0 0-2-2"></path></g></svg>                        </template>
+                      </n-button>
+                    </template>
+                    使用占位符
+                  </n-tooltip>
                   <div id="select">
                     <n-select
                         v-model:value="codeTemplate.type"
@@ -180,6 +188,16 @@
       <br/>
     </template>
   </n-modal>
+  <n-modal v-model:show="showFuncModal"
+           preset="card"
+           title="选择占位符"
+           style="width: 60%"
+
+  >
+    <n-scrollbar style="max-height: 60vh;width:100%" :x-scrollable="false">
+      <func-select-pane @choose="handleChooseCommand"/>
+    </n-scrollbar>
+  </n-modal>
 </template>
 
 <script setup>
@@ -192,6 +210,7 @@ import {$normal, $reactive, EDIT_VIEW, LIST_VIEW, navigateView} from "../js/stor
 import {CtrlStr} from "../js/some";
 import {utools_feature_add, utools_feature_del} from "../js/utils/feature";
 import ConfigSwitch from "../components/ConfigSwitch.vue";
+import FuncSelectPane from "../components/pane/FuncSelectPane.vue";
 
 
 
@@ -212,6 +231,7 @@ const tags = computed(()=>{
 const currentTab = ref(codeTemplate.path? 'path':'code')  // 当前Tab页
 const codeTextArea = ref()
 const showModal = ref(false)
+const showFuncModal = ref(false)
 const url = ref()
 const tabOptions = [
   {label: '原生行为',value: 0},
@@ -326,6 +346,14 @@ const keyDownHandler = (e)=>{
       handleUpdate();
       e.preventDefault();
     }
+  }
+}
+const handleChooseCommand = (command)=>{
+  showFuncModal.value = false;
+  if(codeTemplate.code){
+    codeTemplate.code += "{{"+command+"}}"
+  }else{
+    codeTemplate.code = "{{"+command+"}}"
   }
 }
 const handleTypeChange = ()=>{
