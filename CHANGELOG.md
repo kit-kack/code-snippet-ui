@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.4.1](https://github.com/littledot-kit/code-snippet-ui/compare/v2.4.0...v2.4.1) (2023-10-17)
+
+
+### Features
+
+* 更新版本号 ([c6e9a71](https://github.com/littledot-kit/code-snippet-ui/commit/c6e9a719fcbdf621811e4a4ee987dff0e0881861))
+* 完善文档 ([6bb7a8e](https://github.com/littledot-kit/code-snippet-ui/commit/6bb7a8ece0a089c3c35e79b6fcbfb2170878d9e0))
+* 移除mermaid ([3e70b9e](https://github.com/littledot-kit/code-snippet-ui/commit/3e70b9ee7f2f2f40a8d4d5264eb7dea98230d8d6))
+* 重构占位符-基本实现 ([0f2b64f](https://github.com/littledot-kit/code-snippet-ui/commit/0f2b64f7b7a90b61584371707c2de269c865a0f2))
+* 重构占位符-说明展示 ([716e314](https://github.com/littledot-kit/code-snippet-ui/commit/716e31443c510ad4e61e085ab34f27ac31089e18))
+* 重构占位符-外观显示 ([3b92b92](https://github.com/littledot-kit/code-snippet-ui/commit/3b92b9293c6f8b757b8f05b7504a365e97fd8572))
+
+
+### Bug Fixes
+
+* 修复关键字提示信息 ([b17fcbb](https://github.com/littledot-kit/code-snippet-ui/commit/b17fcbb07ce9f6d9c86b0f482588b063e525b609))
+* 修复搜索匹配效果 ([69daa70](https://github.com/littledot-kit/code-snippet-ui/commit/69daa70a7f485c733d4c9eeb6564b28ab296a431))
+* 优化说明 ([b343b67](https://github.com/littledot-kit/code-snippet-ui/commit/b343b67baacecad6cb400c5ca20aefb5344c2194))
+
 ## [2.4.0](https://github.com/littledot-kit/code-snippet-ui/compare/v2.3.4...v2.4.0) (2023-10-13)
 
 
