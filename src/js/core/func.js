@@ -18,7 +18,7 @@ const DEFAULT_FUNCS = {
         default: true
     },
     '日期与时间':{
-        name: "时间",
+        name: "日期与时间",
         default: true,
         desc: `获取日期与时间;
 【自定义时间】需要携带格式化参数，例如<span class="term">HH:mm:ss</span>`,
@@ -143,7 +143,7 @@ export const formatManager = {
         if(name){
             if(name !== oldName){
                 if(name in this.funcMap){
-                    return false
+                    return true
                 }
             }
         }else{

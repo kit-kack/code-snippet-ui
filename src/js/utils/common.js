@@ -209,10 +209,10 @@ const _errorFormatBlockStyle = '<span style="color:red">';
 export function renderFormatBlock(flag){
     const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
     if(codeViewer){
-        codeViewer.innerHTML = codeViewer.innerHTML.replace(/#{.+?}#/g,(substring)=>{
+        codeViewer.innerHTML = codeViewer.innerHTML.replace(/{{.+?}}/g,(substring)=>{
             const temp = substring.slice(2,-2).trim();
             let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
-            if(!temp.startsWith('@')  && !formatManager.contain(temp)){
+            if(!temp.startsWith('@') && !formatManager.checkCommandRepeat(temp)){
                 style = _errorFormatBlockStyle;
             }
             return style+substring+'</span>'

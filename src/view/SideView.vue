@@ -65,7 +65,7 @@
         </n-space>
       </n-space>
     </n-tab-pane>
-    <n-tab-pane :name="1" tab="标签与变量">
+    <n-tab-pane :name="1" tab="标签与占位符">
       <n-scrollbar style="max-height: 91vh">
         <n-tooltip>
           <template #trigger>
@@ -80,7 +80,7 @@
             <normal-tag raw v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithTagRefresh"/>
           </n-space>
         </template>
-        <variable-pane/>
+        <func-pane/>
       </n-scrollbar>
     </n-tab-pane>
   </n-tabs>
@@ -95,7 +95,7 @@ import NormalTag from "../components/NormalTag.vue";
 import ConfigCheckTag from "../components/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import VariablePane from "../components/pane/FuncPane.vue";
+import FuncPane from "../components/pane/FuncPane.vue";
 import {refreshListView} from "../js/store";
 import CustomView from "./CustomView.vue";
 
