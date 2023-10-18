@@ -114,10 +114,10 @@ switch (command){
 
 
 export const formatManager = {
-    data:{
-        pairs:{}, // 存放变量替换值
-        inputs:[] // 表明是否为输入变量
-    },
+    // data:{
+    //     pairs:{}, // 存放变量替换值
+    //     inputs:[] // 表明是否为输入变量
+    // },
     nameMapping:{},
     funcMap:{},
     initedVarSet : new Set(), // 变量是否已经解析
@@ -142,6 +142,9 @@ export const formatManager = {
      * 检查 Func中的Command是否重复
      */
     checkCommandRepeat(command,currentFuncName){
+        if(command === '输入' || command === 'input'){
+            return true;
+        }
         for (let key in this.funcMap) {
             const func = this.funcMap[key];
             if(func.commands.includes(command) && currentFuncName!==func.name){
@@ -425,7 +428,6 @@ export const formatManager = {
                     }
                     inputCount++;
                 }
-                console.log(result)
                 // check command exist
                 let nonExist = true;
                 for (let key in this.funcMap) {

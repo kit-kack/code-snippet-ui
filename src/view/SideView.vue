@@ -131,17 +131,16 @@ const handleSortStrategy = (v)=>{
 
 const handleExport = ()=>{
   const realPath = utools.showSaveDialog({
-    title: 'code-snippet文件保存位置',
+    title: 'code-snippet备份文件保存位置',
     defaultPath: utools.getPath('desktop'),
     buttonLabel: '保存',
     filters: [
-      {name: 'md', extensions: ['md', 'markdown']}
+      {name: 'zip', extensions: ['zip']}
     ],
     properties: ['showOverwriteConfirmation']
   })
   if (realPath != null) {
     codeSnippetManager.store(realPath)
-    utools.showNotification('数据已成功导出至'+realPath)
   }
 }
 const handleImport = ()=>{
@@ -150,9 +149,7 @@ const handleImport = ()=>{
     defaultPath: utools.getPath('desktop'),
     buttonLabel: '导入',
     filters: [
-      {
-        name: 'md', extensions: ['md', 'markdown']
-      }
+      {name: 'zip', extensions: ['zip']}
     ],
     properties: [
       'openFile'

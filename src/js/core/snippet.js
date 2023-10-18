@@ -2,12 +2,14 @@ import {nanoid} from "nanoid";
 import {defaultHelpSnippet} from "../some";
 import {fuzzyCompare} from "../utils/fuzzy";
 import {
-    CODE_PREFIX, createOrUpdate,
+    CODE_PREFIX,
+    createOrUpdate,
     CS_CODE_ID,
     CS_DOC_ID,
     CS_MARK_ID,
     CS_ROOT_ID,
-    getDBItem, GLOBAL_FORMAT,
+    getDBItem,
+    GLOBAL_FUNC,
     GLOBAL_ROOT_TAGS,
     removeDBItem
 } from "./common";
@@ -16,6 +18,7 @@ import {configManager} from "./config";
 import {formatManager} from "./func";
 import {fullAlias, lowercaseIncludes} from "../utils/common";
 import {utools_feature_del} from "../utils/feature";
+import JSZip from "jszip";
 
 
 /**
@@ -372,7 +375,7 @@ export const codeSnippetManager = {
     add(codeSnippet){
         if(codeSnippet.help){
             $message.error("用户无法主动创建内置说明片段")
-            return;
+            return false;
         }
         codeSnippet.id = nanoid();
         codeSnippet.count = codeSnippet.count??0;
@@ -382,6 +385,7 @@ export const codeSnippetManager = {
         createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
         this.addTagInfo(codeSnippet,true)
         console.log('now code snippet size: '+this.codeMap.size)
+        return true;
     },
 
     /**
@@ -517,122 +521,88 @@ export const codeSnippetManager = {
         return _getSortedArray(list);
     },
     store(path){
-        // store yaml header
-        let header = {
-            tags: tagColorManager.all(),
-            vars: formatManager.all()
-        }
-        header = window.preload.encodeBase64(JSON.stringify(header))
-        window.preload.writeConfig(path,'---\n'+header+'\n---\n> 上面为Base64编码后的 变量与标签 数据\n\n',true);
-
+        // - code-snippet-data.json
+        // - code-snippet-tag.json
+        // - code-snippet-func.json
+        // - data
+        // - data / README.md,...
+        const zip = new JSZip();
+        zip.file("code-snippet-tag.json",JSON.stringify({
+            tags: tagColorManager.tags
+        }))
+        zip.file("code-snippet-func.json",JSON.stringify({
+            funcs: formatManager.funcMap
+        }))
+        const snippets = [];
         // snippet
         for (let codeSnippet of this.codeMap.values()) {
-            let str = '\n### '+codeSnippet.name+'\n';
-            if(codeSnippet.desc != null){
-                str += `> 📢 ${codeSnippet.desc}\n> \n`;
+            const snippet = {...codeSnippet};
+            if(snippet.code){
+                zip.file(`code/${snippet.name}.${snippet.type}`,snippet.code)
+                snippet.code = true;
             }
-            if(codeSnippet.time != null){
-                str += `> ⏰ ${codeSnippet.time}\n> \n`;
-            }
-            if(codeSnippet.count != null){
-                str += `> 🎲 ${codeSnippet.count}\n> \n`;
-            }
-            if(codeSnippet.tags != null && codeSnippet.tags.length > 0){
-                str += `> 🔖 ${codeSnippet.tags.join(' ')}\n> \n`;
-            }
-            if(codeSnippet.path != null){
-                if(codeSnippet.local){
-                    str += `> local: ${codeSnippet.path}\n> \n`
-                }else{
-                    str += `> network: ${codeSnippet.path}\n> \n`
-                }
-            }
-            if(codeSnippet.sections && codeSnippet.sections.length > 0){
-                str+= '> 🧩';
-                for (const section of codeSnippet.sections) {
-                    str+= ` ${section[0]}-${section[1]}`
-                }
-                str+='\n';
-            }
+            delete snippet.id;
             if(configManager.getTopList().includes(codeSnippet.id)){
-                str += '> 🔰top \n';
+                snippets.top = true;
             }
-            // output code
-            const max = _getMaxMarkCount(codeSnippet.code)
-            let block = '```';
-            for (let i = 3; i <= max; i++) {
-                block+='`'
-            }
-            str+=`${block}${codeSnippet.type??'plaintext'}\n${codeSnippet.code}\n${block}\n`
-            window.preload.writeConfig(path,str);
+            snippets.push(snippet)
         }
-    },
-    load(path){
-        const lines = window.preload.readConfig(path).split('\n');
-        let cur = 0;   // 当前扫描行
-        let msg = null;
-        let count = 0;
-        let header = false;
-        const repeatCodeSnippets = [];
+        zip.file("code-snippet-data.json",JSON.stringify({
+            snippets: snippets
+        }))
+        window.preload.generateZip(zip,path);
 
-        while (cur < lines.length){
-            // 先识别 三级标题
-            let str = lines[cur].trim();
-            if(!header && str==='---'){
-                // 识别header
-                let temp = ''
-                cur++;
-                while (cur< lines.length && lines[cur].trim()!=='---'){
-                    temp+= lines[cur]
-                    cur++;
-                }
-                // parse
-                try{
-                    const data = JSON.parse(window.preload.decodeBase64(temp))
-                    if(data.tags){
-                        for (const tag of data.tags) {
-                            tagColorManager.tags[tag] = data.tags[tag]
+    },
+    async load(path){
+        const repeatCodeSnippets = [];
+        const data = window.preload.readZip(path);
+        const zip = await JSZip.loadAsync(data);
+        // data
+        try{
+            const obj = JSON.parse(await zip.file("code-snippet-data.json").async("string"))
+            let count = 0;
+            if(obj && obj.snippets && Array.isArray(obj.snippets)){
+                for (const snippet of obj.snippets) {
+                    if(snippet.code){
+                        snippet.code = await zip.file(`code/${snippet.name}.${snippet.type}`).async('string');
+                    }
+                    if(this.contain(snippet.name)){
+                        repeatCodeSnippets.push(snippet)
+                    }else{
+                        count++;
+                        if(this.add(snippet) && snippet.top){
+                            configManager.addTopItem(snippet.id)
                         }
-                        tagColorManager.writeToDB()
-                    }
-                    if(data.vars){
-                        for (const v in data.vars) {
-                            formatManager.set(v,data.vars[v],true)
-                        }
-                        createOrUpdate(GLOBAL_FORMAT,formatManager.data)
-                    }
-                    header=true;
-                }catch (e){
-                    utools.showNotification('解析YAML头失败：'+e.message)
-                }
-                cur++;
-                continue;
-            }
-            if(str === '' || !str.startsWith('### ')){
-                cur++;
-                continue;
-            }
-            // 识别一个CodeSnippet
-            let result = _recongzieCodeSnippet(lines,cur)
-            if(result.snippet != null){
-                count++;
-                if(result.snippet.path && result.snippet.code === "undefined"){
-                    result.snippet.code = undefined;
-                }
-                if(this.contain(result.snippet.name)){
-                    result.snippet.top = result.top;
-                    repeatCodeSnippets.push(result.snippet)
-                }else{
-                    this.add(result.snippet)
-                    if(result.top){
-                        configManager.addTopItem(result.snippet.id)
                     }
                 }
-                cur = result.cur+1;
-            }else{
-                msg = result;
-                break;
             }
+            utools.showNotification('共成功导入'+count+'条数据')
+        }catch (e){
+            utools.showNotification("解析code-snippet-data.json及相关data时发生异常，原因为"+e.message)
+        }
+        // tag
+        try{
+            const obj = JSON.parse(await zip.file("code-snippet-tag.json").async("string"))
+            if(obj && obj.tags){
+                for (const tag in obj.tags) {
+                    tagColorManager.tags[tag] = obj.tags[tag]
+                }
+                tagColorManager.writeToDB()
+            }
+        }catch (e){
+            utools.showNotification("解析code-snippet-tag.json时发生异常，原因为"+e.message)
+        }
+        // func
+        try{
+            const obj = JSON.parse(await zip.file("code-snippet-func.json").async("string"))
+            if(obj && obj.funcs){
+                for (const func in obj.funcs) {
+                    formatManager.funcMap[func] = obj.funcs[func]
+                }
+                createOrUpdate(GLOBAL_FUNC,formatManager.funcMap)
+            }
+        }catch (e){
+            utools.showNotification("解析code-snippet-func.json时发生异常，原因为"+e.message)
         }
         if(repeatCodeSnippets.length > 0){
             $dialog.info({
@@ -641,19 +611,13 @@ export const codeSnippetManager = {
                 positiveText: '全部覆盖',
                 negativeText: '全部丢弃',
                 onPositiveClick: ()=>{
-                    for (let repeatCodeSnippet of repeatCodeSnippets) {
-                        this.add(repeatCodeSnippet)
-                        if(repeatCodeSnippet.top){
-                            configManager.addTopItem(repeatCodeSnippet.id)
+                    for (let snippet of repeatCodeSnippets) {
+                        if(this.add(snippet) && snippet.top){
+                            configManager.addTopItem(snippet.id)
                         }
                     }
                 }
             })
-        }
-        if(msg == null){
-            utools.showNotification('共成功导入'+count+'条数据')
-        }else{
-            utools.showNotification('已导入'+count+'条数据;'+msg+'，导致后续的数据不能被导入')
         }
     },
     empty() {

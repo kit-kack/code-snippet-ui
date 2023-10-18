@@ -1,14 +1,26 @@
 const fs = require('fs')
 const path = require('path')
 const {clipboard} = require('electron');
-export const readConfig = (path) => fs.readFileSync(path).toString();
-export const writeConfig = (path,str,flag)=> {
-    if(flag){
-        return fs.writeFileSync(path,str);
-    }else{
-        return fs.appendFileSync(path,str);
-    }
+
+/**
+ *
+ * @param {JSZip} zip
+ * @param path
+ */
+export const generateZip = (zip,path) =>{
+    zip.generateAsync({
+        type: "uint8array"
+    }).then(content =>{
+        fs.writeFile(path,content,null,(error)=>{
+            if(error){
+                utools.showNotification("备份文件出现错误,原因为 "+error.message);
+            }else{
+                utools.showNotification("备份文件已生成,位于"+path);
+            }
+        })
+    })
 }
+export const readZip = fs.readFileSync;
 export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.md')).toString();
 
 /*
@@ -31,12 +43,6 @@ export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.m
 //     });
 //     return result;
 // }
-export function encodeBase64(str){
-    return new Buffer(str).toString('base64')
-}
-export function decodeBase64(str){
-    return new Buffer(str,'base64').toString()
-}
 
 export function getDirname(p){
     return path.dirname(p)

@@ -73,7 +73,6 @@ const handleVimStatusBarClick = ()=>{
             onPositiveClick: ()=>{
               // 备份
               codeSnippetManager.store(backupFilePath)
-              $message.info("codesnippet-backup.md已备份至桌面")
               // 删除数据
               codeSnippetManager.empty();
               // 刷新
