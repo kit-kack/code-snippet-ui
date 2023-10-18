@@ -150,9 +150,9 @@ function func(command, param){
 
 ## 3.其他更新日志✨
 - v2.5.0
-  - refactor: 【变量与表达式解析】重构为【占位符解析】
+  - refactor：【变量与表达式解析】重构为【占位符解析】
   - refactor：重构 数据导入导出文件 为zip形式
-  - feat: 支持 搜索粘贴子代码片段
+  - feat：支持 搜索粘贴子代码片段
 - v2.4.0
   - feat：支持代码片段名高亮搜索显示
   - feat：支持将代码片段名注册为uTools关键字
