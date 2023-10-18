@@ -16,184 +16,11 @@ import {
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./func";
-import {fullAlias, lowercaseIncludes} from "../utils/common";
+import {convertValidFileSuffix, fullAlias} from "../utils/language";
+import {lowercaseIncludes} from "../utils/common";
 import {utools_feature_del} from "../utils/feature";
 import JSZip from "jszip";
 
-
-/**
- * MD解析：识别MD中CodeSnippet中的代码块起始符号`号数量
- * @param line
- * @return {{prefix: string, type: string} | {prefix: string, type: null} | null} - prefix对应```数量 type对应语言类型
- * @private
- */
-function _recongizeCodeBlock(line){
-    let prefix = '';
-    let flag2 = false;
-    let i;
-    for (i = 0; i < line.length; i++) {
-        if(flag2){
-            if( line[i] !== ' '){
-                break;
-            }
-        } else if(prefix.length> 2){
-            if(line[i] === '`'){
-                prefix+= '`';
-            }else if(line[i] === ' '){
-                flag2 = true;
-            }else{
-                break;
-            }
-        }else{
-            if(line[i] === '`'){
-                prefix+= '`';
-            }else{
-                return null;
-            }
-        }
-    }
-    if(i === line.length){
-        return {
-            prefix: prefix,
-            type: null
-        }
-    }else{
-        return {
-            prefix: prefix,
-            type: line.substring(i)
-        }
-    }
-}
-/**
- * MD解析：识别MD中的一个CodeSnippet片段
- * @param {string[]} lines
- * @param {number} cur
- * @private
- */
-function _recongzieCodeSnippet(lines,cur){
-    const snippet = {};
-    let top = false;
-    snippet.name  =lines[cur].substring(4).trim();
-    let str = null;
-    while (true){
-        cur++;
-        if(cur >= lines.length){
-            break;
-        }
-        str = lines[cur].trim();
-        if(str === '' || str === '>'){
-            continue
-        }
-        if(str.startsWith('> ')){
-            str = str.substring(2).trim();
-            if(str===''){
-                continue;
-            }
-            if(str.startsWith("time:")){
-                let time =  parseInt(str.substring(5).trim());
-                if(!isNaN(time)){
-                    snippet.time = time;
-                }
-            }else if(str.startsWith("desc:")){
-                snippet.desc = str.substring(5).trim();
-            }else if(str.startsWith("count:")){
-                let count =  parseInt(str.substring(6).trim());
-                if(!isNaN(count)){
-                    snippet.count = count;
-                }
-            }else if(str.startsWith("tags:")) {
-                let tags = str.substring(5).trim().split(' ').filter(value => value.length > 0);
-                if (tags != null && tags.length > 0) {
-                    snippet.tags = tags;
-                }
-            }else if(str.startsWith('local:')) {
-                snippet.path = str.substring(6).trim()
-                snippet.local = true;
-            }else if(str.startsWith('network:')){
-                snippet.path = str.substring(8).trim()
-            }else if(str.startsWith('🔖')){
-                let tags = str.substring(2).trim().split(' ').filter(value => value.length>0);
-                if(tags!=null && tags.length> 0){
-                    snippet.tags = tags;
-                }
-            }else if(str.startsWith('📢')){
-                snippet.desc = str.substring(2).trim();
-            }else if(str.startsWith('⏰')){
-                let time =  parseInt(str.substring(2).trim());
-                if(!isNaN(time)){
-                    snippet.time = time;
-                }
-            }else if(str.startsWith('🎲')){
-                let count =  parseInt(str.substring(2).trim());
-                if(!isNaN(count)){
-                    snippet.count = count;
-                }
-            }else if(str.startsWith('🧩')){
-                const sections = str.substring(2).trim().split(' ').filter(value => value.length>0);
-                if(sections && sections.length > 0){
-                    snippet.sections = sections.map(v =>v.split('-',2).map(x=>parseInt(x)))
-                }
-            }else if(str.startsWith('🔰top')){
-                top = true;
-            }
-        }else{
-            let pair = _recongizeCodeBlock(str);
-            if(pair == null){
-                //到达这里表明出现错误 遇到未识别行
-                return`在${cur}行发生解析错误：错误语法行，请符合要求`;
-            }
-            let code = '';
-            cur++;
-            while (cur < lines.length){
-                if(lines[cur].trim()===pair.prefix){
-                    // successs
-                    // 移除最后一个 \n 符号
-                    snippet.code = code.substring(0,code.length-1)
-                    snippet.type = pair.type??"plaintext";
-                    return {
-                        cur: cur,
-                        top: top,
-                        snippet:snippet
-                    };
-                }else{
-                    code+=lines[cur]+"\n";
-                }
-                cur++;
-            }
-            // 到达这里表明出现错误：代码块没有结束部分
-            return `在${cur}行发生解析错误：未扫描到代码块结束部分`;
-        }
-    }
-    // 到达这里 表明出现错误
-    return `在${cur}行发生解析错误：未扫描到代码块部分`
-}
-
-
-/**
- * MD生成：识别代码的起始符号`号数量
- * @param {string} code
- * @private
- */
-function _getMaxMarkCount(code){
-    if(code != null){
-        let max = 0;
-        let temp = 0;
-
-        for (let ch of code) {
-            if(ch === '`'){
-                temp ++;
-            }else{
-                if(temp > max){
-                    max = temp;
-                }
-                temp = 0;
-            }
-        }
-        return max;
-    }else{
-        return 0;
-    }
-}
 /**
  * 根据属性产生对应的排序函数
  * @param {string} property
@@ -216,7 +43,9 @@ function _compare(property){
         }
     }
 }
-
+const CREATE_TIME_COMPARE = _compare("createTime");
+const TIME_COMPARE = _compare("time");
+const COUNT_COMPARE  = _compare("count");
 
 /**
  *  获取排序后的数组
@@ -242,13 +71,13 @@ function _getSortedArray(list){
     topSnippets.sort((a,b)=> a.index - b.index)
     switch (configManager.getSortKey()){
         case 0:   // 创建时间
-            list.sort(_compare('createTime'))
+            list.sort(CREATE_TIME_COMPARE)
             break;
         case 1:   // 最近访问时间
-            list.sort(_compare('time'))
+            list.sort(TIME_COMPARE)
             break;
         case 2:  // 粘贴使用次数
-            list.sort(_compare('count'))
+            list.sort(COUNT_COMPARE)
             break;
         default:  // 自然排序
             list.sort((a,b)=>a.name.localeCompare(b.name))
@@ -538,8 +367,9 @@ export const codeSnippetManager = {
         for (let codeSnippet of this.codeMap.values()) {
             const snippet = {...codeSnippet};
             if(snippet.code){
-                zip.file(`code/${snippet.name}.${snippet.type}`,snippet.code)
-                snippet.code = true;
+                const path = `code/${snippet.name}.${convertValidFileSuffix(snippet.type??'txt')}`
+                zip.file(path,snippet.code)
+                snippet.code = path;
             }
             delete snippet.id;
             if(configManager.getTopList().includes(codeSnippet.id)){
@@ -564,7 +394,7 @@ export const codeSnippetManager = {
             if(obj && obj.snippets && Array.isArray(obj.snippets)){
                 for (const snippet of obj.snippets) {
                     if(snippet.code){
-                        snippet.code = await zip.file(`code/${snippet.name}.${snippet.type}`).async('string');
+                        snippet.code = await zip.file(snippet.code).async('string');
                     }
                     if(this.contain(snippet.name)){
                         repeatCodeSnippets.push(snippet)

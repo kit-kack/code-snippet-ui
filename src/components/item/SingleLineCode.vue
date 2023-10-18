@@ -11,7 +11,7 @@
 
 <script setup>
 import {configManager} from "../../js/core/config";
-import {getRealTypeAndValidStatus} from "../../js/utils/common";
+import {getRealTypeAndValidStatus} from "../../js/utils/language";
 
 const props = defineProps(['code','type']);
 const pair = getRealTypeAndValidStatus(props.type)

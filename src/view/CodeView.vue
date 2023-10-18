@@ -104,7 +104,8 @@ import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import {computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
 import {section_generate} from "../js/utils/section";
-import {calculateTime, getRealTypeAndValidStatus, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
+import {getRealTypeAndValidStatus} from "../js/utils/language";
+import {calculateTime, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
 import {$normal, $reactive, LIST_VIEW, navigateView} from "../js/store";
 
 const scrollBar = ref(null)

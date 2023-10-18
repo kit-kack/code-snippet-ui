@@ -207,7 +207,7 @@ import {computed, h, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {tagColorManager} from "../js/core/tag";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
-import {fullAlias, languages} from "../js/utils/common";
+import {fullAlias, languages} from "../js/utils/language";
 import {$normal, $reactive, EDIT_VIEW, LIST_VIEW, navigateView} from "../js/store";
 import {CtrlStr} from "../js/some";
 import {utools_feature_add, utools_feature_del} from "../js/utils/feature";

@@ -90,16 +90,11 @@
 </template>
 <script setup>
 import {ref, toRaw} from "vue";
-  import {formatManager} from "../../js/core/func";
-  import {getRefreshFunc, languages} from "../../js/utils/common";
-  import {configManager} from "../../js/core/config";
-  import {CtrlStr} from "../../js/some";
-  import ConfigSwitch from "../ConfigSwitch.vue";
-import {$normal, $reactive, LIST_VIEW, navigateView} from "../../js/store";
-  import {codeSnippetManager} from "../../js/core/snippet";
-import {utools_feature_add, utools_feature_del} from "../../js/utils/feature";
+import {formatManager} from "../../js/core/func";
+import {getRefreshFunc} from "../../js/utils/common";
+import {$reactive} from "../../js/store";
 
-  const activeKey = ref(null)
+const activeKey = ref(null)
   const pair = ref({})
   const refreshFlag = ref(true)
   const doRefresh = getRefreshFunc(refreshFlag)

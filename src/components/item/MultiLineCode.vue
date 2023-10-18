@@ -17,7 +17,7 @@
 import {configManager} from "../../js/core/config";
 import {$normal} from "../../js/store";
 import {onMounted, onUpdated, ref} from "vue";
-import {getRealTypeAndValidStatus} from "../../js/utils/common";
+import {getRealTypeAndValidStatus} from "../../js/utils/language";
 
 
 const props = defineProps(['code','type','active']);
