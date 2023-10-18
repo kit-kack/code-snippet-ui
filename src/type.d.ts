@@ -85,3 +85,4 @@ declare type ConfigItem =
     | "closeHelpSnippet"                            // 关闭defaultHelpSnippet
     | "aidTagSelect"                               // 标签辅助选择
 // @deprecated:待考虑    | "allowTest"                                  // 测试版尝鲜
+    | "allowSearchSubSnippet"                        // 允许搜索子代码片段

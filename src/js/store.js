@@ -24,7 +24,8 @@ const $normal = {
     variables: {},        // 后续会映射类型
     defaultValues: {},    // 默认值
     quickCode: null,      // 快速记录代码
-    tempTags: []          // tags缓存
+    tempTags: [],          // tags缓存
+    subSnippetNum: null,  // 子代码片段序号
 }
 const $reactive = reactive({
     currentCode: null,

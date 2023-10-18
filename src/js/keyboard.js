@@ -413,7 +413,7 @@ function init(list) {
         }
         // super key
         if (e.code === 'Enter') {
-            copyCode(true)
+            copyCode(true,$normal.subSnippetNum)
             // handleCopy(true)
             return;
         } else if (e.code === 'Tab') {
@@ -539,6 +539,7 @@ function parseSearchWord(searchWord){
         configManager.set('version',defaultHelpSnippet.version)
         configManager.set('closeHelpSnippet',false)
     }
+    $normal.subSnippetNum = undefined;
     if(searchWord == null || searchWord.length === 0){
         $reactive.view.aidTagActive = false;
         $normal.tempTags = [];
@@ -570,7 +571,17 @@ function parseSearchWord(searchWord){
                     tagFlag = true;
                 }
             }else{
-                name = word;
+                if(configManager.get('allowSearchSubSnippet')){
+                    const index = word.lastIndexOf('$')
+                    if(index !== -1){
+                        name = word.slice(0,index)
+                        $normal.subSnippetNum = (+word.slice(index+1))??1;
+                    }else{
+                        name =  word;
+                    }
+                }else{
+                    name = word;
+                }
             }
         }
         $reactive.view.aidTagActive = (tagFlag && configManager.get('aidTagSelect'));

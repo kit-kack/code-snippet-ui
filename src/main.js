@@ -156,14 +156,24 @@ utools.onPluginEnter((data)=>{
 
 try{
     utools.onMainPush(({code,type,payload})=>{
+        let name = payload;
+        let num = undefined;
+        if(configManager.get('allowSearchSubSnippet')){
+            const index = payload.lastIndexOf('$')
+            if(index !== -1){
+                name = payload.slice(0,index)
+                num =  (+payload.slice(index+1))??1;
+            }
+        }
         let flag = true;
-        const array = codeSnippetManager.queryForMany(payload,null,null)
+        const array = codeSnippetManager.queryForMany(name,null,null)
         return array.map(cs =>{
             flag = !flag;
             return {
                 text: cs.desc? (cs.name+'📢'+cs.desc):cs.name,
                 id: cs.id,
-                icon: '/code.png'
+                icon: '/code.png',
+                num: num
             }
         })
 
@@ -171,7 +181,7 @@ try{
         $reactive.currentSnippet = codeSnippetManager.get(option.id);
         // $reactive.utools.selectedIndex = 0;
         $index.value = 0;
-        return copyCode(true,undefined,true)
+        return copyCode(true,option.num,true)
     })
 }catch (_){}
 

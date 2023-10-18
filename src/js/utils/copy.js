@@ -121,6 +121,10 @@ export function copyCode(isPasted,num,noView){
         }
 
     }else{
+        if(num <= 0){
+            _notify("子代码片段序号必须从1开始",noView);
+            return;
+        }
         if($reactive.currentSnippet.sections && $reactive.currentSnippet.sections.length >= num){
             const  [start,end] = $reactive.currentSnippet.sections[num-1]
             if(!$reactive.currentCode){
@@ -145,7 +149,7 @@ export function copyCode(isPasted,num,noView){
                 return noView;
             }
         }else{
-            _notify(`当前没有 ${num}号 子代码片段`,noView)
+            _notify(`当前片段没有 ${num}号 子代码片段`,noView)
         }
     }
 }

@@ -39,12 +39,20 @@
             本功能只在 列表UI模式下 生效
           </n-tooltip>
         </n-space>
-        <n-tooltip trigger="hover">
-          <template #trigger>
-            <config-check-tag title="💡标签辅助选择" config="aidTagSelect"/>
-          </template>
-          开启后，输入框输入#后，会辅助提示选择标签
-        </n-tooltip>
+        <n-space>
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <config-check-tag title="💡标签辅助选择" config="aidTagSelect"/>
+            </template>
+            开启后，输入框输入#后，会辅助提示选择标签
+          </n-tooltip>
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <config-check-tag title="💡搜索子代码片段" config="allowSearchSubSnippet"/>
+            </template>
+            开启后，可以通过 name$num 搜索复制粘贴 name对应的num号子代码片段
+          </n-tooltip>
+        </n-space>
       </n-space>
       <n-divider title-placement="center">
         个性化设置
