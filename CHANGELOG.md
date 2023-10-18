@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/littledot-kit/code-snippet-ui/compare/v2.4.1...v2.5.0) (2023-10-18)
+
+
+### Features
+
+* 一些样式修改 ([9004260](https://github.com/littledot-kit/code-snippet-ui/commit/9004260e28bd9e35cbae6235f6fdcf1cd551746b))
+* 优化导出文件后缀名 ([41d8312](https://github.com/littledot-kit/code-snippet-ui/commit/41d831291056d68126b1d157c0bbab26f62e4a0d))
+* 支持 搜索子代码片段 ([dfd5499](https://github.com/littledot-kit/code-snippet-ui/commit/dfd5499e7054d2e8f3a377cc78ec51f4367a0a8d))
+* 重构 数据导入导出文件为 zip形式 ([80cba1c](https://github.com/littledot-kit/code-snippet-ui/commit/80cba1c48f2920dbdd808ff89c69c0667a435caa))
+
 ### [2.4.1](https://github.com/littledot-kit/code-snippet-ui/compare/v2.4.0...v2.4.1) (2023-10-17)
 
 
