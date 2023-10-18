@@ -62,15 +62,13 @@
         </n-form-item>
         <n-form-item label="函数实现" path="expression" size="small">
           <div id="main">
-            <p class="code-aid" style="top:0">
-              // command:响应的占位符 param:可选参数<br/>
-              function func(command:string , param?: string){</p>
+            <p class="code-aid" style="top:5px">function func(command,param){</p>
             <n-input
                 v-model:value="pair.expression"
                 placeholder="请输入函数实现"
                 type="textarea"
                 size="small"
-                style="padding: 35px 10px 30px 30px;width:100%"
+                style="padding: 25px 10px 30px 30px;width:100%"
                 :autosize="{maxRows:4}"/>
             <p class="code-aid" style="bottom: 5px">}</p>
           </div>

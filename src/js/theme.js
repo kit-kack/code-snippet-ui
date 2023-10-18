@@ -14,11 +14,11 @@ const theme = utools.isDarkColors()? darkTheme:null;
 function getThemeOverrides(){
     configManager.init();
     const gc = configManager.getGlobalColor();
-    const hoverBorderVar = `1px solid #737475`
+    const hoverBorderVar = `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
     const borderVar = `1px solid ${gc}`
     const boxShadowVar = `inset 0 0 0 1px ${gc}`
     const textOrCaretColorVar =  utools.isDarkColors()? 'white': '#4b4e51';
-    const inputBorderVar = `1px solid ${utools.isDarkColors()? '#303133': '#e7e7e8'}`;
+    const inputBorderVar =  `1px solid ${utools.isDarkColors()? '#303133': '#e0e0e6'}`;
 
 
     return {
@@ -32,11 +32,12 @@ function getThemeOverrides(){
         Tag:{
             colorChecked: gc,
             colorCheckedHover: gc,
-            colorCheckedPressed:gc
+            colorCheckedPressed:gc,
+            border: utools.isDarkColors()? undefined:'none'
         },
         Input:{
             borderFocus: hoverBorderVar,
-            boxShadowFocus: 'none',
+            boxShadowFocus: utools.isDarkColors()? 'none': '0 2px 9px 0 rgba(100,100,111,.2)',
             borderHover: hoverBorderVar,
             border: inputBorderVar,
             caretColor: textOrCaretColorVar,
@@ -45,15 +46,22 @@ function getThemeOverrides(){
             peers:{
                 InternalSelection:{
                     textColor: textOrCaretColorVar,
-                    borderFocus: 'none',
-                    boxShadowFocus: 'none',
-                    borderHover: 'none',
                     border: inputBorderVar,
-                    borderActive: 'none',
+                    borderHover: inputBorderVar,
+                    borderFocus: inputBorderVar,
+                    borderActive: inputBorderVar,
+                    boxShadowFocus: 'none',
                     boxShadowActive: 'none',
+                    boxShadowHover: 'none',
+                    clearColorHover: 'none',
                     caretColor: textOrCaretColorVar,
                     colorFocus: 'white',
                     colorActive: utools.isDarkColors()? '#575859': '#fff'
+                },
+                Popover:{
+                    boxShadow: '0 0 0 2px red',
+                    color: 'red',
+                    textColor: 'red'
                 },
                 InternalSelectMenu:{
                     optionCheckColor: gc,
@@ -82,6 +90,19 @@ function getThemeOverrides(){
             tabTextColorActiveBar: gc,
             tabTextColorHoverBar: gc,
             barColor: gc
+        },
+        DynamicTags:{
+            peers:{
+                Tag:{
+                    textColor: gc
+                },
+                Button:{
+                    color: 'red',
+                    iconColor: 'red',
+                    textColorPresssed: 'red',
+                    colorPressed: 'yellow'
+                }
+            }
         }
     }
 }

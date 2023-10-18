@@ -1,8 +1,11 @@
 <template>
-  <template v-if="raw">
+  <template v-if="info">
+    <n-tag closable size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
+  </template>
+  <template v-else-if="raw">
     <n-tooltip>
       <template #trigger>
-        <n-tag closable id="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
+        <n-tag closable class="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
       </template>
       {{tagColorManager.tags[props.content] === null? "清除标签":"清除颜色"}}
     </n-tooltip>
@@ -10,7 +13,7 @@
   <template v-else>
     <n-popover trigger="click" raw :show-arrow="false" >
       <template #trigger>
-        <n-tag id="tag"  :bordered="false" size="small" :color="colorStyle" > {{props.content}}</n-tag>
+        <n-tag class="tag"  :bordered="false" size="small" :color="colorStyle" > {{props.content}}</n-tag>
       </template>
       <color-picker :instance="instance" is-styled/>
     </n-popover>
@@ -26,7 +29,8 @@ import ColorPicker from "./ColorPicker.vue";
 
 const props = defineProps({
   "content": String,
-  "raw":Boolean
+  "raw":Boolean,
+  "info": Boolean
 })
 let color = tagColorManager.get(props.content)
 if(color[0]==='#'){
@@ -70,7 +74,7 @@ const handleClose = ()=>{
 </script>
 
 <style scoped>
-#tag{
+.tag{
   height: 14px;
 }
 </style>

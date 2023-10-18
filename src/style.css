@@ -61,7 +61,15 @@
   border-radius: 0;
   background: rgba(0, 0, 0, 0.1);
 }
-span.term{
+.func i{
   color: #ffa400;
   font-size: 13px;
+  font-style: normal;
+}
+
+#light-app .n-tag--closable button{
+  color: #aaa;
+}
+#dark-app .n-dynamic-tags .n-button{
+  --n-text-color-pressed: #adadaf !important;
 }

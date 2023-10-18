@@ -14,7 +14,7 @@ const DEFAULT_FUNCS = {
         name: "主动输入",
         desc: `弹出输入框，用户主动输入值;
 可选参数：任意值（作为输入框默认值）
-额外说明：如果没有使用变量接收，默认输入的值会被保存到名为[位置X]的变量，故请勿将自定义的变量设置为[位置X]的形式
+额外说明：如果没有使用变量接收，默认输入的值会被保存到名为<i>位置X</i>的变量，故请勿将自定义的变量设置为<i>位置X</i>的形式
 `,
         commands: ["input","输入"],
         expression: '内置提供，无函数实现',
@@ -23,7 +23,7 @@ const DEFAULT_FUNCS = {
     '日期与时间':{
         name: "日期与时间",
         desc: `获取日期与时间;
-【custom-time/自定义时间】需要携带格式化参数，例如<span class="term">HH:mm:ss</span>`,
+【custom-time/自定义时间】需要携带格式化参数，例如<i>HH:mm:ss</i>`,
         commands: ["now", "时间戳", "date", "日期", "time", "时间","custom-time", "自定义时间"],
         expression: `\
 switch (command) {
@@ -47,7 +47,7 @@ switch (command) {
     '剪切板': {
         name: "剪切板",
         desc: `获取剪切板内容;
-可选参数：<span class="term">小写</span>/<span class="term">lowercase</span>/<span class="term">大写</span>/<span class="term">uppercase</span>/<span class="term">去空格</span>/<span class="term">trim</span>
+可选参数：<i>小写</i>/<i>lowercase</i>/<i>大写</i>/<i>uppercase</i>/<i>去空格</i>/<i>trim</i>
         `,
         commands: ["clipboard","剪切板"],
         expression: `\
@@ -69,9 +69,9 @@ switch (param){
     "随机":{
         name: "随机",
         desc: `获取随机数/nanoid/uuid;
-random可选参数：<span class="term">min..max</span>（来指定范围） 
-nanoid可选参数：<span class="term">size</span>(来指定id字符数量)
-uuid可选参数：<span class="term">len,radix</span>（len对应uuid长度，radix对应uuid选取字符数量）  
+random可选参数：<i>min..max</i>（来指定范围） 
+nanoid可选参数：<i>size</i>(来指定id字符数量)
+uuid可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）  
 `,
         commands: ["random", "nanoid","uuid"],
         expression: `\

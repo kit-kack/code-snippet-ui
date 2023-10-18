@@ -23,10 +23,12 @@
             multiple
             tag
             placeholder="可选：请选择或输入标签"
+            :show-arrow="false"
             :options="tags"
+            :render-tag="renderTag"
         />
 <!--        <n-dynamic-tags v-model:value="codeTemplate.tags">-->
-<!--          <template #input="{ submit, deactivate }">-->
+<!--          <template #input="{ submit }">-->
 <!--            <n-select-->
 <!--                v-model:value="tempTag"-->
 <!--                filterable tag-->
@@ -51,7 +53,7 @@
                     placeholder="请输入代码片段"
                     type="textarea"
                     size="small"
-                    style="padding-top: 40px;padding-bottom: 10px"
+                    style="padding-top: 40px;padding-bottom: 10px;"
                     @keydown="handleKeyDown"
                     ref="codeTextArea"
                     show-count
@@ -106,7 +108,7 @@
                         :default-value="configManager.get('defaultLanguage')??'plaintext'"
                         tag
                         @update:value="handleTypeChange()"
-                        :render-tag="renderTag"
+                        :render-tag="renderCodeTypeTag"
                         :theme-overrides="selectThemeOverrides"
                     />
                   </div>
@@ -131,7 +133,7 @@
                         default-value="plaintext"
                         tag
                         @update:value="handleTypeChange()"
-                        :render-tag="renderTag"
+                        :render-tag="renderCodeTypeTag"
                         :theme-overrides="selectThemeOverrides"
                     />
                     <n-button @click="handleClearPath" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error">
@@ -201,7 +203,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
+import {computed, h, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {tagColorManager} from "../js/core/tag";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
@@ -211,6 +213,8 @@ import {CtrlStr} from "../js/some";
 import {utools_feature_add, utools_feature_del} from "../js/utils/feature";
 import ConfigSwitch from "../components/ConfigSwitch.vue";
 import FuncSelectPane from "../components/pane/FuncSelectPane.vue";
+import NormalTag from "../components/NormalTag.vue";
+import {NTag} from "naive-ui";
 
 
 
@@ -232,6 +236,7 @@ const currentTab = ref(codeTemplate.path? 'path':'code')  // 当前Tab页
 const codeTextArea = ref()
 const showModal = ref(false)
 const showFuncModal = ref(false)
+const tempTag = ref()
 const url = ref()
 const tabOptions = [
   {label: '原生行为',value: 0},
@@ -239,14 +244,30 @@ const tabOptions = [
   {label: '2个空格',value: 2},
   {label: '4个空格',value: 4}
 ]
-const renderTag = ({option})=>{
+const renderCodeTypeTag = ({option})=>{
   if(option.value.length > 2 && option.value.startsWith('x-')){
     return option.label + ' （解析⚡）'
   }else{
     return option.label;
   }
 }
-
+const renderTag = ({ option, handleClose }) => {
+  return h(
+      NormalTag,
+      {
+        info: true,
+        content: option.label,
+        onMousedown: (e) => {
+          e.preventDefault()
+        },
+        onClose: (e) => {
+          e.stopPropagation()
+          handleClose()
+        }
+      }, // <n-tag closable id="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
+      null
+  )
+}
 const rules = {
   "name":[
     {
@@ -454,15 +475,17 @@ function handleClearPath(){
   position: relative;
   width: 100%;
   height: 270px;
+  box-sizing: border-box;
+  padding: 0 5px;
 }
 #sub{
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% - 2px);
+  width: calc(100% - 10px);
   height: 37px;
   box-sizing: border-box;
-  margin-left: 1px;
+  margin-left: 5px;
   border-bottom: 1px solid #efeff2;
   padding: 1px;
   z-index: 3;
