@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.1](https://github.com/littledot-kit/code-snippet-ui/compare/v2.5.0...v2.5.1) (2023-10-19)
+
+
+### Features
+
+* 修改相关显示外观 ([1aa0ca4](https://github.com/littledot-kit/code-snippet-ui/commit/1aa0ca463c1f195cfc76f90e8bded680511f0574))
+
+
+### Bug Fixes
+
+* 修复preload相关api bug ([6ac40e8](https://github.com/littledot-kit/code-snippet-ui/commit/6ac40e81eadb4241633699b3ff3d6abe6f9f05ff))
+
 ## [2.5.0](https://github.com/littledot-kit/code-snippet-ui/compare/v2.4.1...v2.5.0) (2023-10-18)
 
 
