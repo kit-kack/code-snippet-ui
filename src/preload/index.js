@@ -20,7 +20,7 @@ export const generateZip = (zip,path) =>{
         })
     })
 }
-export const readZip = fs.readFileSync;
+export const readFile = fs.readFileSync;
 export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.md')).toString();
 
 /*

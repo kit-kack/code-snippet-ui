@@ -8,6 +8,9 @@ export default defineConfig({
     server:{
       port: 3100
     },
+    define:{
+        __APP_VERSION__: JSON.stringify(process.env.npm_package_version)
+    },
     plugins: [
       vue(),
       createPreloadPlugin({

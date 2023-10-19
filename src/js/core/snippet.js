@@ -385,7 +385,7 @@ export const codeSnippetManager = {
     },
     async load(path){
         const repeatCodeSnippets = [];
-        const data = window.preload.readZip(path);
+        const data = window.preload.readFile(path);
         const zip = await JSZip.loadAsync(data);
         // data
         try{

@@ -157,7 +157,7 @@ function getCode(){
 function getCodeFromPath(){
   if(snippet.local){
     try{
-      return window.preload.readConfig(snippet.path)?? '[本地内容为空]'
+      return window.preload.readFile(snippet.path).toString()?? '[本地内容为空]'
     }catch (e){
       $message.error(e.message)
       return `😅加载失败: 本地文件[ ${snippet.path} ]`
