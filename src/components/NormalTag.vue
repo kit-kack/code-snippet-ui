@@ -1,8 +1,11 @@
 <template>
-  <template v-if="info">
-    <n-tag closable size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
+  <template v-if="type === 'raw'">
+    <n-tag size="small" class="tag" :color="colorStyle" >{{props.content}}</n-tag>
   </template>
-  <template v-else-if="raw">
+  <template v-else-if="type === 'closable'">
+    <n-tag closable size="small" :color="colorStyle">{{props.content}}</n-tag>
+  </template>
+  <template v-else-if="type === 'clear'">
     <n-tooltip>
       <template #trigger>
         <n-tag closable class="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
@@ -29,8 +32,7 @@ import ColorPicker from "./ColorPicker.vue";
 
 const props = defineProps({
   "content": String,
-  "raw":Boolean,
-  "info": Boolean
+  "type": String
 })
 let color = tagColorManager.get(props.content)
 if(color[0]==='#'){

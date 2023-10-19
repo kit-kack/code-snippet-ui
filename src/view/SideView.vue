@@ -85,7 +85,7 @@
         </n-tooltip>
         <template v-if="refreshFlag">
           <n-space>
-            <normal-tag raw v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithTagRefresh"/>
+            <normal-tag type="clear" v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithTagRefresh"/>
           </n-space>
         </template>
         <func-pane/>

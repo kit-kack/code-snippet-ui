@@ -236,7 +236,6 @@ const currentTab = ref(codeTemplate.path? 'path':'code')  // 当前Tab页
 const codeTextArea = ref()
 const showModal = ref(false)
 const showFuncModal = ref(false)
-const tempTag = ref()
 const url = ref()
 const tabOptions = [
   {label: '原生行为',value: 0},
@@ -255,7 +254,7 @@ const renderTag = ({ option, handleClose }) => {
   return h(
       NormalTag,
       {
-        info: true,
+        type: "closable",
         content: option.label,
         onMousedown: (e) => {
           e.preventDefault()

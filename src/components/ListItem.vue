@@ -34,7 +34,7 @@
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="!configManager.get('noItemCodeShow')">{{snippet.desc}}</span>
               <!-- 子代码片段 -->
               <span class="snippet-item__desc"  style="margin-left: 10px;" v-if="configManager.get('noItemCodeShow')">
-                {{(snippet.sections?.length> 0? snippet.sections.length+'个子代码片段': '') ??''}}
+                {{sideInfo}}
               </span>
             </n-ellipsis>
           </div>
@@ -67,7 +67,7 @@
         </template>
         <!-- 子代码片段 -->
         <span  class="snippet-item-info sub-item-code" style="left: 0px;z-index: 20;" >
-              {{(snippet.sections?.length> 0? snippet.sections.length+'个子代码片段': '') ??''}}
+              {{sideInfo}}
         </span>
       </template>
       <!-- 右侧下方 （语言类型|使用次数|上次使用时间） -->
@@ -145,8 +145,7 @@ const isShowBtn = computed(()=>{
 const isHover = ref(false)
 let topIndex = configManager.getTopList().indexOf(props.snippet.id)
 const pair = computed(()=>{
-  let txt = props.snippet.feature? '🔰 ':'';
-  txt += (props.snippet.type?? 'plaintext') + ' | ';
+  let txt = (props.snippet.type?? 'plaintext') + ' | ';
   if(props.snippet.count){
     txt += props.snippet.count +' | ';
   }
@@ -169,6 +168,21 @@ const pair = computed(()=>{
     }
   }
 })
+const sideInfo = getSideInfo();
+
+
+function getSideInfo(){
+  if(props.snippet.sections){
+    if(props.snippet.sections.length > 0){
+      if(props.snippet.feature){
+        return '★×'+props.snippet.sections.length;
+      }else{
+        return '⚑×'+props.snippet.sections.length;
+      }
+    }
+  }
+  return props.snippet.feature? '★':''
+}
 const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
   if(isHoverRef){

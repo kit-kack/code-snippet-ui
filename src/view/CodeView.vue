@@ -71,18 +71,20 @@
             <n-list-item  v-if="snippet.desc != null">
               <div>{{"📢 "+snippet.desc}}</div>
             </n-list-item >
-            <n-list-item  v-if="snippet.tags && snippet.tags.length > 0">
-              <div>{{"🔖 "+snippet.tags.join()}}</div>
-            </n-list-item >
             <n-list-item >
-              <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0} 📃${pair.count}字`}}</div>
+              <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0} 📃${pair.count}字 ${snippet.sections?.length > 0 ? '⚑×'+snippet.sections.length:''}`}}</div>
             </n-list-item>
-            <n-list-item  v-if="snippet.sections && snippet.sections.length > 0">
-              <div>{{`🧩 ${snippet.sections.length}个子代码片段`}}</div>
-            </n-list-item >
             <n-list-item  v-if="snippet.feature">
-              <div>🔰 已注册为uTools关键字</div>
+              <div>★ 已注册为uTools关键字</div>
             </n-list-item >
+            <n-list-item  v-if="snippet.tags && snippet.tags.length > 0">
+              <n-scrollbar x-scrollable :size="10" style="margin-left: 5px">
+                <n-space :wrap="false">
+                  <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
+                </n-space>
+              </n-scrollbar>
+            </n-list-item >
+
           </n-list>
         </n-popover>
 
@@ -107,6 +109,7 @@ import {section_generate} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
 import {calculateTime, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
 import {$normal, $reactive, LIST_VIEW, navigateView} from "../js/store";
+import NormalTag from "../components/NormalTag.vue";
 
 const scrollBar = ref(null)
 /**
