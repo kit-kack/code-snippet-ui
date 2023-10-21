@@ -28,12 +28,11 @@
     </n-list>
     <n-button size="small" style="margin:5px;" @click="enterAddView">添加</n-button>
     <n-button size="small" style="margin:5px;" @click="doReset()">重置</n-button>
-    <n-modal v-model:show="$reactive.view.funcEditActive"
-             preset="card"
-             :auto-focus="false"
-             :close-on-esc="false"
-             :title="pair.flag?'修改占位符函数': '新增占位符函数'"
-             style="width: 80%"
+    <base-modal v-model:show="$reactive.view.funcEditActive"
+                :title="pair.flag?'修改占位符函数': '新增占位符函数'"
+                @cancel="$reactive.view.funcEditActive = false"
+                @confirm="doFinal"
+                wide
     >
       <n-form
           label-placement="left"
@@ -76,16 +75,7 @@
 
         </n-form-item>
       </n-form>
-      <template #footer>
-        <div style="width: 100%;position: relative">
-          <n-space style="position: absolute; right: 3px">
-            <n-button quaternary @click="$reactive.view.funcEditActive = false">取消</n-button>
-            <n-button quaternary type="success" @click="doFinal()">确定</n-button>
-          </n-space>
-        </div>
-        <br/>
-      </template>
-    </n-modal>
+    </base-modal>
   </div>
 </template>
 <script setup>
@@ -93,6 +83,7 @@ import {ref, toRaw} from "vue";
 import {formatManager} from "../../js/core/func";
 import {getRefreshFunc} from "../../js/utils/common";
 import {$reactive} from "../../js/store";
+import BaseModal from "../base/BaseModal.vue";
 
 const activeKey = ref(null)
   const pair = ref({})

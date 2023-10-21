@@ -115,9 +115,9 @@
                 </div>
               </div>
             </n-tab-pane>
-            <n-tab-pane name="path" tab="链接文件">
-              <n-button @click="handleImport" quaternary type="primary">关联本地文本文件</n-button> &nbsp;&nbsp;
-              <n-button @click="showModal = true" quaternary type="info" >关联文本链接</n-button>
+            <n-tab-pane name="path" tab="关联文件">
+              <n-button @click="handleImport" quaternary type="primary">本地文件</n-button> &nbsp;&nbsp;
+              <n-button @click="showModal = true" quaternary type="info" >网络文件</n-button>
               <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
                 <n-list-item v-if="codeTemplate.path" style="height: 100px">
                   <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
@@ -157,7 +157,7 @@
         <n-tooltip trigger="hover">
           <template #trigger>
             <n-button id="cancel" strong secondary type="warning"  class="btn" @click="handleCancel">
-              取消
+              取消 (Q)
             </n-button>
           </template>
           {{CtrlStr+'+Q'}}
@@ -165,7 +165,7 @@
         <n-tooltip trigger="hover">
           <template #trigger>
             <n-button strong secondary type="success"  class="btn" @click="handleUpdate">
-              保存
+              保存 (S)
             </n-button>
           </template>
           {{CtrlStr+'+S'}}
@@ -173,23 +173,9 @@
       </div>
     </n-form>
   </div>
-  <n-modal v-model:show="showModal"
-           preset="card"
-           title="请输入链接"
-            style="width: 60%"
-
-  >
+  <base-modal :show="showModal" raw title="请输入链接" @cancel="showModal = false" @confirm="handleSetUrlAsPath">
     <n-input v-model:value="url" clearable/>
-    <template #footer>
-      <div style="width: 100%;position: relative">
-        <n-space style="position: absolute; right: 3px">
-          <n-button quaternary @click="showModal = false">取消</n-button>
-          <n-button quaternary type="success" @click="handleSetUrlAsPath">确定</n-button>
-        </n-space>
-      </div>
-      <br/>
-    </template>
-  </n-modal>
+  </base-modal>
   <n-modal v-model:show="showFuncModal"
            preset="card"
            title="选择占位符"
@@ -215,6 +201,7 @@ import ConfigSwitch from "../components/ConfigSwitch.vue";
 import FuncSelectPane from "../components/pane/FuncSelectPane.vue";
 import NormalTag from "../components/NormalTag.vue";
 import {NTag} from "naive-ui";
+import BaseModal from "../components/base/BaseModal.vue";
 
 
 
