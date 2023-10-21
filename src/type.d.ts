@@ -35,6 +35,8 @@ declare interface CodeSnippet{
     help?: boolean
     // 是否为功能关键字
     feature?: boolean
+    // 前缀
+    prefix?: string
 }
 
 declare interface Func {
@@ -48,6 +50,15 @@ declare interface Func {
     expression: string,
     // 内置
     default?: boolean
+}
+
+declare interface Prefix{
+    // 唯一标识
+    name: string,
+    // 路径
+    path?: string,
+    // 类型
+    type?: string
 }
 
 declare type ConfigItem =

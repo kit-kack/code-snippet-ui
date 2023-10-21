@@ -116,7 +116,7 @@
               </div>
             </n-tab-pane>
             <n-tab-pane name="path" tab="关联文件">
-              <n-button @click="handleImport" quaternary type="primary">本地文件</n-button> &nbsp;&nbsp;
+              <n-button @click="importLocalFile" quaternary type="primary">本地文件</n-button> &nbsp;&nbsp;
               <n-button @click="showModal = true" quaternary type="info" >网络文件</n-button>
               <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
                 <n-list-item v-if="codeTemplate.path" style="height: 100px">
@@ -202,7 +202,6 @@ import FuncSelectPane from "../components/pane/FuncSelectPane.vue";
 import NormalTag from "../components/NormalTag.vue";
 import {NTag} from "naive-ui";
 import BaseModal from "../components/base/BaseModal.vue";
-
 
 
 const form = ref()
@@ -417,7 +416,7 @@ const selectThemeOverrides = {
     }
   }
 }
-const handleImport = ()=>{
+const importLocalFile = ()=>{
   const realPathList = utools.showOpenDialog({
     title: '指定你的本地关联文件' ,
     defaultPath: utools.getPath('desktop'),

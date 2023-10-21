@@ -91,6 +91,24 @@
         <func-pane/>
       </n-scrollbar>
     </n-tab-pane>
+<!--    <n-tab-pane :name="2" tab="超级前缀（vip）">-->
+<!--      <n-scrollbar style="max-height: 91vh">-->
+<!--        <n-tooltip>-->
+<!--          <template #trigger>-->
+<!--            <n-divider title-placement="center">-->
+<!--              💡清除自定义标签（若有关联颜色先清除颜色）-->
+<!--            </n-divider>-->
+<!--          </template>-->
+<!--          自定义标签被清除后，只会影响到编辑界面/辅助标签选择界面的标签选择-->
+<!--        </n-tooltip>-->
+<!--        <template v-if="refreshFlag">-->
+<!--          <n-space>-->
+<!--            <normal-tag type="clear" v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithTagRefresh"/>-->
+<!--          </n-space>-->
+<!--        </template>-->
+<!--        <func-pane/>-->
+<!--      </n-scrollbar>-->
+<!--    </n-tab-pane>-->
   </n-tabs>
 </template>
 

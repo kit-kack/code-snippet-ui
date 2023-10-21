@@ -26,8 +26,7 @@ import {
     NDivider,
     NModal,
     NDialogProvider,
-    NDynamicTags,
-    NThing
+    NDynamicTags
 } from 'naive-ui'
 
 
@@ -58,8 +57,7 @@ const naive = create({
         NTooltip,
         NDivider,
         NModal,
-        NDialogProvider,
-        NThing
+        NDialogProvider
     ]
 })
 

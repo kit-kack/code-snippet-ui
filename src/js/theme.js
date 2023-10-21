@@ -14,12 +14,13 @@ const theme = utools.isDarkColors()? darkTheme:null;
 function getThemeOverrides(){
     configManager.init();
     const gc = configManager.getGlobalColor();
-    const hoverBorderVar = `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
-    const borderVar = `1px solid ${gc}`
-    const boxShadowVar = `inset 0 0 0 1px ${gc}`
+    const borderHover = `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
+    const border = `1px solid ${gc}`
     const textOrCaretColorVar =  utools.isDarkColors()? 'white': '#4b4e51';
     const inputBorderVar =  `1px solid ${utools.isDarkColors()? '#303133': '#e0e0e6'}`;
 
+    const lightBoxShadowFoucsAndActive = `0 2px 9px 0 rgba(100,100,111,.2)`
+    const borderFoucs =  `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
 
     return {
         Switch:{
@@ -36,9 +37,9 @@ function getThemeOverrides(){
             border: utools.isDarkColors()? undefined:'none'
         },
         Input:{
-            borderFocus: hoverBorderVar,
-            boxShadowFocus: utools.isDarkColors()? 'none': '0 2px 9px 0 rgba(100,100,111,.2)',
-            borderHover: hoverBorderVar,
+            borderFocus: borderFoucs,
+            boxShadowFocus: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
+            borderHover: borderHover,
             border: inputBorderVar,
             caretColor: textOrCaretColorVar,
         },
@@ -47,12 +48,11 @@ function getThemeOverrides(){
                 InternalSelection:{
                     textColor: textOrCaretColorVar,
                     border: inputBorderVar,
-                    borderHover: inputBorderVar,
-                    borderFocus: inputBorderVar,
-                    borderActive: inputBorderVar,
-                    boxShadowFocus: 'none',
-                    boxShadowActive: 'none',
-                    boxShadowHover: 'none',
+                    borderHover: borderHover,
+                    borderFocus: borderHover,
+                    borderActive: borderHover,
+                    boxShadowFocus: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
+                    boxShadowActive: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
                     clearColorHover: 'none',
                     caretColor: textOrCaretColorVar,
                     colorFocus: 'white',
@@ -71,18 +71,12 @@ function getThemeOverrides(){
             }
         },
         Button:{
-            borderHover: borderVar,
-            borderFocus: borderVar,
-            borderPressed: borderVar,
+            borderHover: border,
+            borderFocus: border,
+            borderPressed: border,
             textColorPressed: utools.isDarkColors()? 'white': 'black',
             textColorHover: gc,
             textColorFocus: gc
-        },
-        Radio:{
-            dotColorActive: gc,
-            boxShadowFocus: boxShadowVar,
-            boxShadowActive: boxShadowVar,
-            boxShadowHover: boxShadowVar,
         },
         Tabs:{
             tabTextColorHoverLine: gc,
@@ -95,12 +89,6 @@ function getThemeOverrides(){
             peers:{
                 Tag:{
                     textColor: gc
-                },
-                Button:{
-                    color: 'red',
-                    iconColor: 'red',
-                    textColorPresssed: 'red',
-                    colorPressed: 'yellow'
                 }
             }
         }
