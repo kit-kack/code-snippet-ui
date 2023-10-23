@@ -381,7 +381,7 @@ function dealWithCommonView(e){
                     utools.shellOpenExternal($reactive.currentSnippet.path)
                 }
             }else{
-                $message.warning("当前文件不为【链接文件】")
+                $message.warning("当前文件不为【关联文件】")
             }
             break
     }

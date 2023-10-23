@@ -28,6 +28,7 @@
             <n-ellipsis >
               <!-- 标题 -->
               <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
+<!--              <n-tag size="small" style="height: 14px;margin-left: 10px" round strong :bordered="false" type="warning">目录</n-tag>-->
               <!-- 本地&网络 -->
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="snippet.path&& configManager.get('noItemCodeShow')">{{snippet.local? '本地':'网络'}}</span>
               <!-- 描述（标题右侧） -->

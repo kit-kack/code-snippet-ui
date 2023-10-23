@@ -35,8 +35,8 @@ declare interface CodeSnippet{
     help?: boolean
     // 是否为功能关键字
     feature?: boolean
-    // 前缀
-    prefix?: string
+    // 是否为目录
+    dir?: boolean,
 }
 
 declare interface Func {
