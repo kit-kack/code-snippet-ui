@@ -37,6 +37,8 @@ declare interface CodeSnippet{
     feature?: boolean
     // 是否为目录
     dir?: boolean,
+    // 前缀
+    prefix?: string
 }
 
 declare interface Func {

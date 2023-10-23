@@ -301,21 +301,30 @@ export const codeSnippetManager = {
         if(name !== null){
             name = name.toLowerCase();
             // 0. 搜索词需要同样被替换
-            for (const codeSnippet of this.codeMap.values()) {
-                const query = codeSnippet.name.toLowerCase();
-                // 2.比较 查询缓存
-                if(configManager.get('enabledFuzzySymbolQuery')){
-                    const offsets = fuzzyCompare(name,query);
-                    if(offsets){
-                        // 拆分替换
-                        const charArray = codeSnippet.name.split('')
-                        for (let offset of offsets) {
-                            charArray[offset] = `<span style="color: ${configManager.getGlobalColor()}">${charArray[offset]}</span>`
-                        }
-                        codeSnippet.temp = charArray.join('');
+            if(configManager.get('enabledFuzzySymbolQuery')){
+                for (const codeSnippet of this.codeMap.values()) {
+                    const query = codeSnippet.name.toLowerCase();
+                    // 2.比较 查询缓存
+                    if(query.includes(name)){
+                        codeSnippet.temp = codeSnippet.name.replace(new RegExp(name,"i"),`<span style="color: ${configManager.getGlobalColor()}">$&</span>`)
                         list.push(codeSnippet)
+                    }else{
+                        const offsets = fuzzyCompare(name,query);
+                        if(offsets){
+                            // 拆分替换
+                            const charArray = codeSnippet.name.split('')
+                            for (let offset of offsets) {
+                                charArray[offset] = `<span style="color: ${configManager.getGlobalColor()}">${charArray[offset]}</span>`
+                            }
+                            codeSnippet.temp = charArray.join('');
+                            list.push(codeSnippet)
+                        }
                     }
-                }else{
+                }
+            }else{
+                for (const codeSnippet of this.codeMap.values()) {
+                    const query = codeSnippet.name.toLowerCase();
+                    // 2.比较 查询缓存
                     if(query.includes(name)){
                         codeSnippet.temp = codeSnippet.name.replace(new RegExp(name,"i"),`<span style="color: ${configManager.getGlobalColor()}">$&</span>`)
                         list.push(codeSnippet)
