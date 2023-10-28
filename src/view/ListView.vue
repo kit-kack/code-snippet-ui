@@ -1,18 +1,18 @@
 <template>
   <div id="list-view"  :style="{cursor: ($reactive.view.cursorShow)? '': 'none'}"
        @mousemove="$reactive.view.cursorShow = true">
-    <template v-if="list.length > 0">
-      <n-scrollbar style="max-height: 99vh" :ref="(el)=>{ $normal.scroll.listInvoker = el}">
+    <template v-if="$list.length > 0">
+      <n-scrollbar style="max-height: calc(100vh - 15px)" :ref="(el)=>{ $normal.scroll.listInvoker = el}">
         <div id="list-view-container" :ref="(el)=>{ $reactive.view.listViewRef = el}"  style="padding-top: 2px">
-          <template  v-for="(snippet,index) in list" :key="snippet.id+snippet.temp">
+          <template  v-for="(snippet,index) in $list" :key="snippet.id+snippet.name+snippet.temp">
             <list-item
                 :index="index"
                 :snippet="snippet"
-                :last="index === list.length - 1"
+                :last="index === $list.length - 1"
                 :selected="handleSelect(index,snippet.id,$index)"/>
           </template>
           <div id="info" v-if="$reactive.view.fullScreenShow">
-            <p style="color:gray;">~共有{{list.length}}条数据~</p>
+            <p style="color:gray;">~共有{{$list.length}}条数据~</p>
           </div>
         </div>
       </n-scrollbar>
@@ -87,13 +87,15 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from "vue";
-import {init, parseSearchWord} from "../js/keyboard.js";
-import {$index, $normal, $reactive, CREATE_VIEW, navigateView, refreshListView} from "../js/store";
+import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import {init} from "../js/keyboard.js";
+import {parseSearchWord} from "../js/hierarchy/common"
+import {$index, $list, $normal, $reactive, CREATE_VIEW, navigateView, refreshListView} from "../js/store";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import {NButton} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
+import TopNav from "../components/item/TopNav.vue";
 // import ListItem from "../components/ListItem.vue";
 
 // const ListItemAsync = defineAsyncComponent({
@@ -101,11 +103,17 @@ import ListItem from "../components/ListItem.vue";
 //   delay: 0
 // })
 
-const list = computed(()=>parseSearchWord($reactive.utools.search,$reactive.view.refreshSearch)) // 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
+// const list = ref(parseSearchWord($reactive.utools.search,[]))// 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
+
 const expanded = ref(false)
 const handleSelect = (index,id,selectedIndex)=>{
   if(index === selectedIndex){
-    $reactive.currentSnippet = codeSnippetManager.get(id)
+    if(id){
+      $reactive.currentSnippet = codeSnippetManager.get(id)
+    }else{
+      $reactive.currentSnippet = $list.value[index]
+    }
+
     return true;
   }else{
     return false;
@@ -116,11 +124,17 @@ const handleSelect = (index,id,selectedIndex)=>{
 // },{
 //   flush: 'post'
 // })
-
+watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix],([search,prefix])=>{
+  $list.value = parseSearchWord(search,prefix)
+},{
+  deep:true,
+  immediate:true
+})
 onMounted(()=>{
-  parseSearchWord($reactive.utools.search)
   // handleAppHeight()
-  init(list)
+  console.log('mount')
+  $list.value = parseSearchWord($reactive.utools.search,$reactive.currentPrefix)
+  init($list)
 })
 
 const handleAppHeight = ()=>{

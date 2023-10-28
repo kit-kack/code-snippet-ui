@@ -1,4 +1,5 @@
 import {nextTick, reactive, ref} from "vue";
+import {parseSearchWord} from "./hierarchy/common";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
@@ -19,6 +20,10 @@ const $normal = {
         helpInvoker: null,    // 【快捷方式】控制的滚动
         itemOffsetArray: []  // 元素偏移（目前根据滚动条滚动距离计算）
     },
+    // 层级
+    hierarchy:{
+      path: []
+    },
     keepSelectedStatus: null,  // null false true  // 控制 选中元素 保持记忆功能
     updateCacheCodeFunc: null,      // 调整缓存函数
     variables: {},        // 后续会映射类型
@@ -34,6 +39,7 @@ const $reactive = reactive({
      * @type CodeSnippet
      */
     currentSnippet: null,
+    currentPrefix: [],
     view:{
         fullScreenShow: true,     // 是否为完整UI模式
         aidTagActive: false,
@@ -62,7 +68,7 @@ const $reactive = reactive({
     }
 })
 const $index = ref(0)
-
+const $list = ref([])
 
 /**
  * 恢复列表UI模式
@@ -134,7 +140,7 @@ const navigateView = (view,refresh) =>{
 }
 
 export {
-    $normal,$reactive,$index,
+    $normal,$reactive,$index,$list,
     LIST_VIEW,CODE_VIEW,EDIT_VIEW,CREATE_VIEW,
     handleRecoverLiteShow,refreshListView,switchToFullUIMode,navigateView
 }

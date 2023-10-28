@@ -4,6 +4,7 @@
 <!--      <component :is="Component" :key="$route.fullPath" />-->
 <!--    </keep-alive>-->
 <!--  </router-view>-->
+  <top-nav/>
   <template v-if="$reactive.view.deepRefresh">
     <list-view v-show="$reactive.currentMode === LIST_VIEW"/>
   </template>
@@ -39,6 +40,7 @@ import ListView from "./ListView.vue";
 import CodeView from "./CodeView.vue";
 import FormView from "./FormView.vue";
 import AidTagPane from "../components/pane/AidTagPane.vue";
+import TopNav from "../components/item/TopNav.vue";
 
 const helpViewScorllerRef = ref(null)
 window.$message = useMessage();

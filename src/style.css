@@ -73,3 +73,9 @@
 #dark-app .n-dynamic-tags .n-button{
   --n-text-color-pressed: #adadaf !important;
 }
+.n-breadcrumb .n-breadcrumb-item .n-breadcrumb-item__link{
+  padding: 0;
+}
+.n-breadcrumb .n-breadcrumb-item .n-breadcrumb-item__link:hover{
+  color: goldenrod;
+}

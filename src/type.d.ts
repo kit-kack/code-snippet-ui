@@ -19,7 +19,7 @@ declare interface CodeSnippet{
     // 标签
     tags?: Array<string>,
     // 代码片段 语言类型
-    type?: string,
+    type?: string | HierarchyType,
     /**
      * 高级查询词，存储来提升查询效率
      * @deprecated - 模糊符号匹配改进为 进阶符号匹配，后续版本会删除
@@ -63,6 +63,16 @@ declare interface Prefix{
     type?: string
 }
 
+// 基本定义
+declare interface Hierarchy{
+    search: (name: string | null,tags: string[] | null,type: string | null) => CodeSnippet[]
+}
+declare type HierarchyType =
+    "default"       // 默认类型，可以不填
+    | "local_dir"   // 本地目录
+    | "vscode"      // VSCode代码片段
+    | "maven"       // maven操作方式
+
 declare type ConfigItem =
     "showTimeTag"                                    // 是否展示 内置时间标签
     | "showCountTag"                                 // 是否展示 内置计数标签
@@ -84,7 +94,7 @@ declare type ConfigItem =
     | "topList"                                      //置顶列表
     | "rawLineCode"                                  // 原始行内代码，不进行高亮
     | "enabledLiteShow"                              // 支持无UI模式下的显示效果
-    | "noShowForEmptySearch"                         // 对于空的搜索词，是否不显示（所有）数据
+// @deprecated:暂时移除    | "noShowForEmptySearch"                         // 对于空的搜索词，是否不显示（所有）数据
     | "fullItemCodeShow"                             // 展示元素 代码块
     | "noItemCodeShow"                               // 不展示 元素代码块
     | "version"                                      // 插件版本，用来判断是否为最新版本

@@ -140,3 +140,17 @@ export function getRealTypeAndValidStatus(type){
         };
     }
 }
+
+
+/**
+ * 解析文件类型
+ * @param {string} type
+ */
+export function recongizeFileType(type){
+    let index = type.lastIndexOf('.')
+    if(index === -1){
+        return '目录'
+    }else{
+        return _alias(type.slice(index+1).trim().toLowerCase() ?? 'plaintxt')
+    }
+}

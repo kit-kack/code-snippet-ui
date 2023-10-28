@@ -26,7 +26,9 @@ import {
     NDivider,
     NModal,
     NDialogProvider,
-    NDynamicTags
+    NDynamicTags,
+    NBreadcrumb,
+    NBreadcrumbItem
 } from 'naive-ui'
 
 
@@ -57,7 +59,9 @@ const naive = create({
         NTooltip,
         NDivider,
         NModal,
-        NDialogProvider
+        NDialogProvider,
+        NBreadcrumb,
+        NBreadcrumbItem
     ]
 })
 

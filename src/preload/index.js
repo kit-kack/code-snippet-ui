@@ -28,21 +28,19 @@ export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.m
  * @param path
  * @returns {*[]}
  */
-// export function getFilesInDir(path) {
-//     const items = fs.readdirSync(path);
-//     const result = [];
-//     items.forEach(item => {
-//         const itemPath = `${path}/${item}`;
-//         const stat = fs.statSync(itemPath);
-//         if(stat.isFile()){
-//             result.push({
-//                 name: item,
-//                 path: itemPath
-//             })
-//         }
-//     });
-//     return result;
-// }
+export function getAllFilesFromDir(path) {
+    const items = fs.readdirSync(path);
+    return items.map(item =>{
+        const finalPath = getFinalPath(path,item)
+        const stat = fs.statSync(finalPath);
+        return {
+            name: item,
+            path: finalPath,
+            dir: stat.isDirectory(),
+            time: stat.atimeMs,
+        }
+    })
+}
 
 export function getDirname(p){
     return path.dirname(p)

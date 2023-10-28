@@ -1,10 +1,10 @@
 <template>
-  <div id="root">
+  <div >
     <n-form
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
-        style="margin-top:10px;max-width: 750px; width: 100%;position: fixed;left: 50%; top:50%;transform: translate(-50%, -50%);height: 100%;"
+        style="margin-top:30px;max-width: 750px; width: 100%;position: fixed;left: 50%; top:50%;transform: translate(-50%, -50%);height: 100%;"
         :rules="rules"
         :model="codeTemplate"
         ref="form"
@@ -118,12 +118,15 @@
             <n-tab-pane name="path" tab="关联文件">
               <n-button @click="importLocalFile" quaternary type="primary">本地文件</n-button> &nbsp;&nbsp;
               <n-button @click="showModal = true" quaternary type="info" >网络文件</n-button>
+              <n-button @click="showModal = true" quaternary type="info" >普通目录</n-button>
+              <n-button @click="importLocalDir" quaternary type="info" >本地目录</n-button>
               <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
                 <n-list-item v-if="codeTemplate.path" style="height: 100px">
                   <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
                     <div style="width: 24px" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z" fill="currentColor"></path></svg></div>
                     <div style="position: absolute; left: 32px; bottom: 7px">[ {{codeTemplate.dir? '本地目录':(codeTemplate.local? '本地文件':'网络文件')}} ]</div>
                     <n-select
+                        v-if="!codeTemplate.dir"
                         style="position: absolute; right:36px; bottom: 7px;width: 230px;height: 24px"
                         v-model:value="codeTemplate.type"
                         filterable
@@ -438,6 +441,23 @@ const importLocalFile = ()=>{
     codeTemplate.local = true;
   }
 }
+const importLocalDir = ()=>{
+  const realPathList = utools.showOpenDialog({
+    title: '指定你的本地关联目录' ,
+    defaultPath: utools.getPath('desktop'),
+    buttonLabel: '确定',
+    properties: [
+      'openDirectory'
+    ]
+  })
+  if (realPathList != null) {
+    codeTemplate.path = realPathList[0];
+    // 解析类型
+    codeTemplate.dir = true;
+    codeTemplate.type = "目录";
+    codeTemplate.local = true;
+  }
+}
 const isFullUrlRegex = /^\w+:\/\/.*/
 function handleSetUrlAsPath(){
   if(url.value && url.value.match(isFullUrlRegex)){
@@ -493,7 +513,7 @@ function handleClearPath(){
 }
 #btn{
   position: fixed;
-  bottom: 20px;
+  bottom: 40px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -506,6 +526,11 @@ function handleClearPath(){
 }
 .n-card{
   padding-bottom: 50px;
+}
+.n-form-item {
+  --n-feedback-padding: 2px 0 0 2px;
+  --n-feedback-font-size: 12px;
+  --n-feedback-height: 18px !important;
 }
 
 </style>

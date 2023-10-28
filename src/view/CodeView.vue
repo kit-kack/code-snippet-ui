@@ -1,9 +1,9 @@
 <template>
   <div  id="code-view" class="kit-top">
     <n-scrollbar
-        style="max-height:100vh"
+        style="max-height:calc(100vh - 15px)"
         :x-scrollable="!pair.renderable || !$reactive.view.isRendering"
-        trigger="hover" ref="scrollBar">
+        trigger="none" ref="scrollBar">
       <template v-if="refreshFlag">
         <template v-if="pair.renderable && $reactive.view.isRendering">
           <template v-if="pair.type === 'image'">

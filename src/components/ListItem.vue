@@ -28,7 +28,7 @@
             <n-ellipsis >
               <!-- 标题 -->
               <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
-<!--              <n-tag size="small" style="height: 14px;margin-left: 10px" round strong :bordered="false" type="warning">目录</n-tag>-->
+              <n-tag size="small" style="height: 14px;margin-left: 10px" round strong :bordered="false" type="warning" v-if="snippet.dir">目录</n-tag>
               <!-- 本地&网络 -->
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="snippet.path&& configManager.get('noItemCodeShow')">{{snippet.local? '本地':'网络'}}</span>
               <!-- 描述（标题右侧） -->
@@ -162,7 +162,7 @@ const pair = computed(()=>{
       code: (
           '['+
           (props.snippet.local? '本地':'网络')
-          + '文件]: '+props.snippet.path
+          + (props.snippet.dir ? '目录]: ':'文件]: ')+props.snippet.path
       ),
       type: 'markdown',
       txt: txt

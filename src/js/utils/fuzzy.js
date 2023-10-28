@@ -1,4 +1,6 @@
 // 计算最长公共子序列
+import {configManager} from "../core/config";
+
 export function fuzzyCompare(query, target) {
     let m = query.length, n = target.length;
     const dp = Array.from(Array(m+1),()=> Array(n+1).fill(0));
@@ -52,5 +54,31 @@ export function fuzzyCompare(query, target) {
     }
     // 没有全匹配
     return null
+}
+
+/**
+ *
+ * @param {string} query 需要提前转小写
+ * @param {string} target 原本文字
+ */
+export function match(query,target){
+    const temp = target.toLowerCase();
+    const prefix = `<span style="color: ${configManager.getGlobalColor()}">`
+    const suffix = "</span>"
+    // 1. 普通比较
+    if(temp.includes(query)){
+        return target.replace(new RegExp(query,"i"),`${prefix}$&</span>`);
+    }else if(configManager.get('enabledFuzzySymbolQuery')){
+        const offsets = fuzzyCompare(query,temp);
+        if(offsets){
+            // 拆分替换
+            const charArray = target.split('')
+            for (let offset of offsets) {
+                charArray[offset] = prefix+charArray[offset]+suffix;
+            }
+            return charArray.join('');
+        }
+    }
+    return null;
 }
 

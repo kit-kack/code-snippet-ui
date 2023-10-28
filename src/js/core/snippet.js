@@ -1,6 +1,6 @@
 import {nanoid} from "nanoid";
 import {defaultHelpSnippet} from "../some";
-import {fuzzyCompare} from "../utils/fuzzy";
+import {fuzzyCompare, match} from "../utils/fuzzy";
 import {
     CODE_PREFIX,
     createOrUpdate,
@@ -20,72 +20,6 @@ import {convertValidFileSuffix, fullAlias} from "../utils/language";
 import {lowercaseIncludes} from "../utils/common";
 import {utools_feature_del} from "../utils/feature";
 import JSZip from "jszip";
-
-/**
- * 根据属性产生对应的排序函数
- * @param {string} property
- * @private
- */
-function _compare(property){
-    return function (a,b){
-        if(a[property] == null){
-            return (b[property] == null)? a.name.localeCompare(b.name) : 1;
-        }else if(b[property] == null){
-            return -1;
-        }else{
-            if( a[property] > b[property]){
-                return -1;
-            }else if(a[property] < b[property]){
-                return 1;
-            }else{
-                return a.name.localeCompare(b.name);
-            }
-        }
-    }
-}
-const CREATE_TIME_COMPARE = _compare("createTime");
-const TIME_COMPARE = _compare("time");
-const COUNT_COMPARE  = _compare("count");
-
-/**
- *  获取排序后的数组
- * @param {CodeSnippet[]} list
- * @return {CodeSnippet[]}
- * @private
- */
-function _getSortedArray(list){
-    // 筛选出 置顶列表中的片段
-    let topSnippets = [];
-    let topList = configManager.getTopList();
-    list = list.filter(snippet =>{
-        let index = topList.indexOf(snippet.id);
-        if(index === -1){
-            return true;
-        }else{
-            snippet.index = index;
-            topSnippets.push(snippet)
-            return false;
-        }
-    })
-    // 对 topSnippets进行排序
-    topSnippets.sort((a,b)=> a.index - b.index)
-    switch (configManager.getSortKey()){
-        case 0:   // 创建时间
-            list.sort(CREATE_TIME_COMPARE)
-            break;
-        case 1:   // 最近访问时间
-            list.sort(TIME_COMPARE)
-            break;
-        case 2:  // 粘贴使用次数
-            list.sort(COUNT_COMPARE)
-            break;
-        default:  // 自然排序
-            list.sort((a,b)=>a.name.localeCompare(b.name))
-            break;
-    }
-    return topSnippets.concat(list);
-}
-
 
 
 export const codeSnippetManager = {
@@ -298,37 +232,13 @@ export const codeSnippetManager = {
          * @type {CodeSnippet[]}
          */
         let list = [];
+        // 1.name
         if(name !== null){
-            name = name.toLowerCase();
-            // 0. 搜索词需要同样被替换
-            if(configManager.get('enabledFuzzySymbolQuery')){
-                for (const codeSnippet of this.codeMap.values()) {
-                    const query = codeSnippet.name.toLowerCase();
-                    // 2.比较 查询缓存
-                    if(query.includes(name)){
-                        codeSnippet.temp = codeSnippet.name.replace(new RegExp(name,"i"),`<span style="color: ${configManager.getGlobalColor()}">$&</span>`)
-                        list.push(codeSnippet)
-                    }else{
-                        const offsets = fuzzyCompare(name,query);
-                        if(offsets){
-                            // 拆分替换
-                            const charArray = codeSnippet.name.split('')
-                            for (let offset of offsets) {
-                                charArray[offset] = `<span style="color: ${configManager.getGlobalColor()}">${charArray[offset]}</span>`
-                            }
-                            codeSnippet.temp = charArray.join('');
-                            list.push(codeSnippet)
-                        }
-                    }
-                }
-            }else{
-                for (const codeSnippet of this.codeMap.values()) {
-                    const query = codeSnippet.name.toLowerCase();
-                    // 2.比较 查询缓存
-                    if(query.includes(name)){
-                        codeSnippet.temp = codeSnippet.name.replace(new RegExp(name,"i"),`<span style="color: ${configManager.getGlobalColor()}">$&</span>`)
-                        list.push(codeSnippet)
-                    }
+            for (const codeSnippet of this.codeMap.values()) {
+                const result = match(name,codeSnippet.name)
+                if(result !== null){
+                    codeSnippet.temp = result;
+                    list.push(codeSnippet)
                 }
             }
         }else{
@@ -337,6 +247,7 @@ export const codeSnippetManager = {
                 list.push(codeSnippet)
             }
         }
+        // 2.tags
         if(tags !== null && tags.length > 0){
             tags = tags.map(value => value.toLowerCase())
             list = list.filter(codeSnippet=>{
@@ -351,12 +262,13 @@ export const codeSnippetManager = {
                 return false;
             })
         }
+        // 3.type
         if(type !== null){
             type = fullAlias(type.toLowerCase());
             list = list.filter(codeSnippet=>fullAlias(codeSnippet.type) === type)
         }
         // 进行排序处理
-        return _getSortedArray(list);
+        return list;
     },
     store(path){
         // - code-snippet-data.json

@@ -129,7 +129,7 @@ utools.onPluginEnter((data)=>{
                 // fix: 修复删除界面不移除
                 $reactive.view.isDel = false;
                 $reactive.view.helpActive = false;
-                refreshListView(true)
+                // refreshListView(true)
             }
         }
     },"搜索代码片段, 双击Tab切换UI模式")
