@@ -124,7 +124,7 @@ const handleSelect = (index,id,selectedIndex)=>{
 //   flush: 'post'
 // })
 watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix],([search,prefix])=>{
-  $list.value = GLOBAL_HIERARCHY.search(search,prefix)
+  $list.value = GLOBAL_HIERARCHY.search(search)
 },{
   deep:true,
   immediate:true
@@ -132,7 +132,7 @@ watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix],([search,prefix]
 onMounted(()=>{
   // handleAppHeight()
   console.log('mount')
-  $list.value = GLOBAL_HIERARCHY.search($reactive.utools.search,$reactive.currentPrefix);
+  $list.value = GLOBAL_HIERARCHY.search($reactive.utools.search);
   init($list)
 })
 

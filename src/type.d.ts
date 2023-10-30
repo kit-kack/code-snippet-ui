@@ -86,28 +86,35 @@ declare interface Hierarchy{
          */
         snippets: CodeSnippet[]
     },
-    /**
-     * 创建代码片段
-     * @param {CodeSnippet} snippet
-     * @return {Boolean} 是否保存配置信息到uTools数据库中
-     */
-    create?: (snippet: CodeSnippet)=> boolean;
+    form:{
+        /**
+         * 判断代码片段名是否重复
+         */
+        containName: (name: string) => boolean;
+        /**
+         * 创建代码片段
+         * @param {CodeSnippet} snippet
+         * @return {Boolean} 是否保存配置信息到uTools数据库中
+         */
+        create?: (snippet: CodeSnippet)=> boolean;
+        /**
+         * 修改代码片段
+         * @param {CodeSnippet} snippet
+         * @return {Boolean} 是否保存配置信息到uTools数据库中
+         */
+        edit?: (snippet: CodeSnippet)=> boolean;
+        /**
+         * 如果create()和edit()方法逻辑几乎相同，可以不实现create和edit方法，而是实现该方法来共同处理
+         */
+        createOrEdit?: (snippet: CodeSnippet)=> boolean;
+    }
+
     /**
      * 删除代码片段
      * @param {string} name
      * @return {Boolean} 是否同时删除uTools数据库中的配置信息
      */
     remove?: (name: string) => boolean;
-    /**
-     * 修改代码片段
-     * @param {CodeSnippet} snippet
-     * @return {Boolean} 是否保存配置信息到uTools数据库中
-     */
-    edit?: (snippet: CodeSnippet)=> boolean;
-    /**
-     * 如果create()和edit()方法逻辑几乎相同，可以不实现create和edit方法，而是实现该方法来共同处理
-     */
-    createOrEdit?: (snippet: CodeSnippet)=> boolean;
     /**
      * 配置项
      */

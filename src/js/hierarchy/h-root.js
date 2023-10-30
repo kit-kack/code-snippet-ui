@@ -21,6 +21,11 @@ export const defaultHierarchy = {
             highlighted: true,
             snippets: array,
         };
+    },
+    form:{
+        containName(name){
+            return codeSnippetManager.contain(name)
+        }
     }
 }
 

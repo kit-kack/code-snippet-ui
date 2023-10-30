@@ -7,12 +7,11 @@ import {match} from "../utils/fuzzy";
 
 
 /**
- * @param {string[] } prefix
  * @return Hierarchy
  * @private
  */
-function _getHierarchySearch(prefix){
-    if(prefix && prefix.length !== 0){
+function _getHierarchySearch(){
+    if($reactive.currentPrefix?.length !== 0){
         console.log($reactive.currentSnippet)
         return localDirectoryHierarchy;
     }
@@ -22,13 +21,12 @@ export const GLOBAL_HIERARCHY = {
     /**
      *
      * @param {string} searchWord uTools子搜索框搜索内容
-     * @param {string[] } prefix 当前前缀
      * @return {CodeSnippet[]}
      */
-    search(searchWord,prefix){
+    search(searchWord){
         let result;
         $normal.subSnippetNum = undefined;
-        const hierarchy = _getHierarchySearch(prefix);
+        const hierarchy = _getHierarchySearch();
         let name = null;
         if(searchWord == null || searchWord.length === 0){
             $reactive.view.aidTagActive = false;
@@ -111,5 +109,14 @@ export const GLOBAL_HIERARCHY = {
             }
         }
         return array;
+    },
+    form:{
+        /**
+         * 判断 代码片段名 是否重复
+         * @param {string} name
+         */
+        containName(name){
+            return _getHierarchySearch().form?.containName(name);
+        }
     }
 }

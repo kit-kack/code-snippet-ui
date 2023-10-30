@@ -194,6 +194,7 @@ import FuncSelectPane from "../components/pane/FuncSelectPane.vue";
 import NormalTag from "../components/NormalTag.vue";
 import {NTag} from "naive-ui";
 import BaseModal from "../components/base/BaseModal.vue";
+import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 
 
 const form = ref()
@@ -261,7 +262,7 @@ const rules = {
         if(edit && $reactive.currentSnippet.name === value.trim()){
           return true;
         }
-        return !codeSnippetManager.contain(value.trim())
+        return !GLOBAL_HIERARCHY.form.containName(value.trim())
       },
       trigger: ["input","blur"]
     }
