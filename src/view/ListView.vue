@@ -87,15 +87,14 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import {init} from "../js/keyboard.js";
-import {parseSearchWord} from "../js/hierarchy/common"
+import {GLOBAL_HIERARCHY} from "../js/hierarchy/core"
 import {$index, $list, $normal, $reactive, CREATE_VIEW, navigateView, refreshListView} from "../js/store";
 import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import {NButton} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
-import TopNav from "../components/item/TopNav.vue";
 // import ListItem from "../components/ListItem.vue";
 
 // const ListItemAsync = defineAsyncComponent({
@@ -125,7 +124,7 @@ const handleSelect = (index,id,selectedIndex)=>{
 //   flush: 'post'
 // })
 watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix],([search,prefix])=>{
-  $list.value = parseSearchWord(search,prefix)
+  $list.value = GLOBAL_HIERARCHY.search(search,prefix)
 },{
   deep:true,
   immediate:true
@@ -133,7 +132,7 @@ watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix],([search,prefix]
 onMounted(()=>{
   // handleAppHeight()
   console.log('mount')
-  $list.value = parseSearchWord($reactive.utools.search,$reactive.currentPrefix)
+  $list.value = GLOBAL_HIERARCHY.search($reactive.utools.search,$reactive.currentPrefix);
   init($list)
 })
 

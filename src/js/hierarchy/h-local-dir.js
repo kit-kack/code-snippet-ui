@@ -9,7 +9,6 @@ import {recongizeFileType} from "../utils/language";
 export const localDirectoryHierarchy =  {
     search(name,tags,type){
         try{
-
             const files = window.preload.getAllFilesFromDir($normal.hierarchy.path.at(-1));
             const array = [];
             if(name){
@@ -33,10 +32,14 @@ export const localDirectoryHierarchy =  {
                     })
                 }
             }
-            return getSortedArray(array);
+            return {
+                highlighted: true,
+                sorted: false,
+                snippets: array
+            };
         }catch (e){
             $message.error(e.message)
-            return [];
+            return null;
         }
     }
 }

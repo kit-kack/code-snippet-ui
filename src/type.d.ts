@@ -65,7 +65,70 @@ declare interface Prefix{
 
 // 基本定义
 declare interface Hierarchy{
-    search: (name: string | null,tags: string[] | null,type: string | null) => CodeSnippet[]
+    /**
+     * 查询代码片段
+     * @param {string | null} name 名称
+     * @param {string[] | null} tags 标签数组
+     * @param {string | null} type 类型
+     * @return {CodeSnippet[]}
+     */
+    search: (name?: string,tags?: string[],type?: string,prefix?: string[]) => {
+        /**
+         * 是否已经被排序
+         */
+        sorted: boolean,
+        /**
+         * 是否已经高亮匹配
+         */
+        highlighted: boolean,
+        /**
+         * 代码片段
+         */
+        snippets: CodeSnippet[]
+    },
+    /**
+     * 创建代码片段
+     * @param {CodeSnippet} snippet
+     * @return {Boolean} 是否保存配置信息到uTools数据库中
+     */
+    create?: (snippet: CodeSnippet)=> boolean;
+    /**
+     * 删除代码片段
+     * @param {string} name
+     * @return {Boolean} 是否同时删除uTools数据库中的配置信息
+     */
+    remove?: (name: string) => boolean;
+    /**
+     * 修改代码片段
+     * @param {CodeSnippet} snippet
+     * @return {Boolean} 是否保存配置信息到uTools数据库中
+     */
+    edit?: (snippet: CodeSnippet)=> boolean;
+    /**
+     * 如果create()和edit()方法逻辑几乎相同，可以不实现create和edit方法，而是实现该方法来共同处理
+     */
+    createOrEdit?: (snippet: CodeSnippet)=> boolean;
+    /**
+     * 配置项
+     */
+    config:{
+
+        /**
+         *  限制创建的类型：普通-normal 关联文件-link 普通目录-dir 自定义目录-custom
+         */
+        limitSourceTypes?: ('normal' |'link' |'dir' |'custom')[],
+        /**
+         * 限制的代码片段类型(数组表示，默认不限制类型）
+         *
+         */
+        limitSnippetTypes?: string[],
+        /**
+         * 是否允许设置为uTools关键字
+         */
+        allowSetAsuToolsKeyword?: boolean,
+        // 子目录项配置
+        children?: ((prefix: string) => object ) | object;
+    }
 }
 declare type HierarchyType =
     "default"       // 默认类型，可以不填
@@ -90,7 +153,7 @@ declare type ConfigItem =
 // @deprecated:默认行为    | "doubleClickPaste"       // 双击元素 来粘贴代码片段
 // @deprecated:默认行为    | "enabledBeep"            // 是否启用Beep声
 // @deprecated:被废弃    | "exitAfterPaste"          // 粘贴后退出插件
-    | "enabledFuzzySymbolQuery"                      //模糊符号查询
+// @deprecated:默认行为    | "enabledFuzzySymbolQuery"                      //模糊符号查询
     | "topList"                                      //置顶列表
     | "rawLineCode"                                  // 原始行内代码，不进行高亮
     | "enabledLiteShow"                              // 支持无UI模式下的显示效果
