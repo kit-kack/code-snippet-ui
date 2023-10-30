@@ -54,9 +54,6 @@ const datas = [
       },{
         feature: "切换完整/列表UI模式",
         shortcut: "Tab快速双击"
-      },{
-        feature: "开启/关闭进阶模糊查询",
-        shortcut: "C-F"
       }]
   },
   {
@@ -88,7 +85,7 @@ const datas = [
         shortcut: "1 ~ 9",
         tooltip: "粘贴请结合Shift/Alt/Ctrl(Command)键"
       },{
-        feature: "系统应用打开Open（仅适用于链接文件）",
+        feature: "系统应用打开Open（仅适用于关联文件）",
         shortcut: "O",
         tooltip: "若为本地关联文件，结合Shift键会文件管理器打开"
       },{
@@ -126,6 +123,9 @@ const datas = [
     },{
       feature: '清空重新搜索Search',
       shortcut: "S"
+    },{
+      feature: '回到根部Root',
+      shortcut: "R"
     },{
       feature: '查看『设置』',
       shortcut: '/'

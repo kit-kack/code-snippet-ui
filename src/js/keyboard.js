@@ -216,6 +216,11 @@ function dealWithListView(e,list){
                 // router.replace('/code')
             }
             return;
+        case 'KeyR':
+            if($reactive.currentPrefix.length > 0){
+                $reactive.currentPrefix = [];
+            }
+            return;
         case 'KeyQ':
             if($reactive.utools.subItemSelectedIndex !== -1 || $reactive.view.isDel){
                 $reactive.utools.subItemSelectedIndex = -1;

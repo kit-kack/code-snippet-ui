@@ -27,17 +27,6 @@
             :options="tags"
             :render-tag="renderTag"
         />
-<!--        <n-dynamic-tags v-model:value="codeTemplate.tags">-->
-<!--          <template #input="{ submit }">-->
-<!--            <n-select-->
-<!--                v-model:value="tempTag"-->
-<!--                filterable tag-->
-<!--                @blur="submit(tempTag);tempTag=null"-->
-<!--                :options="tags"-->
-<!--                placeholder="请选择或输入标签"-->
-<!--            />-->
-<!--          </template>-->
-<!--        </n-dynamic-tags>-->
       </n-form-item>
       <n-form-item label="代码片段" path="code">
         <template #default>
@@ -302,7 +291,7 @@ const handleUpdate = ()=>{
         if(currentTab.value === 'path'){
           //
           if(!codeTemplate.path){
-            $message.warning("请提供 链接文件")
+            $message.warning("请提供 关联文件")
             return;
           }
         }else{
