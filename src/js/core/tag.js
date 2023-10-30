@@ -1,4 +1,4 @@
-import {createOrUpdate, CS_TAG_COLOR_ID, getDBItem, GLOBAL_TAGS, jsonToMap, removeDBItem} from "./common";
+import {createOrUpdate, CS_TAG_COLOR_ID, getDBItem, GLOBAL_TAGS, jsonToMap, removeDBItem} from "./base";
 import {configManager} from "./config";
 
 export const tagColorManager={

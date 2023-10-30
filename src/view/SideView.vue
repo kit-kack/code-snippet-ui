@@ -15,30 +15,9 @@
         </div>
       </n-space>
       <n-divider title-placement="center">
-        搜索相关设置
+        测试Beta
       </n-divider>
       <n-space vertical align="center">
-        <n-space>
-          搜索排序策略
-          <n-select size="tiny"
-                    :options="sortKeyOptions"
-                    :default-value="configManager.getSortKey()"
-                    @update:value="handleSortStrategy"/>
-        </n-space>
-        <n-space>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <config-check-tag title="💡启用进阶模糊查询" config="enabledFuzzySymbolQuery"/>
-            </template>
-            启用后，使用最长公共子序列方式来进行匹配,例如 hd 能够匹配到 hello@WORLD ,支持C-F来切换
-          </n-tooltip>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <config-check-tag title="💡搜索词为空时，是否不显示数据" config="noShowForEmptySearch"/>
-            </template>
-            本功能只在 列表UI模式下 生效
-          </n-tooltip>
-        </n-space>
         <n-space>
           <n-tooltip trigger="hover">
             <template #trigger>
@@ -91,14 +70,6 @@
         <func-pane/>
       </n-scrollbar>
     </n-tab-pane>
-<!--    <n-tab-pane :name="2" tab="超级前缀（vip）">-->
-<!--      <n-scrollbar style="max-height: 91vh">-->
-<!--        <n-divider title-placement="center">-->
-<!--          超级前缀-->
-<!--        </n-divider>-->
-<!--        <func-pane/>-->
-<!--      </n-scrollbar>-->
-<!--    </n-tab-pane>-->
   </n-tabs>
 </template>
 
@@ -121,29 +92,7 @@ const dealWithTagRefresh = ()=>{
   refreshListView()
   doRefresh();
 }
-const sortKeyOptions = [
-  {
-    label: "创建时间排序",
-    value: 0
-  },
-  {
-    label: "最近使用时间",
-    value: 1
-  },
-  {
-    label: "累计使用次数",
-    value: 2
-  },
-  {
-    label: "名字自然排序",
-    value: 3
-  }
-]
-const handleSortStrategy = (v)=>{
-  configManager.set('sortKey',v);
-  console.log(v)
-  refreshListView()
-}
+
 
 const handleExport = ()=>{
   const realPath = utools.showSaveDialog({

@@ -1,6 +1,6 @@
 import {$normal, $reactive, switchToFullUIMode} from "../store";
 import {copyOrPaste} from "../utils/copy";
-import {createOrUpdate, GLOBAL_FUNC, removeDBItem} from "./common";
+import {createOrUpdate, GLOBAL_FUNC, removeDBItem} from "./base";
 import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 

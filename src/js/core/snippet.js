@@ -12,7 +12,7 @@ import {
     GLOBAL_FUNC,
     GLOBAL_ROOT_TAGS,
     removeDBItem
-} from "./common";
+} from "./base";
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./func";

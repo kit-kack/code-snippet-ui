@@ -1,4 +1,4 @@
-import {createOrUpdate, CS_CONFIG_ID, getDBItem, GLOBAL_CONFIG, jsonToMap, removeDBItem} from "./common";
+import {createOrUpdate, CS_CONFIG_ID, getDBItem, GLOBAL_CONFIG, jsonToMap, removeDBItem} from "./base";
 
 export const configManager = {
     configs: {},
