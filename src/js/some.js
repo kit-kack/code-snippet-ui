@@ -6,7 +6,7 @@ export const defaultHelpSnippet = {
     id: 'default',
     version: __APP_VERSION__,
     name: `🎉入门手册&新版本说明🎉`,
-    desc: '右键该元素选择预览代码，懂的人已经用v打开了',
+    desc: '右键该元素选择预览，懂的人已经用v打开了',
     type: 'markdown',
     code: window.preload?.readREADME_MD(),
     help: true,
