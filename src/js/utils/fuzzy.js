@@ -68,7 +68,7 @@ export function match(query,target){
     // 1. 普通比较
     if(temp.includes(query)){
         return target.replace(new RegExp(query,"i"),`${prefix}$&</span>`);
-    }else if(configManager.get('enabledFuzzySymbolQuery')){
+    }else{
         const offsets = fuzzyCompare(query,temp);
         if(offsets){
             // 拆分替换

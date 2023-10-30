@@ -54,6 +54,8 @@ function _alias(type){
             return 'objectivec';
         case 'py':
             return 'python';
+        case 'sh':
+            return 'shell';
         case 'ts':
             return 'typescript';
         case 'text':
@@ -99,6 +101,9 @@ export function convertValidFileSuffix(type){
             return 'm';
         case 'python':
             return 'py';
+        case 'powershell':
+        case 'shell':
+            return 'sh';
         case 'typescript':
             return 'ts';
         case 'text':

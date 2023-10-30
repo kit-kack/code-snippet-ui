@@ -1,5 +1,4 @@
 import {nextTick, reactive, ref} from "vue";
-import {parseSearchWord} from "./hierarchy/common";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
