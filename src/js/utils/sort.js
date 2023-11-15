@@ -1,4 +1,5 @@
 import {configManager} from "../core/config";
+import {match} from "./fuzzy";
 
 /**
  * 根据属性产生对应的排序函数
@@ -26,40 +27,50 @@ const CREATE_TIME_COMPARE = _compare("createTime");
 const TIME_COMPARE = _compare("time");
 const COUNT_COMPARE  = _compare("count");
 
-/**
- *  获取排序后的数组
- * @param {CodeSnippet[]} list
- * @return {CodeSnippet[]}
- */
-export function getSortedArray(list){
+export function handleArrayForHierarchy(list,topList,sorted,highlighted,name){
     // 筛选出 置顶列表中的片段
-    let topSnippets = [];
-    let topList = configManager.getTopList();
-    list = list.filter(snippet =>{
-        let index = topList.indexOf(snippet.id);
-        if(index === -1){
-            return true;
-        }else{
-            snippet.index = index;
-            topSnippets.push(snippet)
-            return false;
+    const topSnippets = [];
+    const needHighlight = name && !highlighted;
+    if(topList && topList.length > 0){
+        list = list.filter(snippet =>{
+            if(needHighlight){
+                snippet.temp = match(name,snippet.name);
+            }
+            const index = topList.indexOf(snippet.id ?? snippet.name);
+            if(index === -1){
+                snippet.index = undefined;
+                return true;
+            }else{
+                snippet.index = index;
+                topSnippets.push(snippet)
+                return false;
+            }
+        })
+    }else{
+        list.forEach(snippet =>{
+            if(needHighlight){
+                snippet.temp = match(name,snippet.name);
+            }
+            snippet.index = undefined;
+        })
+    }
+    if(!sorted){
+        // 对 topSnippets进行排序
+        topSnippets.sort((a,b)=> a.index - b.index)
+        switch (configManager.getSortKey()){
+            case 0:   // 创建时间
+                list.sort(CREATE_TIME_COMPARE)
+                break;
+            case 1:   // 最近访问时间
+                list.sort(TIME_COMPARE)
+                break;
+            case 2:  // 粘贴使用次数
+                list.sort(COUNT_COMPARE)
+                break;
+            default:  // 自然排序
+                list.sort((a,b)=>a.name.localeCompare(b.name))
+                break;
         }
-    })
-    // 对 topSnippets进行排序
-    topSnippets.sort((a,b)=> a.index - b.index)
-    switch (configManager.getSortKey()){
-        case 0:   // 创建时间
-            list.sort(CREATE_TIME_COMPARE)
-            break;
-        case 1:   // 最近访问时间
-            list.sort(TIME_COMPARE)
-            break;
-        case 2:  // 粘贴使用次数
-            list.sort(COUNT_COMPARE)
-            break;
-        default:  // 自然排序
-            list.sort((a,b)=>a.name.localeCompare(b.name))
-            break;
     }
     return topSnippets.concat(list);
 }

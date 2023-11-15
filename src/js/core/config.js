@@ -1,5 +1,7 @@
-import {createOrUpdate, CS_CONFIG_ID, getDBItem, GLOBAL_CONFIG, jsonToMap, removeDBItem} from "./base";
+import {createOrUpdate} from "./base";
+import {defaultHelpSnippet} from "../some";
 
+const GLOBAL_CONFIG = "config"
 export const configManager = {
     configs: {},
     isInited: false,
@@ -7,16 +9,7 @@ export const configManager = {
         if(this.isInited){
             return;
         }
-        let data = getDBItem(CS_CONFIG_ID)
-        if( data != null){
-            this.configs = Object.fromEntries(jsonToMap(data).entries())
-            console.log(this.configs)
-            // 移除旧标签，转移到新标签
-            removeDBItem(CS_CONFIG_ID)
-            this.writeToDB();
-        }else{
-            this.configs = utools.db.get(GLOBAL_CONFIG)?.data ?? {}
-        }
+        this.configs = utools.db.get(GLOBAL_CONFIG)?.data ?? {}
         // if defaultColor existed, del it
         if(this.configs['defaultColor']){
             this.configs['lightTagColor'] = this.configs['defaultColor']
@@ -30,6 +23,12 @@ export const configManager = {
             this.writeToDB();
         }
         console.log('configManager init')
+
+        // show help snippet
+        if(configManager.get('version') !== defaultHelpSnippet.version){
+            configManager.set('version',defaultHelpSnippet.version)
+            configManager.set('closeHelpSnippet',false)
+        }
         this.isInited = true;
     },
     writeToDB(){
@@ -86,28 +85,6 @@ export const configManager = {
     },
     getSortKey(){
         return this.configs["sortKey"]?? 0;
-    },
-    getTopList(){
-        return this.configs["topIdList"]??[];
-    },
-    addTopItem(id){
-        let list = this.getTopList();
-        list.push(id)
-        this.configs["topIdList"] =list;
-        this.writeToDB();
-        return list.length-1;
-    },
-    delTopItem(index){
-        let list = this.getTopList();
-        list.splice(index,1);
-        this.configs["topIdList"] =list;
-        this.writeToDB();
-    },
-    replaceTopItem(index,name){
-        let list = this.getTopList();
-        list.splice(index,1,name)
-        this.configs["topIdList"] =list;
-        this.writeToDB();
     }
 
 }

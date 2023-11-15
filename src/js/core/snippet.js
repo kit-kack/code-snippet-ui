@@ -1,127 +1,56 @@
 import {nanoid} from "nanoid";
 import {defaultHelpSnippet} from "../some";
-import {fuzzyCompare, match} from "../utils/fuzzy";
-import {
-    CODE_PREFIX,
-    createOrUpdate,
-    CS_CODE_ID,
-    CS_DOC_ID,
-    CS_MARK_ID,
-    CS_ROOT_ID,
-    getDBItem,
-    GLOBAL_FUNC,
-    GLOBAL_ROOT_TAGS,
-    removeDBItem
-} from "./base";
+import {match} from "../utils/fuzzy";
+import {createOrUpdate, remove_utools_feature} from "./base";
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./func";
 import {convertValidFileSuffix, fullAlias} from "../utils/language";
 import {lowercaseIncludes} from "../utils/common";
-import {utools_feature_del} from "../utils/feature";
 import JSZip from "jszip";
 
-
+const CODE_PREFIX = "code/";
+const GLOBAL_FUNC = "func";
 export const codeSnippetManager = {
     // Code Snippet Map (key is its id)
-    codeMap: new Map(),
+    rootSnippetMap: new Map(),
+    snippetMap: null,
+    snippetKey: null,
     isInited: false,
 
     init() {
         if (this.isInited) {
             return;
         }
-        // 读取标签数据
-        let data = getDBItem(CS_ROOT_ID);
-        if(data != null){
-            // 旧版本过渡(v2)
-            let list = data.split('\0');
-            if (data[0] === '\0') {
-                list.shift()
+        for (const doc of utools.db.allDocs(CODE_PREFIX)) {
+            const payload = doc.data;
+            if(payload.count == null){
+                payload.count = 0;
             }
-            // 初始化所有值
-            for (const name of list) {
-                let payload = {};
-                // 兼容操作，逐渐舍弃原标志
-                let code = getDBItem(CS_MARK_ID + name);
-                if (code != null) {  // v1
-                    payload.name = name;
-                    payload.code = code;
-                    // refactor: id
-                    payload.id = nanoid();
-                    removeDBItem(CS_MARK_ID + name)
-                    let doc = getDBItem(CS_DOC_ID + name)
-                    if (doc != null) {
-                        payload.desc = doc;
-                        removeDBItem(CS_DOC_ID + name)
-                    }
-                    // 标签处理
-                    this.addTagInfo(payload)
-                    // 设置 新标签
-                    createOrUpdate(CODE_PREFIX+payload.id,payload)
-                } else {    // v2
-                    payload = JSON.parse(getDBItem(CS_CODE_ID + name));
-                    if(payload != null){
-                        // refactor: id
-                        payload.id = nanoid();
-                        // 标签处理
-                        this.addTagInfo(payload)
-                        // 移除旧标签，转移到新标签
-                        createOrUpdate(CODE_PREFIX+payload.id,payload)
-                        removeDBItem(CS_CODE_ID+name)
-                    }else{
-                        payload = utools.db.get("code#"+name).data;
-                        // refactor: id
-                        payload.id = nanoid();
-                        payload.createTime = Date.now();
-                        createOrUpdate(CODE_PREFIX+payload.id,payload)
-                        removeDBItem("code#"+name);
-                    }
-                }
-                if (payload.count == null) {
-                    payload.count = 0;
-                }
-                this.codeMap.set(payload.id, payload)
-                // 新版本过渡
-                removeDBItem(CS_ROOT_ID)
-                tagColorManager.writeToDB();
+            if(payload.createTime == null){
+                payload.createTime = Date.now();
             }
-        }else{
-            data = utools.db.get(GLOBAL_ROOT_TAGS)?.data;
-            // 保持原有顺序
-            let time = 100;
-            if( data != null){// v2
-                for (let name of data) {
-                    let payload = utools.db.get("code#"+name).data;
-                    if (payload.count == null) {
-                        payload.count = 0;
-                    }
-                    delete payload.query;
-                    // refactor: id
-                    payload.id = nanoid();
-                    payload.createTime = time;
-                    removeDBItem("code#"+name)
-                    createOrUpdate(CODE_PREFIX+payload.id,payload)
-
-                    this.codeMap.set(payload.id, payload)
-                    time+=100;
-                }
-                removeDBItem(GLOBAL_ROOT_TAGS)
-            }else{ // new version
-                for (const doc of utools.db.allDocs(CODE_PREFIX)) {
-                    const payload = doc.data;
-                    if(payload.count == null){
-                        payload.count = 0;
-                    }
-                    if(payload.createTime == null){
-                        payload.createTime = Date.now();
-                    }
-                    this.codeMap.set(payload.id, payload)
-                }
-            }
+            this.rootSnippetMap.set(payload.id, payload)
         }
-        console.log('codeSnippetManager init, and size is '+this.codeMap.size)
+        console.log('codeSnippetManager init, and size is '+this.rootSnippetMap.size)
         this.isInited = true;
+    },
+    prepareForPrefixSnippetMap(prefix){
+        if(this.snippetKey === prefix){
+            return;
+        }
+        this.snippetKey = prefix;
+        this.snippetMap = new Map();
+        for (const doc of utools.db.allDocs("/"+prefix + "/" +CODE_PREFIX)) {
+            const payload = doc.data;
+            if(payload.count == null){
+                payload.count = 0;
+            }
+            if(payload.createTime == null){
+                payload.createTime = Date.now();
+            }
+            this.snippetMap.set(payload.id, payload)
+        }
     },
     addTagInfo(payload,flag){
         if(payload.tags != null){
@@ -134,8 +63,9 @@ export const codeSnippetManager = {
 
     /**
      * @param {CodeSnippet} codeSnippet
+     * @param {string | null} [prefix]
      */
-    add(codeSnippet){
+    add(codeSnippet,prefix){
         if(codeSnippet.help){
             $message.error("用户无法主动创建内置说明片段")
             return false;
@@ -144,62 +74,71 @@ export const codeSnippetManager = {
         codeSnippet.count = codeSnippet.count??0;
         codeSnippet.createTime = Date.now()
         codeSnippet.time = codeSnippet.time??codeSnippet.createTime;
-        this.codeMap.set(codeSnippet.id,codeSnippet);
-        createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
+        if(prefix){
+            this.prepareForPrefixSnippetMap(prefix);
+            this.snippetMap.set(codeSnippet.id,codeSnippet);
+            createOrUpdate("/"+prefix+"/"+CODE_PREFIX+codeSnippet.id,codeSnippet)
+        }else{
+            this.rootSnippetMap.set(codeSnippet.id,codeSnippet);
+            createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
+        }
         this.addTagInfo(codeSnippet,true)
-        console.log('now code snippet size: '+this.codeMap.size)
         return true;
     },
 
     /**
      *
      * @param {string} id
+     * @param {string | null} prefix
      * @returns {boolean} - is success
      */
-    del(id){
+    del(id,prefix){
         if(id === defaultHelpSnippet.id){
             configManager.set('closeHelpSnippet',true)
             return true;
         }
-        // 先查询是否存在
-        const codeSnippet = this.codeMap.get(id);
-        if(codeSnippet){
-            utools.db.remove(CODE_PREFIX+id)
-            this.codeMap.delete(id)
-            if(codeSnippet.feature){
-                utools_feature_del(codeSnippet.name)
+        if(prefix){
+            this.prepareForPrefixSnippetMap(prefix);
+            const codeSnippet = this.snippetMap.get(id);
+            if(codeSnippet){
+                utools.db.remove("/"+prefix+"/"+CODE_PREFIX+codeSnippet.id)
+                this.snippetMap.delete(id)
+                return true;
             }
-            // 处理 topList
-            let index = configManager.getTopList().indexOf(id)
-            if(index !== -1){
-                configManager.delTopItem(index)
+        }else{
+            // 先查询是否存在
+            const codeSnippet = this.rootSnippetMap.get(id);
+            if(codeSnippet){
+                utools.db.remove(CODE_PREFIX+id)
+                this.rootSnippetMap.delete(id)
+                if(codeSnippet.feature){
+                    remove_utools_feature(codeSnippet.name)
+                }
+                return true;
             }
-            return true;
         }
         return false;
 
     },
     /**
      *
-     * @param {string} id
-     * @return {CodeSnippet}
-     */
-    get(id){
-        if(id === defaultHelpSnippet.id){
-            return defaultHelpSnippet;
-        }
-        return this.codeMap.get(id);
-    },
-
-    /**
-     *
      * @param {string} name
      * @return {boolean}
+     * @param {string | null} prefix
      */
-    contain(name){
-        for (const snippet of this.codeMap.values()) {
-            if(snippet.name === name){
-                return true
+    contain(name,prefix){
+        if(prefix){
+            this.prepareForPrefixSnippetMap(prefix)
+            for (const snippet of this.snippetMap.values()) {
+                if(snippet.name === name){
+                    return true
+                }
+            }
+        }else{
+            for (const snippet of this.rootSnippetMap.values()) {
+                if(snippet.name === name){
+                    return true
+                }
             }
         }
         return false
@@ -207,34 +146,47 @@ export const codeSnippetManager = {
     /**
      *
      * @param { CodeSnippet } codeSnippet
+     * @param {string | null} prefix
      * @return {boolean} - is success
      */
-    update(codeSnippet){
-        // 先查询是否存在
-        if(this.codeMap.has(codeSnippet.id)){
-            createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
-            this.codeMap.set(codeSnippet.id,codeSnippet)
-            this.addTagInfo(codeSnippet,true)
-            return true;
+    update(codeSnippet,prefix){
+        if(prefix){
+            this.prepareForPrefixSnippetMap(prefix)
+            if(this.snippetMap.has(codeSnippet.id)) {
+                createOrUpdate("/"+prefix+"/"+CODE_PREFIX+codeSnippet.id, codeSnippet)
+                this.snippetMap.set(codeSnippet.id, codeSnippet)
+                this.addTagInfo(codeSnippet, true)
+                return true;
+            }
         }else{
-            return false;
+            if(this.rootSnippetMap.has(codeSnippet.id)) {
+                createOrUpdate(CODE_PREFIX + codeSnippet.id, codeSnippet)
+                this.rootSnippetMap.set(codeSnippet.id, codeSnippet)
+                this.addTagInfo(codeSnippet, true)
+                return true;
+            }
         }
+        return false;
     },
     /**
      * 满足多种查询要求
      * @param {string | null} name
-     * @param {string[] | null} tags
-     * @param {string | null} type
+     * @param {string | null} prefix
      * @return {CodeSnippet[]}
      */
-    queryForMany(name,tags,type){
+    queryForMany(name,prefix){
+        let map =  this.rootSnippetMap;
+        if(prefix){
+            this.prepareForPrefixSnippetMap(prefix)
+            map = this.snippetMap;
+        }
         /**
          * @type {CodeSnippet[]}
          */
         let list = [];
         // 1.name
         if(name !== null){
-            for (const codeSnippet of this.codeMap.values()) {
+            for (const codeSnippet of map.values()) {
                 const result = match(name,codeSnippet.name)
                 if(result !== null){
                     codeSnippet.temp = result;
@@ -242,30 +194,10 @@ export const codeSnippetManager = {
                 }
             }
         }else{
-            for (let codeSnippet of this.codeMap.values()) {
+            for (let codeSnippet of map.values()) {
                 codeSnippet.temp = undefined;
                 list.push(codeSnippet)
             }
-        }
-        // 2.tags
-        if(tags !== null && tags.length > 0){
-            tags = tags.map(value => value.toLowerCase())
-            list = list.filter(codeSnippet=>{
-                if(codeSnippet.tags == null){
-                    return false;
-                }
-                for(const tag of tags){
-                    if(lowercaseIncludes(codeSnippet.tags,tag)){
-                        return true;
-                    }
-                }
-                return false;
-            })
-        }
-        // 3.type
-        if(type !== null){
-            type = fullAlias(type.toLowerCase());
-            list = list.filter(codeSnippet=>fullAlias(codeSnippet.type) === type)
         }
         // 进行排序处理
         return list;
@@ -285,7 +217,7 @@ export const codeSnippetManager = {
         }))
         const snippets = [];
         // snippet
-        for (let codeSnippet of this.codeMap.values()) {
+        for (let codeSnippet of this.rootSnippetMap.values()) {
             const snippet = {...codeSnippet};
             if(snippet.code){
                 const path = `code/${snippet.name}.${convertValidFileSuffix(snippet.type??'txt')}`
@@ -293,9 +225,10 @@ export const codeSnippetManager = {
                 snippet.code = path;
             }
             delete snippet.id;
-            if(configManager.getTopList().includes(codeSnippet.id)){
-                snippets.top = true;
-            }
+            // TODO 置顶处理
+            // if(configManager.getTopList().includes(codeSnippet.id)){
+            //     snippets.top = true;
+            // }
             snippets.push(snippet)
         }
         zip.file("code-snippet-data.json",JSON.stringify({
@@ -321,9 +254,11 @@ export const codeSnippetManager = {
                         repeatCodeSnippets.push(snippet)
                     }else{
                         count++;
-                        if(this.add(snippet) && snippet.top){
-                            configManager.addTopItem(snippet.id)
-                        }
+                        // TODO:置顶处理
+                        this.add(snippet)
+                        // if(this.add(snippet) && snippet.top){
+                        //     configManager.addTopItem(snippet.id)
+                        // }
                     }
                 }
             }
@@ -363,21 +298,23 @@ export const codeSnippetManager = {
                 negativeText: '全部丢弃',
                 onPositiveClick: ()=>{
                     for (let snippet of repeatCodeSnippets) {
-                        if(this.add(snippet) && snippet.top){
-                            configManager.addTopItem(snippet.id)
-                        }
+                        // TODO 置顶处理
+                        this.add(snippet)
+                        // if(this.add(snippet) && snippet.top){
+                        //     configManager.addTopItem(snippet.id)
+                        // }
                     }
                 }
             })
         }
     },
     empty() {
-        for (let id of this.codeMap.keys()) {
-            this.del(id)
+        for (let id of this.rootSnippetMap.keys()) {
+            this.del(id,null)
         }
     },
     getByName(name) {
-        for (let codeSnippet of this.codeMap.values()) {
+        for (let codeSnippet of this.rootSnippetMap.values()) {
             if(codeSnippet.name === name){
                 return codeSnippet;
             }

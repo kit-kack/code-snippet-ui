@@ -1,6 +1,7 @@
-import {createOrUpdate, CS_TAG_COLOR_ID, getDBItem, GLOBAL_TAGS, jsonToMap, removeDBItem} from "./base";
+import {createOrUpdate} from "./base";
 import {configManager} from "./config";
 
+const GLOBAL_TAGS = "tags";
 export const tagColorManager={
     // tag Color Map
     // key: tag name
@@ -12,16 +13,7 @@ export const tagColorManager={
         if(this.isInited){
             return;
         }
-        let data = getDBItem(CS_TAG_COLOR_ID)
-        if( data != null){
-            this.tags = Object.fromEntries(jsonToMap(data).entries())
-            console.log(this.tags)
-            // 移除旧标签，转移到新标签
-            removeDBItem(CS_TAG_COLOR_ID)
-            this.writeToDB();
-        }else{
-            this.tags = utools.db.get(GLOBAL_TAGS)?.data ?? {}
-        }
+        this.tags = utools.db.get(GLOBAL_TAGS)?.data ?? {}
         this.isInited = true;
     },
     writeToDB(){

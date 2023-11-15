@@ -1,10 +1,10 @@
 import {$normal, $reactive, switchToFullUIMode} from "../store";
 import {copyOrPaste} from "../utils/copy";
-import {createOrUpdate, GLOBAL_FUNC, removeDBItem} from "./base";
+import {createOrUpdate} from "./base";
 import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 
-
+const GLOBAL_FUNC = "func";
 /**
  *
  *
@@ -112,6 +112,34 @@ switch (command){
     }
 }
 
+function _uuid(len, radix) {
+    var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+    var uuid = [], i;
+    radix = radix || chars.length;
+
+    if (len) {
+        // Compact form
+        for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix];
+    } else {
+        // rfc4122, version 4 form
+        var r;
+
+        // rfc4122 requires these characters
+        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+        uuid[14] = '4';
+
+        // Fill in random data.  At i==19 set the high bits of clock sequence as
+        // per rfc4122, sec. 4.1.5
+        for (i = 0; i < 36; i++) {
+            if (!uuid[i]) {
+                r = 0 | Math.random() * 16;
+                uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+            }
+        }
+    }
+    return uuid.join('');
+}
+
 
 export const formatManager = {
     // data:{
@@ -136,7 +164,7 @@ export const formatManager = {
     },
     reset() {
         this.funcMap = {...DEFAULT_FUNCS};
-        removeDBItem(GLOBAL_FUNC)
+        utools.db.remove(GLOBAL_FUNC)
     },
     /**
      * 检查 Func中的Command是否重复
@@ -247,58 +275,6 @@ export const formatManager = {
             }
         }
     },
-    // all(){
-    //     const p = {...this.data.pairs}
-    //     for (let input of this.data.inputs) {
-    //         p[input] = p[input]? '#{input:'+p[input]+'}#' : '#{input}#'
-    //     }
-    //     return p;
-    // },
-    //
-    // /**
-    //  *
-    //  * @param {string} raw
-    //  * @param {string | null} target
-    //  * @param {boolean} [multi]
-    //  */
-    // set(raw,target,multi){
-    //     // recongize分析
-    //     raw = raw.trim();
-    //     if(target){
-    //         if(target.startsWith('#{input') && target.endsWith('}#')){
-    //             // final default
-    //             if(target[7]===':'){
-    //                 if(!this.data.inputs.includes(raw)){
-    //                     this.data.inputs.push(raw)
-    //                 }
-    //                 target = target.slice(8,-2);
-    //             }else if(target.length === 9){  // #{input}#
-    //                 if(!this.data.inputs.includes(raw)){
-    //                     this.data.inputs.push(raw)
-    //                 }
-    //                 target = null;
-    //             }
-    //         }
-    //     }
-    //     this.data.pairs[raw] = target;
-    //     if(multi){
-    //         return;
-    //     }
-    //     createOrUpdate(GLOBAL_FORMAT,this.data)
-    // },
-    // del(raw){
-    //     raw = raw.trim()
-    //     delete  this.data.pairs[raw];
-    //     const index = this.data.inputs.indexOf(raw)
-    //     if(index!== -1){
-    //         this.data.inputs.splice(index,1)
-    //     }
-    //     createOrUpdate(GLOBAL_FORMAT,this.data)
-    // },
-    // contain(raw){
-    //     raw = raw.trim()
-    //     return raw in this.data.pairs;
-    // },
     /**
      * 执行表达式
      * @param {string} key
@@ -322,33 +298,7 @@ export const formatManager = {
             _nanoid: nanoid,
             _dayjs: dayjs,
             _clipboard: window.preload._clipboard,
-            _uuid: function uuid(len, radix) {
-                var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-                var uuid = [], i;
-                radix = radix || chars.length;
-
-                if (len) {
-                    // Compact form
-                    for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix];
-                } else {
-                    // rfc4122, version 4 form
-                    var r;
-
-                    // rfc4122 requires these characters
-                    uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-                    uuid[14] = '4';
-
-                    // Fill in random data.  At i==19 set the high bits of clock sequence as
-                    // per rfc4122, sec. 4.1.5
-                    for (i = 0; i < 36; i++) {
-                        if (!uuid[i]) {
-                            r = 0 | Math.random() * 16;
-                            uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
-                        }
-                    }
-                }
-                return uuid.join('');
-            }
+            _uuid: _uuid
         }
     },
 
@@ -445,26 +395,6 @@ export const formatManager = {
                     })
                 }
             }
-            // else if(name in this.data.pairs){
-            //     if(this.data.inputs.includes(name)){
-            //         inputVars.add(name)
-            //         target.push({
-            //             inp: true,
-            //             exp: true,
-            //             code: name
-            //         })
-            //     }else{
-            //         // 直接替换
-            //         target.push({
-            //             exp: true,  // 后续可能会解析表达式
-            //             code: this.pairBuffer[name] // 使用Proxy后， 普通变量和表达式变量都会返回其结果，但结果可能以@开头
-            //         })
-            //     }
-            // }else{
-            //     target.push({
-            //         code: formatBlock[0]  // 不解析
-            //     })
-            // }
         }
         if(last === 0){
             return {
