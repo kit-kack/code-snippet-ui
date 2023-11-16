@@ -1,4 +1,5 @@
 import hljs from "highlight.js/lib/common";
+// 基于语雀，选取的常用编程语言列表如下
 // a:
 // b: bash basic
 import basic from 'highlight.js/lib/languages/basic'

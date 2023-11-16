@@ -1,4 +1,4 @@
-import {createApp, toRaw} from 'vue'
+import {createApp} from 'vue'
 import './style.css'
 import App from './App.vue'
 import initNU from "./js/dep/naiveui-dep";
@@ -6,11 +6,12 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
-import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, navigateView, refreshListView} from "./js/store";
+import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW} from "./js/store";
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/func";
+import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
 // init
 configManager.init()
 tagColorManager.init()
@@ -41,7 +42,6 @@ function bindApp(){
             ul.onclick = (event)=>{
                 let target = event.target;
                 if(target && target.value){
-                    console.log(target.value)
                     if($reactive.currentSnippet.sections){
                         if(section_contain($reactive.currentSnippet.sections,target.value)){
                             section_del($reactive.currentSnippet.sections,target.value,false)
@@ -55,7 +55,7 @@ function bindApp(){
                     if($reactive.currentSnippet.help){
                         return;
                     }
-                    codeSnippetManager.update(toRaw($reactive.currentSnippet))
+                    GLOBAL_HIERARCHY.update(null,"sections")
                 }
             }
             ul.oncontextmenu = (event) =>{
@@ -72,7 +72,7 @@ function bindApp(){
                         $reactive.currentSnippet.sections = [[0,target.value]]
                     }
                     // 保存
-                    codeSnippetManager.update(toRaw($reactive.currentSnippet))
+                    GLOBAL_HIERARCHY.update(null,"sections")
                 }
             }
             ul.classList.add('hljs-code-number')
@@ -95,7 +95,7 @@ utools.onPluginEnter((data)=>{
         return;
     }else if(data.code === 'code-snippet-keyword'){
         $reactive.currentSnippet = codeSnippetManager.getByName(data.payload);
-        // $reactive.utools.selectedIndex = 0;
+        // $reactive.core.selectedIndex = 0;
         $index.value = 0;
         if(!copyCode(true,undefined,true)){
             return;
@@ -116,7 +116,7 @@ utools.onPluginEnter((data)=>{
         if($reactive.view.backStageShow){
             utools.showNotification("插件重新前台运行")
             $reactive.view.backStageShow = false;
-            navigateView(LIST_VIEW,true)
+            GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
         }
         text = text.trim();
         if(text.length === 0){
@@ -135,7 +135,7 @@ utools.onPluginEnter((data)=>{
     },"搜索代码片段, 双击Tab切换UI模式")
     if(data.code==='code-snippet-save'){
         $normal.quickCode = data.payload;
-        navigateView(CREATE_VIEW)
+        GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
         // fix: liteShow模式下高度统一
         utools.setExpendHeight(545)
     }else if(data.code=== 'code-snippet-paste'){
@@ -148,7 +148,7 @@ utools.onPluginEnter((data)=>{
     //         setTimeout(()=>{
     //             codeSnippetManager.store(backupFilePath)
     //             configManager.set('lastAutoBackupTime',now)
-    //             utools.showNotification('自动备份触发（周期为每5天），备份数据文件位于:'+backupFilePath)
+    //             core.showNotification('自动备份触发（周期为每5天），备份数据文件位于:'+backupFilePath)
     //         },1000)
     //     }
     // }
@@ -166,7 +166,7 @@ try{
             }
         }
         let flag = true;
-        const array = codeSnippetManager.queryForMany(name,null,null)
+        const array = codeSnippetManager.queryForMany(name,null)
         return array.map(cs =>{
             flag = !flag;
             return {
@@ -178,8 +178,8 @@ try{
         })
 
     },({code,type,payload,option})=>{
-        $reactive.currentSnippet = codeSnippetManager.get(option.id);
-        // $reactive.utools.selectedIndex = 0;
+        $reactive.currentSnippet = codeSnippetManager.rootSnippetMap.get(option.id);
+        // $reactive.core.selectedIndex = 0;
         $index.value = 0;
         return copyCode(true,option.num,true)
     })

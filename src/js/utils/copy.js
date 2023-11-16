@@ -1,21 +1,13 @@
 import {$index, $normal, $reactive} from "../store";
-import {codeSnippetManager} from "../core/snippet";
 import {formatManager} from "../core/func";
-
-import {toRaw} from "vue";
+import {isNetWorkUri} from "./common";
+import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
 let lastCachedMsg = null;
 let isLastPasted = false;
-function getCode(path,local,noView){
-    if(local){
-        try{
-            return window.preload.readConfig(path)?? '[本地内容为空]'
-        }catch (e){
-            _notify(`😅加载失败: 本地文件[ ${path} ]，原因为${e.message}`,noView)
-            return null;
-        }
-    }else {
+function getCode(path,noView){
+    if(isNetWorkUri(path)){
         const xhr = new XMLHttpRequest();
         xhr.open('get',path,false);
         xhr.send()
@@ -23,6 +15,13 @@ function getCode(path,local,noView){
             return xhr.responseText;
         }else{
             _notify(`😅加载失败: 网络文件[ ${path} ]，原因为${xhr.statusText}`,noView)
+            return null;
+        }
+    }else {
+        try{
+            return window.preload.readConfig(path)?? '[本地内容为空]'
+        }catch (e) {
+            _notify(`😅加载失败: 本地文件[ ${path} ]，原因为${e.message}`, noView)
             return null;
         }
     }
@@ -52,9 +51,6 @@ export function copyOrPaste(text,noView){
         try{
             // utools新API
             utools.hideMainWindowPasteText(text)
-            // if(!isNotExit){
-            //     utools.outPlugin();
-            // }
             return;
         }catch (_){}
     }
@@ -63,9 +59,6 @@ export function copyOrPaste(text,noView){
     if(isLastPasted){
         utools.hideMainWindow();
         utools.simulateKeyboardTap('v',ctrlKey);
-        // if(!isNotExit){
-        //     utools.outPlugin();
-        // }
     }
 }
 
@@ -97,7 +90,7 @@ export function copyCode(isPasted,num,noView){
     // 获取代码
     if($normal.lastQueryCodeSnippetId !== $reactive.currentSnippet.id){  // 获取代码
         if(!$reactive.currentSnippet.code && $reactive.currentSnippet.path){
-            const temp = getCode($reactive.currentSnippet.path,$reactive.currentSnippet.local,noView);
+            const temp = getCode($reactive.currentSnippet.path,noView);
             if(temp === null){
                 _notify("当前代码片段加载失败，无法复制粘贴",noView)
                 return;
@@ -112,9 +105,7 @@ export function copyCode(isPasted,num,noView){
     // 复制操作
     if(num === undefined){
         // 更新次数和时间
-        $reactive.currentSnippet.time = Date.now();
-        $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
-        codeSnippetManager.update(toRaw($reactive.currentSnippet))
+        GLOBAL_HIERARCHY.update(null,"count&time")
         // 复制
         if(copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`,noView)){
             return noView;
@@ -141,9 +132,7 @@ export function copyCode(isPasted,num,noView){
                 str += (lines[i-1]+'\n')
             }
             // 更新次数和时间
-            $reactive.currentSnippet.time = Date.now();
-            $reactive.currentSnippet.count = ($reactive.currentSnippet.count??0) +1;
-            codeSnippetManager.update(toRaw($reactive.currentSnippet))
+            GLOBAL_HIERARCHY.update(null,"count&time")
             // 复制
             if(copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`,noView)){
                 return noView;

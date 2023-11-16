@@ -1,4 +1,3 @@
-import {codeSnippetManager} from "./core/snippet";
 import {configManager} from "./core/config";
 import {
     $index,
@@ -8,11 +7,9 @@ import {
     CREATE_VIEW,
     EDIT_VIEW,
     LIST_VIEW,
-    navigateView,
     refreshListView,
 } from "./store"
-import {defaultHelpSnippet} from "./some";
-import {debounce} from "./utils/common";
+import {debounce, isNetWorkUri} from "./utils/common";
 import {
     Direction,
     doScrollForCodeView,
@@ -21,6 +18,7 @@ import {
     gotoTheLastPosition
 } from "./utils/scroller";
 import {copyCode} from "./utils/copy";
+import {GLOBAL_HIERARCHY} from "./hierarchy/core";
 
 // 控制长按键
 let longKeyDown = false;
@@ -31,7 +29,7 @@ const debMoveDown = debounce(function(){
     // bug: $index变量有时修改不生效
     const old = $index.value;
     $index.value++;
-    // console.log($reactive.utools.selectedIndex)
+    // console.log($reactive.core.selectedIndex)
     gotoTheLastPosition(true);
 })
 const debMoveUp = debounce(function(){
@@ -161,8 +159,13 @@ function dealWithListView(e,list){
             break;
         case "Space":
             if($reactive.utools.subItemSelectedIndex === -1){
-                if(e.repeat){
-                    navigateView(CODE_VIEW);
+                if(e.repeat && !longKeyDown){
+                    if($reactive.currentSnippet.dir){
+                        GLOBAL_HIERARCHY.changeHierarchy("next")
+                    }else{
+                        $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id;
+                        GLOBAL_HIERARCHY.changeView(CODE_VIEW)
+                    }
                     // router.replace('/code')
                     longKeyDown = true;
                 }
@@ -171,7 +174,7 @@ function dealWithListView(e,list){
         case "Digit0":
             if($index.value === -1){
                 // if(configManager.get("enabledBeep")){
-                //     utools.shellBeep();
+                //     core.shellBeep();
                 // }
             }else if(e.shiftKey){
                 doScrollForListView(Direction.RESET);
@@ -185,49 +188,37 @@ function dealWithListView(e,list){
                 $message.warning('内置文档无法置顶');
                 return;
             }
-            let index = configManager.getTopList().indexOf($reactive.currentSnippet.id)
-            if(index === -1){
-                if(configManager.get('closeHelpSnippet')){
-                    $index.value = configManager.addTopItem($reactive.currentSnippet.id);
-                }else{
-                    $index.value = configManager.addTopItem($reactive.currentSnippet.id) +1;
-                }
-            }else{
-                configManager.delTopItem(index)
-            }
+            GLOBAL_HIERARCHY.update(null,"top");
             $normal.keepSelectedStatus = true;
-            refreshListView()
+            refreshListView(true)
             break;
         case 'KeyD':
         case 'KeyX':
-            $reactive.utools.subItemSelectedIndex = 1;
-            $reactive.view.isDel = true;
+            if(GLOBAL_HIERARCHY.currentConfig.remove){
+                $reactive.utools.subItemSelectedIndex = 1;
+                $reactive.view.isDel = true;
+            }else{
+                $message.warning("当前目录层级不支持[删除]操作")
+            }
             break;
         case 'KeyV':
             if($reactive.currentSnippet.dir){
-                if($reactive.currentSnippet.local){
-                    $normal.hierarchy.path.push($reactive.currentSnippet.path);
-                }
-                $reactive.currentPrefix.push($reactive.currentSnippet.name)
-
+                GLOBAL_HIERARCHY.changeHierarchy("next")
             }else{
                 $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id;
-                navigateView(CODE_VIEW)
+                GLOBAL_HIERARCHY.changeView(CODE_VIEW)
                 // router.replace('/code')
             }
             return;
         case 'KeyR':
-            if($reactive.currentPrefix.length > 0){
-                $reactive.currentPrefix = [];
-            }
+            GLOBAL_HIERARCHY.changeHierarchy("root")
             return;
         case 'KeyQ':
             if($reactive.utools.subItemSelectedIndex !== -1 || $reactive.view.isDel){
                 $reactive.utools.subItemSelectedIndex = -1;
                 $reactive.view.isDel = false;
             }else{
-                $reactive.currentPrefix.pop();
-                $normal.hierarchy.path.pop()
+                GLOBAL_HIERARCHY.changeHierarchy("prev")
             }
             break;
         default:
@@ -267,6 +258,7 @@ function handleMdHorizonMove(left,fast){
     }
     if(finalPre){
         const distance = fast? 50 : 10;
+        // TODO: 标色
         if(left){
             if(finalPre.scrollLeft < distance){
                 finalPre.scrollLeft = 0;
@@ -315,7 +307,7 @@ function dealWithCodeView(e){
             break;
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
-            navigateView(LIST_VIEW)
+            GLOBAL_HIERARCHY.changeView(LIST_VIEW)
             // switchToListView()
             console.log('exit')
             break;
@@ -328,11 +320,11 @@ function dealWithCodeView(e){
             }
             $reactive.view.isRendering = !$reactive.view.isRendering;
             break;
-        case 'KeyB':
-            if($reactive.currentSnippet.path){
-                $normal.updateCacheCodeFunc?.()
-            }
-            break;
+        // case 'KeyB':
+        //     if($reactive.currentSnippet.path){
+        //         $normal.updateCacheCodeFunc?.()
+        //     }
+        //     break;
         default:
             dealWithCommonView(e)
             break;
@@ -343,6 +335,7 @@ function dealWithCodeView(e){
  * ListView & CodeView
  */
 function dealWithCommonView(e){
+    e.preventDefault();
     switch (e.code){
         case 'KeyC':
         case 'KeyY':
@@ -361,7 +354,7 @@ function dealWithCommonView(e){
             if($reactive.view.helpActive){
                 $reactive.view.helpActive = false;
             }
-            navigateView(EDIT_VIEW)
+            GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
             // router.replace({
             //     name: 'form',
             //     query:{
@@ -389,14 +382,14 @@ function dealWithCommonView(e){
             break
         case 'KeyO':
             if($reactive.currentSnippet.path){
-                if($reactive.currentSnippet.local){
+                if(isNetWorkUri($reactive.currentSnippet.path)){
+                    utools.shellOpenExternal($reactive.currentSnippet.path)
+                }else{
                     if(e.shiftKey){
                         utools.shellShowItemInFolder($reactive.currentSnippet.path)
                     }else{
                         utools.shellOpenPath($reactive.currentSnippet.path);
                     }
-                }else{
-                    utools.shellOpenExternal($reactive.currentSnippet.path)
                 }
             }else{
                 $message.warning("当前文件不为【关联文件】")
@@ -468,7 +461,7 @@ function init(list) {
         if (e.ctrlKey || e.metaKey) {
             switch (e.code){
                 case 'KeyN':
-                    navigateView(CREATE_VIEW)
+                    GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
                     // router.replace({
                     //     name: 'form',
                     //     query:{
@@ -481,17 +474,17 @@ function init(list) {
                         refreshListView(true)
                     }
                     return;
-                case 'KeyF':
-                    if($reactive.currentMode === LIST_VIEW){
-                        if (configManager.get("enabledFuzzySymbolQuery")) {
-                            configManager.set("enabledFuzzySymbolQuery", false)
-                            $message.info("退出【进阶模糊查询】模式")
-                        } else {
-                            configManager.set("enabledFuzzySymbolQuery", true)
-                            $message.success("进入【进阶模糊查询】模式")
-                        }
-                    }
-                    return;
+                // case 'KeyF':
+                //     if($reactive.currentMode === LIST_VIEW){
+                //         if (configManager.get("enabledFuzzySymbolQuery")) {
+                //             configManager.set("enabledFuzzySymbolQuery", false)
+                //             $message.info("退出【进阶模糊查询】模式")
+                //         } else {
+                //             configManager.set("enabledFuzzySymbolQuery", true)
+                //             $message.success("进入【进阶模糊查询】模式")
+                //         }
+                //     }
+                //     return;
                 case 'Digit1':
                 case 'Digit2':
                 case 'Digit3':
@@ -527,7 +520,7 @@ function init(list) {
                 longKeyDown = false;
                 // $normal.keepSelectedStatus = true;
                 // switchToListView()
-                navigateView(LIST_VIEW)
+                GLOBAL_HIERARCHY.changeView(LIST_VIEW)
                 return;
             }
             if ($reactive.currentMode === LIST_VIEW) {

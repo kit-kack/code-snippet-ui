@@ -9,40 +9,42 @@
         :model="codeTemplate"
         ref="form"
     >
-      <n-form-item label="代码片段名" path="name">
-        <n-input v-model:value="codeTemplate.name" placeholder="起个好名字呗~"  clearable autofocus/>
-        <n-tag style="margin-left: 10px;user-select: none" checkable v-model:checked="codeTemplate.feature" >设置为uTools关键字</n-tag>
+      <n-form-item label="片段名" path="name">
+        <n-input v-model:value="codeTemplate.name" :placeholder="placeholders?.name ?? '起个好名字呗~'"  clearable autofocus :disabled="!properties.name"/>
+<!--        <n-tag style="margin-left: 10px;user-select: none" checkable v-model:checked="codeTemplate.feature" >设置为uTools关键字</n-tag>-->
       </n-form-item>
-      <n-form-item label="代码描述" path="desc">
-        <n-input v-model:value="codeTemplate.desc" placeholder="可选：请输入描述" clearable />
+      <n-form-item label="描述" path="desc">
+        <n-input v-model:value="codeTemplate.desc" :placeholder="placeholders?.desc ?? '可选：请输入描述'" clearable :disabled="!properties.desc" />
       </n-form-item>
-      <n-form-item label="标签" path="tags">
+      <n-form-item label="标签" path="tags" >
         <n-select
             v-model:value="codeTemplate.tags"
             filterable
             multiple
             tag
-            placeholder="可选：请选择或输入标签"
+            :placeholder="placeholders?.tags ?? '可选：请选择或输入标签'"
             :show-arrow="false"
             :options="tags"
+            :disabled="!properties.tags"
             :render-tag="renderTag"
         />
       </n-form-item>
-      <n-form-item label="代码片段" path="code">
+      <n-form-item label="代码提供" path="code">
         <template #default>
           <n-tabs  animated
                    v-model:value="currentTab"
                    justify-content="space-evenly"
                    type="line"
                    size="small">
-            <n-tab-pane name="code" tab="代码">
+            <n-tab-pane name="code" tab="代码" :disabled="formProperties.codeSource === 'link'">
               <div id="main">
                 <n-input
                     v-model:value="codeTemplate.code"
-                    placeholder="请输入代码片段"
+                    :placeholder="placeholders?.code ?? '请输入代码片段'"
                     type="textarea"
                     size="small"
                     style="padding-top: 40px;padding-bottom: 10px;"
+                    :disabled="!properties.code"
                     @keydown="handleKeyDown"
                     ref="codeTextArea"
                     show-count
@@ -96,6 +98,7 @@
                         :options="languages"
                         :default-value="configManager.get('defaultLanguage')??'plaintext'"
                         tag
+                        :disabled="!properties.type"
                         @update:value="handleTypeChange()"
                         :render-tag="renderCodeTypeTag"
                         :theme-overrides="selectThemeOverrides"
@@ -104,39 +107,55 @@
                 </div>
               </div>
             </n-tab-pane>
-            <n-tab-pane name="path" tab="关联文件">
-              <n-button @click="importLocalFile" quaternary type="primary">本地文件</n-button> &nbsp;&nbsp;
-              <n-button @click="showModal = true" quaternary type="info" >网络文件</n-button>
-              <n-button @click="showModal = true" quaternary type="info" >普通目录</n-button>
-              <n-button @click="importLocalDir" quaternary type="info" >本地目录</n-button>
-              <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
-                <n-list-item v-if="codeTemplate.path" style="height: 100px">
-                  <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
-                    <div style="width: 24px" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z" fill="currentColor"></path></svg></div>
-                    <div style="position: absolute; left: 32px; bottom: 7px">[ {{codeTemplate.dir? '本地目录':(codeTemplate.local? '本地文件':'网络文件')}} ]</div>
-                    <n-select
-                        v-if="!codeTemplate.dir"
-                        style="position: absolute; right:36px; bottom: 7px;width: 230px;height: 24px"
-                        v-model:value="codeTemplate.type"
-                        filterable
-                        size="small"
-                        placeholder="选择代码类型"
-                        :options="languages"
-                        default-value="plaintext"
-                        tag
-                        @update:value="handleTypeChange()"
-                        :render-tag="renderCodeTypeTag"
-                        :theme-overrides="selectThemeOverrides"
-                    />
-                    <n-button @click="handleClearPath" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error">
-                      <template #icon>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
-                      </template>
-                    </n-button>
-                  </div>
-                  <div style="margin-left: 8px;margin-top: 10px">{{codeTemplate.path}}</div>
-                </n-list-item>
-              </n-list>
+            <n-tab-pane name="path" tab="关联" :disabled="formProperties.codeSource === 'code'">
+              <template v-if="codeTemplate.path || codeTemplate.dir">
+                <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
+                  <n-list-item style="height: 100px">
+                    <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
+                      <div style="width: 24px" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z" fill="currentColor"></path></svg></div>
+                      <div style="position: absolute; left: 32px; bottom: 7px">[ {{linkDesc}} ]</div>
+                      <n-select
+                          v-if="!codeTemplate.dir"
+                          style="position: absolute; right:36px; bottom: 7px;width: 230px;height: 24px"
+                          v-model:value="codeTemplate.type"
+                          filterable
+                          size="small"
+                          placeholder="选择代码类型"
+                          :options="languages"
+                          default-value="plaintext"
+                          tag
+                          :disabled="!properties.type"
+                          @update:value="handleTypeChange()"
+                          :render-tag="renderCodeTypeTag"
+                          :theme-overrides="selectThemeOverrides"
+                      />
+                      <n-button @click="handleClearPath" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error" :disabled="!properties.code">
+                        <template #icon>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
+                        </template>
+                      </n-button>
+                    </div>
+                    <div style="margin-left: 8px;margin-top: 10px">{{(codeTemplate.dir&&!codeTemplate.ref)? '📢无预设内容，其内容受父目录控制':codeTemplate.path}}</div>
+                  </n-list-item>
+                </n-list>
+              </template>
+              <template v-else>
+                <template v-if="formProperties.linkType !== 'dir'">
+                  <n-divider title-placement="left">
+                    文件
+                  </n-divider>
+                  <n-button @click="importLocalFile" quaternary type="primary">本地文件</n-button>
+                  <n-button @click="showModal = true" quaternary type="info" >网络文件</n-button>
+                </template>
+                <template v-if="formProperties.linkType !== 'file'">
+                  <n-divider title-placement="left">
+                    目录
+                  </n-divider>
+                  <n-button @click="importLocalDir" quaternary type="primary" v-if="!GLOBAL_HIERARCHY.currentPrefixStr">本地目录</n-button>
+                  <n-button @click="setAsNormalDir" quaternary type="info" >普通目录</n-button>
+                  <n-button @click="setAsCustomDir" quaternary type="error" v-if="!GLOBAL_HIERARCHY.currentPrefixStr">自定义目录(代码实现)</n-button>
+                </template>
+              </template>
             </n-tab-pane>
           </n-tabs>
         </template>
@@ -183,21 +202,23 @@
 <script setup>
 import {computed, h, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {tagColorManager} from "../js/core/tag";
-import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import {fullAlias, languages} from "../js/utils/language";
-import {$normal, $reactive, EDIT_VIEW, LIST_VIEW, navigateView} from "../js/store";
+import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {CtrlStr} from "../js/some";
-import {utools_feature_add, utools_feature_del} from "../js/utils/feature";
 import ConfigSwitch from "../components/ConfigSwitch.vue";
 import FuncSelectPane from "../components/pane/FuncSelectPane.vue";
 import NormalTag from "../components/NormalTag.vue";
-import {NTag} from "naive-ui";
 import BaseModal from "../components/base/BaseModal.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
+import {add_utools_feature, remove_utools_feature} from "../js/core/base";
+import {isNetWorkUri} from "../js/utils/common";
 
 
 const form = ref()
+const formProperties = GLOBAL_HIERARCHY.currentConfig.form;
+const properties = formProperties.allowUpdatedProperties;
+const placeholders = formProperties.placeholders;
 const edit = $reactive.currentMode === EDIT_VIEW;
 const codeTemplate = reactive(edit?{...toRaw($reactive.currentSnippet)} :{
   code: $normal.quickCode,
@@ -211,11 +232,26 @@ const tags = computed(()=>{
     }
   })
 })
-const currentTab = ref(codeTemplate.path? 'path':'code')  // 当前Tab页
+const currentTab = ref(codeTemplate.path? 'path':(formProperties.codeSource === 'link' ?'path':'code'))  // 当前Tab页
 const codeTextArea = ref()
 const showModal = ref(false)
 const showFuncModal = ref(false)
 const url = ref()
+const linkDesc = computed(()=>{
+  if(codeTemplate.dir){
+    if(codeTemplate.ref){
+      if(codeTemplate.ref === "local"){
+        return "本地目录"
+      }else{
+        return "自定义目录";
+      }
+    }else{
+      return "普通目录";
+    }
+  }else{
+    return '关联文件'
+  }
+})
 const tabOptions = [
   {label: '原生行为',value: 0},
   {label: '\\t制表符',value: 1},
@@ -249,20 +285,19 @@ const renderTag = ({ option, handleClose }) => {
 const rules = {
   "name":[
     {
+      message: "代码片段名必须非空且不重复",
       required: true,
-      message: '代码片段名必须为非空字符串',
-      validator(rule,value){
-        return value!=null && value.trim() !== '';
-      },
-      trigger: ["input","blur"]
-    },
-    {
-      message: "代码片段名已重复",
       validator(rule, value) {
-        if(edit && $reactive.currentSnippet.name === value.trim()){
-          return true;
+        if(value!= null){
+          const v = value.trim();
+          if(v !== ''){
+            if(edit && $reactive.currentSnippet.name === v){
+              return true;
+            }
+            return !GLOBAL_HIERARCHY.form.containName(v)
+          }
         }
-        return !GLOBAL_HIERARCHY.form.containName(value.trim())
+        return false;
       },
       trigger: ["input","blur"]
     }
@@ -275,12 +310,12 @@ const rules = {
       }
       return true;
     },
-    message:"请放置代码片段"
+    message:"代码片段不能为空"
   }
 }
 const handleCancel = ()=>{
   $normal.keepSelectedStatus = true;
-  navigateView(LIST_VIEW)
+  GLOBAL_HIERARCHY.changeView(LIST_VIEW)
 }
 const handleUpdate = ()=>{
   form.value.validate().then(error=>{
@@ -290,12 +325,28 @@ const handleUpdate = ()=>{
         codeTemplate.name = codeTemplate.name.trim()
         //
         if(currentTab.value === 'path'){
-          //
-          if(!codeTemplate.path){
-            $message.warning("请提供 关联文件")
-            return;
+          // link
+          if(codeTemplate.dir){
+            // dir
+            if(codeTemplate.ref){
+              if(codeTemplate.ref === "local"){
+                if(!codeTemplate.path){
+                  $message.warning("请提供 [关联目录路径]")
+                  return;
+                }
+              }
+            }else{
+              // normal
+            }
+          }else{
+            // file
+            if(!codeTemplate.path){
+              $message.warning("请提供 [关联项]")
+              return;
+            }
           }
         }else{
+          // code
           if(!codeTemplate.code){
             $message.warning("代码不能为空")
             return;
@@ -311,26 +362,26 @@ const handleUpdate = ()=>{
           }
           // utools关键字处理
           if(codeTemplate.feature){
-            utools_feature_add(codeTemplate.name)
+            add_utools_feature(codeTemplate.name)
           }else{
-            utools_feature_del(codeTemplate.name)
+            remove_utools_feature(codeTemplate.name)
           }
           // 更新
-          codeSnippetManager.update(toRaw(codeTemplate))
+          GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),$reactive.currentSnippet.name)
           // 是否维持选中
           $normal.keepSelectedStatus = (codeTemplate.name === $reactive.currentSnippet.name)? true : null;
         }else{
           $normal.keepSelectedStatus = null;
           if(codeTemplate.feature){
-            utools_feature_add(codeTemplate.name)
+            add_utools_feature(codeTemplate.name)
           }
-          codeSnippetManager.add(toRaw(codeTemplate))
+          GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),null)
         }
         window.$message.success("操作成功")
         // handleRecoverLiteShow()
         // $var.currentMode = LIST_VIEW;
         // $var.others.code = null;
-        navigateView(LIST_VIEW,true)
+        GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
         // switchToListView(true)
       }
   },()=>{
@@ -356,7 +407,9 @@ const handleChooseCommand = (command)=>{
   }
 }
 const handleTypeChange = ()=>{
-  codeTemplate.type = fullAlias(codeTemplate.type)
+  if(GLOBAL_HIERARCHY.currentHierarchy.inline){
+    codeTemplate.type = fullAlias(codeTemplate.type)
+  }
 }
 
 onMounted(()=>{
@@ -428,7 +481,6 @@ const importLocalFile = ()=>{
     }else{
       codeTemplate.type = fullAlias(path.slice(index +1).toLowerCase())
     }
-    codeTemplate.local = true;
   }
 }
 const importLocalDir = ()=>{
@@ -444,15 +496,20 @@ const importLocalDir = ()=>{
     codeTemplate.path = realPathList[0];
     // 解析类型
     codeTemplate.dir = true;
-    codeTemplate.type = "目录";
-    codeTemplate.local = true;
+    codeTemplate.ref = "local";
   }
 }
-const isFullUrlRegex = /^\w+:\/\/.*/
+function setAsNormalDir() {
+  codeTemplate.dir = true;
+  codeTemplate.ref = undefined;
+}
+function setAsCustomDir(){
+  codeTemplate.dir = true;
+  codeTemplate.ref = "vscode";
+}
 function handleSetUrlAsPath(){
-  if(url.value && url.value.match(isFullUrlRegex)){
+  if(url.value && isNetWorkUri(url.value)){
     codeTemplate.path = url.value;
-    codeTemplate.local = undefined;
     showModal.value = false;
   }else{
     $message.warning("请填写合法链接")
@@ -460,7 +517,8 @@ function handleSetUrlAsPath(){
 }
 function handleClearPath(){
   codeTemplate.path = undefined;
-  codeTemplate.local = undefined;
+  codeTemplate.dir = undefined;
+  codeTemplate.ref = undefined;
 }
 </script>
 

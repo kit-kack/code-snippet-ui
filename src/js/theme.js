@@ -66,7 +66,8 @@ function getThemeOverrides(){
                 InternalSelectMenu:{
                     optionCheckColor: gc,
                     optionTextColorActive: gc,
-                    optionTextColorPressed: gc
+                    optionTextColorPressed: gc,
+                    height: '200px'
                 }
             }
         },

@@ -37,6 +37,9 @@
 .item-code{
   border-top: 1px darkgray dashed;
 }
+#dark-app .item-code{
+  border-top: 1px #686869 dashed;
+}
 #dark-app .n-input{
   --n-color-focus: #454647 !important;
 }

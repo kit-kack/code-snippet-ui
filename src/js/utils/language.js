@@ -152,10 +152,9 @@ export function getRealTypeAndValidStatus(type){
  * @param {string} type
  */
 export function recongizeFileType(type){
-    let index = type.lastIndexOf('.')
-    if(index === -1){
-        return '目录'
-    }else{
+    const index = type.lastIndexOf('.')
+    if(index > 0){
         return _alias(type.slice(index+1).trim().toLowerCase() ?? 'plaintxt')
     }
+    return type.trim().toLowerCase();
 }

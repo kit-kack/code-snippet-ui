@@ -7,6 +7,7 @@ const CREATE_VIEW = 3;
 
 const $normal = {
     listViewVisitedCount: 0,
+    // TODO id可能有重复的情况
     lastQueryCodeSnippetId: null,
     recoverLiteShow: false,   // 是否恢复为 列表UI
     recoverLiteHeight: 0,      // 恢复为列表UI的高度
@@ -21,6 +22,13 @@ const $normal = {
     },
     // 层级
     hierarchy:{
+        /**
+         * @type {{
+         *     local?: boolean,
+         *     value: string,
+         *     index: number
+         * }[]}
+         */
       path: []
     },
     keepSelectedStatus: null,  // null false true  // 控制 选中元素 保持记忆功能
@@ -113,33 +121,8 @@ const refreshListView = (deepFlag)=>{
     }
 }
 
-
-/**
- * 切换界面
- * @param {number} view
- * @param {boolean} [refresh]
- */
-const navigateView = (view,refresh) =>{
-    if( view === LIST_VIEW){
-        $reactive.currentMode = view;
-        nextTick(()=>{
-            handleRecoverLiteShow();
-        })
-        if(refresh){
-            $reactive.view.deepRefresh = false;
-            nextTick(()=>{
-                $reactive.view.deepRefresh = true
-            })
-        }
-    }else{
-        switchToFullUIMode();
-        $reactive.currentMode = view;
-    }
-
-}
-
 export {
     $normal,$reactive,$index,$list,
     LIST_VIEW,CODE_VIEW,EDIT_VIEW,CREATE_VIEW,
-    handleRecoverLiteShow,refreshListView,switchToFullUIMode,navigateView
+    handleRecoverLiteShow,refreshListView,switchToFullUIMode
 }

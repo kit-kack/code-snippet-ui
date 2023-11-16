@@ -97,7 +97,15 @@ export function calculateTime(time){
     return '现在';
 }
 
-
+const networkRegex = /^\w+:\/\/.*/
+/**
+ * 判断URI是否为网络URI
+ * @param {string} uri
+ * @type {boolean}
+ */
+export function isNetWorkUri(uri){
+    return  networkRegex.test(uri);
+}
 
 
 const _darkFormatBlockStyle = '<span style="color:#ffa400;border-radius:3px;background-color:#414141;font-weight: bolder;">'

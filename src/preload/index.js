@@ -22,6 +22,8 @@ export const generateZip = (zip,path) =>{
 }
 export const readFile = fs.readFileSync;
 export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.md')).toString();
+export const writeFile = fs.writeFileSync;
+export const renameFile = fs.renameSync;
 
 /*
  * 暂未使用到
