@@ -2,7 +2,8 @@
   <n-modal :show="show"
            preset="card"
            :title="title"
-           :mask-closable="false" :auto-focus="false"
+           :closable="false"
+           :mask-closable="false"
            @close="$emit('cancel')"
            :style="{
              width: wide? '80%':'60%'
@@ -18,13 +19,13 @@
         <template v-else>
           <n-tooltip trigger="hover">
             <template #trigger>
-              <n-button quaternary @click="$emit('cancel')">取消 (Q)</n-button>
+              <n-button :focusable="false" quaternary @click="$emit('cancel')">取消 (Q)</n-button>
             </template>
             {{CtrlStr+'+Q'}}
           </n-tooltip>
           <n-tooltip trigger="hover">
             <template #trigger>
-              <n-button quaternary type="success" @click="$emit('confirm')">确定 (S)</n-button>
+              <n-button :focusable="false" quaternary type="success" @click="$emit('confirm')">确定 (S)</n-button>
             </template>
             {{CtrlStr+'+S'}}
           </n-tooltip>

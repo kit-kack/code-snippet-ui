@@ -49,7 +49,7 @@ const datas = [
         feature: "刷新",
         shortcut: "C-R"
       },{
-        feature: "启用/关闭Vim模式，utool输入框失聚焦",
+        feature: "启用/关闭Vim模式，uTools子输入框失聚焦",
         shortcut:"Tab"
       },{
         feature: "切换完整/列表UI模式",
@@ -137,10 +137,12 @@ const datas = [
     {
       feature: "开启/关闭渲染模式Render",
       shortcut: "R"
-    },{
-      feature: "缓存数据Buffer",
-      shortcut: "B"
-    },{
+    },
+    //   {
+    //   feature: "缓存数据Buffer",
+    //   shortcut: "B"
+    // },
+      {
       feature: "查看代码片段说明Show",
       shortcut: 'S'
     },{

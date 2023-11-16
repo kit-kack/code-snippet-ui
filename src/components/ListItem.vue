@@ -17,7 +17,7 @@
       <!-- 置顶 圆心 -->
       <div class="snippet-item__top"
            :style="{
-              backgroundColor: configManager.getTopList().includes(snippet.id)? configManager.getGlobalColor(): ''
+              backgroundColor: (isTop || snippet.help)? configManager.getGlobalColor(): ''
            }"
       ></div>
       <!-- 右侧 序号 -->
@@ -30,7 +30,7 @@
               <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
               <n-tag size="small" style="height: 14px;margin-left: 10px" round strong :bordered="false" type="warning" v-if="snippet.dir">目录</n-tag>
               <!-- 本地&网络 -->
-              <span class="snippet-item__desc" style="margin-left: 10px;" v-if="snippet.path&& configManager.get('noItemCodeShow')">{{snippet.local? '本地':'网络'}}</span>
+              <span class="snippet-item__desc" v-if="configManager.get('noItemCodeShow')" style="margin-left: 10px;" >{{pair.code}}</span>
               <!-- 描述（标题右侧） -->
               <span class="snippet-item__desc" style="margin-left: 10px;" v-if="!configManager.get('noItemCodeShow')">{{snippet.desc}}</span>
               <!-- 子代码片段 -->
@@ -72,8 +72,8 @@
         </span>
       </template>
       <!-- 右侧下方 （语言类型|使用次数|上次使用时间） -->
-      <span v-if="selected" class="snippet-item-info" style="right: -5px" :style="{color: configManager.getGlobalColor()}">
-              {{pair.txt}}
+      <span  class="snippet-item-info" style="  transform-origin: 100% 0;right:0;margin-right:3px;color:#777">
+              {{snippet.dir? '':(snippet.type?? 'plaintext')}}
       </span>
     </n-card>
 
@@ -92,7 +92,7 @@
       <template v-else-if="isShowBtn">
         <div id="child" >
           <n-space>
-            <selectable-button :disabled="snippet.help"  :mid="305"  type="warning" tip="编辑" :index="0" @invoke="doEdit" >
+            <selectable-button :disabled="snippet.help || !GLOBAL_HIERARCHY.currentConfig?.edit"  :mid="305"  type="warning" tip="编辑" :index="0" @invoke="doEdit" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M20.998 6.25A3.25 3.25 0 0 0 17.748 3H6.25A3.25 3.25 0 0 0 3 6.25v11.499a3.25 3.25 0 0 0 3.25 3.25h4.914l.356-1.424l.02-.076H6.25a1.75 1.75 0 0 1-1.75-1.75v-9.25h14.998v2.733c.48-.19.994-.264 1.5-.22V6.25zM6.25 4.5h11.499c.966 0 1.75.783 1.75 1.75V7h-15v-.75c0-.967.784-1.75 1.75-1.75zm12.848 8.169l-5.901 5.901a2.685 2.685 0 0 0-.707 1.248l-.457 1.83c-.2.797.522 1.518 1.318 1.319l1.83-.458a2.685 2.685 0 0 0 1.248-.706L22.33 15.9a2.286 2.286 0 0 0-3.233-3.232z" fill="currentColor"></path></g></svg>
             </selectable-button>
             <selectable-button :mid="350" type="primary" tip="预览" :index="1" @invoke="doViewCode" >
@@ -101,17 +101,17 @@
             <selectable-button :mid="395" lite type="info" tip="复制" :index="2" @invoke="copyCode(false)" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M5.503 4.627L5.5 6.75v10.504a3.25 3.25 0 0 0 3.25 3.25h8.616a2.251 2.251 0 0 1-2.122 1.5H8.75A4.75 4.75 0 0 1 4 17.254V6.75c0-.98.627-1.815 1.503-2.123zM17.75 2A2.25 2.25 0 0 1 20 4.25v13a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-13A2.25 2.25 0 0 1 8.75 2h9zm0 1.5h-9a.75.75 0 0 0-.75.75v13c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75v-13a.75.75 0 0 0-.75-.75z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <selectable-button :mid="440" lite type="error" tip="删除" :index="3" @invoke="$reactive.view.isDel = true;$reactive.utools.subItemSelectedIndex=1">
+            <selectable-button :disabled="!GLOBAL_HIERARCHY.currentConfig?.remove" :mid="440" lite type="error" tip="删除" :index="3" @invoke="$reactive.view.isDel = true;$reactive.utools.subItemSelectedIndex=1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <template v-if="topIndex === -1">
-              <selectable-button :disabled="snippet.help" :mid="485" lite  type="primary"  color="#9b59b6" :index="4" tip="置顶" @invoke="handleSetTop">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 8.826l.874.998a.5.5 0 0 0 .752-.658l-1.75-2a.5.5 0 0 0-.752 0l-1.75 2a.5.5 0 0 0 .752.658l.874-.998v3.679a.5.5 0 0 0 1 0v-3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-3.834a1.495 1.495 0 0 0-.287-.493l-1.75-2a1.5 1.5 0 0 0-2.258 0l-1.75 2c-.13.15-.226.317-.287.493H3v5z" fill="currentColor"></path></g></svg>
+            <template v-if="isTop">
+              <selectable-button :mid="485" lite  type="primary"  color="#9b59b6" :index="4" tip="取消置顶" @invoke="handleCancelTop">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 11.174l.874-.998a.5.5 0 0 1 .752.658l-1.75 2a.5.5 0 0 1-.752 0l-1.75-2a.5.5 0 1 1 .752-.658l.874.998V7.495a.5.5 0 0 1 1 0v3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-5.5V7.495a1.5 1.5 0 1 0-3 0V9H3v5z" fill="currentColor"></path></g></svg>
               </selectable-button>
             </template>
             <template v-else>
-              <selectable-button :mid="485" lite  type="primary"  color="#9b59b6" :index="4" tip="取消置顶" @invoke="handleCancelTop">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 11.174l.874-.998a.5.5 0 0 1 .752.658l-1.75 2a.5.5 0 0 1-.752 0l-1.75-2a.5.5 0 1 1 .752-.658l.874.998V7.495a.5.5 0 0 1 1 0v3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-5.5V7.495a1.5 1.5 0 1 0-3 0V9H3v5z" fill="currentColor"></path></g></svg>
+              <selectable-button :disabled="snippet.help" :mid="485" lite  type="primary"  color="#9b59b6" :index="4" tip="置顶" @invoke="handleSetTop">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 8.826l.874.998a.5.5 0 0 0 .752-.658l-1.75-2a.5.5 0 0 0-.752 0l-1.75 2a.5.5 0 0 0 .752.658l.874-.998v3.679a.5.5 0 0 0 1 0v-3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-3.834a1.495 1.495 0 0 0-.287-.493l-1.75-2a1.5 1.5 0 0 0-2.258 0l-1.75 2c-.13.15-.226.317-.287.493H3v5z" fill="currentColor"></path></g></svg>
               </selectable-button>
             </template>
           </n-space>
@@ -123,16 +123,15 @@
 
 <script setup>
 import {computed, nextTick, onMounted, ref} from "vue";
-import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
 import SelectableButton from "./SelectableButton.vue";
-import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, navigateView, refreshListView} from "../js/store";
+import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshListView} from "../js/store";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
 import {copyCode} from "../js/utils/copy";
-import {calculateTime} from "../js/utils/common";
 import {gotoTheLastPosition} from "../js/utils/scroller";
+import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -144,30 +143,50 @@ const isShowBtn = computed(()=>{
   return !!(props.selected && $reactive.utools.subItemSelectedIndex > -1);
 })
 const isHover = ref(false)
-let topIndex = configManager.getTopList().indexOf(props.snippet.id)
+const isTop = props.snippet.index !== undefined;
 const pair = computed(()=>{
-  let txt = (props.snippet.type?? 'plaintext') + ' | ';
-  if(props.snippet.count){
-    txt += props.snippet.count +' | ';
-  }
-  txt += calculateTime(props.snippet.time);
-  if(props.snippet.code){
-    return {
-      code: props.snippet.code,
-      type: props.snippet.type??'plaintext',
-      txt: txt
+  let code = props.snippet["link_desc"];
+  if(props.snippet.dir){
+    if(!code){
+      if(!configManager.get('noItemCodeShow')){
+        if(props.snippet.ref){
+          if(props.snippet.ref === "local"){
+            code = "[本地目录]: "+props.snippet.path;
+          }else{
+            code = "[自定义目录] ";
+          }
+        }else{
+          code = "[普通目录] ";
+        }
+      }
     }
   }else{
-    return {
-      code: (
-          '['+
-          (props.snippet.local? '本地':'网络')
-          + (props.snippet.dir ? '目录]: ':'文件]: ')+props.snippet.path
-      ),
-      type: 'markdown',
-      txt: txt
+    // file
+    if(configManager.get('noItemCodeShow')){
+      if(props.snippet.path){
+        if(!code){
+          code = '关联';
+        }
+      }
+    }else{
+      if(props.snippet.code){
+        return {
+          code: props.snippet.code,
+          type: props.snippet.type??'plaintext',
+        }
+      }else{
+        // code
+        if(!code){
+          code = '[关联文件]: '+props.snippet.path;
+        }
+      }
     }
   }
+  return {
+    code: code,
+    type: 'markdown'
+  }
+
 })
 const sideInfo = getSideInfo();
 
@@ -238,7 +257,7 @@ onMounted(()=>{
 })
 
 const handleDelete = ()=>{
-  codeSnippetManager.del(props.snippet.id)
+  GLOBAL_HIERARCHY.remove(props.snippet)
   $index.value--;
   $normal.keepSelectedStatus = true;
   $reactive.view.isDel = false;
@@ -264,15 +283,19 @@ const handleContextMenu = ()=>{
   }
 }
 const handleDoubleClick = ()=>{
-  copyCode(true)
+  if(props.snippet.dir){
+    GLOBAL_HIERARCHY.changeHierarchy("next")
+  }else{
+    copyCode(true)
+  }
 }
 const handleCancelTop = ()=>{
-  configManager.delTopItem(topIndex)
+  GLOBAL_HIERARCHY.update(props.snippet,"top");
   $index.value = props.index;
   doItemRefresh()
 }
 const handleSetTop = ()=>{
-  $index.value = configManager.addTopItem(props.snippet.id)
+  GLOBAL_HIERARCHY.update(props.snippet,"top");
   doItemRefresh()
 }
 
@@ -292,21 +315,12 @@ const handleMouseLeave = (e)=>{
 }
 const doViewCode = ()=>{
   $normal.lastQueryCodeSnippetId = props.snippet.id;
-  navigateView(CODE_VIEW);
-  // router.replace({
-  //   name: 'code'
-  // })
+  GLOBAL_HIERARCHY.changeView(CODE_VIEW);
 }
 const doEdit = ()=>{
   // $reactive.currentName = props.snippet.name;
   // $va r.currentMode = UPDATE_VIEW;
-  navigateView(EDIT_VIEW);
-  // router.replace({
-  //   name: 'form',
-  //   query:{
-  //     mode: 'edit'
-  //   }
-  // })
+  GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
 }
 const doItemRefresh = ()=>{
   $normal.keepSelectedStatus = true;
@@ -391,8 +405,8 @@ const doItemRefresh = ()=>{
 .snippet-item-info{
   position: absolute;
   bottom: -1px;
-  font-size:13px;
-  transform: scale(0.78); /* 用缩放来解决 */
+  font-size:12px;
+  transform: scale(0.8); /* 用缩放来解决 */
   line-height: 1;
 }
 .sub-item-code {

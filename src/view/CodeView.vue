@@ -41,20 +41,20 @@
     </n-scrollbar>
     <div id="extra">
       <n-space>
-        <template v-if="snippet.path && pair.type !=='image'">
-          <n-button quaternary
-                    @click="updateCachedCode"
-                    :color="configManager.getGlobalColor()">
-            {{  snippet.code? '🌝已缓存 [B]': '未缓存 [B]' }}
-          </n-button>
-        </template>
+<!--        <template v-if="snippet.path && pair.type !=='image'">-->
+<!--          <n-button quaternary-->
+<!--                    @click="updateCachedCode"-->
+<!--                    :color="configManager.getGlobalColor()">-->
+<!--            {{  snippet.code? '已缓存 [B]': '未缓存 [B]' }}-->
+<!--          </n-button>-->
+<!--        </template>-->
         <template v-if="pair.renderable">
           <n-button quaternary
                     @click=" $reactive.view.isRendering = !$reactive.view.isRendering"
                     :color="configManager.getGlobalColor()"
                     :disabled="pair.type === 'image' && snippet.path"
           >
-            {{ $reactive.view.isRendering? '✨已渲染 [R]': '未渲染 [R]' }}
+            {{ $reactive.view.isRendering? '已渲染 [R]': '未渲染 [R]' }}
           </n-button>
         </template>
         <n-popover trigger="hover" :show="hover || $reactive.view.codeTipActive" placement="top" :show-arrow="false" style="padding:5px">
@@ -62,7 +62,7 @@
             <n-button
                 @mouseenter="hover = true"
                 @mouseleave="hover = false"
-                quaternary :color="configManager.getGlobalColor()">🚀{{ (snippet.type??'plaintext')+' [S]' }}</n-button>
+                quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]' }}</n-button>
           </template>
           <n-list hoverable clickable :show-divider="false" @mouseenter="hover = true" @mouseleave="hover = false">
             <n-list-item >
@@ -102,20 +102,21 @@
 </template>
 
 <script setup>
-import {codeSnippetManager} from "../js/core/snippet";
 import {configManager} from "../js/core/config";
-import {computed, nextTick, onMounted, onUnmounted, ref, toRaw, watch} from "vue";
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
-import {calculateTime, getRefreshFunc, renderFormatBlock} from "../js/utils/common";
-import {$normal, $reactive, LIST_VIEW, navigateView} from "../js/store";
+import {calculateTime, getRefreshFunc, isNetWorkUri, renderFormatBlock} from "../js/utils/common";
+import {$normal, $reactive, LIST_VIEW} from "../js/store";
 import NormalTag from "../components/NormalTag.vue";
+import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 
 const scrollBar = ref(null)
 /**
  * @type CodeSnippet
  */
 const snippet = $reactive.currentSnippet;
+const isNetWorkPath = snippet.path && isNetWorkUri(snippet.path)
 $reactive.currentCode = getCode()
 const hover = ref(false)
 const refreshFlag = ref(true)
@@ -158,42 +159,47 @@ function getCode(){
   return snippet.code;
 }
 function getCodeFromPath(){
-  if(snippet.local){
+  // 分析path
+  if(isNetWorkPath){
+    // network
+    if(snippet.type !== 'image' && snippet.type !== 'x-image'){
+      fetch(snippet.path).then(resp=>{
+        if(resp.ok){
+          resp.text().then(value=>{
+            // 刷新页面
+            $reactive.currentCode = value;
+            doRefresh();
+          })
+        }else{
+          $reactive.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
+        }
+      })
+      return "网络文件[ "+snippet.path +" ]数据正在获取中..."
+    }
+  }else{
+    // local
     try{
       return window.preload.readFile(snippet.path).toString()?? '[本地内容为空]'
     }catch (e){
       $message.error(e.message)
       return `😅加载失败: 本地文件[ ${snippet.path} ]`
     }
-  }else if(snippet.type !== 'image' && snippet.type !== 'x-image'){
-    fetch(snippet.path).then(resp=>{
-      if(resp.ok){
-        resp.text().then(value=>{
-          // 刷新页面
-          $reactive.currentCode = value;
-          doRefresh();
-        })
-      }else{
-        $reactive.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
-      }
-    })
-    return "网络文件[ "+snippet.path +" ]数据正在获取中..."
   }
 }
 const handleClose = ()=>{
   $reactive.view.codeTipActive = false;
   $normal.keepSelectedStatus = true;
-  navigateView(LIST_VIEW)
+  GLOBAL_HIERARCHY.changeView(LIST_VIEW)
 }
-function updateCachedCode(){
-  if(snippet.code){   // 清除缓存
-    snippet.code = undefined;
-    $reactive.currentCode = getCodeFromPath();  // 抓取数据
-  }else{  // 添加缓存
-    snippet.code = $reactive.currentCode;
-  }
-  codeSnippetManager.update(toRaw(snippet))
-}
+// function updateCachedCode(){
+//   if(snippet.code){   // 清除缓存
+//     snippet.code = undefined;
+//     $reactive.currentCode = getCodeFromPath();  // 抓取数据
+//   }else{  // 添加缓存
+//     snippet.code = $reactive.currentCode;
+//   }
+//   GLOBAL_HIERARCHY.update(snippet,"buffer")
+// }
 function getNumShow(num){
   return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
 }
@@ -226,7 +232,7 @@ let count = -1;
  */
 const beforeChangeFunc = (text,next) =>{
   count = -1;
-  if(snippet.path && snippet.local) {
+  if(snippet.path && !isNetWorkPath) {
     cachedImageUrls = new Map();
     const localDir = window.preload.getDirname(snippet.path)
     text = text.replace(/!\[(.*?)]\((.*?)\)/g, (match, name, url) => {
@@ -272,7 +278,7 @@ function whenRender(text,html){
 }
 
 onMounted(()=>{
-    $normal.updateCacheCodeFunc = updateCachedCode
+    // $normal.updateCacheCodeFunc = updateCachedCode
     $normal.scroll.codeInvoker = scrollBar.value;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
       renderFormatBlock(pair.value.renderable && $reactive.view.isRendering)

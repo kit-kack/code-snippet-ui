@@ -27,8 +27,8 @@
 import {configManager} from "../js/core/config";
 import {codeSnippetManager} from "../js/core/snippet";
 import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW, refreshListView} from "../js/store";
-import {toRaw} from "vue";
 import {backupFilePath} from "../js/some";
+import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 
 const getBtnStyle = ()=>{
   if($reactive.currentMode<= CODE_VIEW){
@@ -94,7 +94,7 @@ const handleVimStatusBarClick = ()=>{
         if($reactive.currentSnippet.help){
           return;
         }
-        codeSnippetManager.update(toRaw($reactive.currentSnippet))
+        GLOBAL_HIERARCHY.update(null,"sections")
         clearCount = 0;
       }else{
         clearCount++;

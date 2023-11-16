@@ -9,7 +9,7 @@
                 :index="index"
                 :snippet="snippet"
                 :last="index === $list.length - 1"
-                :selected="handleSelect(index,snippet.id,$index)"/>
+                :selected="handleSelect(index,$index)"/>
           </template>
           <div id="info" v-if="$reactive.view.fullScreenShow">
             <p style="color:gray;">~共有{{$list.length}}条数据~</p>
@@ -90,8 +90,7 @@
 import {onMounted, ref, watch} from "vue";
 import {init} from "../js/keyboard.js";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core"
-import {$index, $list, $normal, $reactive, CREATE_VIEW, navigateView, refreshListView} from "../js/store";
-import {codeSnippetManager} from "../js/core/snippet";
+import {$index, $list, $normal, $reactive, CREATE_VIEW, refreshListView} from "../js/store";
 import {configManager} from "../js/core/config";
 import {NButton} from "naive-ui";
 import ListItem from "../components/ListItem.vue";
@@ -102,17 +101,12 @@ import ListItem from "../components/ListItem.vue";
 //   delay: 0
 // })
 
-// const list = ref(parseSearchWord($reactive.utools.search,[]))// 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
+// const list = ref(parseSearchWord($reactive.core.search,[]))// 其中parseSearchWord第二个参数只是单纯为了响应式触发，没有其他作用
 
 const expanded = ref(false)
-const handleSelect = (index,id,selectedIndex)=>{
+const handleSelect = (index,selectedIndex)=>{
   if(index === selectedIndex){
-    if(id){
-      $reactive.currentSnippet = codeSnippetManager.get(id)
-    }else{
-      $reactive.currentSnippet = $list.value[index]
-    }
-
+    $reactive.currentSnippet = $list.value[index]
     return true;
   }else{
     return false;
@@ -159,7 +153,7 @@ const handleAppHeight = ()=>{
   }
 }
 function goToCreateView(){
-  navigateView(CREATE_VIEW)
+  GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
 }
 
 

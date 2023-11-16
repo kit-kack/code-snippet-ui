@@ -4,6 +4,7 @@
               @cancel="doCancel"
               @confirm="doYes"
   >
+    <h5>tips: 按Tab键来上下切换</h5>
     <n-scrollbar style="max-height: 60vh">
       <div style="padding-right: 6px">
         <template v-for="(template,index) in templates">

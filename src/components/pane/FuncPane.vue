@@ -26,8 +26,8 @@
         </template>
       </n-list-item>
     </n-list>
-    <n-button size="small" style="margin:5px;" @click="enterAddView">添加</n-button>
-    <n-button size="small" style="margin:5px;" @click="doReset()">重置</n-button>
+    <n-button size="small" style="margin:5px;"  @click="enterAddView">添加</n-button>
+    <n-button size="small" ghost type="error" style="margin:5px;" @click="doReset()">重置</n-button>
     <base-modal v-model:show="$reactive.view.funcEditActive"
                 :title="pair.flag?'修改占位符函数': '新增占位符函数'"
                 @cancel="$reactive.view.funcEditActive = false"
