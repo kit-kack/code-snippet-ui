@@ -40,6 +40,8 @@
 <script setup>
 import {CtrlStr} from "../../js/some";
 import {onMounted, onUnmounted} from "vue";
+import _ from "lodash";
+import {$normal} from "../../js/store";
 
 const props = defineProps({
   'show': Boolean,
@@ -48,7 +50,12 @@ const props = defineProps({
   'title': String
 })
 const emit = defineEmits(['update:show','cancel','confirm'])
-
+const down = _.throttle(()=>{
+  utools.simulateKeyboardTap('down')
+},120);
+const up = _.throttle(()=>{
+  utools.simulateKeyboardTap('up')
+},120)
 if(!props.raw){
   const keyDownHandler = (e)=>{
     if(e.ctrlKey){
@@ -57,6 +64,16 @@ if(!props.raw){
       }else if(e.code === 'KeyS'){
         emit('confirm')
         e.preventDefault();
+      }else if(e.code === 'KeyJ'){
+        down();
+      }else if(e.code === 'KeyK'){
+        up();
+      }
+    }else if($normal.vimDirectFlag){
+      if(e.code === 'KeyJ'){
+        down();
+      }else if(e.code === 'KeyK'){
+        up();
       }
     }
   }

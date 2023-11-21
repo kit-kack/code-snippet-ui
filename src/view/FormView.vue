@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <n-form
         label-placement="left"
         label-width="auto"
@@ -61,9 +61,9 @@
                       Tab键行为：
                       <n-select
                           :options="tabOptions"
-                          :default-value="configManager.get('whatTabDo')??0"
+                          :default-value="configManager.get('default_tab')??0"
                           :theme-overrides="selectThemeOverrides"
-                          @update-value="v=> configManager.set('whatTabDo',v)"
+                          @update-value="v=> configManager.set('default_tab',v)"
                           style="width: 190px"
                       />
                     </n-space>
@@ -73,13 +73,13 @@
                           filterable
                           placeholder="选择默认语言"
                           :options="languages"
-                          :default-value="configManager.get('defaultLanguage')??'plaintext'"
+                          :default-value="configManager.get('default_language')??'plaintext'"
                           tag
-                          @update-value="v=> configManager.set('defaultLanguage',v)"
+                          @update-value="v=> configManager.set('default_language',v)"
                           :theme-overrides="selectThemeOverrides"
                       />
                     </n-space>
-                    <config-switch title="默认是否注册uTools关键字" config="defaultUtoolFeatureEnable"/>
+                    <config-switch title="默认是否注册uTools关键字" config="default_feature_on"/>
                   </n-popover>
                   <n-tooltip v-if="codeTemplate.type && codeTemplate.type.startsWith('x-')">
                     <template #trigger>
@@ -96,7 +96,7 @@
                         filterable
                         placeholder="选择代码类型"
                         :options="languages"
-                        :default-value="configManager.get('defaultLanguage')??'plaintext'"
+                        :default-value="configManager.get('default_language')??'plaintext'"
                         tag
                         :disabled="!properties.type"
                         @update:value="handleTypeChange()"
@@ -222,7 +222,7 @@ const placeholders = formProperties.placeholders;
 const edit = $reactive.currentMode === EDIT_VIEW;
 const codeTemplate = reactive(edit?{...toRaw($reactive.currentSnippet)} :{
   code: $normal.quickCode,
-  feature: configManager.get('defaultUtoolFeatureEnable')
+  feature: configManager.get('default_feature_on')
 })
 const tags = computed(()=>{
   return tagColorManager.all().map(v=>{
@@ -353,7 +353,7 @@ const handleUpdate = ()=>{
           }
         }
         if(codeTemplate.type === undefined){
-          codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
+          codeTemplate.type = configManager.get('default_language')?? 'plaintext';
         }
         if(edit){
           if(codeTemplate.id === $normal.lastQueryCodeSnippetId){
@@ -422,7 +422,7 @@ onUnmounted(()=>{
 const handleKeyDown = (e)=>{
   if(e.code === 'Tab'){
     let char;
-    switch (configManager.get('whatTabDo')){
+    switch (configManager.get('default_tab')){
       case 1:
         char = '\t';
         break;
@@ -477,7 +477,7 @@ const importLocalFile = ()=>{
     // 解析类型
     const index = path.lastIndexOf('.');
     if(index === -1){
-      codeTemplate.type = configManager.get('defaultLanguage')?? 'plaintext';
+      codeTemplate.type = configManager.get('default_language')?? 'plaintext';
     }else{
       codeTemplate.type = fullAlias(path.slice(index +1).toLowerCase())
     }
@@ -505,7 +505,7 @@ function setAsNormalDir() {
 }
 function setAsCustomDir(){
   codeTemplate.dir = true;
-  codeTemplate.ref = "vscode";
+  codeTemplate.ref = "new-maven";
 }
 function handleSetUrlAsPath(){
   if(url.value && isNetWorkUri(url.value)){

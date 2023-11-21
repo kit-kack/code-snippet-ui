@@ -10,14 +10,13 @@
 
 <script setup>
 import hljs from "./js/dep/highlight-dep";
-import {initTheme, theme, themeOverrides} from "./js/theme";
+import {theme, themeOverrides} from "./js/theme";
 import {onMounted} from "vue";
 import MiddleView from "./view/MiddleView.vue";
 
 
 onMounted(()=>{
   document.body.id = utools.isDarkColors()? 'dark-app' : 'light-app'
-  initTheme()
 })
 
 </script>

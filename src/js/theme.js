@@ -1,107 +1,15 @@
 import {darkTheme} from "naive-ui";
 import {ref} from "vue";
 import {configManager} from "./core/config";
-import {refreshListView} from "./store";
+import {$normal} from "./store";
 
 const theme = utools.isDarkColors()? darkTheme:null;
 
 
 
-/**
- *
- * @return { import('naive-ui').GlobalThemeOverrides }
- */
-function getThemeOverrides(){
-    configManager.init();
-    const gc = configManager.getGlobalColor();
-    const borderHover = `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
-    const border = `1px solid ${gc}`
-    const textOrCaretColorVar =  utools.isDarkColors()? 'white': '#4b4e51';
-    const inputBorderVar =  `1px solid ${utools.isDarkColors()? '#303133': '#e0e0e6'}`;
-
-    const lightBoxShadowFoucsAndActive = `0 2px 9px 0 rgba(100,100,111,.2)`
-    const borderFoucs =  `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
-
-    return {
-        Switch:{
-            railColorActive: gc
-        },
-        Tooltip:{
-            color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
-            textColor: utools.isDarkColors()? '#fafafc':'#2a2a2c'
-        },
-        Tag:{
-            colorChecked: gc,
-            colorCheckedHover: gc,
-            colorCheckedPressed:gc,
-            border: utools.isDarkColors()? undefined:'none'
-        },
-        Input:{
-            borderFocus: borderFoucs,
-            boxShadowFocus: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
-            borderHover: borderHover,
-            border: inputBorderVar,
-            caretColor: textOrCaretColorVar,
-        },
-        Select:{
-            peers:{
-                InternalSelection:{
-                    textColor: textOrCaretColorVar,
-                    border: inputBorderVar,
-                    borderHover: borderHover,
-                    borderFocus: borderHover,
-                    borderActive: borderHover,
-                    boxShadowFocus: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
-                    boxShadowActive: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
-                    clearColorHover: 'none',
-                    caretColor: textOrCaretColorVar,
-                    colorFocus: 'white',
-                    colorActive: utools.isDarkColors()? '#575859': '#fff'
-                },
-                Popover:{
-                    boxShadow: '0 0 0 2px red',
-                    color: 'red',
-                    textColor: 'red'
-                },
-                InternalSelectMenu:{
-                    optionCheckColor: gc,
-                    optionTextColorActive: gc,
-                    optionTextColorPressed: gc,
-                    height: '200px'
-                }
-            }
-        },
-        Button:{
-            borderHover: border,
-            borderFocus: border,
-            borderPressed: border,
-            textColorPressed: utools.isDarkColors()? 'white': 'black',
-            textColorHover: gc,
-            textColorFocus: gc
-        },
-        Tabs:{
-            tabTextColorHoverLine: gc,
-            tabTextColorActiveLine: gc,
-            tabTextColorActiveBar: gc,
-            tabTextColorHoverBar: gc,
-            barColor: gc
-        },
-        DynamicTags:{
-            peers:{
-                Tag:{
-                    textColor: gc
-                }
-            }
-        }
-    }
-}
 
 
 
-const themeOverrides = ref(getThemeOverrides())
-const globalThemeRefresh = ()=>{
-    themeOverrides.value = getThemeOverrides()
-}
 
 const colorSchemaStyleOptions = [
     {
@@ -188,47 +96,107 @@ const darkColorSchemaStyleOptions = [
     // }
     ];
 
-function initTheme(){
-    let flag = false;
-    if(configManager.get('darkHighlightColor') === undefined){
-        configManager.configs["darkHighlightColor"] = darkColorSchemaStyleOptions[0].highColor
-        configManager.configs["lightHighlightColor"]  = colorSchemaStyleOptions[0].highColor;
-        configManager.writeToDB()
-        flag = true;
-    }
-    if(configManager.get("colorSchema") === undefined){
-        configManager.configs["colorSchema"] = 0
-        configManager.configs["darkColorSchema"] = 0
-        configManager.configs["lightGlobalColor"] = colorSchemaStyleOptions[0].globalColor
-        configManager.configs["darkGlobalColor"] = darkColorSchemaStyleOptions[0].globalColor
-        configManager.configs["lightTagColor"] = colorSchemaStyleOptions[0].tagColor
-        configManager.configs["darkTagColor"] = darkColorSchemaStyleOptions[0].tagColor
-        configManager.configs["lightSelectedColor"] = colorSchemaStyleOptions[0].selectedColor
-        configManager.configs["darkSelectedColor"] = darkColorSchemaStyleOptions[0].selectedColor
-        configManager.writeToDB()
-        flag = true;
-    }
-    if(flag){
-        globalThemeRefresh()
-        refreshListView();
-    }
-}
-
 function adjustTheme(v){
-    let style = utools.isDarkColors()? darkColorSchemaStyleOptions[v]: colorSchemaStyleOptions[v];
-    configManager.setGlobalColor(style.globalColor)
-    configManager.setColor('TagColor',style.tagColor)
-    configManager.setColor('SelectedColor',style.selectedColor)
-    configManager.setColor('HighlightColor',style.highColor)
+    $normal.theme = utools.isDarkColors()? darkColorSchemaStyleOptions[v]: colorSchemaStyleOptions[v];
 }
+/**
+ *
+ * @return { import('naive-ui').GlobalThemeOverrides }
+ */
+function getThemeOverrides(){
+    configManager.init();
+    const gc = $normal.theme.globalColor;
+    const borderHover = `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
+    const border = `1px solid ${gc}`
+    const textOrCaretColorVar =  utools.isDarkColors()? 'white': '#4b4e51';
+    const inputBorderVar =  `1px solid ${utools.isDarkColors()? '#303133': '#e0e0e6'}`;
 
+    const lightBoxShadowFoucsAndActive = `0 2px 9px 0 rgba(100,100,111,.2)`
+    const borderFoucs =  `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
+
+    return {
+        Switch:{
+            railColorActive: gc
+        },
+        Tooltip:{
+            color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
+            textColor: utools.isDarkColors()? '#fafafc':'#2a2a2c'
+        },
+        Tag:{
+            colorChecked: gc,
+            colorCheckedHover: gc,
+            colorCheckedPressed:gc,
+            border: utools.isDarkColors()? undefined:'none'
+        },
+        Input:{
+            borderFocus: borderFoucs,
+            boxShadowFocus: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
+            borderHover: borderHover,
+            border: inputBorderVar,
+            caretColor: textOrCaretColorVar,
+        },
+        Select:{
+            peers:{
+                InternalSelection:{
+                    textColor: textOrCaretColorVar,
+                    border: inputBorderVar,
+                    borderHover: borderHover,
+                    borderFocus: borderHover,
+                    borderActive: borderHover,
+                    boxShadowFocus: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
+                    boxShadowActive: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
+                    clearColorHover: 'none',
+                    caretColor: textOrCaretColorVar,
+                    colorFocus: 'white',
+                    colorActive: utools.isDarkColors()? '#575859': '#fff'
+                },
+                Popover:{
+                    boxShadow: '0 0 0 2px red',
+                    color: 'red',
+                    textColor: 'red'
+                },
+                InternalSelectMenu:{
+                    optionCheckColor: gc,
+                    optionTextColorActive: gc,
+                    optionTextColorPressed: gc,
+                    height: '200px'
+                }
+            }
+        },
+        Button:{
+            borderHover: border,
+            borderFocus: border,
+            borderPressed: border,
+            textColorPressed: utools.isDarkColors()? 'white': 'black',
+            textColorHover: gc,
+            textColorFocus: gc
+        },
+        Tabs:{
+            tabTextColorHoverLine: gc,
+            tabTextColorActiveLine: gc,
+            tabTextColorActiveBar: gc,
+            tabTextColorHoverBar: gc,
+            barColor: gc
+        },
+        DynamicTags:{
+            peers:{
+                Tag:{
+                    textColor: gc
+                }
+            }
+        }
+    }
+}
+const themeOverrides = ref(getThemeOverrides())
+const globalThemeRefresh = ()=>{
+    themeOverrides.value = getThemeOverrides()
+}
 
 export {
     theme,
     themeOverrides,
     globalThemeRefresh,
     adjustTheme,
-    initTheme,
     colorSchemaStyleOptions,
     darkColorSchemaStyleOptions
 }

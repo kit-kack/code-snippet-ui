@@ -1,16 +1,16 @@
 <template>
   <div  id="code-view" class="kit-top">
+<!--    :x-scrollable="!pair.renderable || !$reactive.view.isRendering"-->
     <n-scrollbar
         style="max-height:calc(100vh - 15px)"
-        :x-scrollable="!pair.renderable || !$reactive.view.isRendering"
-        trigger="none" ref="scrollBar">
+        trigger="none" ref="verticalScroller">
       <template v-if="refreshFlag">
         <template v-if="pair.renderable && $reactive.view.isRendering">
           <template v-if="pair.type === 'image'">
             <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 100vw;">
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
-            <v-md-preview :beforeChange="beforeChangeFunc" @change="whenRender" :text="$reactive.currentCode" ></v-md-preview>
+            <markdown-view/>
           </template>
           <template v-else>
             未知渲染类型
@@ -18,19 +18,21 @@
         </template>
         <template v-else>
           <div class="hljs-container" v-code>
-            <template v-if="pair.valid">
-              <highlightjs :language="pair.type" :autodetect="false" :code="pair.code" width="100%"/>
-            </template>
-            <template v-else>
-              <highlightjs language="plaintext" :autodetect="false" :code="pair.code" width="100%"/>
-            </template>
+            <n-scrollbar  x-scrollable :ref="(el)=> $normal.scroll.codeHorizontalInvoker = el">
+              <template v-if="pair.valid">
+                <highlightjs :language="pair.type" :autodetect="false" :code="pair.code" width="100%"/>
+              </template>
+              <template v-else>
+                <highlightjs language="plaintext" :autodetect="false" :code="pair.code" width="100%"/>
+              </template>
+            </n-scrollbar>
             <div class="hljs-line-container">
               <template v-for="(section,sindex) in snippet.sections">
                 <div class="hljs-line-item"
                      v-for="(line,lindex) in section_generate(section)"
                      :style="{
                        color: configManager.getGlobalColor(),
-                        backgroundColor:configManager.getColor('HighlightColor'),
+                        backgroundColor:$normal.theme.highColor,
                    top: (22*line-22)+'px'}">{{lindex === 0? (sindex <9? getNumShow(sindex): ''):''}}</div>
               </template>
             </div>
@@ -62,14 +64,14 @@
             <n-button
                 @mouseenter="hover = true"
                 @mouseleave="hover = false"
-                quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]' }}</n-button>
+                quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]'}}</n-button>
           </template>
           <n-list hoverable clickable :show-divider="false" @mouseenter="hover = true" @mouseleave="hover = false">
             <n-list-item >
               <div align="center">{{snippet.name}}</div>
             </n-list-item>
-            <n-list-item  v-if="snippet.desc != null">
-              <div>{{"📢 "+snippet.desc}}</div>
+            <n-list-item>
+              <div>{{"📢 "+(snippet.desc??'暂无描述~')}}</div>
             </n-list-item >
             <n-list-item >
               <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0} 📃${pair.count}字 ${snippet.sections?.length > 0 ? '⚑×'+snippet.sections.length:''}`}}</div>
@@ -103,15 +105,16 @@
 
 <script setup>
 import {configManager} from "../js/core/config";
-import {computed, nextTick, onMounted, onUnmounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
 import {calculateTime, getRefreshFunc, isNetWorkUri, renderFormatBlock} from "../js/utils/common";
 import {$normal, $reactive, LIST_VIEW} from "../js/store";
 import NormalTag from "../components/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
+import MarkdownView from "../components/item/MarkdownView.vue";
 
-const scrollBar = ref(null)
+const verticalScroller = ref(null)
 /**
  * @type CodeSnippet
  */
@@ -132,8 +135,7 @@ const pair = computed(()=>{
   if($reactive.currentCode){
     result.count = $reactive.currentCode.length;
     if($reactive.currentCode.length > 100000){
-      $message.info("代码长度超限，只会显示前100000个字符")
-      result.code = $reactive.currentCode.slice(0,100000)
+      result.code = $reactive.currentCode.slice(0,100000)+'\n由于性能限制，最多可显示100000个字符（放心，不会影响复制粘贴），后续'+(result.count - 100000)+'个字符被省略显示...'
     }else{
       result.code = $reactive.currentCode;
     }
@@ -146,7 +148,7 @@ const pair = computed(()=>{
 
 const doRefresh = getRefreshFunc(refreshFlag,()=>{
   // 滚动条重新绑定
-  $normal.scroll.codeInvoker = scrollBar.value;
+  $normal.scroll.codeVerticalInvoker = verticalScroller.value;
 })
 function getCode(){
   if(snippet.path){
@@ -203,83 +205,13 @@ const handleClose = ()=>{
 function getNumShow(num){
   return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
 }
-const handleClickUrl = (e)=>{
-  const a = e.target.closest('.github-markdown-body a')
-  if(a){
-    console.dir(a)
-    if(a.dataset['vMdAnchor']){
-      // const heading = document.querySelector('.github-markdown-body').querySelector()
-      const heading = document.querySelector(`.github-markdown-body [data-v-md-heading=${a.dataset['vMdAnchor']}]`)
-      if(heading){
-        $normal.scroll.codeInvoker?.scrollTo({
-          top: heading.getBoundingClientRect().y - 100,
-          behavior: 'smooth'
-        })
-      }
-    }else if(a.href && (e.ctrlKey || e.metaKey)){
-      e.preventDefault();
-      utools.shellOpenExternal(a.href)
-    }
-  }
-}
 
-let cachedImageUrls = null;
-let count = -1;
-/**
- * 实现渲染本地相对图片
- * @param {string} text
- * @param {(string)=> void} next
- */
-const beforeChangeFunc = (text,next) =>{
-  count = -1;
-  if(snippet.path && !isNetWorkPath) {
-    cachedImageUrls = new Map();
-    const localDir = window.preload.getDirname(snippet.path)
-    text = text.replace(/!\[(.*?)]\((.*?)\)/g, (match, name, url) => {
-      count ++;
-      if(url){
-        if(url.startsWith('http://') || url.startsWith('https://')){
-          return match
-        }else if(url.startsWith('./') || url.startsWith('../')){
-          // 本地相对路径
-          cachedImageUrls.set(count,window.preload.getFinalPath(localDir, url))
-          // const abs = window.preload.encodeBase64(window.preload.getFinalPath(localDir, url))
-          // return `<a href="https://file:::${abs}">${name}[本地图片需要预览显示]</a>`
-        }else{
-          // 本地绝对路径
-          cachedImageUrls.set(count,url);
-        }
-      }
-      return match
-    })
-    text = text.replace(/^\[TOC\]$/gm,"[[TOC]]")
-  }else{
-      cachedImageUrls = null;
-  }
-  next(text)
-}
-/**
- * 实现渲染本地相对图片
- *
- */
-function whenRender(text,html){
-  if(count === -1){
-    return
-  }
-  nextTick(()=>{
-    document.querySelectorAll('.github-markdown-body img').forEach((value,index)=>{
-      value.parentElement.style.textAlign = 'center'
-      if(cachedImageUrls && cachedImageUrls.has(index)){
-        value.src = cachedImageUrls.get(index)
-      }
-    })
-  })
 
-}
+
 
 onMounted(()=>{
     // $normal.updateCacheCodeFunc = updateCachedCode
-    $normal.scroll.codeInvoker = scrollBar.value;
+    $normal.scroll.codeVerticalInvoker = verticalScroller.value;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
       renderFormatBlock(pair.value.renderable && $reactive.view.isRendering)
       watch(()=>$reactive.view.isRendering,(newValue)=>{
@@ -289,11 +221,8 @@ onMounted(()=>{
         immediate:true
       })
     }
-    document.addEventListener('click',handleClickUrl)
 })
-onUnmounted(()=>{
-  document.removeEventListener('click',handleClickUrl)
-})
+
 
 
 </script>
@@ -301,11 +230,12 @@ onUnmounted(()=>{
 <style >
 #code-view{
   position: relative;
+  height: calc(100vh - 15px);
+}
+#light-app #code-view{
+  background-color: white;
 }
 
-#dark-app .github-markdown-body div[class*=v-md-pre-wrapper-]{
-  background-color: #242425;
-}
 #extra{
   position: fixed;
   right:20px;
@@ -396,70 +326,5 @@ onUnmounted(()=>{
   text-align: center;
   z-index: 2;
 }
-.github-markdown-body h1{
-  text-align: center;
-  border-bottom-color: transparent;
-}
 
-.github-markdown-body img{
-  background-color: transparent;
-}
-
-#dark-app .v-md-editor {
-  background-color: transparent !important;
-}
-#dark-app .v-md-editor.v-md-editor--edit {
-  background-color: transparent;
-}
-#dark-app .v-md-editor__toolbar {
-  background-color: transparent;
-  color: #ddd;
-}
-#dark-app .v-md-textarea-editor textarea{
-  background-color: transparent;
-  color: #ddd !important;
-}
-.github-markdown-body{
-  background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
-  background-size: 20px 20px;
-  background-position: 50%;
-}
-#dark-app .github-markdown-body  {
-  background-image: linear-gradient(90deg, rgba(145, 142, 142, 0.04) 3%, transparent 0), linear-gradient(1turn, rgba(201, 194, 197, 0.04) 3%, transparent 0);
-  color: #ccc !important;
-}
-#dark-app .github-markdown-body table{
-  background-color: #313134;
-}
-#dark-app .github-markdown-body table thead  tr{
-  background-color: #313134;
-}
-#dark-app .github-markdown-body table tr{
-  background-color: #353539;
-  border-top-color: #313134;
-}
-#dark-app .github-markdown-body table tr:nth-child(2n){
-  background-color: #313134;
-}
-#dark-app .github-markdown-body table td, #dark-app .github-markdown-body table th{
-  border-color: #444 !important;
-}
-#dark-app .github-markdown-body blockquote{
-  border-left-color: #515154;
-}
-#dark-app .github-markdown-body h2, #dark-app .github-markdown-body h1{
-  border-bottom-color: #515154;
-}
-#dark-app .github-markdown-body code:not(pre) {
-  background-color: #414141;
-}
-#dark-app .github-markdown-body pre code {
-  background-color: unset;
-}
-#dark-app .github-markdown-body a {
-  color: #1c84f9;
-}
-#dark-app .github-markdown-body pre.v-md-mermaid{
-  background-color: #cccccc;
-}
 </style>

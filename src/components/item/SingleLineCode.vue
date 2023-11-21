@@ -1,6 +1,6 @@
 <template>
-  <n-ellipsis style="max-width: 98%" :tooltip="false" >
-    <template v-if="configManager.get('rawLineCode')">
+  <n-ellipsis style="width: 100%" :tooltip="false" class="item-code" >
+    <template v-if="configManager.get('strategy_item_code_raw')">
       <span  :style="getCodeStyle()">{{handleCode(code)}}</span>
     </template>
     <template v-else>

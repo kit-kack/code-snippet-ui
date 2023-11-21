@@ -1,59 +1,55 @@
 // 计算最长公共子序列
 import {configManager} from "../core/config";
 
-export function fuzzyCompare(query, target) {
-    let m = query.length, n = target.length;
-    const dp = Array.from(Array(m+1),()=> Array(n+1).fill(0));
-    /*    j  target
-       i  0   1
-   query  2   X
+const chineseRegex=/[\u4E00-\u9FA5]/
 
-     */
-    const path = Array.from(Array(m+1),()=> Array(n+1).fill(0));
-
-    for (let i = 1; i <= m; i++) {
-        for (let j = 1; j <= n; j++) {
-            if (query[i - 1] === target[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-                path[i][j] = 0;
-            } else {
-                if(dp[i -1][j] > dp[i][j-1]){
-                    dp[i][j] = dp[i -1][j]
-                    path[i][j] = 1
-                }else{
-                    dp[i][j] = dp[i][j -1]
-                    path[i][j] = 2
+/**
+ *
+ * @param {string} query - 已经小写化
+ * @param {string} target - 已经小写化
+ * @param {boolean} [chineseMatchDisabled] - 禁用中文匹配
+ */
+export function advancedFuzzyCompare(query,target,chineseMatchDisabled){
+    if(query.length > target.length){
+        return null;
+    }
+    const q_max = query.length;
+    const t_max = target.length;
+    const offset_result = [];
+    let q_index = 0;
+    let t_index = 0;
+    while (q_index < q_max){
+        const q = query[q_index];
+        const isChinese = chineseRegex.test(q)
+        while (t_index < t_max){
+            const t = target[t_index]
+            if(chineseMatchDisabled || isChinese){
+                if(q === t){
+                    offset_result.push(t_index);
+                    // break
+                    break
+                }
+            }else{
+                if(window.pinyinUtil.getFirstLetter(t,true).findIndex(item => item.toLowerCase() === q) !== -1){
+                    offset_result.push(t_index);
+                    // break
+                    break
                 }
             }
+            t_index++;
         }
-    }
-    // 先比较是否匹配
-    if(dp[m][n] === query.length){
-        const offsets = [];
-        // 进行回溯
-        let i = m;
-        let j = n;
-        while (i>0 && j>0){
-            switch (path[i][j]){
-                case 0:
-                    offsets.unshift(j-1)
-                    i--;
-                    j--;
-                    break
-                case 1:
-                    i--;
-                    break
-                case 2:
-                    j--;
-                    break
-            }
+        if(t_index >= t_max){
+            // target 遍历完成
+            break;
+        }else{
+            t_index++;
         }
-
-        // 开始字符串拼凑
-        return offsets
+        q_index++;
     }
-    // 没有全匹配
-    return null
+    if(offset_result.length === 0 || q_index < q_max){
+        return null
+    }
+    return offset_result;
 }
 
 /**
@@ -69,7 +65,7 @@ export function match(query,target){
     if(temp.includes(query)){
         return target.replace(new RegExp(query,"i"),`${prefix}$&</span>`);
     }else{
-        const offsets = fuzzyCompare(query,temp);
+        const offsets = advancedFuzzyCompare(query,temp);
         if(offsets){
             // 拆分替换
             const charArray = target.split('')

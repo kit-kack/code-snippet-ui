@@ -17,7 +17,7 @@
       <!-- 置顶 圆心 -->
       <div class="snippet-item__top"
            :style="{
-              backgroundColor: (isTop || snippet.help)? configManager.getGlobalColor(): ''
+              backgroundColor: (props.snippet.index !== undefined)? configManager.getGlobalColor(): ''
            }"
       ></div>
       <!-- 右侧 序号 -->
@@ -28,15 +28,16 @@
             <n-ellipsis >
               <!-- 标题 -->
               <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
-              <n-tag size="small" style="height: 14px;margin-left: 10px" round strong :bordered="false" type="warning" v-if="snippet.dir">目录</n-tag>
               <!-- 本地&网络 -->
-              <span class="snippet-item__desc" v-if="configManager.get('noItemCodeShow')" style="margin-left: 10px;" >{{pair.code}}</span>
-              <!-- 描述（标题右侧） -->
-              <span class="snippet-item__desc" style="margin-left: 10px;" v-if="!configManager.get('noItemCodeShow')">{{snippet.desc}}</span>
-              <!-- 子代码片段 -->
-              <span class="snippet-item__desc"  style="margin-left: 10px;" v-if="configManager.get('noItemCodeShow')">
-                {{sideInfo}}
-              </span>
+              <span class="snippet-item__desc" style="margin-left: 10px;" >{{pair.desc}}</span>
+              <template v-if="configManager.get('strategy_item_code_show') > 0 ">
+                <!-- 描述（标题右侧） -->
+                <span class="snippet-item__desc" style="margin-left: 10px;">{{snippet.desc}}</span>
+              </template>
+              <template v-else>
+                <!-- 子代码片段 -->
+                <span class="snippet-item__desc"  style="margin-left: 10px;">{{sideInfo}}</span>
+              </template>
             </n-ellipsis>
           </div>
         </n-scrollbar>
@@ -52,27 +53,30 @@
         </n-scrollbar>
       </template>
 
-      <!-- 描述（标题下方） -->
-      <template v-if="configManager.get('noItemCodeShow')">
-        <n-ellipsis :tooltip="false">
-          <span class="snippet-item__desc" style="margin-left: 6px">{{snippet.desc}}</span>
-        </n-ellipsis>
-      </template>
-      <!-- 代码 -->
-      <template v-else>
-        <template v-if="configManager.get('fullItemCodeShow')">
+      <template v-if="configManager.get('strategy_item_code_show') > 0">
+        <!-- 代码 -->
+        <template v-if="configManager.get('strategy_item_code_show') > 1">
           <multi-line-code :type="pair.type" :code="pair.code" :active="$index === index"/>
         </template>
         <template v-else>
           <single-line-code :type="pair.type" :code="pair.code"/>
         </template>
         <!-- 子代码片段 -->
-        <span  class="snippet-item-info sub-item-code" style="left: 0px;z-index: 20;" >
+        <span  class="snippet-item-info sub-item-code" style="left: 0;z-index: 20;" >
               {{sideInfo}}
         </span>
       </template>
+      <template v-else>
+        <!-- 描述（标题下方） -->
+        <n-ellipsis :tooltip="false">
+          <span class="snippet-item__desc" style="margin-left: 6px">{{snippet.desc}}</span>
+        </n-ellipsis>
+      </template>
+
+
       <!-- 右侧下方 （语言类型|使用次数|上次使用时间） -->
       <span  class="snippet-item-info" style="  transform-origin: 100% 0;right:0;margin-right:3px;color:#777">
+        <n-tag size="small" style="height: 14px;margin-left: 10px" round strong :bordered="false" type="warning" v-if="snippet.dir">目录</n-tag>
               {{snippet.dir? '':(snippet.type?? 'plaintext')}}
       </span>
     </n-card>
@@ -104,7 +108,7 @@
             <selectable-button :disabled="!GLOBAL_HIERARCHY.currentConfig?.remove" :mid="440" lite type="error" tip="删除" :index="3" @invoke="$reactive.view.isDel = true;$reactive.utools.subItemSelectedIndex=1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <template v-if="isTop">
+            <template v-if="props.snippet.index !== undefined">
               <selectable-button :mid="485" lite  type="primary"  color="#9b59b6" :index="4" tip="取消置顶" @invoke="handleCancelTop">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 11.174l.874-.998a.5.5 0 0 1 .752.658l-1.75 2a.5.5 0 0 1-.752 0l-1.75-2a.5.5 0 1 1 .752-.658l.874.998V7.495a.5.5 0 0 1 1 0v3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-5.5V7.495a1.5 1.5 0 1 0-3 0V9H3v5z" fill="currentColor"></path></g></svg>
               </selectable-button>
@@ -114,6 +118,16 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 8.826l.874.998a.5.5 0 0 0 .752-.658l-1.75-2a.5.5 0 0 0-.752 0l-1.75 2a.5.5 0 0 0 .752.658l.874-.998v3.679a.5.5 0 0 0 1 0v-3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-3.834a1.495 1.495 0 0 0-.287-.493l-1.75-2a1.5 1.5 0 0 0-2.258 0l-1.75 2c-.13.15-.226.317-.287.493H3v5z" fill="currentColor"></path></g></svg>
               </selectable-button>
             </template>
+<!--            <template v-if="snippet.feature">-->
+<!--              <selectable-button :mid="485" lite  type="primary"  color="#ff85c0" :index="5" tip="取消注册关键字">-->
+<!--                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778z" fill="currentColor"></path></g></svg>-->
+<!--              </selectable-button>-->
+<!--            </template>-->
+<!--            <template v-else>-->
+<!--              <selectable-button :mid="485" lite  type="primary"  color="#ff85c0" :index="5" tip="注册关键字">-->
+<!--                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778zm1.21.937L9.74 8.614a1.35 1.35 0 0 1-1.016.739l-5.05.734l3.654 3.562c.318.31.463.757.388 1.195l-.862 5.029l4.516-2.375a1.35 1.35 0 0 1 1.257 0l4.516 2.375l-.862-5.03a1.35 1.35 0 0 1 .388-1.194l3.654-3.562l-5.05-.734a1.35 1.35 0 0 1-1.016-.739L11.998 4.04z" fill="currentColor"></path></g></svg>-->
+<!--              </selectable-button>-->
+<!--            </template>-->
           </n-space>
         </div>
       </template>
@@ -122,16 +136,16 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {configManager} from "../js/core/config";
 import SelectableButton from "./SelectableButton.vue";
-import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshListView} from "../js/store";
+import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshSearchResult} from "../js/store";
 import NormalTag from "./NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
 import {copyCode} from "../js/utils/copy";
-import {gotoTheLastPosition} from "../js/utils/scroller";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
+import {isNetWorkUri} from "../js/utils/common";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -143,41 +157,51 @@ const isShowBtn = computed(()=>{
   return !!(props.selected && $reactive.utools.subItemSelectedIndex > -1);
 })
 const isHover = ref(false)
-const isTop = props.snippet.index !== undefined;
 const pair = computed(()=>{
-  let code = props.snippet["link_desc"];
-  if(props.snippet.dir){
-    if(!code){
-      if(!configManager.get('noItemCodeShow')){
-        if(props.snippet.ref){
-          if(props.snippet.ref === "local"){
-            code = "[本地目录]: "+props.snippet.path;
-          }else{
-            code = "[自定义目录] ";
-          }
+
+  let code = props.snippet["link_desc"]
+  if(configManager.get('strategy_item_code_show') === 0){
+    let desc = code;
+    // show tag
+    if(props.snippet.dir){
+      if(props.snippet.ref){
+        if(props.snippet.ref === "local"){
+          desc = "本地"
         }else{
-          code = "[普通目录] ";
+          desc = "自定义";
         }
       }
+    }else if(props.snippet.path){
+      desc = isNetWorkUri(props.snippet.path) ? "网络": "本地"
     }
+    return {
+      desc: desc
+    }
+
   }else{
-    // file
-    if(configManager.get('noItemCodeShow')){
-      if(props.snippet.path){
-        if(!code){
-          code = '关联';
-        }
-      }
-    }else{
-      if(props.snippet.code){
-        return {
-          code: props.snippet.code,
-          type: props.snippet.type??'plaintext',
+    if(props.snippet.dir){
+      if(props.snippet.ref){
+        if(props.snippet.ref === "local"){
+          code = "[本地目录]: "+props.snippet.path;
+        }else{
+          code = "[自定义目录] ";
         }
       }else{
-        // code
-        if(!code){
-          code = '[关联文件]: '+props.snippet.path;
+        code = "[普通目录] ";
+      }
+    }else{
+      // file
+      code = props.snippet.code;
+      if(code){
+        return {
+          code: code,
+          type: props.snippet.type ?? 'plaintext'
+        }
+      }
+      if(props.snippet.path){
+        return {
+          code: '[关联文件]: '+props.snippet.path,
+          type: 'markdown'
         }
       }
     }
@@ -204,12 +228,12 @@ function getSideInfo(){
   return props.snippet.feature? '★':''
 }
 const getSelectedStyle =(selected,isHoverRef)=>{
-  let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'';
+  let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'backgroundColor: #fff';
   if(isHoverRef){
     style = utools.isDarkColors()? 'backgroundColor: #3a3a3c' : 'background-color: #eaeef2'
   }
   if(selected){
-    style = `background: ${configManager.getColor('SelectedColor')}`
+    style = `background: ${$normal.theme.selectedColor}`
     // 保存当前滚动距离
     if($reactive.utools.focused){
       return `border: 2px solid transparent !important; ${style};`
@@ -220,41 +244,6 @@ const getSelectedStyle =(selected,isHoverRef)=>{
   }
 }
 
-const handleAppHeight = ()=>{
-  if($reactive.view.fullScreenShow){
-    utools.setExpendHeight(545)
-  }else{
-    if($reactive.view.listViewRef == null){
-      utools.setExpendHeight(0)
-      $normal.recoverLiteHeight = 0;
-    }else{
-      let offset = $reactive.view.listViewRef?.offsetHeight;
-      if(offset == null){
-        utools.setExpendHeight(0)
-        $normal.recoverLiteHeight = 0;
-      }else if(offset > 535){
-        utools.setExpendHeight(545)
-        $normal.recoverLiteHeight = 545;
-      }else{
-        utools.setExpendHeight(offset+6)
-        $normal.recoverLiteHeight = offset+6;
-      }
-    }
-  }
-}
-onMounted(()=>{
-  // $normal.scroll.itemOffsetArray[props.index] = Math.trunc(item.value.getBoundingClientRect().y);
-  if(props.last){
-    handleAppHeight()
-    if($normal.keepSelectedStatus){
-      nextTick(()=>{
-        gotoTheLastPosition();
-      })
-    }
-    // 重置
-    $normal.keepSelectedStatus = false;
-  }
-})
 
 const handleDelete = ()=>{
   GLOBAL_HIERARCHY.remove(props.snippet)
@@ -324,7 +313,8 @@ const doEdit = ()=>{
 }
 const doItemRefresh = ()=>{
   $normal.keepSelectedStatus = true;
-  refreshListView(true)
+  // refreshListView(true)
+  refreshSearchResult();
 }
 
 </script>

@@ -6,17 +6,20 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
-import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW} from "./js/store";
+import {$index, $list, $normal, $reactive, CREATE_VIEW, LIST_VIEW} from "./js/store";
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/func";
 import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
+import _ from "lodash";
+import {init} from "./js/keyboard";
 // init
 configManager.init()
 tagColorManager.init()
 formatManager.init()
 codeSnippetManager.init()
+init($list)
 
 function bindApp(){
     const app = createApp(App)
@@ -88,6 +91,27 @@ utools.onPluginOut(processExit => {
     $reactive.view.backStageShow = true;
 })
 
+const handleUToolsTextChange =  _.debounce((text)=>{
+    if($reactive.view.backStageShow){
+        utools.showNotification("插件重新前台运行")
+        $reactive.view.backStageShow = false;
+        GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
+    }
+    text = text.trim();
+    if(text.length === 0){
+        $reactive.utools.search = null;
+    }else{
+        if($reactive.utools.search !== text){
+            $reactive.utools.search = text;
+            $normal.keepSelectedStatus = null;
+            // $normal.itemOffsetArray = [];
+            // fix: 修复删除界面不移除
+            $reactive.view.isDel = false;
+            $reactive.view.helpActive = false;
+            // refreshListView(true)
+        }
+    }
+},250)
 
 utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
@@ -104,34 +128,17 @@ utools.onPluginEnter((data)=>{
 
     console.log('Enter App ...')
     bindApp()
-    if(configManager.get('enabledLiteShow')){
-        $reactive.view.fullScreenShow = false;
-        if(configManager.get('noShowForEmptySearch')){
-            utools.setExpendHeight(0)
-        }
-    }else{
-        utools.setExpendHeight(545)
-    }
+    // TODO:处理
+    // if(configManager.get('enabledLiteShow')){
+    //     $reactive.view.fullScreenShow = false;
+    //     if(configManager.get('noShowForEmptySearch')){
+    //         utools.setExpendHeight(0)
+    //     }
+    // }else{
+    //     utools.setExpendHeight(545)
+    // }
     utools.setSubInput(({text}) =>{
-        if($reactive.view.backStageShow){
-            utools.showNotification("插件重新前台运行")
-            $reactive.view.backStageShow = false;
-            GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
-        }
-        text = text.trim();
-        if(text.length === 0){
-            $reactive.utools.search = null;
-        }else{
-            if($reactive.utools.search !== text){
-                $reactive.utools.search = text;
-                $normal.keepSelectedStatus = null;
-                // $normal.itemOffsetArray = [];
-                // fix: 修复删除界面不移除
-                $reactive.view.isDel = false;
-                $reactive.view.helpActive = false;
-                // refreshListView(true)
-            }
-        }
+        handleUToolsTextChange(text)
     },"搜索代码片段, 双击Tab切换UI模式")
     if(data.code==='code-snippet-save'){
         $normal.quickCode = data.payload;
@@ -158,7 +165,7 @@ try{
     utools.onMainPush(({code,type,payload})=>{
         let name = payload;
         let num = undefined;
-        if(configManager.get('allowSearchSubSnippet')){
+        if(configManager.get('beta_sub_snippet_search')){
             const index = payload.lastIndexOf('$')
             if(index !== -1){
                 name = payload.slice(0,index)

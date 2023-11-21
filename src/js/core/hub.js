@@ -186,9 +186,17 @@ export const hierachyHubManager = {
 export function deleteHub(prefix){
     // delete current
     const key  = HIERARCHY_PREFIX+prefix;
+    console.log('delete hub ['+key + ']')
     utools.db.remove(key)
-    // delete sub
+    // delete sub hub
     utools.db.allDocs(key+"/").forEach(doc =>{
+        utools.db.remove(doc._id)
+    })
+    // delete sub snippet
+    utools.db.allDocs('#code/'+prefix+"/").forEach(doc =>{
+        utools.db.remove(doc._id)
+    })
+    utools.db.allDocs('#code/'+prefix+"#").forEach(doc =>{
         utools.db.remove(doc._id)
     })
 }

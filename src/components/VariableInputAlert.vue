@@ -1,15 +1,23 @@
 <template>
   <base-modal :show="$reactive.view.variableActive"
-              title="输入变量"
+              :title="$reactive.currentSnippet.name"
               @cancel="doCancel"
               @confirm="doYes"
   >
-    <h5>tips: 按Tab键来上下切换</h5>
     <n-scrollbar style="max-height: 60vh">
       <div style="padding-right: 6px">
         <template v-for="(template,index) in templates">
           <p style="font-size: 13px;margin: 5px">{{template.label}}</p>
-          <n-input v-model:value="template.value" clearable placeholder="替换值"/>
+          <template v-if="template.type === 'input'">
+            <n-input v-model:value="template.value" clearable placeholder="输入值"/>
+          </template>
+          <template v-else>
+            <n-select v-model:value="template.value"
+                      :options="template.option"
+                      @focus="$normal.vimDirectFlag = true"
+                      @blur="$normal.vimDirectFlag = false"
+                      placeholder="选择或输入值"/>
+          </template>
         </template>
       </div>
     </n-scrollbar>
@@ -22,10 +30,47 @@ import {ref} from "vue";
 import {formatManager} from "../js/core/func";
 import BaseModal from "./base/BaseModal.vue";
 
-const templates = ref( $normal.variables.map(v =>{
-  return {
-    label: v,
-    value: $normal.defaultValues[v]
+const templates = ref( $normal.variables.map(en =>{
+  if(en[1] === 'input'){
+    return {
+      label: en[0],
+      value: $normal.defaultValues[en[0]],
+      type: en[1]
+    }
+  }else{
+    const array = $normal.defaultValues[en[0]]??[]
+    if(array.length === 0){
+      return {
+        label: en[0],
+        type: en[1]
+      }
+    }else{
+      let first = array[0];
+      const ind  = first.indexOf("||")
+      if(ind !== -1){
+        first = first.slice(0,ind)
+      }
+      return {
+        label: en[0],
+        type: en[1],
+        value: first,
+        option: array.map(item => {
+          const index = item.indexOf('||')
+          if(index === -1){
+            return {
+              value: item,
+              label: item
+            }
+          }
+          const value = item.slice(0,index);
+          return {
+            value: value,
+            label: value + "  （"+item.slice(index+2)+"）"
+          }
+        })
+      }
+    }
+
   }
 }))
 

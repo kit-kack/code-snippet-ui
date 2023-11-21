@@ -7,7 +7,9 @@ import {
     EDIT_VIEW,
     handleRecoverLiteShow,
     LIST_VIEW,
-    switchToFullUIMode
+    refreshSearchResult,
+    switchToFullUIMode,
+    utools_focus_or_blur
 } from "../store";
 import {DEFAULT_ROOT_HIERARCHY_CONFIG, rootHierachy} from "./h-root";
 import {localDirectoryHierarchy} from "./h-local-dir";
@@ -19,6 +21,9 @@ import {lowercaseIncludes} from "../utils/common";
 import {fullAlias} from "../utils/language";
 import {codeSnippetManager} from "../core/snippet";
 import {defaultHelpSnippet} from "../some";
+import {mavenHierarchy} from "./h-maven";
+import {newMavenHierarchy} from "./h-new-maven";
+import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
 
 export const GLOBAL_HIERARCHY = {
     currentHierarchy: rootHierachy,
@@ -46,6 +51,7 @@ export const GLOBAL_HIERARCHY = {
                 const result = $normal.hierarchy.path.pop();
                 if(result){
                     $index.value = result.index;
+                    doScrollForListView();
                 }
                 break
             case "next":
@@ -65,6 +71,8 @@ export const GLOBAL_HIERARCHY = {
                 $reactive.currentPrefix.push($reactive.currentSnippet.name)
                 // 改变index
                 $index.value = 0;
+                doScrollForListView();
+                doScrollForTopNav();
                 break
             case "custom":
                 const ind = index +1;
@@ -86,6 +94,11 @@ export const GLOBAL_HIERARCHY = {
                         this.currentHierarchy = vscodeHierarchy;
                         // custom ref
                         // TODO: 动态解析JS文件
+                    }else if(temp.value === "maven"){
+                        console.log("maven")
+                        this.currentHierarchy = mavenHierarchy;
+                    }else if(temp.value === "new-maven"){
+                        this.currentHierarchy = newMavenHierarchy;
                     }
                 }else{ // normal
                     // 保持不变
@@ -106,7 +119,10 @@ export const GLOBAL_HIERARCHY = {
         }
         hierachyHubManager.changeHub(this.currentPrefixStr)
         // config
-        this.currentConfig = this.currentHierarchy.getConfig(this.currentPrefixArray) ?? DEFAULT_ROOT_HIERARCHY_CONFIG;
+        this.currentConfig = this.currentHierarchy.getConfig?.(this.currentPrefixArray) ?? {};
+        // clear utools input
+        utools.setSubInputValue('')
+        utools_focus_or_blur(false)
     },
     /**
      * 改变视图
@@ -122,10 +138,8 @@ export const GLOBAL_HIERARCHY = {
                 handleRecoverLiteShow();
             })
             if(refresh){
-                $reactive.view.deepRefresh = false;
-                nextTick(()=>{
-                    $reactive.view.deepRefresh = true
-                })
+                // refreshListView();
+                refreshSearchResult();
             }
         }else{
             // check permit
@@ -149,16 +163,15 @@ export const GLOBAL_HIERARCHY = {
     /**
      *
      * @param {string} searchWord uTools子搜索框搜索内容
-     * @return {CodeSnippet[]}
      */
-    search(searchWord){
+    async search(searchWord){
         let result;
         $normal.subSnippetNum = undefined;
         let name = null;
         if(searchWord == null || searchWord.length === 0){
             $reactive.view.aidTagActive = false;
             $normal.tempTags = [];
-            result = this.currentHierarchy.search(this.currentPrefixArray,null)
+            result = await this.currentHierarchy.search(this.currentPrefixArray,null)
         }else{
             const words = searchWord.split(/\s/).filter(v=>v.length>=1)
             let type = null;
@@ -176,7 +189,7 @@ export const GLOBAL_HIERARCHY = {
                         tagFlag = true;
                     }
                 }else{
-                    if(configManager.get('allowSearchSubSnippet')){
+                    if(configManager.get('beta_sub_snippet_search')){
                         const index = word.lastIndexOf('$')
                         if(index !== -1){
                             name = word.slice(0,index)
@@ -189,9 +202,9 @@ export const GLOBAL_HIERARCHY = {
                     }
                 }
             }
-            $reactive.view.aidTagActive = (tagFlag && configManager.get('aidTagSelect'));
+            $reactive.view.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
             $normal.tempTags = tags;
-            result = this.currentHierarchy.search(this.currentPrefixArray,name?.toLowerCase())
+            result = await this.currentHierarchy.search(this.currentPrefixArray,name?.toLowerCase())
 
             if(result && result.snippets){
                 // tags
@@ -225,7 +238,7 @@ export const GLOBAL_HIERARCHY = {
         }else{
             array = [];
         }
-        if(!configManager.get('closeHelpSnippet')){
+        if(!configManager.get('readme_close')){
             array.unshift(defaultHelpSnippet)
         }
         // 判断 keepSelectedStatus ，如果为true，需要保留selectIndex位置
@@ -251,6 +264,8 @@ export const GLOBAL_HIERARCHY = {
 
         // 控制界面高度
         if(array.length === 0){
+            // utools.subInputFocus();
+            // $reactive.utools.focused = true;
             if(!$reactive.view.fullScreenShow){
                 utools.setExpendHeight($reactive.view.aidTagActive? 65:0)
             }
@@ -327,7 +342,12 @@ export const GLOBAL_HIERARCHY = {
         // 移除 hub数据
         if(snippet.dir){
             // 移除 整个hub
-            deleteHub(this.currentPrefixStr)
+            if(this.currentPrefixStr){
+                deleteHub(this.currentPrefixStr+'/'+snippet.name)
+            }else{
+                deleteHub(snippet.name)
+            }
+
         }else{
             hierachyHubManager.removeElement(snippet.id??snippet.name)
         }

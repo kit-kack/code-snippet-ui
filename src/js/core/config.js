@@ -1,7 +1,10 @@
 import {createOrUpdate} from "./base";
 import {defaultHelpSnippet} from "../some";
+import {adjustTheme} from "../theme";
+import {$normal} from "../store";
 
 const GLOBAL_CONFIG = "config"
+const NEW_GLOBAL_CONFIG = "conf"
 export const configManager = {
     configs: {},
     isInited: false,
@@ -9,30 +12,25 @@ export const configManager = {
         if(this.isInited){
             return;
         }
-        this.configs = utools.db.get(GLOBAL_CONFIG)?.data ?? {}
-        // if defaultColor existed, del it
-        if(this.configs['defaultColor']){
-            this.configs['lightTagColor'] = this.configs['defaultColor']
-            this.configs['darkTagColor'] = this.configs['defaultColor'];
-            delete this.configs['defaultColor']
-            this.writeToDB()
+        // TODO: 下版本移除
+        utools.db.remove(GLOBAL_CONFIG)
+        this.configs = utools.db.get(NEW_GLOBAL_CONFIG)?.data ?? {}
+        // init item code show
+        if(!"strategy_item_code_show" in this.configs){
+            this.configs["strategy_item_code_show"] = 0;
         }
-        // refactor: id
-        if(this.configs["topList"]){
-            delete this.configs["topList"]
-            this.writeToDB();
+        if(!"strategy_theme" in this.configs){
+            this.configs["strategy_theme"] = 0;
         }
-        console.log('configManager init')
-
+        // init theme
+        adjustTheme(this.configs["strategy_theme"])
         // show help snippet
         if(configManager.get('version') !== defaultHelpSnippet.version){
             configManager.set('version',defaultHelpSnippet.version)
-            configManager.set('closeHelpSnippet',false)
+            configManager.set('readme_close',false)
         }
+        console.log('configManager init')
         this.isInited = true;
-    },
-    writeToDB(){
-       createOrUpdate(GLOBAL_CONFIG,this.configs)
     },
     /**
      *
@@ -49,42 +47,13 @@ export const configManager = {
      */
     set(config,value){
         this.configs[config] = value;
-        this.writeToDB();
-    },
-    /**
-     *
-     * @param {'SelectedColor' | 'TagColor' | 'HighlightColor' } key
-     * @return {*|string}
-     */
-    getColor(key){
-        return this.configs[(utools.isDarkColors()? 'dark':'light')+key]?? '#707070FF';
-    },
-    /**
-     *
-     * @param {'SelectedColor' | 'TagColor' | 'HighlightColor' } key
-     * @param {String} value
-     */
-    setColor(key,value){
-        this.configs[(utools.isDarkColors()? 'dark':'light')+key] = value;
-        this.writeToDB();
+        createOrUpdate(NEW_GLOBAL_CONFIG,this.configs)
     },
     getGlobalColor(){
-        if(utools.isDarkColors()){
-            return this.configs["darkGlobalColor"]??'#F4B23CEB'; //'#b4a0ff';
-        }else{
-            return this.configs["lightGlobalColor"]?? '#18A058FF'; // #5c2d91
-        }
-    },
-    setGlobalColor(color){
-        if(utools.isDarkColors()){
-            this.configs["darkGlobalColor"] =color;
-        }else{
-            this.configs["lightGlobalColor"] =color;
-        }
-        this.writeToDB();
+        return $normal.theme.globalColor;
     },
     getSortKey(){
-        return this.configs["sortKey"]?? 0;
+        return this.configs["strategy_sort"]?? 0;
     }
 
 }

@@ -1,4 +1,5 @@
 import {$index, $normal} from "../store";
+import {configManager} from "../core/config";
 
 
 export const Direction = {
@@ -11,7 +12,7 @@ export const Direction = {
 }
 
 /**
- *
+ * 控制滚动条滚动
  * @param scrollBar
  * @param {number} direction
  * @param {boolean} fast
@@ -42,7 +43,7 @@ function _controlScrollBar(scrollBar,direction,fast){
  * 控制多行代码块滚动
  * @param {number} direction
  */
-export function doScrollForListView(direction){
+export function doScrollForMultiLineCode(direction){
     _controlScrollBar($normal.scroll.itemCodeInvoker,direction,false)
 }
 
@@ -52,7 +53,20 @@ export function doScrollForListView(direction){
  * @param {boolean} fast
  */
 export function doScrollForCodeView(direction,fast){
-    _controlScrollBar($normal.scroll.codeInvoker,direction,fast)
+    switch (direction){
+        case Direction.LEFT:
+        case Direction.RIGHT:
+            _controlScrollBar($normal.scroll.codeHorizontalInvoker,direction,fast)
+            break
+        case Direction.UP:
+        case Direction.DOWN:
+            _controlScrollBar($normal.scroll.codeVerticalInvoker,direction,fast)
+            break
+        default:
+            _controlScrollBar($normal.scroll.codeHorizontalInvoker,direction,fast)
+            _controlScrollBar($normal.scroll.codeVerticalInvoker,direction,fast)
+            break
+    }
 }
 
 /**
@@ -64,22 +78,14 @@ export function doScrollForHelpView(direction){
 }
 
 /**
- * @param {boolean} [smooth] - 平滑
- * @param {boolean} [up] - 向上
+ * 控制【TopNav】界面滚动
  */
-export const gotoTheLastPosition = (smooth,up)=>{
-    // 校准位置
-    if($index.value > -1 ){
-        const element = document.querySelector('#list-view #list-view-container .snippet-item:nth-child('+($index.value+1)+')')
-        let distance = 0;
-        if(element){
-            distance = Math.trunc(element.offsetTop) -220;
-        }
-        if(distance < 0){
-            distance = 0;
-        }
+export function doScrollForTopNav(){
+    $normal.scroll.hierarchyInvoker?.scrollBy?.({left: 100})
+}
 
-        $normal.scroll.listInvoker?.scrollTo({top:+distance,left:0,behavior:smooth?'smooth':'auto'})
-        // $var.scroll.listInvoker?.(distance)
-    }
+export function doScrollForListView(){
+    $normal.scroll.virtualScrollInvoker?.scrollToItem(
+        $index.value - ((configManager.get('strategy_item_code_show') === 2)?1: 3)
+    )
 }

@@ -1,6 +1,6 @@
 <template>
   <n-scrollbar style="max-height: 180px" x-scrollable trigger="hover" class="item-code" ref="itemCodeScrollBar">
-    <template v-if="configManager.get('rawLineCode')">
+    <template v-if="configManager.get('strategy_item_code_raw')">
       <pre :style="getCodeStyle()">{{code}}</pre>
     </template>
     <template v-else-if="pair.valid">

@@ -29,14 +29,24 @@ function getCode(path,noView){
 
 function copyOrPasteWithType(isPasted,text,type,msg,noView){
     if(type && type.length>2 && type.startsWith('x-')){
-        text = formatManager.parse(text);
+        formatManager.parse(text).then(t=>{
+            text = t;
+            lastCachedMsg = msg;
+            isLastPasted = isPasted;
+            if(text === null){
+                return true;
+            }
+            copyOrPaste(text,noView);
+        })
+    }else{
+        lastCachedMsg = msg;
+        isLastPasted = isPasted;
+        if(text === null){
+            return true;
+        }
+        copyOrPaste(text,noView);
     }
-    lastCachedMsg = msg;
-    isLastPasted = isPasted;
-    if(text === null){
-        return true;
-    }
-    copyOrPaste(text,noView);
+
 }
 
 /**

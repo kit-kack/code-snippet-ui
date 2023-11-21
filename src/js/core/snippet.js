@@ -1,15 +1,14 @@
-import {nanoid} from "nanoid";
 import {defaultHelpSnippet} from "../some";
 import {match} from "../utils/fuzzy";
 import {createOrUpdate, remove_utools_feature} from "./base";
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./func";
-import {convertValidFileSuffix, fullAlias} from "../utils/language";
-import {lowercaseIncludes} from "../utils/common";
+import {convertValidFileSuffix} from "../utils/language";
 import JSZip from "jszip";
 
 const CODE_PREFIX = "code/";
+const SUB_CODE_PREFIX = "#code/"
 const GLOBAL_FUNC = "func";
 export const codeSnippetManager = {
     // Code Snippet Map (key is its id)
@@ -41,7 +40,7 @@ export const codeSnippetManager = {
         }
         this.snippetKey = prefix;
         this.snippetMap = new Map();
-        for (const doc of utools.db.allDocs("/"+prefix + "/" +CODE_PREFIX)) {
+        for (const doc of utools.db.allDocs(SUB_CODE_PREFIX+prefix + "#" )) {
             const payload = doc.data;
             if(payload.count == null){
                 payload.count = 0;
@@ -70,14 +69,14 @@ export const codeSnippetManager = {
             $message.error("用户无法主动创建内置说明片段")
             return false;
         }
-        codeSnippet.id = nanoid();
+        codeSnippet.id = Date.now();
         codeSnippet.count = codeSnippet.count??0;
         codeSnippet.createTime = Date.now()
         codeSnippet.time = codeSnippet.time??codeSnippet.createTime;
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix);
             this.snippetMap.set(codeSnippet.id,codeSnippet);
-            createOrUpdate("/"+prefix+"/"+CODE_PREFIX+codeSnippet.id,codeSnippet)
+            createOrUpdate(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id,codeSnippet)
         }else{
             this.rootSnippetMap.set(codeSnippet.id,codeSnippet);
             createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
@@ -94,14 +93,14 @@ export const codeSnippetManager = {
      */
     del(id,prefix){
         if(id === defaultHelpSnippet.id){
-            configManager.set('closeHelpSnippet',true)
+            configManager.set('readme_close',true)
             return true;
         }
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix);
             const codeSnippet = this.snippetMap.get(id);
             if(codeSnippet){
-                utools.db.remove("/"+prefix+"/"+CODE_PREFIX+codeSnippet.id)
+                utools.db.remove(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id)
                 this.snippetMap.delete(id)
                 return true;
             }
@@ -153,7 +152,7 @@ export const codeSnippetManager = {
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix)
             if(this.snippetMap.has(codeSnippet.id)) {
-                createOrUpdate("/"+prefix+"/"+CODE_PREFIX+codeSnippet.id, codeSnippet)
+                createOrUpdate(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id, codeSnippet)
                 this.snippetMap.set(codeSnippet.id, codeSnippet)
                 this.addTagInfo(codeSnippet, true)
                 return true;

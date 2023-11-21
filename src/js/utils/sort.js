@@ -1,5 +1,6 @@
 import {configManager} from "../core/config";
 import {match} from "./fuzzy";
+import {$reactive} from "../store";
 
 /**
  * 根据属性产生对应的排序函数
@@ -30,13 +31,16 @@ const COUNT_COMPARE  = _compare("count");
 export function handleArrayForHierarchy(list,topList,sorted,highlighted,name){
     // 筛选出 置顶列表中的片段
     const topSnippets = [];
+    const now = $reactive.utools.search + '-' + Date.now();
     const needHighlight = name && !highlighted;
     if(topList && topList.length > 0){
         list = list.filter(snippet =>{
             if(needHighlight){
                 snippet.temp = match(name,snippet.name);
             }
-            const index = topList.indexOf(snippet.id ?? snippet.name);
+            const id = snippet.id ?? snippet.name;
+            snippet.now = now + '-' + id;
+            const index = topList.indexOf(id);
             if(index === -1){
                 snippet.index = undefined;
                 return true;
@@ -51,6 +55,7 @@ export function handleArrayForHierarchy(list,topList,sorted,highlighted,name){
             if(needHighlight){
                 snippet.temp = match(name,snippet.name);
             }
+            snippet.now = now + '-' + snippet.id + '-' + snippet.name;
             snippet.index = undefined;
         })
     }

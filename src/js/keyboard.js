@@ -7,38 +7,40 @@ import {
     CREATE_VIEW,
     EDIT_VIEW,
     LIST_VIEW,
-    refreshListView,
+    refreshListView, refreshSearchResult,
+    utools_focus_or_blur,
 } from "./store"
-import {debounce, isNetWorkUri} from "./utils/common";
+import {isNetWorkUri} from "./utils/common";
 import {
     Direction,
     doScrollForCodeView,
     doScrollForHelpView,
     doScrollForListView,
-    gotoTheLastPosition
+    doScrollForMultiLineCode
 } from "./utils/scroller";
 import {copyCode} from "./utils/copy";
 import {GLOBAL_HIERARCHY} from "./hierarchy/core";
+import _ from "lodash";
 
 // 控制长按键
 let longKeyDown = false;
 let lastTabTime = 0;  // 计算上次按下Tab时间
 
-const debMoveDown = debounce(function(){
+const debMoveDown = _.throttle(function(){
     $reactive.utools.subItemSelectedIndex = -1;
     // bug: $index变量有时修改不生效
     const old = $index.value;
     $index.value++;
     // console.log($reactive.core.selectedIndex)
-    gotoTheLastPosition(true);
-})
-const debMoveUp = debounce(function(){
+    doScrollForListView();
+},120)
+const debMoveUp = _.throttle(function(){
     $index.value--;
     $reactive.utools.subItemSelectedIndex = -1;
     // $var.scroll.listInvoker?.("up")
-    gotoTheLastPosition(true,true);
-},)
-const debItemMoveLeft = debounce(function(){
+    doScrollForListView()
+},120)
+const debItemMoveLeft = _.throttle(function(){
     if($reactive.view.isDel){
         $reactive.utools.subItemSelectedIndex = $reactive.utools.subItemSelectedIndex === 0? 1:0;
     }else{
@@ -48,8 +50,8 @@ const debItemMoveLeft = debounce(function(){
             $reactive.utools.subItemSelectedIndex --;
         }
     }
-})
-const debItemMoveRight = debounce(function(){
+},120)
+const debItemMoveRight = _.throttle(function(){
     if($reactive.view.isDel){
         $reactive.utools.subItemSelectedIndex = $reactive.utools.subItemSelectedIndex === 0? 1:0;
     }else{
@@ -59,7 +61,7 @@ const debItemMoveRight = debounce(function(){
             $reactive.utools.subItemSelectedIndex ++;
         }
     }
-})
+},120)
 
 function dealWithHelpViewOnly(e){
     switch (e.code){
@@ -101,8 +103,8 @@ function dealWithListView(e,list){
             // 校验是否有效
             if($index.value=== -1){
                 $message.error("没有可选择的元素")
-            }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                doScrollForListView(Direction.LEFT);
+            }else if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
+                doScrollForMultiLineCode(Direction.LEFT);
             }else{
                 debItemMoveLeft()
             }
@@ -112,11 +114,11 @@ function dealWithListView(e,list){
             if($reactive.view.isDel){
                 $reactive.view.isDel = false;
             }
-            if(e.shiftKey && configManager.get('fullItemCodeShow')){
+            if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
                 if ($index.value === -1) { // -1 >= 0-1
                     $message.error("没有可选择的元素")
                 }else {
-                    doScrollForListView(Direction.DOWN);
+                    doScrollForMultiLineCode(Direction.DOWN);
                 }
             }else{
                 if ($index.value >= list.value.length -1) { // -1 >= 0-1
@@ -131,11 +133,11 @@ function dealWithListView(e,list){
             if($reactive.view.isDel){
                 $reactive.view.isDel = false;
             }
-            if(e.shiftKey && configManager.get('fullItemCodeShow')){
+            if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
                 if ($index.value === -1) {
                     $message.error("没有可选择的元素")
                 }else {
-                    doScrollForListView(Direction.UP);
+                    doScrollForMultiLineCode(Direction.UP);
                 }
             }else{
                 if ($index.value <= 0) {
@@ -151,8 +153,8 @@ function dealWithListView(e,list){
             // 校验是否有效
             if($index.value=== -1 ){
                 $message.error("没有可选择的元素")
-            }else if(e.shiftKey && configManager.get('fullItemCodeShow')){
-                doScrollForListView(Direction.RIGHT);
+            }else if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
+                doScrollForMultiLineCode(Direction.RIGHT);
             }else{
                 debItemMoveRight();
             }
@@ -177,10 +179,10 @@ function dealWithListView(e,list){
                 //     core.shellBeep();
                 // }
             }else if(e.shiftKey){
-                doScrollForListView(Direction.RESET);
+                doScrollForMultiLineCode(Direction.RESET);
             }else{
                 $index.value = 0;
-                $normal.scroll.listInvoker?.scrollTo({top:0,left:0})
+                doScrollForListView();
             }
             break;
         case 'KeyT':// TODO:处理置顶ID情况
@@ -190,7 +192,8 @@ function dealWithListView(e,list){
             }
             GLOBAL_HIERARCHY.update(null,"top");
             $normal.keepSelectedStatus = true;
-            refreshListView(true)
+            // refreshListView(true)
+            refreshSearchResult();
             break;
         case 'KeyD':
         case 'KeyX':
@@ -431,18 +434,19 @@ function init(list) {
             e.preventDefault();
             let gap = e.timeStamp - lastTabTime;
             if (gap < 300) {
+                if(configManager.get('strategy_item_code_show') === 2){
+                    $reactive.view.fullScreenShow = true;
+                    return;
+                }
                 $reactive.view.fullScreenShow = !$reactive.view.fullScreenShow;
-                $reactive.utools.focused = true;
-                utools.subInputFocus();
+                utools_focus_or_blur(true)
             } else {
                 if ($reactive.utools.focused && $index.value > -1) {
-                    $reactive.utools.focused = false;
                     $reactive.view.cursorShow = false;
-                    utools.subInputBlur();
-                    gotoTheLastPosition();
+                    utools_focus_or_blur(false)
+                    doScrollForListView()
                 } else {
-                    utools.subInputFocus();
-                    $reactive.utools.focused = true;
+                    utools_focus_or_blur(true)
                 }
             }
             lastTabTime = e.timeStamp;
@@ -462,29 +466,12 @@ function init(list) {
             switch (e.code){
                 case 'KeyN':
                     GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
-                    // router.replace({
-                    //     name: 'form',
-                    //     query:{
-                    //         mode: 'new'
-                    //     }
-                    // })
                     return;
                 case 'KeyR':
                     if($reactive.currentMode === LIST_VIEW){
                         refreshListView(true)
                     }
                     return;
-                // case 'KeyF':
-                //     if($reactive.currentMode === LIST_VIEW){
-                //         if (configManager.get("enabledFuzzySymbolQuery")) {
-                //             configManager.set("enabledFuzzySymbolQuery", false)
-                //             $message.info("退出【进阶模糊查询】模式")
-                //         } else {
-                //             configManager.set("enabledFuzzySymbolQuery", true)
-                //             $message.success("进入【进阶模糊查询】模式")
-                //         }
-                //     }
-                //     return;
                 case 'Digit1':
                 case 'Digit2':
                 case 'Digit3':

@@ -1,5 +1,4 @@
 import {createOrUpdate} from "./base";
-import {configManager} from "./config";
 
 const GLOBAL_TAGS = "tags";
 export const tagColorManager={
@@ -25,7 +24,7 @@ export const tagColorManager={
      * @return {string} - color string
      */
     get(tag){
-        return this.tags[tag]?? configManager.getColor('TagColor');
+        return this.tags[tag]?? '#64696FAD';
     },
     update(tag,color){
         this.tags[tag] = color;
