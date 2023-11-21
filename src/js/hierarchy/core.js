@@ -28,32 +28,54 @@ import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
 export const GLOBAL_HIERARCHY = {
     currentHierarchy: rootHierachy,
     currentPrefixStr: null,
+    currentPrefixIdStr: null,
     currentPrefixArray: null,
+    currentPrefixIdArray: [],
     /**
      * @type {HierarchyConfig}
      */
     currentConfig: DEFAULT_ROOT_HIERARCHY_CONFIG,
     /**
      * 修改层级
-     * @param {"root" | "prev" | "next" | "custom" } mode
-     * @param {number} [index]
+     * @param {"root" | "prev" | "next" | "custom" | "redirect" } mode
+     * @param {any} [param] custom-number:指定索引位，redirect-string:指定前缀
      */
-    changeHierarchy(mode,index){
+    changeHierarchy(mode,param){
         switch (mode){
             case "root":
                 if($reactive.currentPrefix.length > 0 ){
                     $reactive.currentPrefix = [];
                     $normal.hierarchy.path = [];
+                    this.currentPrefixIdArray = [];
                 }
                 break
             case "prev":
                 $reactive.currentPrefix.pop();
+                this.currentPrefixIdArray.pop()
                 const result = $normal.hierarchy.path.pop();
                 if(result){
                     $index.value = result.index;
                     doScrollForListView();
                 }
                 break
+            case "redirect":
+                // clear
+                if($reactive.currentPrefix.length > 0 ){
+                    $reactive.currentPrefix = [];
+                    $normal.hierarchy.path = [];
+                    this.currentPrefixIdArray = [];
+                }
+                // 只是h-root的导向
+                if(param !== null){
+                    for (const prefix of param.split('/')) {
+                        $normal.hierarchy.path.push({
+                            index: 0
+                        })
+                        $reactive.currentPrefix.push(prefix)
+                        this.currentPrefixIdArray.push(prefix)
+                    }
+                }
+                // redirect后续逻辑同next
             case "next":
                 // 先判断ref
                 if($reactive.currentSnippet.ref === "local"){
@@ -69,16 +91,18 @@ export const GLOBAL_HIERARCHY = {
                     })
                 }
                 $reactive.currentPrefix.push($reactive.currentSnippet.name)
+                this.currentPrefixIdArray.push(this.currentHierarchy.core? $reactive.currentSnippet.id : $reactive.currentSnippet.name)
                 // 改变index
                 $index.value = 0;
                 doScrollForListView();
                 doScrollForTopNav();
                 break
             case "custom":
-                const ind = index +1;
+                const ind = param +1;
                 if(ind < $reactive.currentPrefix.length){
                     $reactive.currentPrefix.splice(ind,$reactive.currentPrefix.length)
                     $normal.hierarchy.path.splice(ind,$reactive.currentPrefix.length)
+                    this.currentPrefixIdArray.splice(ind,$reactive.currentPrefix.length)
                 }
                 break
         }
@@ -112,17 +136,23 @@ export const GLOBAL_HIERARCHY = {
         if($reactive.currentPrefix && $reactive.currentPrefix.length > 0){
             this.currentPrefixStr = $reactive.currentPrefix.join('/')
             this.currentPrefixArray = $reactive.currentPrefix.slice()
+            this.currentPrefixIdStr = this.currentPrefixIdArray.join('/')
         }else{
             // root
             this.currentPrefixStr = null;
             this.currentPrefixArray = null;
+            this.currentPrefixIdStr = null
         }
-        hierachyHubManager.changeHub(this.currentPrefixStr)
+        hierachyHubManager.changeHub(this.currentPrefixIdStr)
         // config
         this.currentConfig = this.currentHierarchy.getConfig?.(this.currentPrefixArray) ?? {};
-        // clear utools input
-        utools.setSubInputValue('')
-        utools_focus_or_blur(false)
+        if(mode === "redirect"){
+            utools_focus_or_blur(true)
+        }else{
+            // clear utools input
+            utools.setSubInputValue('')
+            utools_focus_or_blur(false)
+        }
     },
     /**
      * 改变视图
@@ -153,6 +183,9 @@ export const GLOBAL_HIERARCHY = {
                     $message.warning("当前目录层级不支持[创建]操作")
                     return;
                 }
+            }else{ // CODE_VIEW
+                // cache id
+                $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id ?? $reactive.currentSnippet.name;
             }
             switchToFullUIMode();
             $reactive.currentMode = view;
@@ -181,6 +214,8 @@ export const GLOBAL_HIERARCHY = {
                 if(word[0] === '@'){
                     if(word.length !== 1){
                         type = word.slice(1)
+                    }else{
+                        type = '';
                     }
                 }else if(word[0] === '#'){
                     if(word.length !== 1){
@@ -202,10 +237,12 @@ export const GLOBAL_HIERARCHY = {
                     }
                 }
             }
+            if(name){
+                name = name.toLowerCase()
+            }
             $reactive.view.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
             $normal.tempTags = tags;
-            result = await this.currentHierarchy.search(this.currentPrefixArray,name?.toLowerCase())
-
+            result = await this.currentHierarchy.search(this.currentPrefixArray,name)
             if(result && result.snippets){
                 // tags
                 if(tags !== null && tags.length > 0){
@@ -224,8 +261,12 @@ export const GLOBAL_HIERARCHY = {
                 }
                 // type
                 if(type !== null){
-                    type = fullAlias(type.toLowerCase());
-                    result.snippets = result.snippets.filter(codeSnippet=>fullAlias(codeSnippet.type) === type)
+                    if (type.length === 0) {
+                        result.snippets = result.snippets.filter(snippet => snippet.dir)
+                    }else{
+                        type = fullAlias(type.toLowerCase());
+                        result.snippets = result.snippets.filter(codeSnippet=>fullAlias(codeSnippet.type) === type)
+                    }
                 }
             }
 
@@ -238,8 +279,11 @@ export const GLOBAL_HIERARCHY = {
         }else{
             array = [];
         }
-        if(!configManager.get('readme_close')){
-            array.unshift(defaultHelpSnippet)
+        // only appear : root & no-search & readme_close
+        if(!configManager.get('readme_close') ){
+            if(!this.currentPrefixIdStr && !searchWord){
+                array.unshift(defaultHelpSnippet)
+            }
         }
         // 判断 keepSelectedStatus ，如果为true，需要保留selectIndex位置
         // 由于默认keepSelectedStatus为true，则selectIndex可能为非法，这时候需要忽视keepSelectedStatus
@@ -286,6 +330,10 @@ export const GLOBAL_HIERARCHY = {
          * @param {string | null} [oldName]
          */
         createOrEdit(snippet,oldName){
+            // 处理 keyword，只允许h-root
+            if(!GLOBAL_HIERARCHY.currentHierarchy.core){
+                snippet.keyword = undefined;
+            }
             GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixArray,snippet,oldName);
             if(oldName){
                 if(oldName !== snippet.name){
@@ -313,17 +361,17 @@ export const GLOBAL_HIERARCHY = {
                 if(GLOBAL_HIERARCHY.currentHierarchy.core){
                     snippet.time = Date.now();
                     snippet.count = (snippet.count??0) +1;
-                    codeSnippetManager.update(toRaw(snippet),GLOBAL_HIERARCHY.currentPrefixStr);
+                    codeSnippetManager.update(toRaw(snippet),GLOBAL_HIERARCHY.currentPrefixIdStr);
                 }
                 return;
             case "buffer":
                 if(GLOBAL_HIERARCHY.currentHierarchy.core){
-                    codeSnippetManager.update(toRaw(snippet),GLOBAL_HIERARCHY.currentPrefixStr);
+                    codeSnippetManager.update(toRaw(snippet),GLOBAL_HIERARCHY.currentPrefixIdStr);
                 }
                 return;
             case "sections":
                 if(GLOBAL_HIERARCHY.currentHierarchy.core){
-                    codeSnippetManager.update(toRaw(snippet),GLOBAL_HIERARCHY.currentPrefixStr);
+                    codeSnippetManager.update(toRaw(snippet),GLOBAL_HIERARCHY.currentPrefixIdStr);
                 }else{
                     hierachyHubManager.handleSections(key,snippet.sections)
                 }
@@ -342,10 +390,10 @@ export const GLOBAL_HIERARCHY = {
         // 移除 hub数据
         if(snippet.dir){
             // 移除 整个hub
-            if(this.currentPrefixStr){
-                deleteHub(this.currentPrefixStr+'/'+snippet.name)
+            if(this.currentPrefixIdStr){
+                deleteHub(this.currentPrefixIdStr+'/'+(snippet.id??snippet.name))
             }else{
-                deleteHub(snippet.name)
+                deleteHub(snippet.id)
             }
 
         }else{

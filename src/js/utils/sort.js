@@ -59,9 +59,9 @@ export function handleArrayForHierarchy(list,topList,sorted,highlighted,name){
             snippet.index = undefined;
         })
     }
+    // 对 topSnippets进行排序
+    topSnippets.sort((a,b)=> a.index - b.index)
     if(!sorted){
-        // 对 topSnippets进行排序
-        topSnippets.sort((a,b)=> a.index - b.index)
         switch (configManager.getSortKey()){
             case 0:   // 创建时间
                 list.sort(CREATE_TIME_COMPARE)

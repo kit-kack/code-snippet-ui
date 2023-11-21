@@ -4,7 +4,7 @@
   "pluginName": "code-snippet",
   "description": "管理您的代码片段，支持Vim操作方式",
   "author": "kitkack",
-  "logo": "logo.png",
+  "logo": "coding.png",
   "main": "index.html",
   "preload": "preload.js",
   "development": {
@@ -18,8 +18,8 @@
   "features": [
     {
       "code": "code-snippet",
-      "explain": "记录代码片段",
-      "cmds": ["code-snippet","snippet","cs"]
+      "explain": "管理我的代码片段",
+      "cmds": ["code-snippet","snippet","cs","root"]
     },
     {
       "code": "code-snippet-save",

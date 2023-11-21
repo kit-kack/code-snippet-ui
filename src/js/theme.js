@@ -98,6 +98,11 @@ const darkColorSchemaStyleOptions = [
 
 function adjustTheme(v){
     $normal.theme = utools.isDarkColors()? darkColorSchemaStyleOptions[v]: colorSchemaStyleOptions[v];
+    modifyCSSVar()
+}
+
+function modifyCSSVar(){
+    document.documentElement.style.setProperty('--global-color', $normal.theme.globalColor);
 }
 /**
  *

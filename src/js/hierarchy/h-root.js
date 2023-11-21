@@ -35,23 +35,23 @@ export const rootHierachy = {
         return {
             sorted: false,
             highlighted: true,
-            snippets: codeSnippetManager.queryForMany(name,GLOBAL_HIERARCHY.currentPrefixStr),
+            snippets: codeSnippetManager.queryForMany(name,GLOBAL_HIERARCHY.currentPrefixIdStr),
         };
     },
     checkNameRepeat(prefix,name){
-        return codeSnippetManager.contain(name,GLOBAL_HIERARCHY.currentPrefixStr)
+        return codeSnippetManager.contain(name,GLOBAL_HIERARCHY.currentPrefixIdStr)
     },
     createOrEdit(prefix,snippet,oldName){
         if(oldName){
             // update
-            codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixStr)
+            codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)
         }else{
             // add
-            codeSnippetManager.add(snippet,GLOBAL_HIERARCHY.currentPrefixStr)
+            codeSnippetManager.add(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)
         }
     },
     remove(prefix,snippet){
-        codeSnippetManager.del(snippet.id,GLOBAL_HIERARCHY.currentPrefixStr)
+        codeSnippetManager.del(snippet.id,GLOBAL_HIERARCHY.currentPrefixIdStr)
     }
 }
 

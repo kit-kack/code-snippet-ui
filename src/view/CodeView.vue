@@ -76,7 +76,7 @@
             <n-list-item >
               <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0} 📃${pair.count}字 ${snippet.sections?.length > 0 ? '⚑×'+snippet.sections.length:''}`}}</div>
             </n-list-item>
-            <n-list-item  v-if="snippet.feature">
+            <n-list-item  v-if="snippet.keyword">
               <div>★ 已注册为uTools关键字</div>
             </n-list-item >
             <n-list-item  v-if="snippet.tags && snippet.tags.length > 0">
@@ -108,11 +108,12 @@ import {configManager} from "../js/core/config";
 import {computed, onMounted, ref, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
-import {calculateTime, getRefreshFunc, isNetWorkUri, renderFormatBlock} from "../js/utils/common";
+import {calculateTime, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
 import {$normal, $reactive, LIST_VIEW} from "../js/store";
 import NormalTag from "../components/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import MarkdownView from "../components/item/MarkdownView.vue";
+import {renderFormatBlock} from "../js/core/func";
 
 const verticalScroller = ref(null)
 /**

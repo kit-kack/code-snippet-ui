@@ -14,6 +14,8 @@ export const configManager = {
         }
         // TODO: 下版本移除
         utools.db.remove(GLOBAL_CONFIG)
+        utools.removeFeature("code-snippet-keyword")
+        // data
         this.configs = utools.db.get(NEW_GLOBAL_CONFIG)?.data ?? {}
         // init item code show
         if(!"strategy_item_code_show" in this.configs){

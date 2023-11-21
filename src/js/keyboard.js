@@ -165,7 +165,6 @@ function dealWithListView(e,list){
                     if($reactive.currentSnippet.dir){
                         GLOBAL_HIERARCHY.changeHierarchy("next")
                     }else{
-                        $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id;
                         GLOBAL_HIERARCHY.changeView(CODE_VIEW)
                     }
                     // router.replace('/code')
@@ -208,7 +207,6 @@ function dealWithListView(e,list){
             if($reactive.currentSnippet.dir){
                 GLOBAL_HIERARCHY.changeHierarchy("next")
             }else{
-                $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id;
                 GLOBAL_HIERARCHY.changeView(CODE_VIEW)
                 // router.replace('/code')
             }
@@ -275,7 +273,6 @@ function handleMdHorizonMove(left,fast){
 }
 
 function dealWithCodeView(e){
-    console.log('codeview: '+e.code)
     switch (e.code){
         case "KeyH":
         case "ArrowLeft":
@@ -342,10 +339,16 @@ function dealWithCommonView(e){
     switch (e.code){
         case 'KeyC':
         case 'KeyY':
+            if($reactive.currentSnippet.dir){
+                return;
+            }
             copyCode(false);
             // handleCopy(false)
             break;
         case 'KeyP':
+            if($reactive.currentSnippet.dir){
+                return;
+            }
             copyCode(true);
             // handleCopy(true)
             break;
@@ -358,12 +361,6 @@ function dealWithCommonView(e){
                 $reactive.view.helpActive = false;
             }
             GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
-            // router.replace({
-            //     name: 'form',
-            //     query:{
-            //         mode: 'edit'
-            //     }
-            // })
             break;
         case 'Digit1':
         case 'Digit2':
@@ -374,6 +371,9 @@ function dealWithCommonView(e){
         case 'Digit7':
         case 'Digit8':
         case 'Digit9':
+            if($reactive.currentSnippet.dir){
+                return;
+            }
             copyCode(e.shiftKey || e.altKey,+e.code[5])
             break;
         case 'KeyZ':
@@ -439,6 +439,7 @@ function init(list) {
                     return;
                 }
                 $reactive.view.fullScreenShow = !$reactive.view.fullScreenShow;
+                refreshListView()
                 utools_focus_or_blur(true)
             } else {
                 if ($reactive.utools.focused && $index.value > -1) {

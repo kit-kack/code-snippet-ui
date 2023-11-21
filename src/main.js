@@ -91,41 +91,9 @@ utools.onPluginOut(processExit => {
     $reactive.view.backStageShow = true;
 })
 
-const handleUToolsTextChange =  _.debounce((text)=>{
-    if($reactive.view.backStageShow){
-        utools.showNotification("插件重新前台运行")
-        $reactive.view.backStageShow = false;
-        GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
-    }
-    text = text.trim();
-    if(text.length === 0){
-        $reactive.utools.search = null;
-    }else{
-        if($reactive.utools.search !== text){
-            $reactive.utools.search = text;
-            $normal.keepSelectedStatus = null;
-            // $normal.itemOffsetArray = [];
-            // fix: 修复删除界面不移除
-            $reactive.view.isDel = false;
-            $reactive.view.helpActive = false;
-            // refreshListView(true)
-        }
-    }
-},250)
 
-utools.onPluginEnter((data)=>{
-    if(data.code === 'code-snippet-backup'){
-        codeSnippetManager.store(backupFilePath)
-        return;
-    }else if(data.code === 'code-snippet-keyword'){
-        $reactive.currentSnippet = codeSnippetManager.getByName(data.payload);
-        // $reactive.core.selectedIndex = 0;
-        $index.value = 0;
-        if(!copyCode(true,undefined,true)){
-            return;
-        }
-    }
 
+const enterApp = (data) => {
     console.log('Enter App ...')
     bindApp()
     // TODO:处理
@@ -137,9 +105,6 @@ utools.onPluginEnter((data)=>{
     // }else{
     //     utools.setExpendHeight(545)
     // }
-    utools.setSubInput(({text}) =>{
-        handleUToolsTextChange(text)
-    },"搜索代码片段, 双击Tab切换UI模式")
     if(data.code==='code-snippet-save'){
         $normal.quickCode = data.payload;
         GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
@@ -148,17 +113,39 @@ utools.onPluginEnter((data)=>{
     }else if(data.code=== 'code-snippet-paste'){
         utools.subInputBlur();
     }
-    // if(configManager.get('autoBackup')){
-    //     const now = Date.now();
-    //     const time = configManager.get('lastAutoBackupTime')??0;
-    //     if(now - time >= 432000000){
-    //         setTimeout(()=>{
-    //             codeSnippetManager.store(backupFilePath)
-    //             configManager.set('lastAutoBackupTime',now)
-    //             core.showNotification('自动备份触发（周期为每5天），备份数据文件位于:'+backupFilePath)
-    //         },1000)
-    //     }
-    // }
+}
+
+utools.onPluginEnter((data)=>{
+    if(data.code === 'code-snippet-backup'){
+        codeSnippetManager.store(backupFilePath)
+        return;
+    }else if(data.code.startsWith('keyword/')){
+        let id = data.code.slice(8);
+        let prefix = null;
+        const index = id.indexOf('#')
+        if(index !== -1){
+            prefix = id.slice(0,index)
+            id = id.slice(index+1)
+        }
+        $reactive.currentSnippet =  codeSnippetManager.get(id,prefix);
+        // $reactive.core.selectedIndex = 0;
+        $index.value = 0;
+        if($reactive.currentSnippet.dir){
+            GLOBAL_HIERARCHY.changeHierarchy('redirect',prefix)
+            enterApp(data)
+        }else{
+            copyCode(true,undefined,true)
+                .then(input =>{
+                    if(input){
+                        enterApp(data)
+                    }else{
+                        utools.outPlugin();
+                    }
+                })
+        }
+    }else{
+        enterApp(data)
+    }
 })
 
 try{

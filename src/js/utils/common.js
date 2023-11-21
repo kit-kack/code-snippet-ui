@@ -1,6 +1,4 @@
 import {nextTick} from "vue";
-import {formatManager} from "../core/func";
-import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 
 
 /**
@@ -89,73 +87,4 @@ const networkRegex = /^\w+:\/\/.*/
  */
 export function isNetWorkUri(uri){
     return  networkRegex.test(uri);
-}
-
-
-const _darkFormatBlockStyle = '<span style="color:#ffa400;border-radius:3px;background-color:#414141;font-weight: bolder;">'
-const _darkAssignBlockStyle = '<span style="color:#10be8e;border-radius:3px;background-color:#414141;font-weight: bolder;">'
-const _lightFormatBlockStyle = '<span style="color:#ffa400;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;">'
-const _lightAssignBlockStyle = '<span style="color:#10be8e;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;">'
-const _errorFormatBlockStyle = '<span style="color:red">';
-
-/**
- * 渲染formatBlock
- * @param {boolean} flag - 是否在渲染模式
- */
-export function renderFormatBlock(flag){
-    const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
-    if(codeViewer){
-        codeViewer.innerHTML = codeViewer.innerHTML.replace(/{{.+?}}/gs,(substring)=>{
-            const name = substring.slice(2,-2).trim();
-            let style = utools.isDarkColors()? _darkFormatBlockStyle:_lightFormatBlockStyle;
-            if(name.startsWith('#')){
-                if(name.includes('::')){
-                    style = utools.isDarkColors()? _darkAssignBlockStyle:_lightAssignBlockStyle;
-                }else{
-                    style = _errorFormatBlockStyle;
-                }
-            }else{
-                if(!name.startsWith('@')){
-                    // parse
-                    let command;
-                    let index = name.indexOf(':');
-                    if(index !== -1){
-                        if(index === name.length-1){ // last
-                            // command : param
-                            command = name.slice(0,index)
-                        }else{
-                            if(name[index+1] === ':'){
-                                // variable :: command [:param]
-                                const newName = name.slice(index+2);
-                                index = newName.indexOf(':')
-                                if(index !== -1){
-                                    // command: param
-                                    command = newName.slice(0,index)
-                                }else{
-                                    // command
-                                    command = newName;
-                                }
-                            }else{
-                                // command : param
-                                command = name.slice(0,index)
-                            }
-                        }
-                    }else{
-                        // only command
-                        command = name;
-                    }
-                    if(command.startsWith('$')){
-                        command = command.slice(1)
-                        const funcs = GLOBAL_HIERARCHY.currentConfig.funcs ?? {};
-                        if(!(command in funcs)){
-                            style = _errorFormatBlockStyle;
-                        }
-                    }else if(!formatManager.checkCommandRepeat(command)){
-                        style = _errorFormatBlockStyle;
-                    }
-                }
-            }
-            return style+substring+'</span>'
-        })
-    }
 }

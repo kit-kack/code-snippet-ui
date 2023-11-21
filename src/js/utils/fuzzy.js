@@ -1,6 +1,3 @@
-// 计算最长公共子序列
-import {configManager} from "../core/config";
-
 const chineseRegex=/[\u4E00-\u9FA5]/
 
 /**
@@ -58,19 +55,20 @@ export function advancedFuzzyCompare(query,target,chineseMatchDisabled){
  * @param {string} target 原本文字
  */
 export function match(query,target){
+    if(!query){
+        return null;
+    }
     const temp = target.toLowerCase();
-    const prefix = `<span style="color: ${configManager.getGlobalColor()}">`
-    const suffix = "</span>"
     // 1. 普通比较
     if(temp.includes(query)){
-        return target.replace(new RegExp(query,"i"),`${prefix}$&</span>`);
+        return target.replace(new RegExp(query,"i"),'<b>$&</b>');
     }else{
         const offsets = advancedFuzzyCompare(query,temp);
         if(offsets){
             // 拆分替换
             const charArray = target.split('')
             for (let offset of offsets) {
-                charArray[offset] = prefix+charArray[offset]+suffix;
+                charArray[offset] ='<b>'+charArray[offset]+'</b>';
             }
             return charArray.join('');
         }

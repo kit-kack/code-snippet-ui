@@ -1,11 +1,12 @@
 import {defaultHelpSnippet} from "../some";
 import {match} from "../utils/fuzzy";
-import {createOrUpdate, remove_utools_feature} from "./base";
+import {createOrUpdate} from "./base";
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {formatManager} from "./func";
 import {convertValidFileSuffix} from "../utils/language";
 import JSZip from "jszip";
+import {batch_delete_utools_keyword, delete_utools_keyword, register_utools_keyword} from "./keyword";
 
 const CODE_PREFIX = "code/";
 const SUB_CODE_PREFIX = "#code/"
@@ -69,7 +70,7 @@ export const codeSnippetManager = {
             $message.error("用户无法主动创建内置说明片段")
             return false;
         }
-        codeSnippet.id = Date.now();
+        codeSnippet.id = Date.now().toString();
         codeSnippet.count = codeSnippet.count??0;
         codeSnippet.createTime = Date.now()
         codeSnippet.time = codeSnippet.time??codeSnippet.createTime;
@@ -81,6 +82,10 @@ export const codeSnippetManager = {
             this.rootSnippetMap.set(codeSnippet.id,codeSnippet);
             createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
         }
+        // keyword
+        if(codeSnippet.keyword){
+            register_utools_keyword(codeSnippet,prefix)
+        }
         this.addTagInfo(codeSnippet,true)
         return true;
     },
@@ -89,34 +94,39 @@ export const codeSnippetManager = {
      *
      * @param {string} id
      * @param {string | null} prefix
-     * @returns {boolean} - is success
      */
     del(id,prefix){
         if(id === defaultHelpSnippet.id){
             configManager.set('readme_close',true)
-            return true;
+            return;
         }
+        let snippet = null;
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix);
-            const codeSnippet = this.snippetMap.get(id);
-            if(codeSnippet){
-                utools.db.remove(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id)
+            snippet = this.snippetMap.get(id);
+            if(snippet){
+                utools.db.remove(SUB_CODE_PREFIX+prefix+"#"+id)
                 this.snippetMap.delete(id)
-                return true;
             }
         }else{
             // 先查询是否存在
-            const codeSnippet = this.rootSnippetMap.get(id);
-            if(codeSnippet){
+            snippet= this.rootSnippetMap.get(id);
+            if(snippet){
                 utools.db.remove(CODE_PREFIX+id)
                 this.rootSnippetMap.delete(id)
-                if(codeSnippet.feature){
-                    remove_utools_feature(codeSnippet.name)
-                }
-                return true;
             }
         }
-        return false;
+        if(snippet){
+            // delete current keyword
+            if(snippet.keyword){
+                delete_utools_keyword(snippet,prefix)
+            }
+            if(snippet.dir){
+                // delete sub snippets keyword
+                batch_delete_utools_keyword(prefix ? (prefix+'/'+id) : id)
+            }
+        }
+
 
     },
     /**
@@ -146,7 +156,6 @@ export const codeSnippetManager = {
      *
      * @param { CodeSnippet } codeSnippet
      * @param {string | null} prefix
-     * @return {boolean} - is success
      */
     update(codeSnippet,prefix){
         if(prefix){
@@ -155,17 +164,24 @@ export const codeSnippetManager = {
                 createOrUpdate(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id, codeSnippet)
                 this.snippetMap.set(codeSnippet.id, codeSnippet)
                 this.addTagInfo(codeSnippet, true)
-                return true;
+                if(codeSnippet.keyword){
+                    register_utools_keyword(codeSnippet,prefix)
+                }else{
+                    delete_utools_keyword(codeSnippet,prefix)
+                }
             }
         }else{
             if(this.rootSnippetMap.has(codeSnippet.id)) {
                 createOrUpdate(CODE_PREFIX + codeSnippet.id, codeSnippet)
                 this.rootSnippetMap.set(codeSnippet.id, codeSnippet)
                 this.addTagInfo(codeSnippet, true)
-                return true;
+                if(codeSnippet.keyword){
+                    register_utools_keyword(codeSnippet,prefix)
+                }else{
+                    delete_utools_keyword(codeSnippet,prefix)
+                }
             }
         }
-        return false;
     },
     /**
      * 满足多种查询要求
@@ -183,8 +199,7 @@ export const codeSnippetManager = {
          * @type {CodeSnippet[]}
          */
         let list = [];
-        // 1.name
-        if(name !== null){
+        if(name){
             for (const codeSnippet of map.values()) {
                 const result = match(name,codeSnippet.name)
                 if(result !== null){
@@ -319,5 +334,18 @@ export const codeSnippetManager = {
             }
         }
         return null;
+    },
+    /**
+     * @param {string} id
+     * @param {string | null} prefix
+     * @return {undefined}
+     */
+    get(id, prefix) {
+        if(prefix){
+            this.prepareForPrefixSnippetMap(prefix)
+            return this.snippetMap.get(id)
+        }else{
+            return this.rootSnippetMap.get(id)
+        }
     }
 }

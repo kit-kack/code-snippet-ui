@@ -11,7 +11,24 @@
     >
       <n-form-item label="片段名" path="name">
         <n-input v-model:value="codeTemplate.name" :placeholder="placeholders?.name ?? '起个好名字呗~'"  clearable autofocus :disabled="!properties.name"/>
-<!--        <n-tag style="margin-left: 10px;user-select: none" checkable v-model:checked="codeTemplate.feature" >设置为uTools关键字</n-tag>-->
+        <template v-if="GLOBAL_HIERARCHY.currentHierarchy.core" >
+          <n-tooltip :show-arrow="false">
+            <template #trigger>
+              <n-button :color="$normal.theme.globalColor" text @click="codeTemplate.keyword = !codeTemplate.keyword" style="width: 60px" >
+                <template #icon>
+                  <template v-if="codeTemplate.keyword">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778z" fill="currentColor"></path></g></svg>
+                  </template>
+                  <template v-else>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778zm1.21.937L9.74 8.614a1.35 1.35 0 0 1-1.016.739l-5.05.734l3.654 3.562c.318.31.463.757.388 1.195l-.862 5.029l4.516-2.375a1.35 1.35 0 0 1 1.257 0l4.516 2.375l-.862-5.03a1.35 1.35 0 0 1 .388-1.194l3.654-3.562l-5.05-.734a1.35 1.35 0 0 1-1.016-.739L11.998 4.04z" fill="currentColor"></path></g></svg>
+                  </template>
+                </template>
+              </n-button>
+            </template>
+            注册为uTools功能关键字
+          </n-tooltip>
+
+        </template>
       </n-form-item>
       <n-form-item label="描述" path="desc">
         <n-input v-model:value="codeTemplate.desc" :placeholder="placeholders?.desc ?? '可选：请输入描述'" clearable :disabled="!properties.desc" />
@@ -48,7 +65,7 @@
                     @keydown="handleKeyDown"
                     ref="codeTextArea"
                     show-count
-                    :autosize="{minRows: 9,maxRows: 9}"/>
+                    :autosize="{minRows: 8,maxRows: 8}"/>
                 <div id="sub">
                   <n-popover>
                     <template #trigger>
@@ -79,7 +96,7 @@
                           :theme-overrides="selectThemeOverrides"
                       />
                     </n-space>
-                    <config-switch title="默认是否注册uTools关键字" config="default_feature_on"/>
+                    <config-switch title="默认是否注册uTools关键字" config="default_keyword_enable"/>
                   </n-popover>
                   <n-tooltip v-if="codeTemplate.type && codeTemplate.type.startsWith('x-')">
                     <template #trigger>
@@ -151,9 +168,9 @@
                   <n-divider title-placement="left">
                     目录
                   </n-divider>
-                  <n-button @click="importLocalDir" quaternary type="primary" v-if="!GLOBAL_HIERARCHY.currentPrefixStr">本地目录</n-button>
+                  <n-button @click="importLocalDir" quaternary type="primary" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">本地目录</n-button>
                   <n-button @click="setAsNormalDir" quaternary type="info" >普通目录</n-button>
-                  <n-button @click="setAsCustomDir" quaternary type="error" v-if="!GLOBAL_HIERARCHY.currentPrefixStr">自定义目录(代码实现)</n-button>
+                  <n-button @click="setAsCustomDir" quaternary type="error" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">自定义目录(代码实现)</n-button>
                 </template>
               </template>
             </n-tab-pane>
@@ -211,7 +228,6 @@ import FuncSelectPane from "../components/pane/FuncSelectPane.vue";
 import NormalTag from "../components/NormalTag.vue";
 import BaseModal from "../components/base/BaseModal.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
-import {add_utools_feature, remove_utools_feature} from "../js/core/base";
 import {isNetWorkUri} from "../js/utils/common";
 
 
@@ -222,7 +238,7 @@ const placeholders = formProperties.placeholders;
 const edit = $reactive.currentMode === EDIT_VIEW;
 const codeTemplate = reactive(edit?{...toRaw($reactive.currentSnippet)} :{
   code: $normal.quickCode,
-  feature: configManager.get('default_feature_on')
+  keyword: configManager.get('default_keyword_enable')
 })
 const tags = computed(()=>{
   return tagColorManager.all().map(v=>{
@@ -232,7 +248,7 @@ const tags = computed(()=>{
     }
   })
 })
-const currentTab = ref(codeTemplate.path? 'path':(formProperties.codeSource === 'link' ?'path':'code'))  // 当前Tab页
+const currentTab = ref((codeTemplate.path || codeTemplate.dir)? 'path':(formProperties.codeSource === 'link' ?'path':'code'))  // 当前Tab页
 const codeTextArea = ref()
 const showModal = ref(false)
 const showFuncModal = ref(false)
@@ -300,6 +316,15 @@ const rules = {
         return false;
       },
       trigger: ["input","blur"]
+    },
+    {
+      message: "代码片段名不能包含/",
+      validator(rule, value) {
+        if(value!= null){
+          return !value.includes('/')
+        }
+      },
+      trigger: ["input","blur"]
     }
 
   ],
@@ -356,15 +381,10 @@ const handleUpdate = ()=>{
           codeTemplate.type = configManager.get('default_language')?? 'plaintext';
         }
         if(edit){
-          if(codeTemplate.id === $normal.lastQueryCodeSnippetId){
+          const id = codeTemplate.id ?? codeTemplate.name;
+          if(id === $normal.lastQueryCodeSnippetId){
             // 发生修改，缓存失效
             $normal.lastQueryCodeSnippetId = null;
-          }
-          // utools关键字处理
-          if(codeTemplate.feature){
-            add_utools_feature(codeTemplate.name)
-          }else{
-            remove_utools_feature(codeTemplate.name)
           }
           // 更新
           GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),$reactive.currentSnippet.name)
@@ -372,9 +392,6 @@ const handleUpdate = ()=>{
           $normal.keepSelectedStatus = (codeTemplate.name === $reactive.currentSnippet.name)? true : null;
         }else{
           $normal.keepSelectedStatus = null;
-          if(codeTemplate.feature){
-            add_utools_feature(codeTemplate.name)
-          }
           GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),null)
         }
         window.$message.success("操作成功")
@@ -578,7 +595,7 @@ function handleClearPath(){
 .n-form-item {
   --n-feedback-padding: 2px 0 0 2px;
   --n-feedback-font-size: 12px;
-  --n-feedback-height: 18px !important;
+  --n-feedback-height: 22px !important;
 }
 
 </style>

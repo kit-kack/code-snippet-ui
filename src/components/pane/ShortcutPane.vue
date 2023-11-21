@@ -53,7 +53,8 @@ const datas = [
         shortcut:"Tab"
       },{
         feature: "切换完整/列表UI模式",
-        shortcut: "Tab快速双击"
+        shortcut: "Tab快速双击",
+        tooltip: "暂时不支持[多行元素代码块]场景"
       }]
   },
   {

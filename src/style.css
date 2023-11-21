@@ -1,10 +1,16 @@
 @import "style/atom.css";
+:root{
+  --global-color: red;
+}
 *{
   padding: 0;
   margin: 0;
 }
 body#light-app{
   background-color: #f5f5f5;
+}
+.snippet-item__title b{
+  color: var(--global-color);
 }
 
 #light-app .vue-recycle-scroller::-webkit-scrollbar-track-piece{

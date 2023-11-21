@@ -36,7 +36,7 @@
               </template>
               <template v-else>
                 <!-- 子代码片段 -->
-                <span class="snippet-item__desc"  style="margin-left: 10px;">{{sideInfo}}</span>
+                <span class="snippet-item__desc"  style="margin-left: 5px;">{{getSideInfo()}}</span>
               </template>
             </n-ellipsis>
           </div>
@@ -63,7 +63,7 @@
         </template>
         <!-- 子代码片段 -->
         <span  class="snippet-item-info sub-item-code" style="left: 0;z-index: 20;" >
-              {{sideInfo}}
+              {{getSideInfo()}}
         </span>
       </template>
       <template v-else>
@@ -118,16 +118,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M10.5 8.826l.874.998a.5.5 0 0 0 .752-.658l-1.75-2a.5.5 0 0 0-.752 0l-1.75 2a.5.5 0 0 0 .752.658l.874-.998v3.679a.5.5 0 0 0 1 0v-3.68zM4 16a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4zm-1-2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9h-3.834a1.495 1.495 0 0 0-.287-.493l-1.75-2a1.5 1.5 0 0 0-2.258 0l-1.75 2c-.13.15-.226.317-.287.493H3v5z" fill="currentColor"></path></g></svg>
               </selectable-button>
             </template>
-<!--            <template v-if="snippet.feature">-->
-<!--              <selectable-button :mid="485" lite  type="primary"  color="#ff85c0" :index="5" tip="取消注册关键字">-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778z" fill="currentColor"></path></g></svg>-->
-<!--              </selectable-button>-->
-<!--            </template>-->
-<!--            <template v-else>-->
-<!--              <selectable-button :mid="485" lite  type="primary"  color="#ff85c0" :index="5" tip="注册关键字">-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778zm1.21.937L9.74 8.614a1.35 1.35 0 0 1-1.016.739l-5.05.734l3.654 3.562c.318.31.463.757.388 1.195l-.862 5.029l4.516-2.375a1.35 1.35 0 0 1 1.257 0l4.516 2.375l-.862-5.03a1.35 1.35 0 0 1 .388-1.194l3.654-3.562l-5.05-.734a1.35 1.35 0 0 1-1.016-.739L11.998 4.04z" fill="currentColor"></path></g></svg>-->
-<!--              </selectable-button>-->
-<!--            </template>-->
           </n-space>
         </div>
       </template>
@@ -212,20 +202,18 @@ const pair = computed(()=>{
   }
 
 })
-const sideInfo = getSideInfo();
-
 
 function getSideInfo(){
   if(props.snippet.sections){
     if(props.snippet.sections.length > 0){
-      if(props.snippet.feature){
+      if(props.snippet.keyword){
         return '★×'+props.snippet.sections.length;
       }else{
         return '⚑×'+props.snippet.sections.length;
       }
     }
   }
-  return props.snippet.feature? '★':''
+  return props.snippet.keyword? '★':''
 }
 const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'backgroundColor: #fff';
@@ -303,7 +291,6 @@ const handleMouseLeave = (e)=>{
   isHover.value = false;
 }
 const doViewCode = ()=>{
-  $normal.lastQueryCodeSnippetId = props.snippet.id;
   GLOBAL_HIERARCHY.changeView(CODE_VIEW);
 }
 const doEdit = ()=>{
@@ -324,6 +311,7 @@ const doItemRefresh = ()=>{
   position: relative;
   overflow: hidden;
 }
+
 .sub{
   margin-bottom: 6px;
 }
@@ -412,6 +400,9 @@ const doItemRefresh = ()=>{
 }
 #dark-app .snippet-item__title{
   color: #E0E0E0;
+}
+.snippet-item__title i{
+  color:red;
 }
 
 

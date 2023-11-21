@@ -216,6 +216,36 @@ function _parseVariable_Command_Param(text) {
     return result;
 }
 
+/**
+ * 获取command对应的键，如果返回null则代表该占位符不存在
+ * @param {string} command
+ * @private
+ */
+function _get_command_key(command){
+    // 1.first $
+    if(command.startsWith('$')){
+        // first query from current hierarchy
+        command = command.slice(1);
+        const funcs = GLOBAL_HIERARCHY.currentConfig.funcs?? {};
+        if(command in funcs){
+            return {
+                command: command
+            }
+        }
+    }
+    // 2. normal funcMap
+    for (const key in formatManager.funcMap) {
+        const func = formatManager.funcMap[key];
+        if(func.commands.includes(command)){
+            return {
+                command: command,
+                key: key
+            }
+        }
+    }
+    return null;
+}
+
 export const formatManager = {
     // data:{
     //     pairs:{}, // 存放变量替换值
@@ -504,25 +534,11 @@ export const formatManager = {
                 // 3.check command valid
                 if(commandFlag < 0){
                     if(result.command){
-                        // 1.first $
-                        if(result.command.startsWith('$')){
-                            // first query from current hierarchy
-                            result.command = result.command.slice(1);
-                            const funcs = GLOBAL_HIERARCHY.currentConfig.funcs?? {};
-                            if(result.command in funcs){
-                                commandFlag = 1;
-                            }
-                        }
-                        // 2. normal funcMap
-                        if(commandFlag < 0){
-                            for (let key in this.funcMap) {
-                                const func = this.funcMap[key];
-                                if(func.commands.includes(result.command)){
-                                    result.key = key;
-                                    commandFlag = 1;
-                                    break;
-                                }
-                            }
+                        const command_key = _get_command_key(result.command);
+                        if(command_key){
+                            commandFlag = 1;
+                            result.command = command_key.command;
+                            result.key = command_key.key;
                         }
                     }else{
                         // param将作为command实现函数处理
@@ -649,5 +665,70 @@ export const formatManager = {
                 copyOrPaste(code)
             })
         }
+    }
+}
+
+
+
+
+
+
+const _errorFormatBlockStyle = '<span style="color:red">';
+const _formatBlockStyle = utools.isDarkColors()?
+    '<span style="color:#ffa400;border-radius:3px;background-color:#414141;font-weight: bolder;">':
+    '<span style="color:#ffa400;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;">'
+const _assginBlockStyle = utools.isDarkColors()?
+    '<span style="color:#10be8e;border-radius:3px;background-color:#414141;font-weight: bolder;">' :
+    '<span style="color:#10be8e;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;">'
+
+const regex = /<([^>]+)>([^<]+)<\/[^>]+>/;
+function _resolveCommandFromSpan(command){
+    const match = regex.exec(command);
+    if(match && match.length > 1){
+        return match[2].trim().toLowerCase()
+    }else{
+        return command
+    }
+}
+/**
+ * 渲染formatBlock
+ * @param {boolean} flag - 是否在渲染模式
+ */
+export function renderFormatBlock(flag){
+    const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
+    if(codeViewer){
+        codeViewer.innerHTML = codeViewer.innerHTML.replace(/{{.+?}}/gs,(substring)=>{
+            const text = substring.slice(2,-2).trim();
+            let style = _errorFormatBlockStyle ;
+            if(text.startsWith('#')) {
+                const result = _parseVariable_Command_Param(text.slice(1));
+                console.log(result)
+                if (result._var) {
+                    if (result.command) {
+                        if(!flag){
+                            result.command = _resolveCommandFromSpan(result.command)
+                        }
+                        if (_get_command_key(result.command)) {
+                            style =  _assginBlockStyle
+                        }
+                    }else  if (result.param) {
+                        style = _assginBlockStyle
+                    }
+                }
+            }else if(text.startsWith('@')){
+                style = _formatBlockStyle
+            }else{
+                const result = _parseVariable_Command_Param(text);
+                if(result.command){
+                    if(!flag){
+                        result.command = _resolveCommandFromSpan(result.command)
+                    }
+                    if(_get_command_key(result.command)){
+                        style = _formatBlockStyle
+                    }
+                }
+            }
+            return style+substring+'</span>'
+        })
     }
 }
