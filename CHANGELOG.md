@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/littledot-kit/code-snippet-ui/compare/v2.5.1...v2.6.0) (2023-11-23)
+
+
+### Features
+
+* 目录系统-基本搜索 ([d8138c9](https://github.com/littledot-kit/code-snippet-ui/commit/d8138c9f390beea0abaa7864f0de94c888ba687b))
+* 目录系统-基本搜索2 ([8aeb438](https://github.com/littledot-kit/code-snippet-ui/commit/8aeb438113674f983c27a3b3f64c8221d1e169e9))
+* 设置界面移除“搜索相关配置” ([87a7429](https://github.com/littledot-kit/code-snippet-ui/commit/87a74290dda31f39668817ae624d1d813088336c))
+
+
+### Bug Fixes
+
+* 完善一些UI细节 ([f598214](https://github.com/littledot-kit/code-snippet-ui/commit/f598214af988c1b3e721a0b9743279f9d459ccf9))
+* 完善一些UI细节 ([4e4238f](https://github.com/littledot-kit/code-snippet-ui/commit/4e4238fa13e5ec424a97b1c3c57d0cbd464699d4))
+* 优化搜索匹配 ([3b5cca4](https://github.com/littledot-kit/code-snippet-ui/commit/3b5cca46332221e0872400adee6964b53a31ff81))
+
 ### [2.5.1](https://github.com/littledot-kit/code-snippet-ui/compare/v2.5.0...v2.5.1) (2023-10-19)
 
 
