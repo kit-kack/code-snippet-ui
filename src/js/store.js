@@ -1,5 +1,4 @@
 import {nextTick, reactive, ref} from "vue";
-import {configManager} from "./core/config";
 
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
@@ -134,21 +133,6 @@ const refreshListView = ()=>{
 export const refreshSearchResult =()=>{
     $reactive.utools.searchRefreshValue++;
 }
-
-function handleAppHeight(){
-    if($reactive.view.fullScreenShow){
-        utools.setExpendHeight(545)
-    }else{
-        if(configManager.get('strategy_item_code_show') === 2){
-            $message.info("多行元素代码块场景下不支持 列表UI")
-        }
-    }
-
-    const height = $list.value.length * 66 + 15;
-    utools.setExpendHeight(height > 535? 545 : height)
-    console.dir($normal.scroll.virtualScrollInvoker?.$refs?.scroller?.totalSize)
-}
-
 
 export {
     $normal,$reactive,$index,$list,

@@ -1,9 +1,4 @@
 <template>
-<!--  <router-view v-slot="{ Component }">-->
-<!--    <keep-alive include="ListView">-->
-<!--      <component :is="Component" :key="$route.fullPath" />-->
-<!--    </keep-alive>-->
-<!--  </router-view>-->
   <top-nav/>
   <template v-if="$reactive.view.deepRefresh">
     <list-view  v-show="$reactive.currentMode === LIST_VIEW"/>
@@ -49,7 +44,7 @@
               </template>
             </n-button>
           </template>
-          查看更多
+          设置
         </n-tooltip>
         <n-tooltip trigger="hover" placement="left">
           <template #trigger>

@@ -1,7 +1,7 @@
 import {createOrUpdate} from "./base";
 import {defaultHelpSnippet} from "../some";
 import {adjustTheme} from "../theme";
-import {$normal} from "../store";
+import {$normal, $reactive} from "../store";
 
 const GLOBAL_CONFIG = "config"
 const NEW_GLOBAL_CONFIG = "conf"
@@ -17,11 +17,14 @@ export const configManager = {
         utools.removeFeature("code-snippet-keyword")
         // data
         this.configs = utools.db.get(NEW_GLOBAL_CONFIG)?.data ?? {}
+        if(this.configs['lite']){
+            $reactive.view.fullScreenShow = false;
+        }
         // init item code show
         if(!"strategy_item_code_show" in this.configs){
             this.configs["strategy_item_code_show"] = 0;
         }
-        if(!"strategy_theme" in this.configs){
+        if(!(this.configs["strategy_theme"] >= 0)){
             this.configs["strategy_theme"] = 0;
         }
         // init theme

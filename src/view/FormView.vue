@@ -170,7 +170,7 @@
                   </n-divider>
                   <n-button @click="importLocalDir" quaternary type="primary" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">本地目录</n-button>
                   <n-button @click="setAsNormalDir" quaternary type="info" >普通目录</n-button>
-                  <n-button @click="setAsCustomDir" quaternary type="error" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">自定义目录(代码实现)</n-button>
+                  <n-button @click="importHierarchyJS" quaternary type="error" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">自定义目录(代码实现)</n-button>
                 </template>
               </template>
             </n-tab-pane>
@@ -516,13 +516,31 @@ const importLocalDir = ()=>{
     codeTemplate.ref = "local";
   }
 }
+const importHierarchyJS = ()=>{
+  const realPathList = utools.showOpenDialog({
+    title: '指定你的【自定义目录】代码实现文件' ,
+    defaultPath: utools.getPath('desktop'),
+    buttonLabel: '确定',
+    properties: [
+      'openFile'
+    ],
+    filters:[
+      {
+        name: 'js',
+        extensions: ['js','javascript']
+      }
+    ]
+  })
+  if (realPathList != null) {
+    codeTemplate.path = realPathList[0];
+    // 解析类型
+    codeTemplate.dir = true;
+    codeTemplate.ref = "custom";
+  }
+}
 function setAsNormalDir() {
   codeTemplate.dir = true;
   codeTemplate.ref = undefined;
-}
-function setAsCustomDir(){
-  codeTemplate.dir = true;
-  codeTemplate.ref = "new-maven";
 }
 function handleSetUrlAsPath(){
   if(url.value && isNetWorkUri(url.value)){

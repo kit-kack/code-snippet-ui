@@ -25,9 +25,7 @@
 
 <script setup>
 import {configManager} from "../js/core/config";
-import {codeSnippetManager} from "../js/core/snippet";
-import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW, refreshListView} from "../js/store";
-import {backupFilePath} from "../js/some";
+import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 
 const getBtnStyle = ()=>{
@@ -50,37 +48,7 @@ let lastTime = 0  // 时间
 const handleVimStatusBarClick = ()=>{
   if($reactive.currentMode === LIST_VIEW){
     if(showCount === 7){
-
-      $dialog.error({
-        title:'危险清空操作',
-        content: '当前操作将会清空插件所有代码片段，请您慎重考虑',
-        positiveText: '确认清空',
-        negativeText: '幸好没清',
-        onNegativeClick: ()=>{
-          $message.success("花点时间去看看外面的风景吧")
-        },
-        onPositiveClick: ()=>{
-          $dialog.warning({
-            title: '提示备份操作',
-            content: '所有代码片段即将被清空，是否进行最后的备份？（如果误点，请点击X退出清空操作）',
-            positiveText: '备份',
-            negativeText: '不备份',
-            onNegativeClick: ()=>{
-              // 删除数据
-              codeSnippetManager.empty();
-              refreshListView(true)
-            },
-            onPositiveClick: ()=>{
-              // 备份
-              codeSnippetManager.store(backupFilePath)
-              // 删除数据
-              codeSnippetManager.empty();
-              // 刷新
-              refreshListView(true)
-            }
-          })
-        }
-      })
+      $message.success("花点时间去看看外面的风景吧")
       showCount = 0;
     }else{
       showCount++;

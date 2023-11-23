@@ -1,58 +1,90 @@
 <template>
-  <div id="top-nav">
-    <n-scrollbar x-scrollable style="max-width: 500px;">
+  <div id="top-nav" :class="{
+    'non-code-view': $reactive.currentMode !== CODE_VIEW
+  }">
+    <n-scrollbar x-scrollable style="max-width: 92vw;" :ref="(el)=> $normal.scroll.hierarchyInvoker = el">
       <n-breadcrumb style="padding-left: 10px" class="top-nav-item" >
-        <n-breadcrumb-item  clickable>
+        <n-breadcrumb-item  clickable @click="clearCurrentPrefix">
           ◈
         </n-breadcrumb-item>
-        <n-breadcrumb-item v-for="p in $reactive.currentPrefix" clickable>
+        <n-breadcrumb-item v-for="(p,index) in $reactive.currentPrefix" clickable @click="sliceCurrentPrefix(index)">
           {{p}}
         </n-breadcrumb-item>
       </n-breadcrumb>
     </n-scrollbar>
-    <div style="position: absolute;right: 0;top:0">
-      <n-space align="center">
-        <div style="font-size: 12px;height: 15px;margin-top: -10px">
-          {{$list.length}}条数据
-        </div>
-        <n-button quaternary style="padding: 0 5px" class="top-nav-item"  @click="switchSortKey">
-          <template #icon>
-            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 18 18"><g fill="none"><path d="M4.854 2.146a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L4 3.707V13.5a.5.5 0 0 0 1 0V3.707l2.146 2.147a.5.5 0 1 0 .708-.708l-3-3zm6.298 11.714a.5.5 0 0 0 .696 0l3-2.9a.5.5 0 1 0-.696-.72L12 12.321v-9.82a.5.5 0 0 0-1 0v9.82l-2.152-2.08a.5.5 0 1 0-.696.718l3 2.9z" fill="currentColor"></path></g></svg>          </template>
-          {{sortKeyOptions[currentSortKey]}}
-        </n-button>
-      </n-space>
-
+    <div class="top-nav-item snippet-count-info">
+      {{word}} {{$reactive.view.fullScreenShow? '◈': '◇'}}
     </div>
   </div>
 </template>
 <script setup>
 
-import {$index, $list, $reactive, refreshListView} from "../../js/store";
-import {configManager} from "../../js/core/config";
-import {ref} from "vue";
-
-const currentSortKey = ref(configManager.getSortKey())
-
-const sortKeyOptions = ["创建次序","最近访问","使用次数","名字排序"]
-
-function switchSortKey(){
-  let key = configManager.getSortKey() +1;
-  if(key > 3){
-    key = 0;
+import {$list, $normal, $reactive, CODE_VIEW, LIST_VIEW} from "../../js/store";
+import {GLOBAL_HIERARCHY} from "../../js/hierarchy/core";
+import {ref, watch} from "vue";
+import dayjs from "dayjs";
+const word = ref();
+const weekdays = ["周一","周二","周三","周四","周五","周六","周日"];
+let timer = null;
+watch([()=>$list.value,()=>$reactive.currentMode],(newValue)=>{
+  if($reactive.currentMode === LIST_VIEW){
+    word.value = $list.value.length;
+    if(timer){
+      clearInterval(timer)
+    }
+  }else{
+    const now = dayjs();
+    word.value = now.format(`M月D日 ${weekdays[now.day()]} HH:mm`);
+    if(!timer){
+      timer = setInterval(()=>{
+        const now = dayjs();
+        word.value = now.format(`M月D日 ${weekdays[now.day()]} HH:mm`);
+      },10000)
+    }
   }
-  configManager.set('sortKey',key)
-  currentSortKey.value = key;
-  // refresh
-  refreshListView(true)
+},{
+  deep: true,
+  immediate:true
+})
+function clearCurrentPrefix(){
+  if($reactive.currentMode === LIST_VIEW){
+    GLOBAL_HIERARCHY.changeHierarchy("root")
+  }
+}
+function sliceCurrentPrefix(ind){
+  if($reactive.currentMode === LIST_VIEW){
+    GLOBAL_HIERARCHY.changeHierarchy("custom",ind);
+  }
 }
 </script>
 <style scoped>
 #top-nav{
   height: 15px;
-  box-shadow: 3px 3px 6px 0 rgba(58, 57, 57, 0.5) inset, -3px -3px 6px 1px #343434 inset;
 }
+#light-app #top-nav{
+  background-color: white;
+}
+#light-app #top-nav.non-code-view{
+  background: linear-gradient(180deg,#fff,#f5f5f5);
+}
+
 .top-nav-item{
   height: 15px;
   font-size: 12px;
+  line-height: 1.0;
+}
+.snippet-count-info{
+  position: absolute;
+  right: 10px;
+  top:0;
+}
+#dark-app .snippet-count-info{
+  color: #d9d9da;
+}
+#light-app .n-breadcrumb-item :hover{
+  color: #282c34 !important;
+}
+#dark-app .n-breadcrumb-item :hover{
+  color: white !important;
 }
 </style>

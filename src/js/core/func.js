@@ -665,6 +665,41 @@ export const formatManager = {
                 copyOrPaste(code)
             })
         }
+    },
+    backup(zip, filename,dirname) {
+        const funcs = {};
+        for(const key in formatManager.funcMap){
+            const func = formatManager.funcMap[key];
+            if(func.default){
+                continue
+            }
+            funcs[key] = {
+                name: func.name,
+                desc: func.desc,
+                commands: func.commands
+            }
+            // store
+            zip.file(`${dirname}/${func.name}.func.js`,func.expression)
+        }
+        zip.file(filename,JSON.stringify({
+            funcs: funcs
+        }))
+    },
+    async load(zip, filename,dirname) {
+        // func
+        try{
+            const obj = JSON.parse(await zip.file(filename).async("string"))
+            if(obj && obj.funcs){
+                for (const key in obj.funcs) {
+                    const func = obj.funcs[key];
+                    func.expression = await zip.file(`${dirname}/${func.name}.func.js`).async("string");
+                    formatManager.funcMap[key] = func
+                }
+                createOrUpdate(GLOBAL_FUNC,formatManager.funcMap)
+            }
+        }catch (e){
+            utools.showNotification(`解析${filename}时发生异常，原因为${e.message}`)
+        }
     }
 }
 

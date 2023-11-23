@@ -1,6 +1,6 @@
 @import "style/atom.css";
 :root{
-  --global-color: red;
+  --global-color: white;
 }
 *{
   padding: 0;
@@ -24,7 +24,7 @@ body#light-app{
 }
 #dark-app .vue-recycle-scroller::-webkit-scrollbar-thumb{
   border-color: #303133;
-  background-color: #222;
+  background-color: #262626;
 }
 #app .hljs-container pre{
   overflow: hidden;

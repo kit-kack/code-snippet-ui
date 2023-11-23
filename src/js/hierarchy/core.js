@@ -16,14 +16,24 @@ import {localDirectoryHierarchy} from "./h-local-dir";
 import {handleArrayForHierarchy} from "../utils/sort";
 import {deleteHub, hierachyHubManager} from "../core/hub";
 import {nextTick, toRaw} from "vue";
-import {vscodeHierarchy} from "./h-vscode";
 import {lowercaseIncludes} from "../utils/common";
 import {fullAlias} from "../utils/language";
 import {codeSnippetManager} from "../core/snippet";
 import {defaultHelpSnippet} from "../some";
-import {mavenHierarchy} from "./h-maven";
-import {newMavenHierarchy} from "./h-new-maven";
 import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
+import _ from "lodash";
+
+function _loadValidHierarchyJS(path) {
+    const hierarchy = window.preload.dynamicLoadJS(path);
+    if (hierarchy) {
+        // check method
+        if(!_.isFunction(hierarchy.search)){
+            utools.showNotification('该JS文件导出的对象必须有search方法')
+            return null;
+        }
+    }
+    return hierarchy;
+}
 
 export const GLOBAL_HIERARCHY = {
     currentHierarchy: rootHierachy,
@@ -78,17 +88,25 @@ export const GLOBAL_HIERARCHY = {
                 // redirect后续逻辑同next
             case "next":
                 // 先判断ref
-                if($reactive.currentSnippet.ref === "local"){
-                    $normal.hierarchy.path.push({
-                        local:true,
-                        value: $reactive.currentSnippet.path,
-                        index: $index.value
-                    })
-                }else{
-                    $normal.hierarchy.path.push({
-                        value: $reactive.currentSnippet.ref,
-                        index: $index.value
-                    })
+                switch ($reactive.currentSnippet.ref) {
+                    case "local":
+                        $normal.hierarchy.path.push({
+                            local:true,
+                            value: $reactive.currentSnippet.path,
+                            index: $index.value
+                        })
+                        break
+                    case "custom":
+                        $normal.hierarchy.path.push({
+                            value: $reactive.currentSnippet.path,
+                            index: $index.value
+                        })
+                        break
+                    default:
+                        $normal.hierarchy.path.push({
+                            index: $index.value
+                        })
+                        break
                 }
                 $reactive.currentPrefix.push($reactive.currentSnippet.name)
                 this.currentPrefixIdArray.push(this.currentHierarchy.core? $reactive.currentSnippet.id : $reactive.currentSnippet.name)
@@ -112,21 +130,14 @@ export const GLOBAL_HIERARCHY = {
             if(temp.local){
                 // local dir
                 this.currentHierarchy = localDirectoryHierarchy;
-            }else{
-                if(temp.value){
-                    if(temp.value === "vscode"){
-                        this.currentHierarchy = vscodeHierarchy;
-                        // custom ref
-                        // TODO: 动态解析JS文件
-                    }else if(temp.value === "maven"){
-                        console.log("maven")
-                        this.currentHierarchy = mavenHierarchy;
-                    }else if(temp.value === "new-maven"){
-                        this.currentHierarchy = newMavenHierarchy;
-                    }
-                }else{ // normal
-                    // 保持不变
+            }else if(temp.value) {
+                this.currentHierarchy = _loadValidHierarchyJS(temp.value)
+                // null
+                if (this.currentHierarchy === null) {
+                    this.currentHierarchy = rootHierachy;
                 }
+            }else{ // normal
+                // 保持不变
             }
         }else{
             // root
@@ -204,7 +215,17 @@ export const GLOBAL_HIERARCHY = {
         if(searchWord == null || searchWord.length === 0){
             $reactive.view.aidTagActive = false;
             $normal.tempTags = [];
-            result = await this.currentHierarchy.search(this.currentPrefixArray,null)
+            try{
+                result = await this.currentHierarchy.search(this.currentPrefixArray,null,hierachyHubManager.getTopList())
+                if(_.isArray(result)){
+                    result = {
+                        snippets: result
+                    }
+                }
+            }catch (e) {
+                utools.showNotification(e.message)
+            }
+
         }else{
             const words = searchWord.split(/\s/).filter(v=>v.length>=1)
             let type = null;
@@ -242,7 +263,16 @@ export const GLOBAL_HIERARCHY = {
             }
             $reactive.view.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
             $normal.tempTags = tags;
-            result = await this.currentHierarchy.search(this.currentPrefixArray,name)
+            try{
+                result = await this.currentHierarchy.search(this.currentPrefixArray,name,hierachyHubManager.getTopList())
+                if(_.isArray(result)){
+                    result = {
+                        snippets: result
+                    }
+                }
+            }catch (e) {
+                utools.showNotification(e.message)
+            }
             if(result && result.snippets){
                 // tags
                 if(tags !== null && tags.length > 0){
@@ -334,7 +364,11 @@ export const GLOBAL_HIERARCHY = {
             if(!GLOBAL_HIERARCHY.currentHierarchy.core){
                 snippet.keyword = undefined;
             }
-            GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixArray,snippet,oldName);
+            try{
+                GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixArray,snippet,oldName);
+            }catch (e){
+                $message.error(e.message)
+            }
             if(oldName){
                 if(oldName !== snippet.name){
                     // update
@@ -386,7 +420,12 @@ export const GLOBAL_HIERARCHY = {
      * @param {CodeSnippet} snippet
      */
     remove(snippet){
-        this.currentHierarchy.remove(this.currentPrefixArray,snippet);
+        try{
+            this.currentHierarchy.remove?.(this.currentPrefixArray,snippet);
+        }catch (e){
+            $message.error(e.message)
+        }
+
         // 移除 hub数据
         if(snippet.dir){
             // 移除 整个hub

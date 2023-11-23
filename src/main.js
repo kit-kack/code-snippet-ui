@@ -6,18 +6,20 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
-import {$index, $list, $normal, $reactive, CREATE_VIEW, LIST_VIEW} from "./js/store";
+import {$index, $list, $normal, $reactive, CREATE_VIEW} from "./js/store";
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/func";
 import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
-import _ from "lodash";
 import {init} from "./js/keyboard";
+import {hierachyHubManager} from "./js/core/hub";
+import {generate_backup} from "./js/core/backup";
 // init
 configManager.init()
 tagColorManager.init()
 formatManager.init()
+hierachyHubManager.init()
 codeSnippetManager.init()
 init($list)
 
@@ -96,15 +98,6 @@ utools.onPluginOut(processExit => {
 const enterApp = (data) => {
     console.log('Enter App ...')
     bindApp()
-    // TODO:处理
-    // if(configManager.get('enabledLiteShow')){
-    //     $reactive.view.fullScreenShow = false;
-    //     if(configManager.get('noShowForEmptySearch')){
-    //         utools.setExpendHeight(0)
-    //     }
-    // }else{
-    //     utools.setExpendHeight(545)
-    // }
     if(data.code==='code-snippet-save'){
         $normal.quickCode = data.payload;
         GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
@@ -117,7 +110,8 @@ const enterApp = (data) => {
 
 utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
-        codeSnippetManager.store(backupFilePath)
+        generate_backup(backupFilePath)
+        utools.outPlugin();
         return;
     }else if(data.code.startsWith('keyword/')){
         let id = data.code.slice(8);

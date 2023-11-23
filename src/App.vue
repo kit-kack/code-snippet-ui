@@ -13,9 +13,9 @@ import hljs from "./js/dep/highlight-dep";
 import {theme, themeOverrides} from "./js/theme";
 import {onMounted, watch} from "vue";
 import MiddleView from "./view/MiddleView.vue";
+import {$normal, $reactive, LIST_VIEW} from "./js/store";
 import _ from "lodash";
 import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
-import {$normal, $reactive, LIST_VIEW, utools_focus_or_blur} from "./js/store";
 
 const handleUtoolsTextChange =  _.debounce((text)=>{
   if($reactive.view.backStageShow){
@@ -45,14 +45,13 @@ watch(()=>$reactive.currentMode,(mode)=>{
   if(mode === LIST_VIEW){
     utools.setSubInput(({text}) =>{
       handleUtoolsTextChange(text)
-    },"搜索: name #tag @type")
+    },"搜索 name #tag @type")
     if(!$reactive.utools.focused){
       utools.subInputBlur();
     }
   }else{
     utools.removeSubInput()
   }
-
 },{
   immediate: true
 })

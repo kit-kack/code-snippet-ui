@@ -24,6 +24,24 @@ export const readFile = fs.readFileSync;
 export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.md')).toString();
 export const writeFile = fs.writeFileSync;
 export const renameFile = fs.renameSync;
+const localConfigDirPath = path.join(utools.getPath('appData'),'./code-snippet-utools')
+export const writeConfigFile = (p,data) =>{
+    if(!fs.existsSync(localConfigDirPath)){
+        fs.mkdirSync(localConfigDirPath)
+    }
+    p = path.join(localConfigDirPath,p)
+    fs.writeFileSync(p,data)
+    return p;
+}
+
+export const dynamicLoadJS = (path) =>{
+    try{
+        return require(path)
+    }catch (e){
+        utools.showNotification('JS文件解析错误：' + e.message);
+        return null
+    }
+}
 
 /*
  * 暂未使用到

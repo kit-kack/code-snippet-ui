@@ -3,9 +3,6 @@ import {match} from "../utils/fuzzy";
 import {createOrUpdate} from "./base";
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
-import {formatManager} from "./func";
-import {convertValidFileSuffix} from "../utils/language";
-import JSZip from "jszip";
 import {batch_delete_utools_keyword, delete_utools_keyword, register_utools_keyword} from "./keyword";
 
 const CODE_PREFIX = "code/";
@@ -216,124 +213,59 @@ export const codeSnippetManager = {
         // 进行排序处理
         return list;
     },
-    store(path){
-        // - code-snippet-data.json
-        // - code-snippet-tag.json
-        // - code-snippet-func.json
-        // - data
-        // - data / README.md,...
-        const zip = new JSZip();
-        zip.file("code-snippet-tag.json",JSON.stringify({
-            tags: tagColorManager.tags
-        }))
-        zip.file("code-snippet-func.json",JSON.stringify({
-            funcs: formatManager.funcMap
-        }))
-        const snippets = [];
-        // snippet
-        for (let codeSnippet of this.rootSnippetMap.values()) {
-            const snippet = {...codeSnippet};
-            if(snippet.code){
-                const path = `code/${snippet.name}.${convertValidFileSuffix(snippet.type??'txt')}`
-                zip.file(path,snippet.code)
-                snippet.code = path;
+    backup(zip,dirname){
+        let count = 0;
+        for (const doc of utools.db.allDocs(CODE_PREFIX)) {
+            if(doc.data.ref === "custom"){
+                zip.file(`${dirname}/custom/${count}.custom.js`,window.preload.readFile(doc.data.path).toString())
             }
-            delete snippet.id;
-            // TODO 置顶处理
-            // if(configManager.getTopList().includes(codeSnippet.id)){
-            //     snippets.top = true;
-            // }
-            snippets.push(snippet)
+            zip.file(`${dirname}/${count}.json`,JSON.stringify({
+                data: doc.data,
+                _id: doc._id,
+                count: count
+            }))
+            count++;
         }
-        zip.file("code-snippet-data.json",JSON.stringify({
-            snippets: snippets
-        }))
-        window.preload.generateZip(zip,path);
-
-    },
-    async load(path){
-        const repeatCodeSnippets = [];
-        const data = window.preload.readFile(path);
-        const zip = await JSZip.loadAsync(data);
-        // data
-        try{
-            const obj = JSON.parse(await zip.file("code-snippet-data.json").async("string"))
-            let count = 0;
-            if(obj && obj.snippets && Array.isArray(obj.snippets)){
-                for (const snippet of obj.snippets) {
-                    if(snippet.code){
-                        snippet.code = await zip.file(snippet.code).async('string');
-                    }
-                    if(this.contain(snippet.name)){
-                        repeatCodeSnippets.push(snippet)
-                    }else{
-                        count++;
-                        // TODO:置顶处理
-                        this.add(snippet)
-                        // if(this.add(snippet) && snippet.top){
-                        //     configManager.addTopItem(snippet.id)
-                        // }
-                    }
-                }
-            }
-            utools.showNotification('共成功导入'+count+'条数据')
-        }catch (e){
-            utools.showNotification("解析code-snippet-data.json及相关data时发生异常，原因为"+e.message)
-        }
-        // tag
-        try{
-            const obj = JSON.parse(await zip.file("code-snippet-tag.json").async("string"))
-            if(obj && obj.tags){
-                for (const tag in obj.tags) {
-                    tagColorManager.tags[tag] = obj.tags[tag]
-                }
-                tagColorManager.writeToDB()
-            }
-        }catch (e){
-            utools.showNotification("解析code-snippet-tag.json时发生异常，原因为"+e.message)
-        }
-        // func
-        try{
-            const obj = JSON.parse(await zip.file("code-snippet-func.json").async("string"))
-            if(obj && obj.funcs){
-                for (const func in obj.funcs) {
-                    formatManager.funcMap[func] = obj.funcs[func]
-                }
-                createOrUpdate(GLOBAL_FUNC,formatManager.funcMap)
-            }
-        }catch (e){
-            utools.showNotification("解析code-snippet-func.json时发生异常，原因为"+e.message)
-        }
-        if(repeatCodeSnippets.length > 0){
-            $dialog.info({
-                title: '重复代码片段×'+repeatCodeSnippets.length,
-                content: '由于代码片段名不允许重复，所以请您选择下面对应操作',
-                positiveText: '全部覆盖',
-                negativeText: '全部丢弃',
-                onPositiveClick: ()=>{
-                    for (let snippet of repeatCodeSnippets) {
-                        // TODO 置顶处理
-                        this.add(snippet)
-                        // if(this.add(snippet) && snippet.top){
-                        //     configManager.addTopItem(snippet.id)
-                        // }
-                    }
-                }
-            })
+        for (const doc of utools.db.allDocs(SUB_CODE_PREFIX)) {
+            zip.file(`${dirname}/${count++}.json`,JSON.stringify({
+                data: doc.data,
+                _id: doc._id
+            }))
         }
     },
-    empty() {
-        for (let id of this.rootSnippetMap.keys()) {
-            this.del(id,null)
-        }
-    },
-    getByName(name) {
-        for (let codeSnippet of this.rootSnippetMap.values()) {
-            if(codeSnippet.name === name){
-                return codeSnippet;
+    async load(zip,dirname){
+        try{
+            const zipItems = zip.file(new RegExp('^'+dirname+'/.+\\.json$'))
+            for (const item of zipItems){
+                if(item.dir){
+                    continue;
+                }
+                const obj = JSON.parse(await item.async("string"))
+                if(obj._id && obj.data){
+                    if(obj.data.ref === "custom"){
+                        const customJSZip = zip.file(`${dirname}/custom/${obj.count}.custom.js`)
+                        if(customJSZip){
+                            // 写入文件
+                            obj.data.path = window.preload.writeConfigFile(`./${obj.count}.custom.js`,await customJSZip.async("string"))
+                        }
+                    }
+                    // 注册关键字
+                    if(obj.data.keyword){
+                        if(obj._id.startsWith(CODE_PREFIX)){
+                            const id = obj._id.slice(CODE_PREFIX.length)
+                            register_utools_keyword(obj.data,obj._id.slice(CODE_PREFIX.length))
+                        }else if(obj._id.startsWith(SUB_CODE_PREFIX)){
+                            register_utools_keyword(obj.data,obj._id.slice(SUB_CODE_PREFIX.length))
+                        }else{
+                            obj.data.keyword = undefined;
+                        }
+                    }
+                    createOrUpdate(obj._id,obj.data)
+                }
             }
+        }catch (e){
+            utools.showNotification(`解析${dirname}目录内容时发生异常，原因为${e.message}`)
         }
-        return null;
     },
     /**
      * @param {string} id

@@ -183,13 +183,13 @@ function getThemeOverrides(){
             tabTextColorHoverBar: gc,
             barColor: gc
         },
-        DynamicTags:{
-            peers:{
-                Tag:{
-                    textColor: gc
-                }
-            }
-        }
+        // DynamicTags:{
+        //     peers:{
+        //         Tag:{
+        //             textColor: gc
+        //         }
+        //     }
+        // },
     }
 }
 const themeOverrides = ref(getThemeOverrides())

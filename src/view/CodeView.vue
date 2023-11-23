@@ -23,7 +23,7 @@
                 <highlightjs :language="pair.type" :autodetect="false" :code="pair.code" width="100%"/>
               </template>
               <template v-else>
-                <highlightjs language="plaintext" :autodetect="false" :code="pair.code" width="100%"/>
+                <highlightjs autodetect :code="pair.code" width="100%"/>
               </template>
             </n-scrollbar>
             <div class="hljs-line-container">

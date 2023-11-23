@@ -46,5 +46,23 @@ export const tagColorManager={
     },
     all(){
         return Object.keys(this.tags).filter(t=> this.tags[t] !== undefined)
+    },
+    backup(zip, filename) {
+        zip.file(filename,JSON.stringify({
+            tags: tagColorManager.tags
+        }))
+    },
+    async load(zip, filename) {
+        try{
+            const obj = JSON.parse(await zip.file(filename).async("string"))
+            if(obj && obj.tags){
+                for (const tag in obj.tags) {
+                    tagColorManager.tags[tag] = obj.tags[tag]
+                }
+                tagColorManager.writeToDB()
+            }
+        }catch (e){
+            utools.showNotification(`解析${filename}时发生异常，原因为${e.message}`)
+        }
     }
 }

@@ -75,9 +75,12 @@
 
 
       <!-- 右侧下方 （语言类型|使用次数|上次使用时间） -->
-      <span  class="snippet-item-info" style="  transform-origin: 100% 0;right:0;margin-right:3px;color:#777">
-        <n-tag size="small" style="height: 14px;margin-left: 10px" round strong :bordered="false" type="warning" v-if="snippet.dir">目录</n-tag>
-              {{snippet.dir? '':(snippet.type?? 'plaintext')}}
+      <span  class="snippet-item-info" style="  transform-origin: 100% 0;right:0;margin-right:3px;"
+             :style="{
+               color: snippet.dir ? $normal.theme.globalColor: '#888'
+             }"
+      >
+              {{snippet.dir? '目录':(snippet.type?? 'plaintext')}}
       </span>
     </n-card>
 
@@ -149,7 +152,7 @@ const isShowBtn = computed(()=>{
 const isHover = ref(false)
 const pair = computed(()=>{
 
-  let code = props.snippet["link_desc"]
+  let code;
   if(configManager.get('strategy_item_code_show') === 0){
     let desc = code;
     // show tag
@@ -174,7 +177,7 @@ const pair = computed(()=>{
         if(props.snippet.ref === "local"){
           code = "[本地目录]: "+props.snippet.path;
         }else{
-          code = "[自定义目录] ";
+          code = "[自定义目录]: "+props.snippet.path;
         }
       }else{
         code = "[普通目录] ";

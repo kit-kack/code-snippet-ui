@@ -184,7 +184,7 @@ function dealWithListView(e,list){
                 doScrollForListView();
             }
             break;
-        case 'KeyT':// TODO:处理置顶ID情况
+        case 'KeyT':
             if($reactive.currentSnippet.help){
                 $message.warning('内置文档无法置顶');
                 return;
@@ -308,8 +308,6 @@ function dealWithCodeView(e){
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
             GLOBAL_HIERARCHY.changeView(LIST_VIEW)
-            // switchToListView()
-            console.log('exit')
             break;
         case 'Digit0':
             doScrollForCodeView(Direction.RESET,false);
@@ -427,6 +425,9 @@ function init(list) {
         }
         // super key
         if (e.code === 'Enter') {
+            if($reactive.currentSnippet.dir){
+                return;
+            }
             copyCode(true,$normal.subSnippetNum)
             // handleCopy(true)
             return;
@@ -439,6 +440,7 @@ function init(list) {
                     return;
                 }
                 $reactive.view.fullScreenShow = !$reactive.view.fullScreenShow;
+                configManager.set('lite',!$reactive.view.fullScreenShow)
                 refreshListView()
                 utools_focus_or_blur(true)
             } else {
@@ -460,6 +462,11 @@ function init(list) {
         }
         // 其他键无法触发
         if ($reactive.utools.focused) {
+            if(e.code === 'KeyQ' && (e.ctrlKey || e.metaKey)){
+                if($reactive.currentMode === LIST_VIEW){
+                    GLOBAL_HIERARCHY.changeHierarchy("prev")
+                }
+            }
             return;
         }
         // 处理Ctrl键
@@ -467,12 +474,12 @@ function init(list) {
             switch (e.code){
                 case 'KeyN':
                     GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
-                    return;
+                    break
                 case 'KeyR':
                     if($reactive.currentMode === LIST_VIEW){
                         refreshListView(true)
                     }
-                    return;
+                    break
                 case 'Digit1':
                 case 'Digit2':
                 case 'Digit3':
@@ -483,7 +490,7 @@ function init(list) {
                 case 'Digit8':
                 case 'Digit9':
                     copyCode(true,+e.code[5])
-                    return;
+                    break
             }
             return;
         }

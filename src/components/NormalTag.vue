@@ -25,23 +25,27 @@
 
 <script setup>
 
-import {reactive} from "vue";
+import {ref} from "vue";
 import Color from "../js/lib/color.js";
 import {tagColorManager} from "../js/core/tag";
 import ColorPicker from "./ColorPicker.vue";
+import {$normal} from "../js/store";
 
 const props = defineProps({
   "content": String,
-  "type": String
+  "type": String,
+  "followTheme": Boolean
 })
-let color = tagColorManager.get(props.content)
-if(color[0]==='#'){
-  color = Color.hexaToRbga(color)
+const colorStyle = ref(getColorStyle(props.followTheme? $normal.theme.tagColor :  tagColorManager.get(props.content)))
+function getColorStyle(color){
+  if(color[0]==='#'){
+    color = Color.hexaToRbga(color)
+  }
+  return {
+    color: Color(color).lightenByRatio(1),
+    textColor:color
+  };
 }
-const colorStyle = reactive({
-  color: Color(color).lightenByRatio(1),
-  textColor:color
-})
 /**
  *
  * @type {EmitFn<string[]>} to  refresh ListView or SideView
@@ -49,16 +53,12 @@ const colorStyle = reactive({
 const emit = defineEmits(['tagRefresh'])
 const instance = {
   title: "更改颜色",
-  color:colorStyle.textColor,
+  color:colorStyle.value.textColor,
   handleUpdate: c=>{
     if(c == null){
       c = tagColorManager.get(props.content)
     }
-    if(c[0]==='#'){
-      c = Color.hexaToRbga(c)
-    }
-    colorStyle.color = Color(c).lightenByRatio(1);
-    colorStyle.textColor = c;
+    colorStyle.value = getColorStyle(c)
   },
   handleConfirm: c=>{
     if(c[0]==='#'){

@@ -1,5 +1,6 @@
 import {createOrUpdate} from "./base";
 import {$index} from "../store";
+import _ from "lodash";
 /**
  *
  * Snippet Hierarchy Hub 职责
@@ -16,8 +17,6 @@ const ROOT_HIERARCHY_PREFIX = "hub";
 
 /**
  * @typedef {Object} HierarchyHub
- * @property {boolean} closeReadME - 关闭入门手册
- * @property {string} README - 入门手册
  * @property {string[]} topList - 记录置顶的代码片段列表
  * @property {Object<string,{ count?: number,time?: number,sections?: Array<[number,number]> }>} snippets - 额外配置的数据
  */
@@ -33,6 +32,14 @@ export const hierachyHubManager = {
      */
     currentHub: _getHierarchyHub(ROOT_HIERARCHY_PREFIX),
     currentPrefix: null,
+    currentClonedTopList: [],
+
+    init(){
+        this.changeHub(null)
+    },
+    _syncTopList(){
+      this.currentClonedTopList = _.clone(this.currentHub.topList)??[]
+    },
 
     changeHub(prefix){
         if(prefix){
@@ -42,6 +49,7 @@ export const hierachyHubManager = {
             this.currentHub = _getHierarchyHub(ROOT_HIERARCHY_PREFIX)
         }
         this.currentPrefix = prefix;
+        this._syncTopList();
     },
     store(){
       if(this.currentPrefix){
@@ -54,7 +62,7 @@ export const hierachyHubManager = {
      * @return {string[]}
      */
     getTopList(){
-      return this.currentHub.topList ?? [];
+      return this.currentClonedTopList;
     },
 
     /**
@@ -70,7 +78,7 @@ export const hierachyHubManager = {
                 // 添加进去
                 topList.push(eleName)
                 // 更新index
-                $index.value = hierachyHubManager.getTopList().length -1;
+                $index.value = topList.length -1;
             }
         }else{
             if(mode !== "set"){
@@ -80,6 +88,7 @@ export const hierachyHubManager = {
         }
         // 保存
         this.currentHub.topList = topList;
+        this._syncTopList();
         this.store();
     },
 
@@ -150,6 +159,7 @@ export const hierachyHubManager = {
             // 移除
             topList.splice(index,1)
         }
+        this._syncTopList()
         // snippet data
         if(this.currentHub.snippets){
             delete this.currentHub.snippets[name]
@@ -165,6 +175,7 @@ export const hierachyHubManager = {
         if(index !== -1){
             // 移除
             topList.splice(index,1,newName)
+            this._syncTopList()
             flag = true;
         }
         // snippet data
@@ -178,6 +189,36 @@ export const hierachyHubManager = {
         // store
         if(flag){
             this.store()
+        }
+    },
+    backup(zip,dirname){
+        let count = 0;
+        zip.file(`${dirname}/${count++}.json`,JSON.stringify({
+            data: _getHierarchyHub(ROOT_HIERARCHY_PREFIX),
+            _id: ROOT_HIERARCHY_PREFIX
+        },null,2))
+        utools.db.allDocs(HIERARCHY_PREFIX).forEach(doc =>{
+            zip.file(`${dirname}/${count++}.json`,JSON.stringify({
+                data: doc.data,
+                _id: doc._id
+            },null,2))
+        });
+    },
+    async load(zip,dirname) {
+
+        try{
+            const zipItems = zip.file(new RegExp('^'+dirname+'/.+\\.json$'))
+            for (const item of zipItems){
+                if(item.dir){
+                    continue;
+                }
+                const obj = JSON.parse(await item.async("string"))
+                if(obj._id && obj.data){
+                    createOrUpdate(obj._id,obj.data)
+                }
+            }
+        }catch (e){
+            utools.showNotification(`解析${dirname}目录内容时发生异常，原因为${e.message}`)
         }
     }
 }
