@@ -13,18 +13,7 @@ code.hljs {
 #dark-app .hljs {
     color: #abb2bf !important;
 }
-.github-markdown-body .hljs{
-    background: #fafafa !important;
-}
-.v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre code{
-    font-family: 'Consolas' !important;
-}
-#dark-app .v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre {
-    background: #282c34 !important;
-}
-#dark-app .v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre code{
-    color: #a0a1a7 !important;
-}
+
 .hljs-comment, .hljs-quote {
     color: #a0a1a7 !important;
     font-style: italic

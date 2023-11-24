@@ -91,12 +91,6 @@ const handleRecoverLiteShow = ()=>{
     if($normal.recoverLiteShow){
         $normal.recoverLiteShow= false;
         $reactive.view.fullScreenShow = false;
-        if($list.value.length > 0){
-            const height = $list.value.length * 67 + 15;
-            $normal.recoverLiteHeight = height > 535? 545 : height;
-        }else{
-            $normal.recoverLiteHeight = 50;
-        }
         utools.setExpendHeight($normal.recoverLiteHeight)
     }
 }

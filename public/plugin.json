@@ -1,6 +1,6 @@
 {
   "name": "zy0gidc9",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "pluginName": "code-snippet",
   "description": "管理您的代码片段，支持Vim操作方式",
   "author": "kitkack",
@@ -12,8 +12,7 @@
     "preload": "preload.js"
   },
   "pluginSetting": {
-    "single": true,
-    "height": 1
+    "single": true
   },
   "features": [
     {

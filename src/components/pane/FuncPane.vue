@@ -60,8 +60,8 @@
           <n-dynamic-tags v-model:value="pair.commands" />
         </n-form-item>
         <n-form-item label="函数实现" path="expression" size="small">
-          <div id="main">
-            <p class="code-aid" style="top:5px">function func(command,param){</p>
+          <div class="func-impl">
+            <p class="func-impl-preset-content" style="top:5px">function func(command,param){</p>
             <n-input
                 v-model:value="pair.expression"
                 placeholder="请输入函数实现"
@@ -69,7 +69,7 @@
                 size="small"
                 style="padding: 25px 10px 30px 30px;width:100%"
                 :autosize="{maxRows:4}"/>
-            <p class="code-aid" style="bottom: 5px">}</p>
+            <p class="func-impl-preset-content" style="bottom: 5px">}</p>
           </div>
 
 
@@ -167,11 +167,11 @@ const activeKey = ref(null)
   height: 40px;
   padding: 0 5px
 }
-#main{
+.func-impl{
   position: relative;
   width: 100%;
 }
-.code-aid{
+.func-impl-preset-content{
   position: absolute;
   left: 0;
   padding-left: 10px;

@@ -1,13 +1,13 @@
 <template>
-  <n-scrollbar style="max-height: 180px" x-scrollable trigger="hover" class="item-code" ref="itemCodeScrollBar">
+  <n-scrollbar style="max-height: 180px" x-scrollable trigger="hover" class="item-code-scroller" ref="itemCodeScrollBar">
     <template v-if="configManager.get('strategy_item_code_raw')">
-      <pre :style="getCodeStyle()">{{code}}</pre>
+      <pre class="item-code">{{code}}</pre>
     </template>
     <template v-else-if="pair.valid">
-      <highlightjs :language="pair.type" :autodetect="false" :code="code" width="100%"/>
+      <highlightjs :language="pair.type" :autodetect="false" :code="code" width="100%" class="item-code"/>
     </template>
     <template v-else>
-      <highlightjs  autodetect :code="code" width="100%"/>
+      <highlightjs  autodetect :code="code" width="100%" class="item-code"/>
     </template>
   </n-scrollbar>
 </template>
@@ -23,13 +23,6 @@ import {getRealTypeAndValidStatus} from "../../js/utils/language";
 const props = defineProps(['code','type','active']);
 const pair = getRealTypeAndValidStatus(props.type)
 const itemCodeScrollBar = ref();
-const getCodeStyle = () =>{
-  return {
-    fontSize: '12px',
-    color: utools.isDarkColors()? '#696666':'#a4a4a4',
-    fontFamily: "'Consolas' !important"
-  }
-}
 onUpdated(()=>{
   if(props.active){
     $normal.scroll.itemCodeInvoker = itemCodeScrollBar.value;

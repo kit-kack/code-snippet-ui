@@ -155,9 +155,4 @@ const handleImport = ()=>{
 .n-divider{
   height: 12px;
 }
-#diy{
-  position: absolute;
-  right:2px;
-  bottom:2px;
-}
 </style>

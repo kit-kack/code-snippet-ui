@@ -58,7 +58,7 @@ onMounted(()=>{
     $normal.recoverLiteHeight = 545;
   }else{
     if($list.value.length > 0){
-      const height = $list.value.length * 68 + 20;
+      const height = $list.value.length * 70 + 16;
       $normal.recoverLiteHeight = height > 535? 545 : height;
     }else{
       if($reactive.utools.search){
@@ -74,6 +74,6 @@ onMounted(()=>{
 
 <style scoped>
 .scroller{
-  max-height: calc(100vh - 15px)
+  max-height: calc(100vh - 17px)
 }
 </style>

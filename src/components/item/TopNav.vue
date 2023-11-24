@@ -2,7 +2,7 @@
   <div id="top-nav" :class="{
     'non-code-view': $reactive.currentMode !== CODE_VIEW
   }">
-    <n-scrollbar x-scrollable style="max-width: 92vw;" :ref="(el)=> $normal.scroll.hierarchyInvoker = el">
+    <n-scrollbar x-scrollable style="max-width: calc(100vw - 180px);"  :ref="(el)=> $normal.scroll.hierarchyInvoker = el">
       <n-breadcrumb style="padding-left: 10px" class="top-nav-item" >
         <n-breadcrumb-item  clickable @click="clearCurrentPrefix">
           ◈
@@ -12,9 +12,10 @@
         </n-breadcrumb-item>
       </n-breadcrumb>
     </n-scrollbar>
-    <div class="top-nav-item snippet-count-info">
-      {{word}} {{$reactive.view.fullScreenShow? '◈': '◇'}}
-    </div>
+
+  </div>
+  <div class="snippet-count-info">
+    {{word}} {{$reactive.view.fullScreenShow? '◈': '◇'}}
   </div>
 </template>
 <script setup>
@@ -23,7 +24,7 @@ import {$list, $normal, $reactive, CODE_VIEW, LIST_VIEW} from "../../js/store";
 import {GLOBAL_HIERARCHY} from "../../js/hierarchy/core";
 import {ref, watch} from "vue";
 import dayjs from "dayjs";
-const word = ref();
+const word = ref(0);
 const weekdays = ["周一","周二","周三","周四","周五","周六","周日"];
 let timer = null;
 watch([()=>$list.value,()=>$reactive.currentMode],(newValue)=>{
@@ -44,7 +45,7 @@ watch([()=>$list.value,()=>$reactive.currentMode],(newValue)=>{
   }
 },{
   deep: true,
-  immediate:true
+  immediate:false
 })
 function clearCurrentPrefix(){
   if($reactive.currentMode === LIST_VIEW){
@@ -57,34 +58,43 @@ function sliceCurrentPrefix(ind){
   }
 }
 </script>
-<style scoped>
+<style lang="scss">
 #top-nav{
+  position: relative;
   height: 15px;
+  width: 100%;
 }
-#light-app #top-nav{
-  background-color: white;
-}
-#light-app #top-nav.non-code-view{
-  background: linear-gradient(180deg,#fff,#f5f5f5);
-}
-
 .top-nav-item{
   height: 15px;
   font-size: 12px;
   line-height: 1.0;
 }
 .snippet-count-info{
-  position: absolute;
+  position: fixed;
   right: 10px;
   top:0;
+  height: 15px;
+  font-size: 12px;
+  line-height: 1.0;
 }
-#dark-app .snippet-count-info{
-  color: #d9d9da;
+.n-breadcrumb .n-breadcrumb-item .n-breadcrumb-item__link{
+  padding: 0;
 }
-#light-app .n-breadcrumb-item :hover{
-  color: #282c34 !important;
+#light-app{
+  #top-nav{
+    background-color: white;
+
+    &.non-code-view{
+      background: linear-gradient(180deg,#fff,#f5f5f5);
+    }
+  }
 }
-#dark-app .n-breadcrumb-item :hover{
-  color: white !important;
+
+#dark-app{
+  .snippet-count-info{
+    color: #d9d9da;
+  }
 }
+
+
 </style>

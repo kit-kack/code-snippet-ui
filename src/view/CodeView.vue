@@ -1,5 +1,5 @@
 <template>
-  <div  id="code-view" class="kit-top">
+  <div  id="code-view">
 <!--    :x-scrollable="!pair.renderable || !$reactive.view.isRendering"-->
     <n-scrollbar
         style="max-height:calc(100vh - 15px)"
@@ -38,10 +38,11 @@
             </div>
           </div>
         </template>
-        <div class="bottom"></div>
+        <div class="code-view-codearea-bottom"></div>
       </template>
     </n-scrollbar>
-    <div id="extra">
+
+    <div id="code-view-bottom-nav">
       <n-space>
 <!--        <template v-if="snippet.path && pair.type !=='image'">-->
 <!--          <n-button quaternary-->
@@ -98,9 +99,6 @@
       </n-space>
     </div>
   </div>
-  <n-modal v-model:show="show">
-    <img :src="url" alt="图片加载失败了哦" style="max-height: 90vh;">
-  </n-modal>
 </template>
 
 <script setup>
@@ -124,8 +122,6 @@ const isNetWorkPath = snippet.path && isNetWorkUri(snippet.path)
 $reactive.currentCode = getCode()
 const hover = ref(false)
 const refreshFlag = ref(true)
-const show = ref(false)
-const url = ref()
 const pair = computed(()=>{
   // 分析类型
   const result = getRealTypeAndValidStatus(snippet.type);
@@ -213,6 +209,7 @@ function getNumShow(num){
 onMounted(()=>{
     // $normal.updateCacheCodeFunc = updateCachedCode
     $normal.scroll.codeVerticalInvoker = verticalScroller.value;
+    $reactive.view.isRendering = pair.value.renderable;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
       renderFormatBlock(pair.value.renderable && $reactive.view.isRendering)
       watch(()=>$reactive.view.isRendering,(newValue)=>{
@@ -228,16 +225,37 @@ onMounted(()=>{
 
 </script>
 
-<style >
+<style lang="scss">
 #code-view{
+  overflow: hidden;
+  z-index: 1000;
+  width: 100%;
   position: relative;
   height: calc(100vh - 15px);
+
+  .hljs-container pre{
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    z-index: 1;
+    background: transparent;
+  }
+  pre code  {
+    line-height: 22px;
+    z-index: 2;
+    background: transparent;
+
+    > *{
+      z-index: 100;
+      background: transparent;
+    }
+  }
 }
 #light-app #code-view{
   background-color: white;
 }
 
-#extra{
+#code-view-bottom-nav{
   position: fixed;
   right:20px;
   bottom: 12px;
@@ -247,34 +265,9 @@ onMounted(()=>{
   height: 32px;
   padding: 0 5px
 }
-#code-view .hljs-container pre{
+.code-view-codearea-bottom{
+  height: 40px;
   width: 100%;
-  padding-left: 10px;
-  padding-right: 10px;
-  z-index: 1;
-  background: transparent;
-}
-#code-view pre code  {
-  line-height: 22px;
-  z-index: 2;
-  background: transparent;
-}
-#code-view pre code > *{
-  z-index: 100;
-  background: transparent;
-}
-
-#code-view pre code.hljs::selection{
-  background-color: rgba(0,0,0,.1) !important;
-}
-#code-view pre code.hljs span::selection{
-  background-color: rgba(0,0,0,.1) !important;
-}
-#dark-app #code-view pre code.hljs::selection{
-  background-color: rgba(255,255,255,.1) !important;
-}
-#dark-app #code-view pre code.hljs span::selection{
-  background-color: rgba(255,255,255,.1) !important;
 }
 
 .hljs-container {
@@ -282,6 +275,10 @@ onMounted(()=>{
   display: flex;
   padding-top: 4px;
   padding-bottom: 8px;
+
+  pre code.hljs{
+    padding: 0 !important;
+  }
 }
 .hljs-line-container{
   position: absolute;
@@ -298,11 +295,6 @@ onMounted(()=>{
 }
 
 
-.bottom{
-  height: 40px;
-  width: 100%;
-}
-
 /** 行数样式 */
 .hljs-code-number {
   padding: 0 10px 0 10px;
@@ -312,20 +304,22 @@ onMounted(()=>{
   border-right: 1px solid #dcdfe5;
   user-select:none;
   z-index: 1;
+
+  &:first-child{
+    margin-top: 0;
+  }
+
+  li{
+    line-height: 12px;
+    padding: 5px 0;
+    font-size: 14px;
+    text-align: center;
+    z-index: 2;
+  }
 }
 #dark-app .hljs-code-number{
   color: #666;
   border-right-color:  #3a3c41;
-}
-.hljs-code-number :first-child{
-  margin-top: 0;
-}
-.hljs-code-number li{
-  line-height: 12px;
-  padding: 5px 0;
-  font-size: 14px;
-  text-align: center;
-  z-index: 2;
 }
 
 </style>

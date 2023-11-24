@@ -1,39 +1,37 @@
 <template>
-  <div>
-    <template v-for="data in datas">
-      <n-divider dashed>
-        {{data.title}}
-      </n-divider>
-      <n-list hoverable clickable :show-divider="false">
-        <n-list-item v-for="item in data.items" >
-          <div>
-            <div style="float: left;">
-              <template v-if="item.tooltip">
-                <n-tooltip>
-                  <template #trigger>
-                    💡{{item.feature}}
-                  </template>
-                  {{item.tooltip}}
-                </n-tooltip>
-              </template>
-              <template v-else>
-                {{item.feature}}
-              </template>
-            </div>
-
-            <div style="float: right;">
-              <template v-if="Array.isArray(item.shortcut)">
-                <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
-              </template>
-              <template v-else>
-                <span class="shortcut">{{item.shortcut}}</span>
-              </template>
-            </div>
+  <template v-for="data in datas">
+    <n-divider dashed>
+      {{data.title}}
+    </n-divider>
+    <n-list hoverable clickable :show-divider="false">
+      <n-list-item v-for="item in data.items" >
+        <div>
+          <div style="float: left;">
+            <template v-if="item.tooltip">
+              <n-tooltip>
+                <template #trigger>
+                  💡{{item.feature}}
+                </template>
+                {{item.tooltip}}
+              </n-tooltip>
+            </template>
+            <template v-else>
+              {{item.feature}}
+            </template>
           </div>
-        </n-list-item>
-      </n-list>
-    </template>
-  </div>
+
+          <div style="float: right;">
+            <template v-if="Array.isArray(item.shortcut)">
+              <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+            </template>
+            <template v-else>
+              <span class="shortcut">{{item.shortcut}}</span>
+            </template>
+          </div>
+        </div>
+      </n-list-item>
+    </n-list>
+  </template>
 </template>
 
 <script setup>

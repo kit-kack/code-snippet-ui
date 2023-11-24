@@ -17,12 +17,14 @@ export const configManager = {
         utools.removeFeature("code-snippet-keyword")
         // data
         this.configs = utools.db.get(NEW_GLOBAL_CONFIG)?.data ?? {}
-        if(this.configs['lite']){
-            $reactive.view.fullScreenShow = false;
-        }
         // init item code show
         if(!"strategy_item_code_show" in this.configs){
             this.configs["strategy_item_code_show"] = 0;
+        }
+        if(this.configs['lite']){
+            if(this.configs['strategy_item_code_show'] < 2){
+                $reactive.view.fullScreenShow = false;
+            }
         }
         if(!(this.configs["strategy_theme"] >= 0)){
             this.configs["strategy_theme"] = 0;

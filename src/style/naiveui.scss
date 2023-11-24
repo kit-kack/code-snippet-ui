@@ -1,0 +1,24 @@
+.n-color-picker {
+  width: 30px;
+  display: inline-block;
+}
+.n-dynamic-tags .n-button:not(.n-button--disabled):hover{
+  --n-text-color-hover: #ccc !important;
+}
+#dark-app {
+  .n-input{
+    --n-color-focus: #454647 !important;
+  }
+  .n-dynamic-tags .n-button:not(.n-button--disabled):hover{
+    --n-text-color-hover: white !important;
+  }
+}
+.n-scrollbar > .n-scrollbar-rail.n-scrollbar-rail--vertical{
+  right: 1px !important;
+}
+#light-app .n-tag--closable button{
+  color: #aaa;
+}
+#dark-app .n-dynamic-tags .n-button{
+  --n-text-color-pressed: #adadaf !important;
+}

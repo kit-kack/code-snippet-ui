@@ -24,14 +24,16 @@ defineEmits(['choose'])
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 .func{
   border-bottom: 1px solid #777;
   margin-bottom: 10px;
+
+  &:last-child{
+    border-bottom: none;
+  }
 }
-.func:last-child{
-  border-bottom: none;
-}
+
 .n-list-item{
   min-height: 90px;
   max-height: 150px;

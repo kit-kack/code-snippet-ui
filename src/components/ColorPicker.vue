@@ -4,8 +4,10 @@
         justify-content: center;
         align-content: center;
         padding: 2px;"
-        id="color"
-        :class="{ style:isStyled}"
+        :class="{
+          'color-picker':true,
+          style:isStyled
+        }"
   >
     <n-color-picker
         :actions="['confirm']"
@@ -48,7 +50,7 @@ function getSwatchesFromOptions(options){
 #dark-app .style{
   background-color: #303133 !important;
 }
-#dark-app #color{
+#dark-app .color-picker{
   color: #d9d9d9;
 }
 .n-color-picker{

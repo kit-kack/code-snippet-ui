@@ -27,12 +27,13 @@
             </template>
             注册为uTools功能关键字
           </n-tooltip>
-
         </template>
       </n-form-item>
+
       <n-form-item label="描述" path="desc">
         <n-input v-model:value="codeTemplate.desc" :placeholder="placeholders?.desc ?? '可选：请输入描述'" clearable :disabled="!properties.desc" />
       </n-form-item>
+
       <n-form-item label="标签" path="tags" >
         <n-select
             v-model:value="codeTemplate.tags"
@@ -46,6 +47,7 @@
             :render-tag="renderTag"
         />
       </n-form-item>
+
       <n-form-item label="代码提供" path="code">
         <template #default>
           <n-tabs  animated
@@ -54,7 +56,7 @@
                    type="line"
                    size="small">
             <n-tab-pane name="code" tab="代码" :disabled="formProperties.codeSource === 'link'">
-              <div id="main">
+              <div id="form-code">
                 <n-input
                     v-model:value="codeTemplate.code"
                     :placeholder="placeholders?.code ?? '请输入代码片段'"
@@ -66,7 +68,7 @@
                     ref="codeTextArea"
                     show-count
                     :autosize="{minRows: 8,maxRows: 8}"/>
-                <div id="sub">
+                <div id="form-code-top-nav">
                   <n-popover>
                     <template #trigger>
                       <n-button  quaternary style="position: absolute;">
@@ -107,7 +109,7 @@
                     </template>
                     使用占位符
                   </n-tooltip>
-                  <div id="select">
+                  <div id="form-code-language-select">
                     <n-select
                         v-model:value="codeTemplate.type"
                         filterable
@@ -124,6 +126,7 @@
                 </div>
               </div>
             </n-tab-pane>
+
             <n-tab-pane name="path" tab="关联" :disabled="formProperties.codeSource === 'code'">
               <template v-if="codeTemplate.path || codeTemplate.dir">
                 <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
@@ -181,10 +184,10 @@
 
 
 
-      <div id="btn">
+      <div id="form-btn">
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button id="cancel" strong secondary type="warning"  class="btn" @click="handleCancel">
+            <n-button id="cancel" strong secondary type="warning"  @click="handleCancel">
               取消 (Q)
             </n-button>
           </template>
@@ -192,7 +195,7 @@
         </n-tooltip>
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button strong secondary type="success"  class="btn" @click="handleUpdate">
+            <n-button strong secondary type="success"   @click="handleUpdate">
               保存 (S)
             </n-button>
           </template>
@@ -557,16 +560,16 @@ function handleClearPath(){
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
-#main{
+#form-code{
   position: relative;
   width: 100%;
   height: 270px;
   box-sizing: border-box;
   padding: 0 5px;
 }
-#sub{
+#form-code-top-nav{
   position: absolute;
   top: 0;
   left: 0;
@@ -578,35 +581,32 @@ function handleClearPath(){
   padding: 1px;
   z-index: 3;
 }
-#dark-app #sub{
+#dark-app #form-code-top-nav{
   border-bottom-color: #848586;
 }
-#select{
+#form-code-language-select{
   width:230px;
   float: right;
   border-left: 2px solid #efeff2;
 }
-#dark-app #select{
+#dark-app #form-code-language-select{
   border-left-color: #646666;
 }
-#setting{
-  float: left;
-  margin-top: 6px;
-  margin-left: 6px;
-}
-#btn{
+#form-btn{
   position: fixed;
   bottom: 40px;
   width: 100%;
   display: flex;
   justify-content: center;
+
+  .n-button{
+    width: 100px;
+  }
 }
 #cancel{
   margin-right: 20px;
 }
-.btn{
-  width: 100px;
-}
+
 .n-card{
   padding-bottom: 50px;
 }

@@ -21,7 +21,7 @@
            }"
       ></div>
       <!-- 右侧 序号 -->
-      <span class="snippet-item__index snippet-item__title">{{index}}</span>
+      <span class="snippet-item__index">{{index}}</span>
       <template #header>
         <n-scrollbar x-scrollable>
           <div class="snippet-item-head__left">
@@ -45,7 +45,7 @@
       <!-- 标签 -->
       <template #header-extra >
         <n-scrollbar x-scrollable :size="10" style="max-width: 250px;margin-left: 5px">
-          <div class="sub">
+          <div class="snippet-item__tags">
             <n-space :wrap="false">
               <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="doItemRefresh"/>
             </n-space>
@@ -61,8 +61,8 @@
         <template v-else>
           <single-line-code :type="pair.type" :code="pair.code"/>
         </template>
-        <!-- 子代码片段 -->
-        <span  class="snippet-item-info sub-item-code" style="left: 0;z-index: 20;" >
+        <!-- no-code-desc -->
+        <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
               {{getSideInfo()}}
         </span>
       </template>
@@ -86,7 +86,7 @@
 
     <transition>
       <template v-if="$reactive.view.isDel && selected">
-        <div id="child">
+        <div class="snippet-item-btn">
           <span style="color: gray">确认删除?</span>
           <selectable-button  :mid="395" lite type="primary" tip="搞错了" :index="0" @invoke="$reactive.view.isDel = false;" >
             ✗
@@ -97,7 +97,7 @@
         </div>
       </template>
       <template v-else-if="isShowBtn">
-        <div id="child" >
+        <div class="snippet-item-btn" >
           <n-space>
             <selectable-button :disabled="snippet.help || !GLOBAL_HIERARCHY.currentConfig?.edit"  :mid="305"  type="warning" tip="编辑" :index="0" @invoke="doEdit" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M20.998 6.25A3.25 3.25 0 0 0 17.748 3H6.25A3.25 3.25 0 0 0 3 6.25v11.499a3.25 3.25 0 0 0 3.25 3.25h4.914l.356-1.424l.02-.076H6.25a1.75 1.75 0 0 1-1.75-1.75v-9.25h14.998v2.733c.48-.19.994-.264 1.5-.22V6.25zM6.25 4.5h11.499c.966 0 1.75.783 1.75 1.75V7h-15v-.75c0-.967.784-1.75 1.75-1.75zm12.848 8.169l-5.901 5.901a2.685 2.685 0 0 0-.707 1.248l-.457 1.83c-.2.797.522 1.518 1.318 1.319l1.83-.458a2.685 2.685 0 0 0 1.248-.706L22.33 15.9a2.286 2.286 0 0 0-3.233-3.232z" fill="currentColor"></path></g></svg>
@@ -309,16 +309,24 @@ const doItemRefresh = ()=>{
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .snippet-item{
   position: relative;
   overflow: hidden;
+
+  .n-card{
+    width:98vw;
+    padding-bottom: 8px;
+    margin: 3px 1vw 3px 1vw;
+    position:relative;
+    overflow: hidden;
+  }
 }
 
-.sub{
+.snippet-item__tags{
   margin-bottom: 6px;
 }
-#child{
+.snippet-item-btn{
   position: absolute;
   top:2px;
   left:0;
@@ -336,17 +344,9 @@ const doItemRefresh = ()=>{
   /* 磨砂的背景颜色 */
   background: rgba(228,237,250,.1)!important;
 }
-#dark-app #child{
+#dark-app .snippet-item-btn{
   /* 磨砂的背景颜色 */
   background: rgba(255,255,255,.1)!important;
-}
-
-.n-card{
-  width:98vw;
-  padding-bottom: 8px;
-  margin: 2px 1vw 2px 1vw;
-  position:relative;
-  overflow: hidden;
 }
 
 
@@ -378,11 +378,12 @@ const doItemRefresh = ()=>{
   font-size: 10px;
   transform: scale(0.9); /* 用缩放来解决 */
   transform-origin: 0 0;  /* 左对齐 */
+  font-weight: bold;
+  z-index: 20;
+  color: #888;
 }
 
-.n-card:hover .circle{
-  animation: blink 1s 3 steps(1);
-}
+
 .snippet-item-info{
   position: absolute;
   bottom: -1px;
@@ -390,10 +391,10 @@ const doItemRefresh = ()=>{
   transform: scale(0.8); /* 用缩放来解决 */
   line-height: 1;
 }
-.sub-item-code {
+.no-item-code {
   color: #676767;
 }
-#light-app .sub-item-code{
+#light-app .no-item-code{
   color:#bdbfc0;
 }
 .snippet-item__title{
@@ -409,11 +410,6 @@ const doItemRefresh = ()=>{
 }
 
 
-@keyframes blink{
-  50% {
-    background-color: transparent;
-  }
-}
 /* 下面我们会解释这些 class 是做什么的 */
 .v-enter-active,
 .v-leave-active {

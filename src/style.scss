@@ -1,0 +1,67 @@
+@import "style/atom.css";
+
+#light-app{
+  --global-color: white;
+  --utools-background-color: white;
+  --plugin-background-color: #f5f5f5;
+  --plugin-text-selected-background-color: rgba(0,0,0,.1);
+  --scrollbar-thumb-background-color: #ccc;
+
+  --item-code-text-color: #696666;
+  --item-code-scroller-border-color: #686869;
+
+}
+#dark-app{
+  --utools-background-color: #303133;
+  --plugin-background-color: #303133;
+  --plugin-text-selected-background-color: rgba(255,255,255,.1);
+  --scrollbar-thumb-background-color: #262626;
+
+  --item-code-text-color: #a4a4a4;
+  --item-code-scroller-border-color: darkgray;
+}
+@import "style/naiveui";
+*{
+  padding: 0;
+  margin: 0;
+  &::selection{
+    background-color: var(--plugin-text-selected-background-color) !important;
+  }
+}
+body#light-app{
+  background-color: var(--plugin-background-color);
+}
+.snippet-item__title b{
+  color: var(--global-color);
+}
+
+.vue-recycle-scroller{
+  &::-webkit-scrollbar-track-piece{
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb{
+    border-color: var(--plugin-background-color);
+    background-color: var(--scrollbar-thumb-background-color);
+  }
+}
+
+
+.func i{
+  color: #ffa400;
+  font-size: 13px;
+  font-style: normal;
+}
+
+
+
+.item-code-scroller{
+  border-top: 1px var(--item-code-scroller-border-color) dashed;
+  code.hljs {
+    padding: 0;
+  }
+}
+.item-code{
+  font-size: 12px;
+  font-family: Consolas;
+  color: var(--item-code-text-color);
+}

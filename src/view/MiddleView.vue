@@ -90,9 +90,9 @@ import ListView from "./ListView.vue";
 import CodeView from "./CodeView.vue";
 import FormView from "./FormView.vue";
 import AidTagPane from "../components/pane/AidTagPane.vue";
-import TopNav from "../components/item/TopNav.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {configManager} from "../js/core/config";
+import TopNav from "../components/item/TopNav.vue";
 
 const helpViewScorllerRef = ref(null)
 const expanded = ref(false)

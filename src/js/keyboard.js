@@ -28,8 +28,6 @@ let lastTabTime = 0;  // 计算上次按下Tab时间
 
 const debMoveDown = _.throttle(function(){
     $reactive.utools.subItemSelectedIndex = -1;
-    // bug: $index变量有时修改不生效
-    const old = $index.value;
     $index.value++;
     // console.log($reactive.core.selectedIndex)
     doScrollForListView();
@@ -433,23 +431,25 @@ function init(list) {
             return;
         } else if (e.code === 'Tab') {
             e.preventDefault();
-            let gap = e.timeStamp - lastTabTime;
-            if (gap < 300) {
-                if(configManager.get('strategy_item_code_show') === 2){
-                    $reactive.view.fullScreenShow = true;
-                    return;
-                }
-                $reactive.view.fullScreenShow = !$reactive.view.fullScreenShow;
-                configManager.set('lite',!$reactive.view.fullScreenShow)
-                refreshListView()
-                utools_focus_or_blur(true)
-            } else {
-                if ($reactive.utools.focused && $index.value > -1) {
-                    $reactive.view.cursorShow = false;
-                    utools_focus_or_blur(false)
-                    doScrollForListView()
-                } else {
+            const gap = e.timeStamp - lastTabTime;
+            if($reactive.currentMode === LIST_VIEW){
+                if (gap < 300) { // UI切换
+                    if(configManager.get('strategy_item_code_show') === 2){
+                        $reactive.view.fullScreenShow = true;
+                        return;
+                    }
+                    $reactive.view.fullScreenShow = !$reactive.view.fullScreenShow;
+                    configManager.set('lite',!$reactive.view.fullScreenShow)
+                    refreshListView()
                     utools_focus_or_blur(true)
+                } else { // vim模式切换
+                    if ($reactive.utools.focused && $index.value > -1) {
+                        $reactive.view.cursorShow = false;
+                        utools_focus_or_blur(false)
+                        doScrollForListView()
+                    } else {
+                        utools_focus_or_blur(true)
+                    }
                 }
             }
             lastTabTime = e.timeStamp;

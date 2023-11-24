@@ -1,7 +1,7 @@
 <template>
   <v-md-preview
-      :beforeChange="beforeChangeFunc"
-      @change="whenRender"
+      :beforeChange="storeLocalImageUrlBeforeMdChange"
+      @change="assignLocalImageUrlWhenMdRender"
       :text="$reactive.currentCode"
       @copy-code-success="copyCodeSuccess"
   ></v-md-preview>
@@ -11,6 +11,7 @@
 import {$normal, $reactive} from "../../js/store";
 import {nextTick, onMounted, onUnmounted} from "vue";
 import {isNetWorkUri} from "../../js/utils/common";
+import _ from "lodash";
 
 function copyCodeSuccess(){
   $message.info("已复制")
@@ -19,11 +20,11 @@ function copyCodeSuccess(){
 let cachedImageUrls = null;
 let count = -1;
 /**
- * 实现渲染本地相对图片
+ * 由于v-md-editor本身只能显示[http(s)://..]的图片，而不能显示本地图片（v-md-editor会直接移除该url），所以需要现将本地图片url保存起来，
  * @param {string} text
  * @param {(string)=> void} next
  */
-const beforeChangeFunc = (text,next) =>{
+const storeLocalImageUrlBeforeMdChange = (text,next) =>{
   count = -1;
   if($reactive.currentSnippet.path && !isNetWorkUri($reactive.currentSnippet.path)) {
     cachedImageUrls = new Map();
@@ -45,6 +46,7 @@ const beforeChangeFunc = (text,next) =>{
       }
       return match
     })
+    // 同时支持[TOC]
     text = text.replace(/^\[TOC\]$/gm,"[[TOC]]")
   }else{
     cachedImageUrls = null;
@@ -52,10 +54,9 @@ const beforeChangeFunc = (text,next) =>{
   next(text)
 }
 /**
- * 实现渲染本地相对图片
- *
+ * 在MD渲染的时候，将本地图片的url补充回去
  */
-function whenRender(text,html){
+function assignLocalImageUrlWhenMdRender(text,html){
   if(count === -1){
     return
   }
@@ -70,9 +71,14 @@ function whenRender(text,html){
 
 }
 
+/**
+ * 处理点击Url事件
+ * @param {MouseEvent} e
+ */
 const handleClickUrl = (e)=>{
   const a = e.target.closest('.github-markdown-body a')
   if(a){
+    // [TOC] 跳转
     if(a.dataset['vMdAnchor']){
       // const heading = document.querySelector('.github-markdown-body').querySelector()
       const heading = document.querySelector(`.github-markdown-body [data-v-md-heading=${a.dataset['vMdAnchor']}]`)
@@ -82,9 +88,22 @@ const handleClickUrl = (e)=>{
           behavior: 'smooth'
         })
       }
-    }else if(a.href && (e.ctrlKey || e.metaKey)){
+    }else if(a.href){
+      // link
       e.preventDefault();
-      utools.shellOpenExternal(a.href)
+      if(e.ctrlKey || e.metaKey){
+        utools.shellOpenExternal(a.href)
+      }else{
+        const idleBrowsers = utools.getIdleUBrowsers();
+        const browser = utools.ubrowser.goto(a.href).show()
+        if(_.isEmpty(idleBrowsers)){
+          browser.run({
+            center: true
+          })
+        }else{
+          browser.run(idleBrowsers[0].id)
+        }
+      }
     }
   }
 }
@@ -98,64 +117,94 @@ onUnmounted(()=>{
 
 
 
-<style>
-#dark-app .github-markdown-body div[class*=v-md-pre-wrapper-]{
-  background-color: #242425;
-}
-.github-markdown-body h1{
-  text-align: center;
-  border-bottom-color: transparent;
-}
-
-.github-markdown-body img{
-  background-color: transparent;
-}
-
-#dark-app .v-md-textarea-editor textarea{
-  background-color: transparent;
-  color: #ddd !important;
-}
+<style lang="scss">
 .github-markdown-body{
   background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
   background-size: 20px 20px;
   background-position: 50%;
+
+  h1{
+    text-align: center;
+    border-bottom-color: transparent;
+  }
+
+  img{
+    background-color: transparent;
+  }
+  .hljs{
+    background: #fafafa !important;
+  }
+
+  pre code{
+    font-family: 'Consolas' !important;
+  }
 }
-#dark-app .github-markdown-body  {
+
+// 适配 暗黑模式
+#dark-app .github-markdown-body{
   background-image: linear-gradient(90deg, rgba(145, 142, 142, 0.04) 3%, transparent 0), linear-gradient(1turn, rgba(201, 194, 197, 0.04) 3%, transparent 0);
   color: #ccc !important;
+
+  div[class*=v-md-pre-wrapper-]{
+    background-color: #242425;
+  }
+
+  table{
+    background-color: #313134;
+    tr{
+      background-color: #353539;
+      border-top-color: #313134;
+    }
+
+    tr:nth-child(2n){
+      background-color: #313134;
+    }
+    thead  tr{
+      background-color: #313134;
+    }
+
+    td, th {
+      border-color: #444 !important;
+    }
+  }
+
+  blockquote{
+    border-left-color: #515154;
+  }
+
+  h1,h2{
+    border-bottom-color: #515154;
+  }
+
+  code:not(pre) {
+    background-color: #414141;
+  }
+  pre {
+    background: #282c34 !important;
+    code {
+      color: #a0a1a7 !important;
+      background-color: unset;
+    }
+    &.v-md-mermaid{
+      background-color: #cccccc;
+    }
+    &::-webkit-scrollbar-track-piece{
+      background-color: var(--plugin-background-color);
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 5px !important;
+      border: none !important;
+      background: rgba(0, 0, 0, 0.2) !important;
+    }
+    &::-webkit-scrollbar-track {
+      border-radius: 0;
+      background: rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  a {
+    color: #1c84f9;
+  }
 }
-#dark-app .github-markdown-body table{
-  background-color: #313134;
-}
-#dark-app .github-markdown-body table thead  tr{
-  background-color: #313134;
-}
-#dark-app .github-markdown-body table tr{
-  background-color: #353539;
-  border-top-color: #313134;
-}
-#dark-app .github-markdown-body table tr:nth-child(2n){
-  background-color: #313134;
-}
-#dark-app .github-markdown-body table td, #dark-app .github-markdown-body table th{
-  border-color: #444 !important;
-}
-#dark-app .github-markdown-body blockquote{
-  border-left-color: #515154;
-}
-#dark-app .github-markdown-body h2, #dark-app .github-markdown-body h1{
-  border-bottom-color: #515154;
-}
-#dark-app .github-markdown-body code:not(pre) {
-  background-color: #414141;
-}
-#dark-app .github-markdown-body pre code {
-  background-color: unset;
-}
-#dark-app .github-markdown-body a {
-  color: #1c84f9;
-}
-#dark-app .github-markdown-body pre.v-md-mermaid{
-  background-color: #cccccc;
-}
+
 </style>
