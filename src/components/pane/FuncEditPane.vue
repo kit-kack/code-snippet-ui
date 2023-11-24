@@ -83,83 +83,83 @@ import {ref, toRaw} from "vue";
 import {formatManager} from "../../js/core/func";
 import {getRefreshFunc} from "../../js/utils/common";
 import {$reactive} from "../../js/store";
-import BaseModal from "../base/BaseModal.vue";
+import BaseModal from "../modal/BaseModal.vue";
 
 const activeKey = ref(null)
-  const pair = ref({})
-  const refreshFlag = ref(true)
-  const doRefresh = getRefreshFunc(refreshFlag)
-  const form = ref()
-  let nowKey = null;
-  const rules = {
-    "name":[
-      {
-        required: true,
-        message: '标识符必须非空唯一',
-        validator(rule,value){
-          return value && value.trim() &&  !formatManager.checkNameRepeat(value,nowKey);
-        },
-        trigger: ["input","blur"]
-      }
-    ],
-    "code":{
+const pair = ref({})
+const refreshFlag = ref(true)
+const doRefresh = getRefreshFunc(refreshFlag)
+const form = ref()
+let nowKey = null;
+const rules = {
+  "name":[
+    {
+      required: true,
+      message: '标识符必须非空唯一',
       validator(rule,value){
-        return value && value.length > 0;
+        return value && value.trim() &&  !formatManager.checkNameRepeat(value,nowKey);
       },
-      message:"请提供函数实现"
+      trigger: ["input","blur"]
+    }
+  ],
+  "code":{
+    validator(rule,value){
+      return value && value.length > 0;
     },
-    "commands":{
-      validator(rule,value){
-        return value && value.length > 0;
-      },
-      message:"请至少提供一个响应命令名"
-    }
+    message:"请提供函数实现"
+  },
+  "commands":{
+    validator(rule,value){
+      return value && value.length > 0;
+    },
+    message:"请至少提供一个响应命令名"
   }
-  function enterAddView(){
-    pair.value = {};
-    nowKey = null;
-    $reactive.view.funcEditActive = true;
+}
+function enterAddView(){
+  pair.value = {};
+  nowKey = null;
+  $reactive.view.funcEditActive = true;
+}
+function doDel(key){
+  formatManager.del(key)
+  doRefresh()
+}
+function doReset(){
+  formatManager.reset();
+  doRefresh()
+}
+function enterEditView(key,value){
+  pair.value = {
+    ...formatManager.funcMap[key]
   }
-  function doDel(key){
-    formatManager.del(key)
-    doRefresh()
-  }
-  function doReset(){
-    formatManager.reset();
-    doRefresh()
-  }
-  function enterEditView(key,value){
-    pair.value = {
-      ...formatManager.funcMap[key]
-    }
-    nowKey = key;
-    $reactive.view.funcEditActive= true;
-  }
+  nowKey = key;
+  $reactive.view.funcEditActive= true;
+}
 
-  function doFinal(){
-    form.value.validate().then(error=>{
-      if(error!=null && error.length >= 0){
-        window.$message.warning("请按要求填写")
+function doFinal(){
+  form.value.validate().then(error=>{
+    if(error!=null && error.length >= 0){
+      window.$message.warning("请按要求填写")
+    }else{
+      // parse commands
+      const func = toRaw(pair.value)
+      if(nowKey){  // edit
+        if(formatManager.update(func,nowKey)){
+          $reactive.view.funcEditActive = false;
+          doRefresh()
+        }
       }else{
-        // parse commands
-        const func = toRaw(pair.value)
-        if(nowKey){  // edit
-          if(formatManager.update(func,nowKey)){
-            $reactive.view.funcEditActive = false;
-            doRefresh()
-          }
-        }else{
-          if(formatManager.add(func)){
-            $reactive.view.funcEditActive = false;
-            doRefresh()
-          }
+        if(formatManager.add(func)){
+          $reactive.view.funcEditActive = false;
+          doRefresh()
         }
       }
-    },()=>{
-      window.$message.warning("请按要求填写")
-    })
+    }
+  },()=>{
+    window.$message.warning("请按要求填写")
+  })
 
-  }
+}
 
 </script>
 <style scoped>

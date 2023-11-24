@@ -84,12 +84,12 @@ import VimStatusBar from "../components/VimStatusBar.vue";
 import ShortcutPane from "../components/pane/ShortcutPane.vue";
 import {ref, watch} from "vue";
 import {NButton, useDialog, useMessage} from 'naive-ui'
-import VariableInputAlert from "../components/VariableInputAlert.vue";
+import VariableInputAlert from "../components/modal/VariableInputModal.vue";
 import {$list, $normal, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, refreshListView} from "../js/store";
 import ListView from "./ListView.vue";
 import CodeView from "./CodeView.vue";
 import FormView from "./FormView.vue";
-import AidTagPane from "../components/pane/AidTagPane.vue";
+import AidTagPane from "../components/pane/TagChoosePane.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {configManager} from "../js/core/config";
 import TopNav from "../components/item/TopNav.vue";

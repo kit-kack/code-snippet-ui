@@ -26,10 +26,10 @@
 <script setup>
 
 import {ref} from "vue";
-import Color from "../js/lib/color.js";
-import {tagColorManager} from "../js/core/tag";
+import Color from "../../js/lib/color.js";
+import {tagColorManager} from "../../js/core/tag";
 import ColorPicker from "./ColorPicker.vue";
-import {$normal} from "../js/store";
+import {$normal} from "../../js/store";
 
 const props = defineProps({
   "content": String,

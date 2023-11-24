@@ -6,9 +6,10 @@
   >
     <template #trigger>
       <n-button  circle
-                 @click="operate()"
+                 @click="$emit('invoke')"
                  :type="type"
-                 :="getStyle(selected)"
+                 quaternary
+                 :secondary="selected"
                  :color="color"
                  @mouseenter="handleMouseEnter"
                  @mouseleave="hover = false"
@@ -25,26 +26,31 @@
 
 <script setup>
 import {computed, onMounted, ref} from "vue";
-import {configManager} from "../js/core/config";
-import {$normal, $reactive} from "../js/store";
+import {$normal, $reactive} from "../../js/store";
 
 const props = defineProps({
-  "tip": String,
-  "type":String,
-  "index": Number,
-  "color": String,
-  "right": Boolean,
-  "mid": Number,
-  "lite": Boolean,   // 支持Lite Show
-  "disabled": Boolean
+  // 提示信息
+  tip: String,
+  // 颜色主题选择
+  type:String,
+  color: String,
+  // vim索引位
+  index: Number,
+  // 按钮中心位置：lite show 只有一条记录时 鼠标划过 场景优化
+  mid: Number,
+  // 禁用
+  disabled: Boolean
 })
 const show = ref()
 const emit = defineEmits(['invoke'])
 const hover = ref(false)
 const flag = ref(false)
+// 是否被vim选中
 const selected = computed(()=>{
   if($reactive.utools.subItemSelectedIndex === props.index){
+    // 当前索引
     if($reactive.view.onlyOne &&  !$reactive.view.fullScreenShow){
+      // 在liteshow下只有一条记录时，被选中短暂显示tooltip
       show.value = true;
       setTimeout(()=>{
         show.value = false
@@ -57,35 +63,18 @@ const selected = computed(()=>{
   return false;
 })
 
-const operate = ()=>{
-  if(!(props.lite || $reactive.view.fullScreenShow)){
-    $reactive.view.fullScreenShow = true;
-    $normal.recoverLiteShow = true;
-    utools.setExpendHeight(545)
-  }
-  emit('invoke')
-}
 
 onMounted(()=>{
+  // 保存行为
   $normal.scroll.spaceInvoker[props.index] = ()=> {
     if(!props.disabled){
-      operate()
+      emit('invoke')
+    }else{
+      $message.warning("当前功能被禁用")
     }
   }
 })
 
-
-const getStyle =(flag) =>{
-  if(flag){
-    return {
-      secondary:true,
-      color: configManager.getGlobalColor()
-    }
-  }
-  return {
-    quaternary:true
-  }
-}
 const handleMouseEnter = (e)=>{
   hover.value = true;
   flag.value = e.clientX > props.mid;

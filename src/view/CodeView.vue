@@ -108,7 +108,7 @@ import {section_generate} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
 import {calculateTime, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
 import {$normal, $reactive, LIST_VIEW} from "../js/store";
-import NormalTag from "../components/NormalTag.vue";
+import NormalTag from "../components/base/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import MarkdownView from "../components/item/MarkdownView.vue";
 import {renderFormatBlock} from "../js/core/func";

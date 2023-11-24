@@ -21,7 +21,7 @@
 <script setup>
 import {h, ref} from "vue";
 import {configManager} from "../js/core/config";
-import ConfigCheckTag from "../components/ConfigCheckTag.vue";
+import ConfigCheckTag from "../components/base/ConfigCheckTag.vue";
 import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../js/theme";
 import {refreshListView} from "../js/store";
 

@@ -23,23 +23,14 @@
 </template>
 
 <script setup>
-import {colorSchemaStyleOptions, darkColorSchemaStyleOptions} from "../js/theme";
+import {colorSchemaStyleOptions, darkColorSchemaStyleOptions} from "../../js/theme";
 
 defineProps({
   instance: Object,
   isStyled: Boolean
 })
-const colorSwatches = getSwatchesFromOptions(utools.isDarkColors()? darkColorSchemaStyleOptions: colorSchemaStyleOptions)
+const colorSwatches = (utools.isDarkColors()? darkColorSchemaStyleOptions: colorSchemaStyleOptions).map(o=>o.tagColor)
 
-
-/**
- *
- * @param {any[]} options
- * @return {*}
- */
-function getSwatchesFromOptions(options){
-  return options.map(op => op.tagColor)
-}
 </script>
 
 <style>

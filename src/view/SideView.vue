@@ -85,11 +85,11 @@
 import {tagColorManager} from "../js/core/tag";
 import {configManager} from "../js/core/config";
 import {ref} from "vue";
-import NormalTag from "../components/NormalTag.vue";
-import ConfigCheckTag from "../components/ConfigCheckTag.vue";
+import NormalTag from "../components/base/NormalTag.vue";
+import ConfigCheckTag from "../components/base/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import FuncPane from "../components/pane/FuncPane.vue";
+import FuncPane from "../components/pane/FuncEditPane.vue";
 import {refreshListView, refreshSearchResult} from "../js/store";
 import CustomView from "./CustomView.vue";
 import {generate_backup, load_backup} from "../js/core/backup";

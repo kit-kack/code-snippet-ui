@@ -45,7 +45,7 @@ const getBtnStyle = ()=>{
 let showCount = 0 // 必须要到达 7
 let clearCount = 0
 let lastTime = 0  // 时间
-const handleVimStatusBarClick = ()=>{
+function handleVimStatusBarClick(){
   if($reactive.currentMode === LIST_VIEW){
     if(showCount === 7){
       $message.success("花点时间去看看外面的风景吧")

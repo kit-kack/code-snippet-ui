@@ -15,13 +15,12 @@
 </template>
 
 <script setup>
-
-import {tagColorManager} from "../../js/core/tag";
-const tagCheck = ref({})
-
 import {ref} from "vue";
+import {tagColorManager} from "../../js/core/tag";
 import {$normal, $reactive} from "../../js/store";
 import {lowercaseIncludes} from "../../js/utils/common";
+
+const tagCheck = ref({})
 
 function handleShow(){
   tagCheck.value = {};
