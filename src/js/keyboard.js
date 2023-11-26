@@ -531,18 +531,14 @@ function init(list) {
             $reactive.view.helpActive = !$reactive.view.helpActive;
             return;
         }
-        // 其他键无法触发
-        if ($reactive.utools.focused) {
-            if(e.code === 'KeyQ' && (e.ctrlKey || e.metaKey)){
-                if($reactive.currentMode === LIST_VIEW){
-                    GLOBAL_HIERARCHY.changeHierarchy("prev")
-                }
-            }
-            return;
-        }
         // 处理Ctrl键
         if (e.ctrlKey || e.metaKey) {
             switch (e.code){
+                case 'KeyQ':
+                    if($reactive.currentMode === LIST_VIEW){
+                        GLOBAL_HIERARCHY.changeHierarchy("prev")
+                    }
+                    break
                 case 'KeyN':
                     GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
                     break
@@ -564,6 +560,10 @@ function init(list) {
                     copyCode(true,+e.code[5])
                     break
             }
+            return;
+        }
+        // 其他键无法触发
+        if ($reactive.utools.focused) {
             return;
         }
         if($reactive.view.helpActive){

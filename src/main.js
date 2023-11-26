@@ -155,7 +155,8 @@ try{
         }
         let flag = true;
         const array = codeSnippetManager.queryForMany(name,null)
-        return array.map(cs =>{
+        return array.filter(cs => !cs.dir)
+            .map(cs =>{
             flag = !flag;
             return {
                 text: cs.desc? (cs.name+'📢'+cs.desc):cs.name,
@@ -169,7 +170,8 @@ try{
         $reactive.currentSnippet = codeSnippetManager.rootSnippetMap.get(option.id);
         // $reactive.core.selectedIndex = 0;
         $index.value = 0;
-        return copyCode(true,option.num,true)
+        copyCode(true,option.num,true)
+        return $reactive.currentSnippet.type?.startsWith('x-')
     })
 }catch (_){}
 

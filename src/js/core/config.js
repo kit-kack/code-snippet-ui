@@ -27,7 +27,7 @@ export const configManager = {
                 $reactive.view.fullScreenShow = false;
             }
         }
-        if(!(this.configs["strategy_theme"] >= 0)){
+        if(!(this.configs["strategy_theme"] >= 0 && this.configs["strategy_theme"] <= 4)){
             this.configs["strategy_theme"] = 0;
         }
         // init theme

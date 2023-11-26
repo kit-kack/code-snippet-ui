@@ -81,8 +81,8 @@ const datas = [
         shortcut: ["Enter","P"]
       },{
         feature: "复制高亮行-子代码片段",
-        shortcut: "1 ~ 9",
-        tooltip: "粘贴请结合Shift/Alt/Ctrl(Command)键"
+        shortcut: ["0","1 ~ 9"],
+        tooltip: "数字0用来进行复制所有子代码片段；粘贴请结合Shift/Alt/Ctrl(Command)键"
       },{
         feature: "系统应用打开Open（仅适用于关联文件）",
         shortcut: "O",
@@ -92,7 +92,7 @@ const datas = [
         shortcut: "Q"
       },{
         feature: '回到开始',
-        shortcut: ["0"],
+        shortcut: ["G"],
         tooltip: "该功能同样适用于代码浏览，浏览多行元素代码块时请结合Shift键"
       },{
         feature: '查看『快捷方式』',

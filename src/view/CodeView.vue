@@ -7,7 +7,9 @@
       <template v-if="refreshFlag">
         <template v-if="pair.renderable && $reactive.view.isRendering">
           <template v-if="pair.type === 'image'">
-            <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 100vw;">
+            <div style="text-align: center">
+              <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 98vw;">
+            </div>
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
             <markdown-view/>
@@ -60,37 +62,30 @@
             {{ $reactive.view.isRendering? '已渲染 [R]': '未渲染 [R]' }}
           </n-button>
         </template>
-        <n-popover trigger="hover" :show="hover || $reactive.view.codeTipActive" placement="top" :show-arrow="false" style="padding:5px">
-          <template #trigger>
-            <n-button
-                @mouseenter="hover = true"
-                @mouseleave="hover = false"
-                quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]'}}</n-button>
-          </template>
-          <n-list hoverable clickable :show-divider="false" @mouseenter="hover = true" @mouseleave="hover = false">
-            <n-list-item >
-              <div align="center">{{snippet.name}}</div>
-            </n-list-item>
-            <n-list-item>
-              <div>{{"📢 "+(snippet.desc??'暂无描述~')}}</div>
-            </n-list-item >
-            <n-list-item >
-              <div>{{`⏰ ${calculateTime(snippet.time)} 🎲${snippet.count??0} 📃${pair.count}字 ${snippet.sections?.length > 0 ? '⚑×'+snippet.sections.length:''}`}}</div>
-            </n-list-item>
-            <n-list-item  v-if="snippet.keyword">
-              <div>★ 已注册为uTools关键字</div>
-            </n-list-item >
-            <n-list-item  v-if="snippet.tags && snippet.tags.length > 0">
-              <n-scrollbar x-scrollable :size="10" style="margin-left: 5px">
-                <n-space :wrap="false">
-                  <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
-                </n-space>
-              </n-scrollbar>
-            </n-list-item >
+        <n-button
+            @click="$reactive.view.codeTipActive = true"
+            quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]'}}</n-button>
+        <n-drawer v-model:show="$reactive.view.codeTipActive" :width="350" placement="right">
+          <n-drawer-content :title="snippet.name">
+            {{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字
+            <n-space>
+              <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
+            </n-space>
+            <ul>
+              <li v-if="snippet.sections?.length > 0">{{snippet.sections.length}} 个子代码片段</li>
+              <li v-if="snippet.keyword">已注册为uTools功能关键字</li>
+            </ul>
+            <template v-if="snippet.path">
+              <n-divider>
+                关联地址
+              </n-divider>
+              <div>{{snippet.path}}</div>
+            </template>
 
-          </n-list>
-        </n-popover>
-
+            <n-divider />
+            <div>{{snippet.desc??'暂无描述~'}}</div>
+          </n-drawer-content>
+        </n-drawer>
         <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="handleClose">
           <template #icon>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
@@ -103,7 +98,7 @@
 
 <script setup>
 import {configManager} from "../js/core/config";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, onUnmounted, ref, watch} from "vue";
 import {section_generate} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
 import {calculateTime, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
@@ -120,7 +115,6 @@ const verticalScroller = ref(null)
 const snippet = $reactive.currentSnippet;
 const isNetWorkPath = snippet.path && isNetWorkUri(snippet.path)
 $reactive.currentCode = getCode()
-const hover = ref(false)
 const refreshFlag = ref(true)
 const pair = computed(()=>{
   // 分析类型
@@ -221,7 +215,9 @@ onMounted(()=>{
     }
 })
 
-
+onUnmounted(()=>{
+  $reactive.view.codeTipActive = false;
+})
 
 </script>
 
