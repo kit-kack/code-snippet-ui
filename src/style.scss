@@ -1,7 +1,8 @@
 @import "style/atom.css";
-
-#light-app{
+:root{
   --global-color: white;
+}
+#light-app{
   --utools-background-color: white;
   --plugin-background-color: #f5f5f5;
   --plugin-text-selected-background-color: rgba(0,0,0,.1);

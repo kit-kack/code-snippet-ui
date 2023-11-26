@@ -25,7 +25,7 @@ import {GLOBAL_HIERARCHY} from "../../js/hierarchy/core";
 import {ref, watch} from "vue";
 import dayjs from "dayjs";
 const word = ref(0);
-const weekdays = ["周一","周二","周三","周四","周五","周六","周日"];
+const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
 let timer = null;
 watch([()=>$list.value,()=>$reactive.currentMode],(newValue)=>{
   if($reactive.currentMode === LIST_VIEW){

@@ -1,5 +1,5 @@
 <template>
-  <top-nav/>
+  <top-nav v-if="topNavShow"/>
   <template v-if="$reactive.view.deepRefresh">
     <list-view  v-show="$reactive.currentMode === LIST_VIEW"/>
   </template>
@@ -98,7 +98,7 @@ const helpViewScorllerRef = ref(null)
 const expanded = ref(false)
 window.$message = useMessage();
 window.$dialog = useDialog();
-
+const topNavShow = ref(true)
 function onShow(){
   if($normal.scroll.helpInvoker === null){
     $normal.scroll.helpInvoker = helpViewScorllerRef.value;
@@ -111,11 +111,13 @@ watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.ut
       if(list.length === 0){
         // 不做任何改变
         if(!$reactive.view.fullScreenShow){
+          topNavShow.value = false;
           utools.setExpendHeight(0)
         }
         return
       }
     }
+    topNavShow.value = true;
     $list.value = list;
     refreshListView()
   })

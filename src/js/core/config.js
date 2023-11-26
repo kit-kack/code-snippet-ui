@@ -2,6 +2,7 @@ import {createOrUpdate} from "./base";
 import {defaultHelpSnippet} from "../some";
 import {adjustTheme} from "../theme";
 import {$normal, $reactive} from "../store";
+import {adapt_old_utools_keyword} from "./keyword";
 
 const GLOBAL_CONFIG = "config"
 const NEW_GLOBAL_CONFIG = "conf"
@@ -12,9 +13,9 @@ export const configManager = {
         if(this.isInited){
             return;
         }
-        // TODO: 下版本移除
+        // TODO: 下个大版本移除
         utools.db.remove(GLOBAL_CONFIG)
-        utools.removeFeature("code-snippet-keyword")
+        adapt_old_utools_keyword()
         // data
         this.configs = utools.db.get(NEW_GLOBAL_CONFIG)?.data ?? {}
         // init item code show

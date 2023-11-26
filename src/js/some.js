@@ -8,6 +8,7 @@ export const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
 
 export const defaultHelpSnippet = {
     id: 'default',
+    index:0,
     now: Date.now(),
     version: __APP_VERSION__,
     name: `🎉入门手册&新版本说明🎉`,

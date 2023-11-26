@@ -1,6 +1,7 @@
 import {$index, $normal, $reactive} from "../store";
 import {formatManager} from "../core/func";
 import {isNetWorkUri} from "./common";
+import _ from "lodash"
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
@@ -51,6 +52,7 @@ export function copyOrPaste(text,noView){
     if(lastCachedMsg){
         _notify(lastCachedMsg,noView,true)
     }
+    utools.copyText(text)
     if(isLastPasted){
         try{
             // utools新API
@@ -58,7 +60,6 @@ export function copyOrPaste(text,noView){
             return;
         }catch (_){}
     }
-    utools.copyText(text)
     // 粘贴
     if(isLastPasted){
         utools.hideMainWindow();
@@ -66,7 +67,7 @@ export function copyOrPaste(text,noView){
     }
 }
 
-/**
+ /**
  * 通知信息
  * @param {string} msg
  * @param {boolean} noView
@@ -118,38 +119,75 @@ export async function copyCode(isPasted,num,noView){
         // 更新次数和时间
         GLOBAL_HIERARCHY.update(null,"count&time")
         // 复制
-        if(await copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`已复制代码片段${$reactive.currentSnippet.name}的内容`,noView)){
+        if(await copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 内容已复制`,noView)){
             return noView;
         }
 
     }else{
-        if(num <= 0){
-            _notify("子代码片段序号必须从1开始",noView);
-            return;
-        }
-        if($reactive.currentSnippet.sections && $reactive.currentSnippet.sections.length >= num){
-            const  [start,end] = $reactive.currentSnippet.sections[num-1]
-            if(!$reactive.currentCode){
-                _notify("当前代码片段不支持",noView)
-                return;
-            }
-            const lines = $reactive.currentCode.split('\n',end)
-            if(lines.length < start){
-                _notify("区间值超出代码片段区间，请更新或清除旧区间值",noView)
-                return;
-            }
-            let str = '';
-            for (let i = start; i <= lines.length; i++) {
-                str += (lines[i-1]+'\n')
-            }
-            // 更新次数和时间
-            GLOBAL_HIERARCHY.update(null,"count&time")
-            // 复制
-            if(await copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`已复制${$reactive.currentSnippet.name}#${num}号子代码片段的内容`,noView)){
-                return noView;
+        if(num < 0){
+            _notify("子代码片段序号非法",noView);
+        }else if(num === 0){
+            if(_.isEmpty($reactive.currentSnippet.sections)){
+                _notify("当前代码片段没有子代码片段，故不支持该操作",noView)
+            }else{
+                if(!$reactive.currentCode){
+                    _notify("当前代码片段不支持",noView)
+                    return;
+                }
+
+                // TODO: 现版本 简单处理
+                const lines = $reactive.currentCode.split('\n')
+                let str = '';
+                for (const section of $reactive.currentSnippet.sections) {
+                    // start
+                    const start = section[0] >= 1 ? section[0] : 1;
+
+                    if(start > lines.length){
+                        // 提前终止
+                        break;
+                    }
+                    const end = section[1] > lines.length? lines.length : section[1];
+
+                    // join
+                    for (let i = start; i <= end; i++) {
+                        str += (lines[i-1]+'\n')
+                    }
+                }
+
+                // 更新次数和时间
+                GLOBAL_HIERARCHY.update(null,"count&time")
+
+                // 复制
+                if(await copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 子片段聚合 内容已复制`,noView)){
+                    return noView;
+                }
             }
         }else{
-            _notify(`当前片段没有 ${num}号 子代码片段`,noView)
+            if($reactive.currentSnippet.sections && $reactive.currentSnippet.sections.length >= num){
+                const  [start,end] = $reactive.currentSnippet.sections[num-1]
+                if(!$reactive.currentCode){
+                    _notify("当前代码片段不支持",noView)
+                    return;
+                }
+                const lines = $reactive.currentCode.split('\n',end)
+                if(lines.length < start){
+                    _notify("区间值超出代码片段区间，请更新或清除旧区间值",noView)
+                    return;
+                }
+                let str = '';
+                for (let i = start; i <= lines.length; i++) {
+                    str += (lines[i-1]+'\n')
+                }
+                // 更新次数和时间
+                GLOBAL_HIERARCHY.update(null,"count&time")
+                // 复制
+                if(await copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} ${num}号子片段 内容已复制`,noView)){
+                    return noView;
+                }
+            }else{
+                _notify(`当前片段没有 ${num}号 子代码片段`,noView)
+            }
         }
+
     }
 }

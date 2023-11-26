@@ -1,11 +1,16 @@
+import _ from "lodash";
+import {codeSnippetManager} from "./snippet";
+import {createOrUpdate} from "./base";
+
 const KEYWORD_PREFIX = 'keyword/';
 
 /**
  * 添加uTools关键字
  * @param {CodeSnippet} snippet
  * @param {string | null} prefix
+ * @param {boolean} [nonNotify]
  */
-export function register_utools_keyword(snippet,prefix){
+export function register_utools_keyword(snippet,prefix,nonNotify){
     let keyword = KEYWORD_PREFIX;
     if(prefix){
         keyword += prefix+"#";
@@ -25,7 +30,7 @@ export function register_utools_keyword(snippet,prefix){
         explain: info,
         cmds: [snippet.name]
     })
-    if(features.length === 0){
+    if(!nonNotify && features.length === 0){
         $message.success("新增uTools关键字："+snippet.name)
     }
 }
@@ -50,7 +55,10 @@ export function delete_utools_keyword(snippet,prefix){
     }
 }
 
-
+/**
+ * 批量移除utools功能关键字
+ * @param prefix
+ */
 export function batch_delete_utools_keyword(prefix){
     const p1 = KEYWORD_PREFIX + prefix + "/";
     const p2 = KEYWORD_PREFIX + prefix + "#";
@@ -61,4 +69,26 @@ export function batch_delete_utools_keyword(prefix){
             utools.removeFeature(feature.code)
         }
     }
+}
+
+export function adapt_old_utools_keyword(){
+    const oldKeywords = "code-snippet-keyword";
+    const featues = utools.getFeatures([oldKeywords])
+    if(_.isEmpty(featues)){
+        return
+    }
+    const cmds = featues[0].cmds;
+    if(_.isEmpty(cmds)){
+        return;
+    }
+    for (const codeSnippet of codeSnippetManager.rootSnippetMap.values()) {
+        if(cmds.includes(codeSnippet.name)){
+            delete codeSnippet.feature;
+            codeSnippet.keyword = true;
+            createOrUpdate("code/"+codeSnippet.id,codeSnippet)
+            register_utools_keyword(codeSnippet,null,false)
+        }
+    }
+    // final delete
+    utools.removeFeature(oldKeywords)
 }

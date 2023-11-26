@@ -1,7 +1,7 @@
 /**
  *
- * @param {[number,number][]} section_list
- * @param {number} value
+ * @param {[number,number][]} section_list 区间列表
+ * @param {number} value 待删除的值
  * @param {boolean | undefined } full - 如果为true则为删除到起始部分的区间，否则只是删除当前元素
  */
 function section_del(section_list,value,full){

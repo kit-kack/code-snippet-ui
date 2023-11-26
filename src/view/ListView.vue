@@ -1,12 +1,12 @@
 <template>
-  <div id="list-view"  :style="{cursor: ($reactive.view.cursorShow)? '': 'none'}"
-       @mousemove="$reactive.view.cursorShow = true">
+  <div id="list-view">
     <template v-if="$list.length > 0">
       <DynamicScroller
           :items="$list"
           key-field="now"
           :min-item-size="60"
           class="scroller"
+          @mousemove="$reactive.view.cursorShow = true"
           :ref="(el)=> $normal.scroll.virtualScrollInvoker = el"
       >
         <template v-slot="{item,index, active}">
@@ -41,8 +41,10 @@ import {$index, $list, $normal, $reactive} from "../js/store";
 import ListItem from "../components/ListItem.vue";
 import {DynamicScroller, DynamicScrollerItem} from "vue-virtual-scroller";
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
-import {onMounted} from "vue";
-
+import {computed, onMounted} from "vue";
+const cursorStyle = computed(()=>{
+  return $reactive.view.cursorShow? '': 'none';
+})
 const handleSelect = (index,selectedIndex)=>{
   if(index === selectedIndex){
     $reactive.currentSnippet = $list.value[index]
@@ -61,19 +63,18 @@ onMounted(()=>{
       const height = $list.value.length * 70 + 16;
       $normal.recoverLiteHeight = height > 535? 545 : height;
     }else{
-      if($reactive.utools.search){
-        $normal.recoverLiteHeight = 0;
-      }else{
-        $normal.recoverLiteHeight = 20;
-      }
+      $normal.recoverLiteHeight = 20;
     }
     utools.setExpendHeight($normal.recoverLiteHeight)
   }
 })
 </script>
 
-<style scoped>
+<style>
 .scroller{
-  max-height: calc(100vh - 17px)
+  max-height: calc(100vh - 17px);
+}
+#list-view, #list-view *{
+  cursor: v-bind(cursorStyle) !important;
 }
 </style>

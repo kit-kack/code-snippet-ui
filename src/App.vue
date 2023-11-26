@@ -19,7 +19,6 @@ import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
 
 const handleUtoolsTextChange =  _.debounce((text)=>{
   if($reactive.view.backStageShow){
-    utools.showNotification("插件重新前台运行")
     $reactive.view.backStageShow = false;
     GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
   }else if($reactive.currentMode !== LIST_VIEW){

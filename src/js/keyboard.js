@@ -170,7 +170,7 @@ function dealWithListView(e,list){
                 }
             }
             break;
-        case "Digit0":
+        case "KeyG":
             if($index.value === -1){
                 // if(configManager.get("enabledBeep")){
                 //     core.shellBeep();
@@ -226,46 +226,91 @@ function dealWithListView(e,list){
     }
 
 }
-function handleMdHorizonMove(left,fast){
+let lastCenterPre = null;
+let lastIndex = null;
+
+function getVisiablePres(){
     const pres  = document.querySelectorAll(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre")
     // 获取窗口大小
     const windowWidth = window.innerWidth || document.documentElement.clientWidth;
     const windowHeight = window.innerHeight || document.documentElement.clientHeight;
     const middleHeight = windowHeight / 2;
-    let finalPre = null;
-    let minDistance =  null;
+    const result = [];
     // 判断视口
     for (const pre of pres) {
         const rect = pre.getBoundingClientRect();
         // before
-        if(rect.bottom < 0){
+        if (rect.bottom < 0) {
             continue;
         }
         // after: break
-        if(rect.top > windowHeight){
+        if (rect.top > windowHeight) {
             break;
         }
         // optional check
-        if(rect.right < 0 || rect.left > windowWidth){
+        if (rect.right < 0 || rect.left > windowWidth) {
             continue;
         }
-        const distance = Math.min(Math.abs(rect.top - middleHeight),Math.abs(rect.bottom - middleHeight));
-        if(minDistance === null || distance < minDistance){
-            finalPre = pre;
-            minDistance = distance;
+        result.push({
+            distance: Math.min(Math.abs(rect.top - middleHeight),Math.abs(rect.bottom - middleHeight)),
+            pre: pre
+        })
+    }
+    return result
+}
+function adjustCenterPre(tab){
+    const pres = getVisiablePres();
+    if(pres.length === 0){
+        return;
+    }
+    let finalIndex;
+    if(tab){
+        if(lastIndex !== null){
+            finalIndex = lastIndex +1;
+            if(finalIndex >= pres.length){
+                finalIndex = 0;
+            }
+        }else{
+            finalIndex = 0;
+        }
+    }else{
+        // find min distance
+        let minDistance = pres[0].distance;
+        finalIndex = 0;
+        for (let i = 1; i < pres.length; i++) {
+            if(pres[i].distance < minDistance){
+                minDistance = pres[i].distance;
+                finalIndex = i;
+            }
         }
     }
-    if(finalPre){
+    lastIndex = finalIndex;
+    const finalPre = pres[finalIndex].pre;
+    if(lastCenterPre === finalPre){
+        return;
+    }else{
+        if(lastCenterPre){
+            // cancel border color
+            lastCenterPre.style.border = '';
+        }
+        lastCenterPre = finalPre;
+        lastCenterPre.style.border = '2px solid '+$normal.theme.globalColor;
+    }
+
+}
+
+function handleMdHorizonMove(left,fast){
+    if(lastCenterPre){
         const distance = fast? 50 : 10;
         // TODO: 标色
         if(left){
-            if(finalPre.scrollLeft < distance){
-                finalPre.scrollLeft = 0;
+            if(lastCenterPre.scrollLeft < distance){
+                lastCenterPre.scrollLeft = 0;
             }else{
-                finalPre.scrollLeft -= distance;
+                lastCenterPre.scrollLeft -= distance;
             }
         }else{
-            finalPre.scrollLeft += distance;
+            lastCenterPre.scrollLeft += distance;
         }
     }
 }
@@ -285,10 +330,22 @@ function dealWithCodeView(e){
         case "KeyJ":
         case "ArrowDown":
             doScrollForCodeView(Direction.DOWN,e.shiftKey);
+            if($reactive.currentSnippet.type === 'markdown'){
+                if($reactive.view.isRendering){
+                    adjustCenterPre()
+                    break;
+                }
+            }
             break;
         case "KeyK":
         case "ArrowUp":
             doScrollForCodeView(Direction.UP,e.shiftKey);
+            if($reactive.currentSnippet.type === 'markdown'){
+                if($reactive.view.isRendering){
+                    adjustCenterPre()
+                    break;
+                }
+            }
             break;
         case "KeyL":
         case "ArrowRight":
@@ -303,13 +360,20 @@ function dealWithCodeView(e){
         case 'KeyS':
             $reactive.view.codeTipActive = !$reactive.view.codeTipActive;
             break;
+        case 'Space':
+            if(lastCenterPre){
+                utools.copyText(lastCenterPre.querySelector('code').innerText)
+                $message.info("已复制该代码块内容")
+                break
+            }
+            break;
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
             GLOBAL_HIERARCHY.changeView(LIST_VIEW)
             break;
-        case 'Digit0':
+        case 'KeyG':
             doScrollForCodeView(Direction.RESET,false);
-            break;
+            break
         case 'KeyR':
             if($reactive.currentSnippet.path && $reactive.currentSnippet.type === 'image'){
                 return;
@@ -336,6 +400,7 @@ function dealWithCommonView(e){
         case 'KeyC':
         case 'KeyY':
             if($reactive.currentSnippet.dir){
+                $message.warning("无法对目录进行此操作");
                 return;
             }
             copyCode(false);
@@ -343,6 +408,7 @@ function dealWithCommonView(e){
             break;
         case 'KeyP':
             if($reactive.currentSnippet.dir){
+                $message.warning("无法对目录进行此操作");
                 return;
             }
             copyCode(true);
@@ -358,6 +424,7 @@ function dealWithCommonView(e){
             }
             GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
             break;
+        case 'Digit0':
         case 'Digit1':
         case 'Digit2':
         case 'Digit3':
@@ -368,8 +435,10 @@ function dealWithCommonView(e){
         case 'Digit8':
         case 'Digit9':
             if($reactive.currentSnippet.dir){
+                $message.warning("无法对目录进行此操作");
                 return;
             }
+            e.preventDefault();
             copyCode(e.shiftKey || e.altKey,+e.code[5])
             break;
         case 'KeyZ':
@@ -451,6 +520,8 @@ function init(list) {
                         utools_focus_or_blur(true)
                     }
                 }
+            }else{
+                adjustCenterPre(true)
             }
             lastTabTime = e.timeStamp;
             return;
@@ -480,6 +551,7 @@ function init(list) {
                         refreshListView(true)
                     }
                     break
+                case 'Digit0':
                 case 'Digit1':
                 case 'Digit2':
                 case 'Digit3':

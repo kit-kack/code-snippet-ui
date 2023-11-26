@@ -11,10 +11,10 @@
 import {$normal, $reactive} from "../../js/store";
 import {nextTick, onMounted, onUnmounted} from "vue";
 import {isNetWorkUri} from "../../js/utils/common";
-import _ from "lodash";
+import {utools_browser_open} from "../../js/core/base";
 
 function copyCodeSuccess(){
-  $message.info("已复制")
+  $message.info("已复制该代码块内容")
 }
 
 let cachedImageUrls = null;
@@ -94,15 +94,7 @@ const handleClickUrl = (e)=>{
       if(e.ctrlKey || e.metaKey){
         utools.shellOpenExternal(a.href)
       }else{
-        const idleBrowsers = utools.getIdleUBrowsers();
-        const browser = utools.ubrowser.goto(a.href).show()
-        if(_.isEmpty(idleBrowsers)){
-          browser.run({
-            center: true
-          })
-        }else{
-          browser.run(idleBrowsers[0].id)
-        }
+        utools_browser_open(a.href)
       }
     }
   }
@@ -134,9 +126,11 @@ onUnmounted(()=>{
   .hljs{
     background: #fafafa !important;
   }
-
-  pre code{
-    font-family: 'Consolas' !important;
+  pre{
+    border: 2px solid transparent;
+    code{
+      font-family: 'Consolas' !important;
+    }
   }
 }
 

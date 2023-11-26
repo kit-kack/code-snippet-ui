@@ -24,7 +24,7 @@ export const tagColorManager={
      * @return {string} - color string
      */
     get(tag){
-        return this.tags[tag]?? '#64696FAD';
+        return this.tags[tag]?? (utools.isDarkColors()? '#5E5E5EFF':'#64696FAD');
     },
     update(tag,color){
         this.tags[tag] = color;

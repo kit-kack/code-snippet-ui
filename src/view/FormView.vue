@@ -67,7 +67,7 @@
                     @keydown="handleKeyDown"
                     ref="codeTextArea"
                     show-count
-                    :autosize="{minRows: 8,maxRows: 8}"/>
+                    :autosize="{minRows: 9,maxRows: 9}"/>
                 <div id="form-code-top-nav">
                   <n-popover>
                     <template #trigger>
@@ -173,7 +173,12 @@
                   </n-divider>
                   <n-button @click="importLocalDir" quaternary type="primary" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">本地目录</n-button>
                   <n-button @click="setAsNormalDir" quaternary type="info" >普通目录</n-button>
-                  <n-button @click="importHierarchyJS" quaternary type="error" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">自定义目录(代码实现)</n-button>
+                  <n-popover v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">
+                    <template #trigger>
+                      <n-button @click="importHierarchyJS" quaternary type="error" >💡自定义目录(代码实现)</n-button>
+                    </template>
+                    <n-button type="info" @click="utools_browser_open('https://flowus.cn/share/87c95fcc-e9f2-420d-a6d3-6578cd424e58')" text>查看教程</n-button>
+                  </n-popover>
                 </template>
               </template>
             </n-tab-pane>
@@ -232,6 +237,7 @@ import NormalTag from "../components/base/NormalTag.vue";
 import BaseModal from "../components/modal/BaseModal.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {isNetWorkUri} from "../js/utils/common";
+import {utools_browser_open} from "../js/core/base";
 
 
 const form = ref()
@@ -614,6 +620,9 @@ function handleClearPath(){
   --n-feedback-padding: 2px 0 0 2px;
   --n-feedback-font-size: 12px;
   --n-feedback-height: 22px !important;
+}
+.n-form .n-form-item:nth-child(3){
+  --n-feedback-height: 10px !important;
 }
 
 </style>
