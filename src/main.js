@@ -1,4 +1,4 @@
-import {createApp} from 'vue'
+import {createApp, nextTick} from 'vue'
 import './style.scss'
 import App from './App.vue'
 import initNU from "./js/dep/naiveui-dep";
@@ -6,7 +6,7 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
-import {$index, $list, $normal, $reactive, CREATE_VIEW} from "./js/store";
+import {$index, $list, $normal, $reactive, CREATE_VIEW, LIST_VIEW} from "./js/store";
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
@@ -96,6 +96,19 @@ utools.onPluginOut(processExit => {
 
 
 const enterApp = (data) => {
+    if($reactive.view.backStageShow){
+        $reactive.view.backStageShow = false;
+        $reactive.view.settingActive = false;
+        $reactive.view.codeTipActive = false;
+        $reactive.view.aidTagActive = false;
+        $reactive.view.funcEditActive = false;
+        $reactive.view.variableActive = false;
+        $reactive.view.helpActive = false;
+        GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
+        nextTick(()=>{
+            $message?.success?.('重新加载~');
+        })
+    }
     console.log('Enter App ...')
     bindApp()
     if(data.code==='code-snippet-save'){

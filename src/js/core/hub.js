@@ -124,8 +124,9 @@ export const hierachyHubManager = {
      * @param {string} name
      * @param {string} desc
      * @param {string[]} tags
+     * @param {string} type
      */
-    handleDescAndTags(name,desc,tags){
+    handle_local_dir_storage(name,desc,tags,type){
         if (!this.currentHub.snippets) {
             this.currentHub.snippets = {};
         }
@@ -141,6 +142,11 @@ export const hierachyHubManager = {
             temp.tags = tags;
         }else{
             delete temp.tags
+        }
+        if(type){
+            temp.type = type;
+        }else{
+            delete temp.type
         }
         // 后置处理
         if(Object.keys(temp).length === 0){

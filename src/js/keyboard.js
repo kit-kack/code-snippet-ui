@@ -7,7 +7,7 @@ import {
     CREATE_VIEW,
     EDIT_VIEW,
     LIST_VIEW,
-    refreshListView, refreshSearchResult,
+    refreshListView, refreshSearchResult, switchToFullUIMode,
     utools_focus_or_blur,
 } from "./store"
 import {isNetWorkUri} from "./utils/common";
@@ -88,7 +88,7 @@ function dealWithListView(e,list){
     $reactive.view.cursorShow = false;
     switch (e.code){
         case "Slash": // / ?
-            $reactive.view.fullScreenShow = true;
+            switchToFullUIMode();
             $reactive.view.settingActive = true;
             break;
         case "KeyS":
@@ -302,7 +302,6 @@ function adjustCenterPre(tab){
 function handleMdHorizonMove(left,fast){
     if(lastCenterPre){
         const distance = fast? 50 : 10;
-        // TODO: 标色
         if(left){
             if(lastCenterPre.scrollLeft < distance){
                 lastCenterPre.scrollLeft = 0;
@@ -442,10 +441,7 @@ function dealWithCommonView(e){
             copyCode(e.shiftKey || e.altKey,+e.code[5])
             break;
         case 'KeyZ':
-            if(!$reactive.view.fullScreenShow){
-                $reactive.view.fullScreenShow = true;
-                utools.setExpendHeight(545)
-            }
+            switchToFullUIMode()
             $reactive.view.helpActive = !$reactive.view.helpActive;
             break
         case 'KeyO':

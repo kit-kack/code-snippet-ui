@@ -91,7 +91,7 @@ import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
 import FuncPane from "../components/pane/FuncEditPane.vue";
 import {refreshListView, refreshSearchResult} from "../js/store";
-import CustomView from "./CustomView.vue";
+import CustomView from "../components/pane/CustomPane.vue";
 import {generate_backup, load_backup} from "../js/core/backup";
 import {backupFilePath} from "../js/some";
 

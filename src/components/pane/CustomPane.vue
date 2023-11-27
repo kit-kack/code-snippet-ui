@@ -20,10 +20,10 @@
 
 <script setup>
 import {h, ref} from "vue";
-import {configManager} from "../js/core/config";
-import ConfigCheckTag from "../components/base/ConfigCheckTag.vue";
-import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../js/theme";
-import {refreshListView} from "../js/store";
+import {configManager} from "../../js/core/config";
+import ConfigCheckTag from "../base/ConfigCheckTag.vue";
+import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../../js/theme";
+import {refreshListView} from "../../js/store";
 
 const colorSchemaRef = ref(configManager.get('strategy_theme')??0)
 const codeBlockRef = ref(configManager.get('strategy_item_code_show')??0)

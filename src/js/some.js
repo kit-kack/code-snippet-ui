@@ -17,7 +17,7 @@ export const defaultHelpSnippet = {
     code: window.preload?.readREADME_MD(),
     help: true,
     sections: [
-        [101,108]
+        [141,151]
     ],
     tags: ["v"+__APP_VERSION__]
 }

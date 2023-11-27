@@ -15,15 +15,8 @@ import {onMounted, watch} from "vue";
 import MiddleView from "./view/MiddleView.vue";
 import {$normal, $reactive, LIST_VIEW} from "./js/store";
 import _ from "lodash";
-import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
 
 const handleUtoolsTextChange =  _.debounce((text)=>{
-  if($reactive.view.backStageShow){
-    $reactive.view.backStageShow = false;
-    GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
-  }else if($reactive.currentMode !== LIST_VIEW){
-    return
-  }
   text = text.trim();
   if(text.length === 0){
     $reactive.utools.search = null;

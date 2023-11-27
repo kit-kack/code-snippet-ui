@@ -1,10 +1,13 @@
 import {nextTick, reactive, ref} from "vue";
-
+// 页面枚举量
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
 const EDIT_VIEW = 2;
 const CREATE_VIEW = 3;
 
+/**
+ * 非响应式全局变量
+ */
 const $normal = {
     listViewVisitedCount: 0,
     // TODO id可能有重复的情况
@@ -47,6 +50,10 @@ const $normal = {
     tempTags: [],          // tags缓存
     subSnippetNum: null,  // 子代码片段序号
 }
+
+/**
+ * 响应式全局变量
+ */
 const $reactive = reactive({
     currentCode: null,
     currentMode: LIST_VIEW,
@@ -82,7 +89,10 @@ const $reactive = reactive({
         subItemSelectedIndex: -1,  // 选择元素子索引，控制右键菜单（Vim模式）
     }
 })
+
+// 当前选中元素索引位
 const $index = ref(0)
+// 当前元素列表
 const $list = ref([])
 /**
  * 恢复列表UI模式

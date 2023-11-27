@@ -41,7 +41,7 @@ export const localDirectoryHierarchy =  {
                         array.push({
                             temp: result,
                             ref: "local",
-                            type: recongizeFileType(file.name),
+                            type: snippetData.type ?? recongizeFileType(file.name),
                             desc: snippetData.desc,
                             tags: snippetData.tags,
                             ...file
@@ -53,7 +53,7 @@ export const localDirectoryHierarchy =  {
                     const snippetData = snippetHub[file.name] ?? {};
                     array.push({
                         ref: "local",
-                        type: recongizeFileType(file.name),
+                        type:  snippetData.type ?? recongizeFileType(file.name),
                         desc: snippetData.desc,
                         tags: snippetData.tags,
                         ...file
@@ -73,6 +73,6 @@ export const localDirectoryHierarchy =  {
     createOrEdit(prefix,snippet,oldName){
         // only edit
         // update type &  desc
-        hierachyHubManager.handleDescAndTags(oldName,snippet.desc,snippet.tags)
+        hierachyHubManager.handle_local_dir_storage(oldName,snippet.desc,snippet.tags,snippet.type)
     }
 }
