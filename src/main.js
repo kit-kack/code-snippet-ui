@@ -6,7 +6,7 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
-import {$index, $list, $normal, $reactive, CREATE_VIEW, LIST_VIEW} from "./js/store";
+import {$index, $list, $normal, $reactive, CREATE_VIEW, LIST_VIEW, utools_focus_or_blur} from "./js/store";
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
@@ -107,6 +107,7 @@ const enterApp = (data) => {
         GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
         nextTick(()=>{
             $message?.success?.('重新加载~');
+            utools_focus_or_blur(true)
         })
     }
     console.log('Enter App ...')
