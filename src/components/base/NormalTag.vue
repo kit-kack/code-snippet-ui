@@ -10,7 +10,12 @@
       <template #trigger>
         <n-tag closable class="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
       </template>
-      {{tagColorManager.tags[props.content] === null? "清除标签":"清除颜色"}}
+      <template v-if="tagColorManager.tags[props.content] === null">
+        <span style="color: indianred">清除标签</span>
+      </template>
+      <template v-else>
+        清除颜色
+      </template>
     </n-tooltip>
   </template>
   <template v-else>

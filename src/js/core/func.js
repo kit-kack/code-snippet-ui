@@ -1,6 +1,6 @@
 import {$normal, $reactive, switchToFullUIMode} from "../store";
 import {copyOrPaste} from "../utils/copy";
-import {createOrUpdate} from "./base";
+import {utools_db_store} from "./base";
 import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
@@ -275,9 +275,6 @@ export const formatManager = {
      * 检查 Func中的Command是否重复
      */
     checkCommandRepeat(command,currentFuncName){
-        if(command === '输入' || command === 'input'){
-            return true;
-        }
         for (let key in this.funcMap) {
             const func = this.funcMap[key];
             if(func.commands.includes(command) && currentFuncName!==func.name){
@@ -344,7 +341,7 @@ export const formatManager = {
         }
         // 保存
         this.funcMap[func.name] = func;
-        createOrUpdate(GLOBAL_FUNC,this.funcMap)
+        utools_db_store(GLOBAL_FUNC,this.funcMap)
         return true
     },
     /**
@@ -362,7 +359,7 @@ export const formatManager = {
         }
         // 保存
         this.funcMap[func.name] = func;
-        createOrUpdate(GLOBAL_FUNC,this.funcMap)
+        utools_db_store(GLOBAL_FUNC,this.funcMap)
         return true
     },
     /**
@@ -376,7 +373,7 @@ export const formatManager = {
             }else{
                 // 移除
                 delete this.funcMap[name]
-                createOrUpdate(GLOBAL_FUNC,this.funcMap)
+                utools_db_store(GLOBAL_FUNC,this.funcMap)
             }
         }
     },
@@ -695,7 +692,7 @@ export const formatManager = {
                     func.expression = await zip.file(`${dirname}/${func.name}.func.js`).async("string");
                     formatManager.funcMap[key] = func
                 }
-                createOrUpdate(GLOBAL_FUNC,formatManager.funcMap)
+                utools_db_store(GLOBAL_FUNC,formatManager.funcMap)
             }
         }catch (e){
             utools.showNotification(`解析${filename}时发生异常，原因为${e.message}`)
@@ -737,7 +734,6 @@ export function renderFormatBlock(flag){
             let style = _errorFormatBlockStyle ;
             if(text.startsWith('#')) {
                 const result = _parseVariable_Command_Param(text.slice(1));
-                console.log(result)
                 if (result._var) {
                     if (result.command) {
                         if(!flag){

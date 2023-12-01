@@ -1,4 +1,4 @@
-import {createOrUpdate} from "./base";
+import {utools_db_store} from "./base";
 import {$index} from "../store";
 import _ from "lodash";
 /**
@@ -53,9 +53,9 @@ export const hierachyHubManager = {
     },
     store(){
       if(this.currentPrefix){
-          createOrUpdate(HIERARCHY_PREFIX+this.currentPrefix,this.currentHub)
+          utools_db_store(HIERARCHY_PREFIX+this.currentPrefix,this.currentHub)
       }else{
-          createOrUpdate(ROOT_HIERARCHY_PREFIX,this.currentHub)
+          utools_db_store(ROOT_HIERARCHY_PREFIX,this.currentHub)
       }
     },
     /**
@@ -220,7 +220,7 @@ export const hierachyHubManager = {
                 }
                 const obj = JSON.parse(await item.async("string"))
                 if(obj._id && obj.data){
-                    createOrUpdate(obj._id,obj.data)
+                    utools_db_store(obj._id,obj.data)
                 }
             }
         }catch (e){

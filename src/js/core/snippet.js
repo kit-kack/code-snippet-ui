@@ -1,6 +1,6 @@
 import {defaultHelpSnippet} from "../some";
 import {match} from "../utils/fuzzy";
-import {createOrUpdate} from "./base";
+import {utools_db_store} from "./base";
 import {tagColorManager} from "./tag";
 import {configManager} from "./config";
 import {batch_delete_utools_keyword, delete_utools_keyword, register_utools_keyword} from "./keyword";
@@ -74,10 +74,10 @@ export const codeSnippetManager = {
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix);
             this.snippetMap.set(codeSnippet.id,codeSnippet);
-            createOrUpdate(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id,codeSnippet)
+            utools_db_store(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id,codeSnippet)
         }else{
             this.rootSnippetMap.set(codeSnippet.id,codeSnippet);
-            createOrUpdate(CODE_PREFIX+codeSnippet.id,codeSnippet)
+            utools_db_store(CODE_PREFIX+codeSnippet.id,codeSnippet)
         }
         // keyword
         if(codeSnippet.keyword){
@@ -158,7 +158,7 @@ export const codeSnippetManager = {
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix)
             if(this.snippetMap.has(codeSnippet.id)) {
-                createOrUpdate(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id, codeSnippet)
+                utools_db_store(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id, codeSnippet)
                 this.snippetMap.set(codeSnippet.id, codeSnippet)
                 this.addTagInfo(codeSnippet, true)
                 if(codeSnippet.keyword){
@@ -169,7 +169,7 @@ export const codeSnippetManager = {
             }
         }else{
             if(this.rootSnippetMap.has(codeSnippet.id)) {
-                createOrUpdate(CODE_PREFIX + codeSnippet.id, codeSnippet)
+                utools_db_store(CODE_PREFIX + codeSnippet.id, codeSnippet)
                 this.rootSnippetMap.set(codeSnippet.id, codeSnippet)
                 this.addTagInfo(codeSnippet, true)
                 if(codeSnippet.keyword){
@@ -260,7 +260,7 @@ export const codeSnippetManager = {
                             obj.data.keyword = undefined;
                         }
                     }
-                    createOrUpdate(obj._id,obj.data)
+                    utools_db_store(obj._id,obj.data)
                 }
             }
         }catch (e){

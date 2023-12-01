@@ -1,4 +1,4 @@
-import {createOrUpdate} from "./base";
+import {utools_db_store} from "./base";
 
 const GLOBAL_TAGS = "tags";
 export const tagColorManager={
@@ -16,7 +16,7 @@ export const tagColorManager={
         this.isInited = true;
     },
     writeToDB(){
-        createOrUpdate(GLOBAL_TAGS,this.tags)
+        utools_db_store(GLOBAL_TAGS,this.tags)
     },
 
     /**

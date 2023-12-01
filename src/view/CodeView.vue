@@ -130,6 +130,21 @@ const pair = computed(()=>{
     }else{
       result.code = $reactive.currentCode;
     }
+    // 解析文件类型
+    if(result.code){
+      const code = result.code.slice(0,1000)
+      let isText = true;
+      for (const c of code) {
+        const t = c.charCodeAt(0)
+        if(t < 32 && t !== 9 && t!== 10 && t!== 13){
+          isText = false;
+          break
+        }
+      }
+      if(!isText){
+        result.code = '[提示]: 抱歉，二进制文件内容无法预览'
+      }
+    }
   }else{
     result.count = 0;
     result.code = '';

@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {codeSnippetManager} from "./snippet";
-import {createOrUpdate} from "./base";
+import {utools_db_store} from "./base";
 
 const KEYWORD_PREFIX = 'keyword/';
 
@@ -85,7 +85,7 @@ export function adapt_old_utools_keyword(){
         if(cmds.includes(codeSnippet.name)){
             delete codeSnippet.feature;
             codeSnippet.keyword = true;
-            createOrUpdate("code/"+codeSnippet.id,codeSnippet)
+            utools_db_store("code/"+codeSnippet.id,codeSnippet)
             register_utools_keyword(codeSnippet,null,false)
         }
     }

@@ -1,4 +1,4 @@
-import {createOrUpdate} from "./base";
+import {utools_db_store} from "./base";
 import {defaultHelpSnippet} from "../some";
 import {adjustTheme} from "../theme";
 import {$normal, $reactive} from "../store";
@@ -55,7 +55,7 @@ export const configManager = {
      */
     set(config,value){
         this.configs[config] = value;
-        createOrUpdate(NEW_GLOBAL_CONFIG,this.configs)
+        utools_db_store(NEW_GLOBAL_CONFIG,this.configs)
     },
     getGlobalColor(){
         return $normal.theme.globalColor;

@@ -7,14 +7,12 @@
           :min-item-size="60"
           class="scroller"
           @mousemove="$reactive.view.cursorShow = true"
-          :ref="(el)=> $normal.scroll.virtualScrollInvoker = el"
-      >
+          :ref="(el)=> $normal.scroll.virtualScrollInvoker = el">
         <template v-slot="{item,index, active}">
           <DynamicScrollerItem
               :active="active"
               :item="item"
-              :data-index="index"
-          >
+              :data-index="index">
             <list-item
                 :index="index"
                 :snippet="item"

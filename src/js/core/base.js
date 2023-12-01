@@ -5,7 +5,7 @@ import _ from "lodash";
  * @param key
  * @param value
  */
-export function createOrUpdate(key,value){
+export function utools_db_store(key, value){
     const result = utools.db.get(key)
     if(result == null){
         utools.db.put({
