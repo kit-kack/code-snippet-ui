@@ -398,9 +398,9 @@ const handleUpdate = ()=>{
           // 更新
           GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),$reactive.currentSnippet.name)
           // 是否维持选中
-          $normal.keepSelectedStatus = (codeTemplate.name === $reactive.currentSnippet.name)? true : null;
+          $normal.keepSelectedStatus = (codeTemplate.name === $reactive.currentSnippet.name);
         }else{
-          $normal.keepSelectedStatus = null;
+          $normal.keepSelectedStatus = false;
           GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),null)
         }
         window.$message.success("操作成功")

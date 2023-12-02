@@ -69,7 +69,7 @@ function dealWithHelpViewOnly(e){
         case 'KeyK':
             doScrollForHelpView(Direction.UP);
             break;
-        case 'Digit0':
+        case 'KeyG':
             doScrollForHelpView(Direction.RESET);
             break;
         case 'KeyZ':

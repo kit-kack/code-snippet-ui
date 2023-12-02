@@ -93,6 +93,7 @@ import AidTagPane from "../components/pane/TagChoosePane.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {configManager} from "../js/core/config";
 import TopNav from "../components/item/TopNav.vue";
+import {doScrollForListView} from "../js/utils/scroller";
 
 const helpViewScorllerRef = ref(null)
 const expanded = ref(false)
@@ -119,6 +120,11 @@ watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.ut
     }
     topNavShow.value = true;
     $list.value = list;
+    if($normal.keepSelectedStatus){
+      setTimeout(()=>{
+        doScrollForListView()
+      },100)
+    }
     refreshListView()
   })
 },{

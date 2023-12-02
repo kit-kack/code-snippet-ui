@@ -1,4 +1,5 @@
 import {nextTick, reactive, ref} from "vue";
+import {doScrollForListView} from "./utils/scroller";
 // 页面枚举量
 const LIST_VIEW = 0;
 const CODE_VIEW = 1;
@@ -42,7 +43,7 @@ const $normal = {
          */
       path: []
     },
-    keepSelectedStatus: null,  // null false true  // 控制 选中元素 保持记忆功能
+    keepSelectedStatus: false,  // null false true  // 控制 选中元素 保持记忆功能
     updateCacheCodeFunc: null,      // 调整缓存函数
     variables: {},        // 后续会映射类型
     defaultValues: {},    // 默认值

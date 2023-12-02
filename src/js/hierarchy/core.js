@@ -65,7 +65,8 @@ export const GLOBAL_HIERARCHY = {
                 const result = $normal.hierarchy.path.pop();
                 if(result){
                     $index.value = result.index;
-                    doScrollForListView();
+                    $normal.keepSelectedStatus = true;
+                    // doScrollForListView();
                 }
                 break
             case "redirect":
@@ -318,7 +319,7 @@ export const GLOBAL_HIERARCHY = {
         // 判断 keepSelectedStatus ，如果为true，需要保留selectIndex位置
         // 由于默认keepSelectedStatus为true，则selectIndex可能为非法，这时候需要忽视keepSelectedStatus
         // 只有当 删除/添加/搜索操作时，会将keepSelectedStatus置为false
-        if( $index.value<0 || $index.value>=array.length ||   $normal.keepSelectedStatus===null){
+        if( $index.value<0 || $index.value>=array.length ||   !$normal.keepSelectedStatus){
             $index.value = (array.length===0)? -1: 0;
         }
         // else if($normal.keepSelectedStatus){

@@ -23,7 +23,7 @@ const handleUtoolsTextChange =  _.debounce((text)=>{
   }else{
     if($reactive.utools.search !== text){
       $reactive.utools.search = text;
-      $normal.keepSelectedStatus = null;
+      $normal.keepSelectedStatus = false;
       // $normal.itemOffsetArray = [];
       // fix: 修复删除界面不移除
       $reactive.view.isDel = false;
@@ -38,6 +38,9 @@ watch(()=>$reactive.currentMode,(mode)=>{
     utools.setSubInput(({text}) =>{
       handleUtoolsTextChange(text)
     },"搜索 name #tag @type")
+    if($reactive.utools.search){
+      utools.setSubInputValue($reactive.utools.search)
+    }
     if(!$reactive.utools.focused){
       utools.subInputBlur();
     }
