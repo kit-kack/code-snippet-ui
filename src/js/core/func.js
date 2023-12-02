@@ -641,8 +641,8 @@ export const formatManager = {
             if(result.vars){  // input 解析
                 switchToFullUIMode()
                 this.codeBuffer = result.code;
-                $normal.variables = result.vars;
-                $normal.defaultValues = result.defaultValues;
+                $normal.funcs.variables = result.vars;
+                $normal.funcs.defaultValues = result.defaultValues;
                 $reactive.view.variableActive = true;
                 return null;
             }else{

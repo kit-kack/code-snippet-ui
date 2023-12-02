@@ -20,7 +20,7 @@ const pair = getRealTypeAndValidStatus(props.type)
  * @param {string} code
  * @return {*}
  */
-const  handleCode = (code)=>{
+function handleCode(code){
   return code.slice(0,200).replaceAll("\n",'↩')
 }
 </script>

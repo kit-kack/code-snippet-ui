@@ -65,7 +65,7 @@ const colorSchemaOptions = [
     value: 4
   }
 ]
-const renderLabel = (option) => {
+function renderLabel(option) {
     return h(
           'div',
           {
@@ -79,7 +79,7 @@ const renderLabel = (option) => {
           [option.label]
       );
 }
-const handleColorSchema = (v)=>{
+function handleColorSchema(v){
   configManager.set('strategy_theme',v);
   adjustTheme(v)
   globalThemeRefresh()

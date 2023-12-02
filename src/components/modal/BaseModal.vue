@@ -69,7 +69,7 @@ if(!props.raw){
       }else if(e.code === 'KeyK'){
         up();
       }
-    }else if($normal.vimDirectFlag){
+    }else if($normal.funcs.vimSupport){
       if(e.code === 'KeyJ'){
         down();
       }else if(e.code === 'KeyK'){

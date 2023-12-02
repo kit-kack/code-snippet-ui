@@ -14,8 +14,8 @@
           <template v-else>
             <n-select v-model:value="template.value"
                       :options="template.option"
-                      @focus="$normal.vimDirectFlag = true"
-                      @blur="$normal.vimDirectFlag = false"
+                      @focus="$normal.funcs.vimSupport = true"
+                      @blur="$normal.funcs.vimSupport = false"
                       placeholder="选择或输入值"/>
           </template>
         </template>
@@ -30,15 +30,15 @@ import {ref} from "vue";
 import {formatManager} from "../../js/core/func";
 import BaseModal from "./BaseModal.vue";
 
-const templates = ref( $normal.variables.map(en =>{
+const templates = ref( $normal.funcs.variables.map(en =>{
   if(en[1] === 'input'){
     return {
       label: en[0],
-      value: $normal.defaultValues[en[0]],
+      value: $normal.funcs.defaultValues[en[0]],
       type: en[1]
     }
   }else{
-    const array = $normal.defaultValues[en[0]]??[]
+    const array = $normal.funcs.defaultValues[en[0]]??[]
     if(array.length === 0){
       return {
         label: en[0],

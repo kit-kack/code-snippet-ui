@@ -120,15 +120,15 @@ const sortKeyOptions = [
     value: 3
   }
 ]
-const handleSortStrategy = (v)=>{
+function handleSortStrategy(v){
   configManager.set('strategy_sort',v);
   // refreshListView()
   refreshSearchResult();
 }
-const handleExport = ()=>{
+function handleExport(){
   generate_backup(backupFilePath)
 }
-const handleImport = ()=>{
+function handleImport(){
   const realPathList = utools.showOpenDialog({
     title: '指定你的数据导入文件',
     defaultPath: utools.getPath('desktop'),

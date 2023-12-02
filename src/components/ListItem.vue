@@ -290,15 +290,15 @@ function handleMouseLeave(e){
   }
   isHover.value = false;
 }
-const doViewCode = ()=>{
+function doViewCode(){
   GLOBAL_HIERARCHY.changeView(CODE_VIEW);
 }
-const doEdit = ()=>{
+function doEdit(){
   // $reactive.currentName = props.snippet.name;
   // $va r.currentMode = UPDATE_VIEW;
   GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
 }
-const doItemRefresh = ()=>{
+function doItemRefresh(){
   $normal.keepSelectedStatus = true;
   // refreshListView(true)
   refreshSearchResult();

@@ -73,7 +73,7 @@ const instance = {
     emit('tagRefresh')
   }
 }
-const handleClose = ()=>{
+function handleClose(){
   tagColorManager.clear(props.content)
   emit('tagRefresh')
 }

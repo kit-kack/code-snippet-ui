@@ -66,7 +66,7 @@ const selected = computed(()=>{
 
 onMounted(()=>{
   // 保存行为
-  $normal.scroll.spaceInvoker[props.index] = ()=> {
+  $normal.spaceInvoker[props.index] = ()=> {
     if(!props.disabled){
       emit('invoke')
     }else{
@@ -75,7 +75,7 @@ onMounted(()=>{
   }
 })
 
-const handleMouseEnter = (e)=>{
+function handleMouseEnter(e){
   hover.value = true;
   flag.value = e.clientX > props.mid;
 }

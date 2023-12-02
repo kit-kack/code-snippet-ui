@@ -55,14 +55,14 @@ export const GLOBAL_HIERARCHY = {
             case "root":
                 if($reactive.currentPrefix.length > 0 ){
                     $reactive.currentPrefix = [];
-                    $normal.hierarchy.path = [];
+                    $normal.hierarchyPath = [];
                     this.currentPrefixIdArray = [];
                 }
                 break
             case "prev":
                 $reactive.currentPrefix.pop();
                 this.currentPrefixIdArray.pop()
-                const result = $normal.hierarchy.path.pop();
+                const result = $normal.hierarchyPath.pop();
                 if(result){
                     $index.value = result.index;
                     $normal.keepSelectedStatus = true;
@@ -73,13 +73,13 @@ export const GLOBAL_HIERARCHY = {
                 // clear
                 if($reactive.currentPrefix.length > 0 ){
                     $reactive.currentPrefix = [];
-                    $normal.hierarchy.path = [];
+                    $normal.hierarchyPath = [];
                     this.currentPrefixIdArray = [];
                 }
                 // 只是h-root的导向
                 if(param !== null){
                     for (const prefix of param.split('/')) {
-                        $normal.hierarchy.path.push({
+                        $normal.hierarchyPath.push({
                             index: 0
                         })
                         $reactive.currentPrefix.push(prefix)
@@ -91,20 +91,20 @@ export const GLOBAL_HIERARCHY = {
                 // 先判断ref
                 switch ($reactive.currentSnippet.ref) {
                     case "local":
-                        $normal.hierarchy.path.push({
+                        $normal.hierarchyPath.push({
                             local:true,
                             value: $reactive.currentSnippet.path,
                             index: $index.value
                         })
                         break
                     case "custom":
-                        $normal.hierarchy.path.push({
+                        $normal.hierarchyPath.push({
                             value: $reactive.currentSnippet.path,
                             index: $index.value
                         })
                         break
                     default:
-                        $normal.hierarchy.path.push({
+                        $normal.hierarchyPath.push({
                             index: $index.value
                         })
                         break
@@ -120,14 +120,14 @@ export const GLOBAL_HIERARCHY = {
                 const ind = param +1;
                 if(ind < $reactive.currentPrefix.length){
                     $reactive.currentPrefix.splice(ind,$reactive.currentPrefix.length)
-                    $normal.hierarchy.path.splice(ind,$reactive.currentPrefix.length)
+                    $normal.hierarchyPath.splice(ind,$reactive.currentPrefix.length)
                     this.currentPrefixIdArray.splice(ind,$reactive.currentPrefix.length)
                 }
                 break
         }
         // 变更 currentHierachy
-        if($normal.hierarchy.path && $normal.hierarchy.path.length > 0){
-            const temp = $normal.hierarchy.path.at(-1);
+        if($normal.hierarchyPath && $normal.hierarchyPath.length > 0){
+            const temp = $normal.hierarchyPath.at(-1);
             if(temp.local){
                 // local dir
                 this.currentHierarchy = localDirectoryHierarchy;
@@ -198,6 +198,7 @@ export const GLOBAL_HIERARCHY = {
             }else{ // CODE_VIEW
                 // cache id
                 $normal.lastQueryCodeSnippetId = $reactive.currentSnippet.id ?? $reactive.currentSnippet.name;
+                $normal.md.pre = null;
             }
             switchToFullUIMode();
             $reactive.currentMode = view;
@@ -211,11 +212,11 @@ export const GLOBAL_HIERARCHY = {
      */
     async search(searchWord){
         let result;
-        $normal.subSnippetNum = undefined;
+        $normal.beta.subSnippetNum = undefined;
         let name = null;
         if(searchWord == null || searchWord.length === 0){
             $reactive.view.aidTagActive = false;
-            $normal.tempTags = [];
+            $normal.beta.tempTags = [];
             try{
                 result = await this.currentHierarchy.search(this.currentPrefixArray,null,hierachyHubManager.getTopList())
                 if(_.isArray(result)){
@@ -250,7 +251,7 @@ export const GLOBAL_HIERARCHY = {
                         const index = word.lastIndexOf('$')
                         if(index !== -1){
                             name = word.slice(0,index)
-                            $normal.subSnippetNum = (+word.slice(index+1))??1;
+                            $normal.beta.subSnippetNum = (+word.slice(index+1))??1;
                         }else{
                             name =  word;
                         }
@@ -263,7 +264,7 @@ export const GLOBAL_HIERARCHY = {
                 name = name.toLowerCase()
             }
             $reactive.view.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
-            $normal.tempTags = tags;
+            $normal.beta.tempTags = tags;
             try{
                 result = await this.currentHierarchy.search(this.currentPrefixArray,name,hierachyHubManager.getTopList())
                 if(_.isArray(result)){

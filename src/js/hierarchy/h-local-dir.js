@@ -31,7 +31,7 @@ export const localDirectoryHierarchy =  {
     search(prefix,name){
         const snippetHub = hierachyHubManager.currentHub.snippets ?? {};
         try{
-            const files = window.preload.getAllFilesFromDir($normal.hierarchy.path.at(-1).value);
+            const files = window.preload.getAllFilesFromDir($normal.hierarchyPath.at(-1).value);
             const array = [];
             if(name){
                 for (const file of files) {

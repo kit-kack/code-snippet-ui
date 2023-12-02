@@ -86,7 +86,7 @@ export function doScrollForTopNav(){
 
 export function doScrollForListView(){
     try{
-        $normal.scroll.virtualScrollInvoker?.scrollToItem(
+        $normal.scroll.virtualInvoker?.scrollToItem(
             $index.value - ((configManager.get('strategy_item_code_show') === 2)?1: 3)
         )
     }catch (e) {

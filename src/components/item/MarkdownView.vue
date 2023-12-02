@@ -24,7 +24,7 @@ let count = -1;
  * @param {string} text
  * @param {(string)=> void} next
  */
-const storeLocalImageUrlBeforeMdChange = (text,next) =>{
+function storeLocalImageUrlBeforeMdChange(text,next){
   count = -1;
   if($reactive.currentSnippet.path && !isNetWorkUri($reactive.currentSnippet.path)) {
     cachedImageUrls = new Map();
@@ -75,7 +75,7 @@ function assignLocalImageUrlWhenMdRender(text,html){
  * 处理点击Url事件
  * @param {MouseEvent} e
  */
-const handleClickUrl = (e)=>{
+function handleClickUrl(e){
   const a = e.target.closest('.github-markdown-body a')
   if(a){
     // [TOC] 跳转

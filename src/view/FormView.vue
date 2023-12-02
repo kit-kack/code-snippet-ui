@@ -283,30 +283,6 @@ const tabOptions = [
   {label: '2个空格',value: 2},
   {label: '4个空格',value: 4}
 ]
-const renderCodeTypeTag = ({option})=>{
-  if(option.value.length > 2 && option.value.startsWith('x-')){
-    return option.label + ' （解析⚡）'
-  }else{
-    return option.label;
-  }
-}
-const renderTag = ({ option, handleClose }) => {
-  return h(
-      NormalTag,
-      {
-        type: "closable",
-        content: option.label,
-        onMousedown: (e) => {
-          e.preventDefault()
-        },
-        onClose: (e) => {
-          e.stopPropagation()
-          handleClose()
-        }
-      }, // <n-tag closable id="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
-      null
-  )
-}
 const rules = {
   "name":[
     {
@@ -347,11 +323,36 @@ const rules = {
     message:"代码片段不能为空"
   }
 }
-const handleCancel = ()=>{
+function renderCodeTypeTag({option}){
+  if(option.value.length > 2 && option.value.startsWith('x-')){
+    return option.label + ' （解析⚡）'
+  }else{
+    return option.label;
+  }
+}
+function renderTag({ option, handleClose }) {
+  return h(
+      NormalTag,
+      {
+        type: "closable",
+        content: option.label,
+        onMousedown: (e) => {
+          e.preventDefault()
+        },
+        onClose: (e) => {
+          e.stopPropagation()
+          handleClose()
+        }
+      },
+      null
+  )
+}
+
+function handleCancel(){
   $normal.keepSelectedStatus = true;
   GLOBAL_HIERARCHY.changeView(LIST_VIEW)
 }
-const handleUpdate = ()=>{
+function handleUpdate(){
   form.value.validate().then(error=>{
       if(error!=null && error.length >= 0){
         window.$message.warning("请按要求填写")
@@ -404,17 +405,13 @@ const handleUpdate = ()=>{
           GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),null)
         }
         window.$message.success("操作成功")
-        // handleRecoverLiteShow()
-        // $var.currentMode = LIST_VIEW;
-        // $var.others.code = null;
         GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
-        // switchToListView(true)
       }
   },()=>{
     window.$message.warning("请按要求填写")
   })
 }
-const keyDownHandler = (e)=>{
+function keyDownHandler(e){
   if(e.ctrlKey){
     if(e.code === 'KeyQ'){
       handleCancel();
@@ -424,7 +421,7 @@ const keyDownHandler = (e)=>{
     }
   }
 }
-const handleChooseCommand = (command)=>{
+function handleChooseCommand(command){
   showFuncModal.value = false;
   if(codeTemplate.code){
     codeTemplate.code += "{{"+command+"}}"
@@ -432,7 +429,7 @@ const handleChooseCommand = (command)=>{
     codeTemplate.code = "{{"+command+"}}"
   }
 }
-const handleTypeChange = ()=>{
+function handleTypeChange(){
   if(GLOBAL_HIERARCHY.currentHierarchy.inline){
     codeTemplate.type = fullAlias(codeTemplate.type)
   }
@@ -445,7 +442,7 @@ onUnmounted(()=>{
   document.removeEventListener('keydown',keyDownHandler)
 })
 
-const handleKeyDown = (e)=>{
+function handleKeyDown(e){
   if(e.code === 'Tab'){
     let char;
     switch (configManager.get('default_tab')){
@@ -488,7 +485,7 @@ const selectThemeOverrides = {
     }
   }
 }
-const importLocalFile = ()=>{
+function importLocalFile(){
   const realPathList = utools.showOpenDialog({
     title: '指定你的本地关联文件' ,
     defaultPath: utools.getPath('desktop'),
@@ -509,7 +506,7 @@ const importLocalFile = ()=>{
     }
   }
 }
-const importLocalDir = ()=>{
+function importLocalDir(){
   const realPathList = utools.showOpenDialog({
     title: '指定你的本地关联目录' ,
     defaultPath: utools.getPath('desktop'),
@@ -525,7 +522,7 @@ const importLocalDir = ()=>{
     codeTemplate.ref = "local";
   }
 }
-const importHierarchyJS = ()=>{
+function importHierarchyJS(){
   const realPathList = utools.showOpenDialog({
     title: '指定你的【自定义目录】代码实现文件' ,
     defaultPath: utools.getPath('desktop'),

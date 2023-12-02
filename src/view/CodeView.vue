@@ -194,7 +194,7 @@ function getCodeFromPath(){
     }
   }
 }
-const handleClose = ()=>{
+function handleClose(){
   $reactive.view.codeTipActive = false;
   $normal.keepSelectedStatus = true;
   GLOBAL_HIERARCHY.changeView(LIST_VIEW)

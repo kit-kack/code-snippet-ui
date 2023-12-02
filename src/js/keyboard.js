@@ -226,10 +226,7 @@ function dealWithListView(e,list){
     }
 
 }
-let lastCenterPre = null;
-let lastIndex = null;
-
-function getVisiablePres(){
+function _getVisiablePres(){
     const pres  = document.querySelectorAll(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre")
     // 获取窗口大小
     const windowWidth = window.innerWidth || document.documentElement.clientWidth;
@@ -259,14 +256,16 @@ function getVisiablePres(){
     return result
 }
 function adjustCenterPre(tab){
-    const pres = getVisiablePres();
+    const pres = _getVisiablePres();
     if(pres.length === 0){
+        $normal.md.pre = null;
+        $normal.md.index = null;
         return;
     }
     let finalIndex;
     if(tab){
-        if(lastIndex !== null){
-            finalIndex = lastIndex +1;
+        if($normal.md.index !== null){
+            finalIndex = $normal.md.index +1;
             if(finalIndex >= pres.length){
                 finalIndex = 0;
             }
@@ -284,32 +283,32 @@ function adjustCenterPre(tab){
             }
         }
     }
-    lastIndex = finalIndex;
+    $normal.md.index = finalIndex;
     const finalPre = pres[finalIndex].pre;
-    if(lastCenterPre === finalPre){
+    if($normal.md.pre === finalPre){
         return;
     }else{
-        if(lastCenterPre){
+        if($normal.md.pre){
             // cancel border color
-            lastCenterPre.style.border = '';
+            $normal.md.pre.style.border = '';
         }
-        lastCenterPre = finalPre;
-        lastCenterPre.style.border = '2px solid '+$normal.theme.globalColor;
+        $normal.md.pre = finalPre;
+        $normal.md.pre.style.border = '2px solid '+$normal.theme.globalColor;
     }
 
 }
 
 function handleMdHorizonMove(left,fast){
-    if(lastCenterPre){
+    if($normal.md.pre){
         const distance = fast? 50 : 10;
         if(left){
-            if(lastCenterPre.scrollLeft < distance){
-                lastCenterPre.scrollLeft = 0;
+            if($normal.md.pre.scrollLeft < distance){
+                $normal.md.pre.scrollLeft = 0;
             }else{
-                lastCenterPre.scrollLeft -= distance;
+                $normal.md.pre.scrollLeft -= distance;
             }
         }else{
-            lastCenterPre.scrollLeft += distance;
+            $normal.md.pre.scrollLeft += distance;
         }
     }
 }
@@ -358,13 +357,6 @@ function dealWithCodeView(e){
             break;
         case 'KeyS':
             $reactive.view.codeTipActive = !$reactive.view.codeTipActive;
-            break;
-        case 'Space':
-            if(lastCenterPre){
-                utools.copyText(lastCenterPre.querySelector('code').innerText)
-                $message.info("已复制该代码块内容")
-                break
-            }
             break;
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
@@ -491,7 +483,7 @@ function init(list) {
             if($reactive.currentSnippet.dir){
                 return;
             }
-            copyCode(true,$normal.subSnippetNum)
+            copyCode(true,$normal.beta.subSnippetNum)
             // handleCopy(true)
             return;
         } else if (e.code === 'Tab') {
@@ -593,7 +585,12 @@ function init(list) {
                     // gotoTheLastPosition();
                 } else {
                     // 处理 Vim 操作
-                    $normal.scroll.spaceInvoker[$reactive.utools.subItemSelectedIndex]?.()
+                    $normal.spaceInvoker[$reactive.utools.subItemSelectedIndex]?.()
+                }
+            }else{
+                if($normal.md.pre){
+                    utools.copyText($normal.md.pre.querySelector('code').innerText)
+                    $message.info("已复制该代码块内容")
                 }
             }
         }

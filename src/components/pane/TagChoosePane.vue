@@ -24,8 +24,8 @@ const tagCheck = ref({})
 
 function handleShow(){
   tagCheck.value = {};
-  if($normal.tempTags){
-    for (let tag of $normal.tempTags) {
+  if($normal.beta.tempTags){
+    for (let tag of $normal.beta.tempTags) {
       tagCheck.value[tag.toLowerCase()] = true;
     }
   }
@@ -35,13 +35,13 @@ function updateTagCheck(tag,flag){
   tagCheck.value[tag] = flag;
   if(flag){
     // add
-    if(!lowercaseIncludes($normal.tempTags,tag)){
+    if(!lowercaseIncludes($normal.beta.tempTags,tag)){
       // 修改uTools输入框
       utools.setSubInputValue(`#${tag} ${$reactive.utools.search}`)
     }
   }else{
     // del
-    if(lowercaseIncludes($normal.tempTags,tag)){
+    if(lowercaseIncludes($normal.beta.tempTags,tag)){
       // 删除
       tag = '#'+tag;
       utools.setSubInputValue($reactive.utools.search.replace(new RegExp(tag,'gi'),'').trim())
