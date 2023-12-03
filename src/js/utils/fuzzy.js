@@ -7,7 +7,7 @@ const chineseRegex=/[\u4E00-\u9FA5]/
  * @param {string} target - 已经小写化
  * @param {boolean} [chineseMatchDisabled] - 禁用中文匹配
  */
-export function advancedFuzzyCompare(query,target,chineseMatchDisabled){
+function advancedFuzzyCompare(query,target,chineseMatchDisabled){
     if(query.length > target.length){
         return null;
     }

@@ -13,8 +13,8 @@
   <n-drawer v-model:show="$reactive.view.settingActive" :width="380" placement="right">
     <side-view/>
   </n-drawer>
-  <n-drawer display-directive="show" v-model:show="$reactive.view.helpActive" placement="left" :width="380" @after-enter="onShow()">
-    <n-scrollbar style="max-height: 99%" ref="helpViewScorllerRef" >
+  <n-drawer display-directive="show" v-model:show="$reactive.view.helpActive" placement="left" :width="380">
+    <n-scrollbar style="max-height: 99%" :ref="(el) => $normal.scroll.helpInvoker= el" >
       <shortcut-pane/>
     </n-scrollbar>
   </n-drawer>
@@ -100,11 +100,6 @@ const expanded = ref(false)
 window.$message = useMessage();
 window.$dialog = useDialog();
 const topNavShow = ref(true)
-function onShow(){
-  if($normal.scroll.helpInvoker === null){
-    $normal.scroll.helpInvoker = helpViewScorllerRef.value;
-  }
-}
 watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.utools.searchRefreshValue],([search,prefix,value])=>{
   GLOBAL_HIERARCHY.search(search).then(list => {
     const isSameLength = $list.value.length === list.length;

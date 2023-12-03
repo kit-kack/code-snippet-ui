@@ -126,7 +126,6 @@ utools.onPluginEnter((data)=>{
     if(data.code === 'code-snippet-backup'){
         generate_backup(backupFilePath)
         utools.outPlugin();
-        return;
     }else if(data.code.startsWith('keyword/')){
         let id = data.code.slice(8);
         let prefix = null;

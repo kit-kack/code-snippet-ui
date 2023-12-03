@@ -21,8 +21,6 @@ import {hierachyHubManager} from "./hub";
  */
 export function generate_backup(path){
     const zip = new JSZip();
-    const docs = utools.db.allDocs();
-
     // tag
     tagColorManager.backup(zip,"code-snippet-tag.json")
     // func

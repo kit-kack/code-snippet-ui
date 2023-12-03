@@ -247,15 +247,8 @@ function _get_command_key(command){
 }
 
 export const formatManager = {
-    // data:{
-    //     pairs:{}, // 存放变量替换值
-    //     inputs:[] // 表明是否为输入变量
-    // },
-    nameMapping:{},
     funcMap:{},
-    initedVarSet : new Set(), // 变量是否已经解析
     codeBuffer : null,  // 为输入变量设置的暂时缓存
-    pairBuffer : {},  // 每次解析时，存放上述pairs变量值解析结果
     isInited: false,
     globalVar:{},  // 全局超级变量
 
@@ -590,7 +583,7 @@ export const formatManager = {
 
     /**
      *
-     * @param {any[]} codes
+     * @param {Result[]} codes
      */
     async _expression(codes){
         // first deal with command
