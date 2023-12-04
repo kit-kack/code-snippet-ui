@@ -1,18 +1,26 @@
 <template>
-  <div class="func" v-for="(func,key) in formatManager.funcMap">
-    <h4>⚡{{func.name}}</h4>
-    <n-scrollbar style="max-height:50px;margin-bottom: 5px" x-scrollable>
-      <p v-html="func.desc?.replaceAll('\n','<br/>')??'暂无描述'"></p>
-    </n-scrollbar>
-
-    <n-scrollbar style="max-width: 420px;padding-bottom: 10px;"     x-scrollable>
-      <n-space :wrap="false">
-        <n-button tertiary size="tiny" v-for="command in func.commands" @click="$emit('choose',command)" >
+  <template v-for="(func,key) in formatManager.funcMap">
+    <div class="func">
+    <n-popover
+        width="trigger"
+        :show-arrow="false"
+        display-directive="show"
+    >
+      <template #trigger>
+          <h4>⚡{{func.name}}</h4>
+      </template>
+        <n-scrollbar style="max-height:100px;margin-bottom: 5px;padding-right: 10px" x-scrollable>
+          <p class="func-desc" v-html="func.desc?.replaceAll('\n','<br/>')??'暂无描述'"></p>
+        </n-scrollbar>
+    </n-popover>
+      <n-space>
+        <n-button tertiary size="tiny" v-for="command in func.commands"
+                  @click="$emit('choose',command)" >
           {{command}}
         </n-button>
       </n-space>
-    </n-scrollbar>
-  </div>
+    </div>
+  </template>
 
 </template>
 
@@ -26,9 +34,9 @@ defineEmits(['choose'])
 
 <style lang="scss" scoped>
 .func{
-  border-bottom: 1px solid #777;
   margin-bottom: 10px;
-
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #777;
   &:last-child{
     border-bottom: none;
   }

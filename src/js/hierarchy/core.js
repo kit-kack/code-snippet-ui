@@ -215,7 +215,7 @@ export const GLOBAL_HIERARCHY = {
         $normal.beta.subSnippetNum = undefined;
         let name = null;
         if(searchWord == null || searchWord.length === 0){
-            $reactive.view.aidTagActive = false;
+            $reactive.main.aidTagActive = false;
             $normal.beta.tempTags = [];
             try{
                 result = await this.currentHierarchy.search(this.currentPrefixArray,null,hierachyHubManager.getTopList())
@@ -263,7 +263,7 @@ export const GLOBAL_HIERARCHY = {
             if(name){
                 name = name.toLowerCase()
             }
-            $reactive.view.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
+            $reactive.main.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
             $normal.beta.tempTags = tags;
             try{
                 result = await this.currentHierarchy.search(this.currentPrefixArray,name,hierachyHubManager.getTopList())
@@ -336,14 +336,14 @@ export const GLOBAL_HIERARCHY = {
         // 重置
         // $normal.keepSelectedStatus = false;
         // 控制tip显示策略
-        $reactive.view.onlyOne =  array.length === 1;
+        $reactive.main.isOnlyOneElement =  array.length === 1;
 
         // 控制界面高度
         if(array.length === 0){
             // utools.subInputFocus();
             // $reactive.utools.focused = true;
-            if(!$reactive.view.fullScreenShow){
-                utools.setExpendHeight($reactive.view.aidTagActive? 65:0)
+            if(!$reactive.main.isFullScreenShow){
+                utools.setExpendHeight($reactive.main.aidTagActive? 65:0)
             }
         }
         return array;

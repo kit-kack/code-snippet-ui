@@ -31,11 +31,11 @@ import {computed} from "vue";
 const show = computed(()=>{
   // !$reactive.utools.focused && $reactive.view.fullScreenShow
   if($reactive.currentMode === CODE_VIEW){
-    if($reactive.view.pureView){
+    if($reactive.code.isPure){
       return false;
     }
   }
-  return !$reactive.utools.focused && $reactive.view.fullScreenShow
+  return !$reactive.utools.focused && $reactive.main.isFullScreenShow
 })
 const getBtnStyle = ()=>{
   if($reactive.currentMode<= CODE_VIEW){

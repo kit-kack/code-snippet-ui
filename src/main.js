@@ -6,25 +6,24 @@ import initVH from "./js/dep/vmd-dep";
 import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
-import {$index, $list, $normal, $reactive, CREATE_VIEW, LIST_VIEW, utools_focus_or_blur} from "./js/store";
+import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, utools_focus_or_blur} from "./js/store";
 import {tagColorManager} from "./js/core/tag";
 import {codeSnippetManager} from "./js/core/snippet";
 import {configManager} from "./js/core/config";
 import {formatManager} from "./js/core/func";
 import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
-import {init} from "./js/keyboard";
 import {hierachyHubManager} from "./js/core/hub";
 import {generate_backup} from "./js/core/backup";
 import {adjustLightDarkTheme} from "./js/theme";
+import {initKeyboardListener} from "./js/keyboard/core";
 // init
 configManager.init()
-tagColorManager.init()
 formatManager.init()
 hierachyHubManager.init()
 codeSnippetManager.init()
-init($list)
-
 function bindApp(){
+    tagColorManager.init()
+    initKeyboardListener()
     const app = createApp(App)
 
     initNU(app)
@@ -91,20 +90,20 @@ utools.onPluginOut(processExit => {
     if(processExit){
         return;
     }
-    $reactive.view.backStageShow = true;
+    $reactive.appRestart = true;
 })
 
 
 
 const enterApp = (data) => {
-    if($reactive.view.backStageShow){
-        $reactive.view.backStageShow = false;
-        $reactive.view.settingActive = false;
-        $reactive.view.codeTipActive = false;
-        $reactive.view.aidTagActive = false;
-        $reactive.view.funcEditActive = false;
-        $reactive.view.variableActive = false;
-        $reactive.view.helpActive = false;
+    if($reactive.appRestart){
+        $reactive.appRestart = false;
+        $reactive.main.settingActive = false;
+        $reactive.code.infoActive = false;
+        $reactive.main.aidTagActive = false;
+        $reactive.setting.funcEditActive = false;
+        $reactive.common.variableActive = false;
+        $reactive.common.shortcutActive = false;
         GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
         nextTick(()=>{
             $message?.success?.('重新加载~');

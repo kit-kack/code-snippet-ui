@@ -72,36 +72,67 @@ const $normal = {
  * 响应式全局变量
  */
 const $reactive = reactive({
+    // 当前访问过的代码内容（缓存作用）
     currentCode: null,
+    // 当前页面
     currentMode: LIST_VIEW,
     /**
+     * 当前代码片段
      * @type CodeSnippet
      */
     currentSnippet: null,
+    // 当前层级前缀
     currentPrefix: [],
-    view:{
-        fullScreenShow: true,     // 是否为完整UI模式
-        aidTagActive: false,
-        helpActive: false,        // 快速方式界面是否显示
-        settingActive: false,     // 侧边栏是否开启，禁止其他按键操作
-        variableActive: false,    // 输入自定义变量界面是否显示
-        funcEditActive: false,
-        codeTipActive: false,      // 是否展示 CodeView中的 Tip
-        isDel: false,             // 当前是否为 删除操作
-        deepRefresh: true,
-        cursorShow: true,
-        buttonFixed: false,
-        isRendering: false,
-        onlyOne: false,           // 当前查询结果是否仅有一条记录
-        backStageShow: false,
-        pureView: false,          // 是否为纯预览
+    common:{
+        // 【快捷方式】界面
+        shortcutActive: false,
+        // 【变量输入】界面
+        variableActive: false,
     },
+    code: {  // 适用于 CodeView场景
+        // 【目录】界面
+        tocActive: false,
+        // 【详细信息】界面
+        infoActive: false,
+        // 是否正在渲染
+        isRendering: false,
+        // 是否处于【纯净模式】
+        isPure: false
+    },
+    main:{
+        // 【辅助标签选择】界面
+        aidTagActive: false,
+        // 【设置】界面
+        settingActive: false,
+        // 是否固定按钮
+        isButtonFixed: false,
+        // 是否进行删除
+        isDel: false,
+        // 是否显示鼠标
+        isCursorShow: false,
+        // 搜索结果是否只有一个元素
+        isOnlyOneElement: false,
+        // 是否处于【完整UI】
+        isFullScreenShow: false,
+        // 用来进行重度刷新
+        deepRefresh: true,
+    },
+    setting:{
+        // 【占位符编辑】界面
+        funcEditActive: false,
+    },
+    // 插件应用重启
+    appRestart: false,
     // 控制utool及Vim模式
     utools:{
-        focused: true,      // utools输入框是否聚焦
-        search: '',         // utools输入框内容
-        searchRefreshValue: 0, // 用来进行刷新
-        subItemSelectedIndex: -1,  // 选择元素子索引，控制右键菜单（Vim模式）
+        // utools输入框是否聚焦
+        focused: true,
+        // utools输入框内容
+        search: '',
+        // 用来进行轻度刷新
+        searchRefreshValue: 0,
+        // 选择元素子索引，控制右键菜单（Vim模式）
+        subItemSelectedIndex: -1,
     }
 })
 
@@ -115,7 +146,7 @@ const $list = ref([])
 const handleRecoverLiteShow = ()=>{
     if($normal.recoverLiteShow){
         $normal.recoverLiteShow= false;
-        $reactive.view.fullScreenShow = false;
+        $reactive.main.isFullScreenShow = false;
         utools.setExpendHeight($normal.recoverLiteHeight)
     }
 }
@@ -123,8 +154,8 @@ const handleRecoverLiteShow = ()=>{
  * 临时需要切换成 完整UI模式
  */
 const switchToFullUIMode = ()=>{
-    if(!$reactive.view.fullScreenShow){
-        $reactive.view.fullScreenShow = true;
+    if(!$reactive.main.isFullScreenShow){
+        $reactive.main.isFullScreenShow = true;
         $normal.recoverLiteShow= true;
         utools.setExpendHeight(545)
     }
@@ -144,9 +175,9 @@ export function utools_focus_or_blur(focus){
 }
 
 const refreshListView = ()=>{
-    $reactive.view.deepRefresh = false;
+    $reactive.main.deepRefresh = false;
     nextTick(()=>{
-        $reactive.view.deepRefresh = true
+        $reactive.main.deepRefresh = true
     })
 }
 export const refreshSearchResult =()=>{

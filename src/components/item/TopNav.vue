@@ -15,7 +15,7 @@
 
   </div>
   <div class="snippet-count-info">
-    {{word}} {{$reactive.view.fullScreenShow? '◈': '◇'}}
+    {{word}} {{$reactive.main.isFullScreenShow? '◈': '◇'}}
   </div>
 </template>
 <script setup>

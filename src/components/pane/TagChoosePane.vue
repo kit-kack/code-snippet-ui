@@ -1,5 +1,5 @@
 <template>
-  <n-drawer resizable v-model:show="$reactive.view.aidTagActive"
+  <n-drawer resizable v-model:show="$reactive.main.aidTagActive"
             height="65px" style="padding-top:16px;user-select: none"
             placement="top"
             @after-enter="handleShow"

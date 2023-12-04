@@ -11,7 +11,7 @@
             size="small"
             content-style="padding: 0 10px"
             header-style="height:28px;"
-            :style="getSelectedStyle(props.selected,isHover&&$reactive.view.cursorShow)"
+            :style="getSelectedStyle(props.selected,isHover&&$reactive.main.isCursorShow)"
     >
       <!-- 置顶 圆心 -->
       <div class="snippet-item__top"
@@ -84,10 +84,10 @@
     </n-card>
 
     <transition>
-      <template v-if="$reactive.view.isDel && selected">
+      <template v-if="$reactive.main.isDel && selected">
         <div class="snippet-item-btn">
           <span style="color: gray">确认删除?</span>
-          <selectable-button  :mid="395"  type="primary" tip="搞错了" :index="0" @invoke="$reactive.view.isDel = false;" >
+          <selectable-button  :mid="395"  type="primary" tip="搞错了" :index="0" @invoke="$reactive.main.isDel = false;" >
             ✗
           </selectable-button>
           <selectable-button :mid="440"  type="error" tip="真的删" :index="1" @invoke="handleDelete" >
@@ -107,7 +107,7 @@
             <selectable-button :disabled="snippet.dir"  :mid="395"  type="info" tip="复制" :index="2" @invoke="copyCode(false)" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M5.503 4.627L5.5 6.75v10.504a3.25 3.25 0 0 0 3.25 3.25h8.616a2.251 2.251 0 0 1-2.122 1.5H8.75A4.75 4.75 0 0 1 4 17.254V6.75c0-.98.627-1.815 1.503-2.123zM17.75 2A2.25 2.25 0 0 1 20 4.25v13a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-13A2.25 2.25 0 0 1 8.75 2h9zm0 1.5h-9a.75.75 0 0 0-.75.75v13c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75v-13a.75.75 0 0 0-.75-.75z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <selectable-button :disabled="!GLOBAL_HIERARCHY.currentConfig?.remove" :mid="440"  type="error" tip="删除" :index="3" @invoke="$reactive.view.isDel = true;$reactive.utools.subItemSelectedIndex=1">
+            <selectable-button :disabled="!GLOBAL_HIERARCHY.currentConfig?.remove" :mid="440"  type="error" tip="删除" :index="3" @invoke="$reactive.main.isDel = true;$reactive.utools.subItemSelectedIndex=1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
             </selectable-button>
             <template v-if="props.snippet.index !== undefined">
@@ -237,7 +237,7 @@ function handleDelete(){
   GLOBAL_HIERARCHY.remove(props.snippet)
   $index.value--;
   $normal.keepSelectedStatus = true;
-  $reactive.view.isDel = false;
+  $reactive.main.isDel = false;
   doItemRefresh()
 }
 
@@ -278,7 +278,7 @@ function handleSetTop(){
 
 function handleMouseLeave(e){
   if(showBtnModal.value){
-    if($reactive.view.onlyOne){
+    if($reactive.main.isOnlyOneElement){
       if(e.relatedTarget!=null){
         if(e.relatedTarget.classList.contains("n-popover") || e.relatedTarget.classList.contains("n-popover-arrow")){
           return;
@@ -286,7 +286,7 @@ function handleMouseLeave(e){
       }
     }
     showBtnModal.value=false;
-    $reactive.view.isDel=false
+    $reactive.main.isDel=false
   }
   isHover.value = false;
 }

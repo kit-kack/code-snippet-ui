@@ -1,5 +1,5 @@
 <template>
-  <base-modal :show="$reactive.view.variableActive"
+  <base-modal :show="$reactive.common.variableActive"
               :title="$reactive.currentSnippet.name"
               @cancel="doCancel"
               @confirm="doYes"
@@ -75,7 +75,7 @@ const templates = ref( $normal.funcs.variables.map(en =>{
 }))
 
 function doCancel(){
-  $reactive.view.variableActive = false;
+  $reactive.common.variableActive = false;
   handleRecoverLiteShow();
 }
 
@@ -87,7 +87,7 @@ function doYes(){
   // 继续进行解析
   formatManager.continueFormat();
   // 关闭
-  $reactive.view.variableActive = false;
+  $reactive.common.variableActive = false;
   handleRecoverLiteShow();
 }
 

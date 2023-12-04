@@ -1,7 +1,7 @@
 <template>
   <n-tooltip trigger="manual"
              :show="hover || (selected && show)"
-             :placement="$reactive.view.onlyOne&&!$reactive.view.fullScreenShow?(flag? 'right':'left'):'top'"
+             :placement="$reactive.main.isOnlyOneElement&&!$reactive.main.isFullScreenShow?(flag? 'right':'left'):'top'"
              :delay="0"
   >
     <template #trigger>
@@ -49,7 +49,7 @@ const flag = ref(false)
 const selected = computed(()=>{
   if($reactive.utools.subItemSelectedIndex === props.index){
     // 当前索引
-    if($reactive.view.onlyOne &&  !$reactive.view.fullScreenShow){
+    if($reactive.main.isOnlyOneElement &&  !$reactive.main.isFullScreenShow){
       // 在liteshow下只有一条记录时，被选中短暂显示tooltip
       show.value = true;
       setTimeout(()=>{

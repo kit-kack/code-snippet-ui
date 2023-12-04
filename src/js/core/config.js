@@ -24,10 +24,10 @@ export const configManager = {
         }
         if(this.configs['lite']){
             if(this.configs['strategy_item_code_show'] < 2){
-                $reactive.view.fullScreenShow = false;
+                $reactive.main.isFullScreenShow = false;
             }
         }
-        $reactive.view.pureView = this.configs['pure_mode']
+        $reactive.code.isPure = this.configs['pure_mode']
         if(!(this.configs["strategy_theme"] >= 0 && this.configs["strategy_theme"] <= 4)){
             this.configs["strategy_theme"] = 0;
         }

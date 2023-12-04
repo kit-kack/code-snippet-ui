@@ -5,7 +5,7 @@
         style="max-height:calc(100vh - 15px)"
         trigger="none" ref="verticalScroller">
       <template v-if="refreshFlag">
-        <template v-if="pair.renderable && $reactive.view.isRendering">
+        <template v-if="pair.renderable && $reactive.code.isRendering">
           <template v-if="pair.type === 'image'">
             <div style="text-align: center">
               <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 98vw;">
@@ -44,7 +44,7 @@
       </template>
     </n-scrollbar>
 
-    <div id="code-view-bottom-nav" v-if="!$reactive.view.pureView">
+    <div id="code-view-bottom-nav" v-if="!$reactive.code.isPure">
       <n-space>
 <!--        <template v-if="snippet.path && pair.type !=='image'">-->
 <!--          <n-button quaternary-->
@@ -55,15 +55,15 @@
 <!--        </template>-->
         <template v-if="pair.renderable">
           <n-button quaternary
-                    @click=" $reactive.view.isRendering = !$reactive.view.isRendering"
+                    @click=" $reactive.code.isRendering = !$reactive.code.isRendering"
                     :color="configManager.getGlobalColor()"
                     :disabled="pair.type === 'image' && snippet.path"
           >
-            {{ $reactive.view.isRendering? '已渲染 [R]': '未渲染 [R]' }}
+            {{ $reactive.code.isRendering? '已渲染 [R]': '未渲染 [R]' }}
           </n-button>
         </template>
         <n-button
-            @click="$reactive.view.codeTipActive = true"
+            @click="$reactive.code.infoActive = true"
             quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]'}}</n-button>
         <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="handleClose">
           <template #icon>
@@ -72,7 +72,7 @@
         </n-button>
       </n-space>
     </div>
-    <n-drawer v-model:show="$reactive.view.codeTipActive" :width="350" placement="right">
+    <n-drawer v-model:show="$reactive.code.infoActive" :width="300" placement="right">
       <n-drawer-content :title="snippet.name">
         {{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字
         <n-space>
@@ -120,7 +120,7 @@ const pair = computed(()=>{
   // 分析类型
   const result = getRealTypeAndValidStatus(snippet.type);
   if(result.type === 'image'){
-    $reactive.view.isRendering = true;
+    $reactive.code.isRendering = true;
   }
   result.renderable = (result.type === 'markdown' || result.type === 'image')
   if($reactive.currentCode){
@@ -195,7 +195,7 @@ function getCodeFromPath(){
   }
 }
 function handleClose(){
-  $reactive.view.codeTipActive = false;
+  $reactive.code.infoActive = false;
   $normal.keepSelectedStatus = true;
   GLOBAL_HIERARCHY.changeView(LIST_VIEW)
 }
@@ -218,10 +218,10 @@ function getNumShow(num){
 onMounted(()=>{
     // $normal.updateCacheCodeFunc = updateCachedCode
     $normal.scroll.codeVerticalInvoker = verticalScroller.value;
-    $reactive.view.isRendering = pair.value.renderable;
+    $reactive.code.isRendering = pair.value.renderable;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
-      renderFormatBlock(pair.value.renderable && $reactive.view.isRendering)
-      watch(()=>$reactive.view.isRendering,(newValue)=>{
+      renderFormatBlock(pair.value.renderable && $reactive.code.isRendering)
+      watch(()=>$reactive.code.isRendering,(newValue)=>{
         renderFormatBlock(newValue)
       },{
         flush:'post',
@@ -231,7 +231,7 @@ onMounted(()=>{
 })
 
 onUnmounted(()=>{
-  $reactive.view.codeTipActive = false;
+  $reactive.code.infoActive = false;
 })
 
 </script>

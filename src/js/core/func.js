@@ -636,7 +636,7 @@ export const formatManager = {
                 this.codeBuffer = result.code;
                 $normal.funcs.variables = result.vars;
                 $normal.funcs.defaultValues = result.defaultValues;
-                $reactive.view.variableActive = true;
+                $reactive.common.variableActive = true;
                 return null;
             }else{
                 return await this._expression(result.code);

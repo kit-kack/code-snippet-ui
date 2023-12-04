@@ -28,9 +28,9 @@
     </n-list>
     <n-button size="small" style="margin:5px;"  @click="enterAddView">添加</n-button>
     <n-button size="small" ghost type="error" style="margin:5px;" @click="doReset()">重置</n-button>
-    <base-modal v-model:show="$reactive.view.funcEditActive"
+    <base-modal v-model:show="$reactive.setting.funcEditActive"
                 :title="pair.flag?'修改占位符函数': '新增占位符函数'"
-                @cancel="$reactive.view.funcEditActive = false"
+                @cancel="$reactive.setting.funcEditActive = false"
                 @confirm="doFinal"
                 wide
     >
@@ -118,7 +118,7 @@ const rules = {
 function enterAddView(){
   pair.value = {};
   nowKey = null;
-  $reactive.view.funcEditActive = true;
+  $reactive.setting.funcEditActive = true;
 }
 function doDel(key){
   formatManager.del(key)
@@ -133,7 +133,7 @@ function enterEditView(key,value){
     ...formatManager.funcMap[key]
   }
   nowKey = key;
-  $reactive.view.funcEditActive= true;
+  $reactive.setting.funcEditActive= true;
 }
 
 function doFinal(){
@@ -145,12 +145,12 @@ function doFinal(){
       const func = toRaw(pair.value)
       if(nowKey){  // edit
         if(formatManager.update(func,nowKey)){
-          $reactive.view.funcEditActive = false;
+          $reactive.setting.funcEditActive = false;
           doRefresh()
         }
       }else{
         if(formatManager.add(func)){
-          $reactive.view.funcEditActive = false;
+          $reactive.setting.funcEditActive = false;
           doRefresh()
         }
       }

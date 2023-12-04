@@ -215,10 +215,11 @@
   <n-modal v-model:show="showFuncModal"
            preset="card"
            title="选择占位符"
-           style="width: 60%"
+           style="width: 66%"
+           :auto-focus="false"
 
   >
-    <n-scrollbar style="max-height: 60vh;width:100%" :x-scrollable="false">
+    <n-scrollbar style="max-height: 60vh;width:100%;padding-right:10px" :x-scrollable="false">
       <func-select-pane @choose="handleChooseCommand"/>
     </n-scrollbar>
   </n-modal>

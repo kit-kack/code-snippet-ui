@@ -39,38 +39,11 @@
 
 const datas = [
   {
-    title:"主界面",
+    title: "元素-(基本)",
     items: [{
         feature: "创建代码片段",
         shortcut:"C-N"
       },{
-        feature: "刷新",
-        shortcut: "C-R"
-      },{
-        feature: "启用/关闭Vim模式，uTools子输入框失聚焦",
-        shortcut:"Tab"
-      },{
-        feature: "切换完整/列表UI模式",
-        shortcut: "Tab快速双击",
-        tooltip: "暂时不支持[多行元素代码块]场景"
-      }]
-  },
-  {
-    title: '元素',
-    items:[{
-        feature: "粘贴使用",
-        shortcut: ["双击","搜索框Enter"]
-      },{
-        feature: "预览代码片段",
-        shortcut: "C-点击"
-      },{
-        feature: "菜单",
-        shortcut: "右击"
-      }]
-  },
-  {
-    title: "元素-Vim模式(通用)",
-    items: [{
         feature: "编辑Edit",
         shortcut: "E"
       },{
@@ -78,7 +51,7 @@ const datas = [
         shortcut: ["C","Y"]
       },{
         feature: "粘贴Paste",
-        shortcut: ["Enter","P"]
+        shortcut: ["Enter","P","双击"]
       },{
         feature: "复制高亮行-子代码片段",
         shortcut: ["0","1 ~ 9"],
@@ -101,8 +74,18 @@ const datas = [
     ]
   },
   {
-    title: '元素-Vim模式（主界面)',
+    title: '元素-(主界面)',
     items: [{
+      feature: "刷新",
+      shortcut: "C-R"
+    },{
+      feature: "启用/关闭Vim模式，uTools子输入框失聚焦",
+      shortcut:"Tab"
+    },{
+      feature: "切换完整/列表UI模式",
+      shortcut: "Tab快速双击",
+      tooltip: "暂时不支持[多行元素代码块]场景"
+    },{
       feature: "上下浏览",
       shortcut: ["J","K","↑","↓"],
       tooltip: '浏览多行元素代码块时请结合Shift键'
@@ -112,7 +95,7 @@ const datas = [
       tooltip: '浏览多行元素代码块时请结合Shift键'
     },{
       feature: "预览代码片段View",
-      shortcut: ["V","Space(长按)"]
+      shortcut: ["V","Space(长按)","C-点击"]
     },{
       feature: "删除Delete",
       shortcut: ["D","X"]
@@ -131,16 +114,18 @@ const datas = [
     }]
   },
   {
-    title: '元素-Vim模式（代码预览界面)',
+    title: '元素-(代码预览界面)',
     items: [
     {
-      feature: "开启/关闭渲染模式Render",
-      shortcut: "R"
-    },
-      {
         feature: "纯净模式Pure",
         shortcut: "C-P"
-      },
+    },{
+      feature: "开启/关闭渲染模式Render",
+      shortcut: "R"
+    },{
+      feature: "Markdown目录TOC",
+      shortcut: "T"
+    },
     //   {
     //   feature: "缓存数据Buffer",
     //   shortcut: "B"

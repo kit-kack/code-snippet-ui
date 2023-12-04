@@ -26,8 +26,8 @@ const handleUtoolsTextChange =  _.debounce((text)=>{
       $normal.keepSelectedStatus = false;
       // $normal.itemOffsetArray = [];
       // fix: 修复删除界面不移除
-      $reactive.view.isDel = false;
-      $reactive.view.helpActive = false;
+      $reactive.main.isDel = false;
+      $reactive.common.shortcutActive = false;
       // refreshListView(true)
     }
   }
