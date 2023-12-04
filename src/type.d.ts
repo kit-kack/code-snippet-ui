@@ -172,3 +172,4 @@ declare type ConfigItem =
     | "version"                                  // 插件版本
     | "lite"                                     // 列表UI模式
     | "readme_close"                             // 说明文档显示
+    | "pure_mode"                                // 纯净模式

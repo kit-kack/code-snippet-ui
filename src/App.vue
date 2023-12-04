@@ -11,7 +11,7 @@
 <script setup>
 import hljs from "./js/dep/highlight-dep";
 import {theme, themeOverrides} from "./js/theme";
-import {onMounted, watch} from "vue";
+import {watch} from "vue";
 import MiddleView from "./view/MiddleView.vue";
 import {$normal, $reactive, LIST_VIEW} from "./js/store";
 import _ from "lodash";
@@ -49,10 +49,6 @@ watch(()=>$reactive.currentMode,(mode)=>{
   }
 },{
   immediate: true
-})
-
-onMounted(()=>{
-  document.body.id = utools.isDarkColors()? 'dark-app' : 'light-app'
 })
 
 </script>

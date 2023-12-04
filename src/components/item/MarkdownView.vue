@@ -126,6 +126,11 @@ onUnmounted(()=>{
   .hljs{
     background: #fafafa !important;
   }
+  code:not(pre) {
+    color: #de414c;
+    font-family: Consolas;
+    background-color: #fff5f5;
+  }
   pre{
     border: 2px solid transparent;
     code{
@@ -171,7 +176,8 @@ onUnmounted(()=>{
   }
 
   code:not(pre) {
-    background-color: #414141;
+    color: #ff7875;
+    background-color: #363636;
   }
   pre {
     background: #282c34 !important;

@@ -44,7 +44,7 @@
       </template>
     </n-scrollbar>
 
-    <div id="code-view-bottom-nav">
+    <div id="code-view-bottom-nav" v-if="!$reactive.view.pureView">
       <n-space>
 <!--        <template v-if="snippet.path && pair.type !=='image'">-->
 <!--          <n-button quaternary-->
@@ -65,27 +65,6 @@
         <n-button
             @click="$reactive.view.codeTipActive = true"
             quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]'}}</n-button>
-        <n-drawer v-model:show="$reactive.view.codeTipActive" :width="350" placement="right">
-          <n-drawer-content :title="snippet.name">
-            {{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字
-            <n-space>
-              <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
-            </n-space>
-            <ul>
-              <li v-if="snippet.sections?.length > 0">{{snippet.sections.length}} 个子代码片段</li>
-              <li v-if="snippet.keyword">已注册为uTools功能关键字</li>
-            </ul>
-            <template v-if="snippet.path">
-              <n-divider>
-                关联地址
-              </n-divider>
-              <div>{{snippet.path}}</div>
-            </template>
-
-            <n-divider />
-            <div>{{snippet.desc??'暂无描述~'}}</div>
-          </n-drawer-content>
-        </n-drawer>
         <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="handleClose">
           <template #icon>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
@@ -93,6 +72,27 @@
         </n-button>
       </n-space>
     </div>
+    <n-drawer v-model:show="$reactive.view.codeTipActive" :width="350" placement="right">
+      <n-drawer-content :title="snippet.name">
+        {{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字
+        <n-space>
+          <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
+        </n-space>
+        <ul>
+          <li v-if="snippet.sections?.length > 0">{{snippet.sections.length}} 个子代码片段</li>
+          <li v-if="snippet.keyword">已注册为uTools功能关键字</li>
+        </ul>
+        <template v-if="snippet.path">
+          <n-divider>
+            关联地址
+          </n-divider>
+          <div>{{snippet.path}}</div>
+        </template>
+
+        <n-divider />
+        <div>{{snippet.desc??'暂无描述~'}}</div>
+      </n-drawer-content>
+    </n-drawer>
   </div>
 </template>
 

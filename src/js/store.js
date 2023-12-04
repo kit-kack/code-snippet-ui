@@ -94,6 +94,7 @@ const $reactive = reactive({
         isRendering: false,
         onlyOne: false,           // 当前查询结果是否仅有一条记录
         backStageShow: false,
+        pureView: false,          // 是否为纯预览
     },
     // 控制utool及Vim模式
     utools:{

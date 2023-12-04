@@ -547,6 +547,12 @@ function init(list) {
                 case 'Digit9':
                     copyCode(true,+e.code[5])
                     break
+                case 'KeyP':
+                    if($reactive.currentMode === CODE_VIEW){
+                        $reactive.view.pureView = ! $reactive.view.pureView;
+                        configManager.set('pure_mode',$reactive.view.pureView)
+                    }
+                    break
             }
             return;
         }

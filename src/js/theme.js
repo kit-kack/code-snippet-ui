@@ -3,13 +3,22 @@ import {ref} from "vue";
 import {configManager} from "./core/config";
 import {$normal} from "./store";
 
-const theme = utools.isDarkColors()? darkTheme:null;
+const theme = ref(utools.isDarkColors()? darkTheme:null);
 
-
-
-
-
-
+export function adjustLightDarkTheme(){
+    const id = document.body.id;
+    if(id){
+        const newId = utools.isDarkColors()? "dark-app":"light-app";
+        if(id !== newId){
+            document.body.id = newId;
+            theme.value = utools.isDarkColors()? darkTheme:null;
+            adjustTheme(configManager.get('strategy_theme')??0)
+            globalThemeRefresh()
+        }
+    }else{
+        document.body.id = utools.isDarkColors()? "dark-app":"light-app";
+    }
+}
 
 const colorSchemaStyleOptions = [
     {

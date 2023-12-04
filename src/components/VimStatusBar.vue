@@ -1,5 +1,5 @@
 <template>
-  <div id="extra-left" v-if="!$reactive.utools.focused && $reactive.view.fullScreenShow" >
+  <div id="extra-left" v-if="show" >
     <n-tooltip trigger="hover" >
       <template #trigger>
         <n-button  round strong  :="getBtnStyle()" @click="handleVimStatusBarClick()">
@@ -27,7 +27,16 @@
 import {configManager} from "../js/core/config";
 import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
-
+import {computed} from "vue";
+const show = computed(()=>{
+  // !$reactive.utools.focused && $reactive.view.fullScreenShow
+  if($reactive.currentMode === CODE_VIEW){
+    if($reactive.view.pureView){
+      return false;
+    }
+  }
+  return !$reactive.utools.focused && $reactive.view.fullScreenShow
+})
 const getBtnStyle = ()=>{
   if($reactive.currentMode<= CODE_VIEW){
     return {

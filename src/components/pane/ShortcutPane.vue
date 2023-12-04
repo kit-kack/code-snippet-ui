@@ -137,6 +137,10 @@ const datas = [
       feature: "开启/关闭渲染模式Render",
       shortcut: "R"
     },
+      {
+        feature: "纯净模式Pure",
+        shortcut: "C-P"
+      },
     //   {
     //   feature: "缓存数据Buffer",
     //   shortcut: "B"

@@ -15,6 +15,7 @@ import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
 import {init} from "./js/keyboard";
 import {hierachyHubManager} from "./js/core/hub";
 import {generate_backup} from "./js/core/backup";
+import {adjustLightDarkTheme} from "./js/theme";
 // init
 configManager.init()
 tagColorManager.init()
@@ -111,6 +112,7 @@ const enterApp = (data) => {
         })
     }
     console.log('Enter App ...')
+    adjustLightDarkTheme()
     bindApp()
     if(data.code==='code-snippet-save'){
         $normal.quickCode = data.payload;

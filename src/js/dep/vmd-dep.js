@@ -8,12 +8,15 @@ import createTodoListPlugin from '@kangc/v-md-editor/lib/plugins/todo-list/index
 import '@kangc/v-md-editor/lib/plugins/todo-list/todo-list.css';
 // import createMermaidPlugin from '@kangc/v-md-editor/lib/plugins/mermaid/cdn';
 // import '@kangc/v-md-editor/lib/plugins/mermaid/mermaid.css';
+import { mark } from "@mdit/plugin-mark";
 import createKatexPlugin from '@kangc/v-md-editor/lib/plugins/katex/cdn';
 import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
 import '@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css';
-
 VMdPreview.use(githubTheme,{
-    Hljs: hljs
+    Hljs: hljs,
+    extend(md){
+        md.use(mark)
+    }
 })
 VMdPreview.use(createTodoListPlugin())
 // VMdPreview.use(createMermaidPlugin())
