@@ -107,7 +107,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"></path><path d="M12 9v6"></path><path d="M6 19a2 2 0 0 1-2-2v-4l-1-1l1-1V7a2 2 0 0 1 2-2"></path><path d="M18 19a2 2 0 0 0 2-2v-4l1-1l-1-1V7a2 2 0 0 0-2-2"></path></g></svg>                        </template>
                       </n-button>
                     </template>
-                    使用占位符
+                    使用占位符(Alt+X)
                   </n-tooltip>
                   <div id="form-code-language-select">
                     <n-select
@@ -165,7 +165,7 @@
                     文件
                   </n-divider>
                   <n-button @click="importLocalFile" quaternary type="primary">本地文件</n-button>
-                  <n-button @click="showModal = true" quaternary type="info" >网络文件</n-button>
+                  <n-button @click="showInternetLinkModal = true" quaternary type="info" >网络文件</n-button>
                 </template>
                 <template v-if="formProperties.linkType !== 'file'">
                   <n-divider title-placement="left">
@@ -209,12 +209,12 @@
       </div>
     </n-form>
   </div>
-  <base-modal :show="showModal" raw title="请输入链接" @cancel="showModal = false" @confirm="handleSetUrlAsPath">
+  <base-modal v-if="showInternetLinkModal" title="请输入链接" @cancel="showInternetLinkModal = false" @confirm="handleSetUrlAsPath">
     <n-input v-model:value="url" clearable/>
   </base-modal>
   <n-modal v-model:show="showFuncModal"
            preset="card"
-           title="选择占位符"
+           title="选择占位符(Alt+C)"
            style="width: 66%"
            :auto-focus="false"
 
@@ -260,7 +260,7 @@ const tags = computed(()=>{
 })
 const currentTab = ref((codeTemplate.path || codeTemplate.dir)? 'path':(formProperties.codeSource === 'link' ?'path':'code'))  // 当前Tab页
 const codeTextArea = ref()
-const showModal = ref(false)
+const showInternetLinkModal = ref(false)
 const showFuncModal = ref(false)
 const url = ref()
 const linkDesc = computed(()=>{
@@ -412,13 +412,49 @@ function handleUpdate(){
     window.$message.warning("请按要求填写")
   })
 }
+
+/**
+ *
+ * @param {KeyboardEvent} e
+ */
 function keyDownHandler(e){
+  if(showInternetLinkModal.value){
+    return
+  }
   if(e.ctrlKey){
+    console.log('xxx')
     if(e.code === 'KeyQ'){
       handleCancel();
     }else if(e.code === 'KeyS'){
       handleUpdate();
       e.preventDefault();
+    }
+  }else if(e.altKey){
+    if(e.code === 'KeyX'){
+      if(!codeTemplate.dir && !showFuncModal.value){
+        if(codeTemplate.type){
+          if(codeTemplate.type.startsWith('x-')){
+            codeTemplate.type = codeTemplate.type.slice(2)
+          }else{
+            codeTemplate.type = 'x-'+codeTemplate.type
+          }
+        }else{
+            codeTemplate.type = 'x-plaintext'
+        }
+      }
+    }else if(e.code === 'KeyC'){
+      if(currentTab.value === 'code'){
+        if(codeTemplate.type){
+          if(!codeTemplate.type.startsWith('x-')){
+            codeTemplate.type = 'x-'+codeTemplate.type
+          }
+        }else{
+          codeTemplate.type = 'x-plaintext'
+        }
+        showFuncModal.value = true;
+      }
+    }else if(e.code === 'KeyZ'){
+      $reactive.common.shortcutActive = ! $reactive.common.shortcutActive
     }
   }
 }
@@ -552,7 +588,7 @@ function setAsNormalDir() {
 function handleSetUrlAsPath(){
   if(url.value && isNetWorkUri(url.value)){
     codeTemplate.path = url.value;
-    showModal.value = false;
+    showInternetLinkModal.value = false;
   }else{
     $message.warning("请填写合法链接")
   }

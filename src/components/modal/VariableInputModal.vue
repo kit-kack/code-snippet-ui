@@ -1,9 +1,8 @@
 <template>
-  <base-modal :show="$reactive.common.variableActive"
+  <base-modal
               :title="$reactive.currentSnippet.name"
               @cancel="doCancel"
-              @confirm="doYes"
-  >
+              @confirm="doYes">
     <n-scrollbar style="max-height: 60vh">
       <div style="padding-right: 6px">
         <template v-for="(template,index) in templates">
