@@ -56,7 +56,6 @@
         <template v-if="pair.renderable">
           <n-button quaternary
                     @click=" $reactive.code.isRendering = !$reactive.code.isRendering"
-                    :color="configManager.getGlobalColor()"
                     :disabled="pair.type === 'image' && snippet.path"
           >
             {{ $reactive.code.isRendering? '已渲染 [R]': '未渲染 [R]' }}
@@ -64,8 +63,13 @@
         </template>
         <n-button
             @click="$reactive.code.infoActive = true"
-            quaternary :color="configManager.getGlobalColor()">{{ (snippet.type??'plaintext')+' [S]'}}</n-button>
-        <n-button strong quaternary circle :color="configManager.getGlobalColor()"  @click="handleClose">
+            quaternary>{{ (snippet.type??'plaintext')+' [S]'}}</n-button>
+        <n-button v-if="$reactive.code.isRendering && pair.type === 'markdown'" quaternary
+                  @click="$reactive.code.tocActive = !$reactive.code.tocActive"
+        >
+          目录 [T]
+        </n-button>
+        <n-button strong quaternary circle  @click="handleClose">
           <template #icon>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
           </template>
@@ -243,6 +247,10 @@ onUnmounted(()=>{
   width: 100%;
   position: relative;
   height: calc(100vh - 15px);
+
+  .n-button{
+    color: var(--global-color)
+  }
 
   .hljs-container pre{
     width: 100%;

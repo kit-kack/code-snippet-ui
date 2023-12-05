@@ -6,16 +6,28 @@
       @copy-code-success="copyCodeSuccess"
       ref="preview"
   ></v-md-preview>
-  <n-drawer v-model:show="$reactive.code.tocActive" :width="300" placement="right">
-    <n-drawer-content title="目录">
-      <div
-          v-for="anchor in tocTitles"
-          class="toc-link"
-          :style="{ padding: `10px 0 10px ${anchor.indent * 20}px` }"
-          @click="handleAnchorClick(anchor)"
-      >
-        <a  style="cursor: pointer">{{ anchor.title }}</a>
-      </div>
+  <n-drawer
+      v-model:show="$reactive.code.tocActive"
+      @after-enter="handleTocShow"
+      display-directive="show"
+      :show-mask="false"
+      :width="300" placement="right">
+    <n-drawer-content title="目录" body-content-style="padding: 0 0 0 20px;" >
+      <n-scrollbar ref="tocScrollRef">
+        <div
+            v-for="(anchor,index) in tocAnchors"
+            class="toc-link"
+            :class="{
+            'active': currentHeadingIndex === index
+          }"
+            :style="{ padding: `10px 0 10px ${anchor.indent * 20}px` }"
+            @click="handleAnchorClick(anchor,index)"
+        >
+          <n-ellipsis>
+            <a  style="cursor: pointer">{{ anchor.title }}</a>
+          </n-ellipsis>
+        </div>
+      </n-scrollbar>
 
     </n-drawer-content>
   </n-drawer>
@@ -28,7 +40,9 @@ import {isNetWorkUri} from "../../js/utils/common";
 import {utools_browser_open} from "../../js/core/base";
 
 const preview = ref()
-const tocTitles= ref([])
+const tocScrollRef = ref()
+const tocAnchors= ref([])
+const currentHeadingIndex = ref(0)
 function copyCodeSuccess(){
   $message.info("已复制该代码块内容")
 }
@@ -115,16 +129,16 @@ function handleClickUrl(e){
     }
   }
 }
-function _getVisiablePres(){
-  const pres  = document.querySelectorAll(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre")
+function _getVisiableBlocks(selectors){
+  const blocks  = document.querySelectorAll(selectors)
   // 获取窗口大小
   const windowWidth = window.innerWidth || document.documentElement.clientWidth;
   const windowHeight = window.innerHeight || document.documentElement.clientHeight;
   const middleHeight = windowHeight / 2;
   const result = [];
   // 判断视口
-  for (const pre of pres) {
-    const rect = pre.getBoundingClientRect();
+  for (const block of blocks) {
+    const rect = block.getBoundingClientRect();
     // before
     if (rect.bottom < 0) {
       continue;
@@ -139,13 +153,13 @@ function _getVisiablePres(){
     }
     result.push({
       distance: Math.min(Math.abs(rect.top - middleHeight),Math.abs(rect.bottom - middleHeight)),
-      pre: pre
+      block:block
     })
   }
   return result
 }
 function adjustCenterPre(tab){
-  const pres = _getVisiablePres();
+  const pres = _getVisiableBlocks(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre");
   if(pres.length === 0){
     $normal.md.pre = null;
     $normal.md.index = null;
@@ -173,16 +187,17 @@ function adjustCenterPre(tab){
     }
   }
   $normal.md.index = finalIndex;
-  const finalPre = pres[finalIndex].pre;
-  if($normal.md.pre === finalPre){
-    return;
-  }else{
+  const finalPre = pres[finalIndex].block;
+  if($normal.md.pre !== finalPre){
     if($normal.md.pre){
       // cancel border color
       $normal.md.pre.style.border = '';
     }
     $normal.md.pre = finalPre;
-    $normal.md.pre.style.border = '2px solid '+$normal.theme.globalColor;
+    if($normal.md.pre){
+      // cancel border color
+      $normal.md.pre.style.border = '2px solid '+$normal.theme.globalColor;
+    }
   }
 
 }
@@ -208,45 +223,132 @@ function handleMdHorizonMove(left,fast){
 function handleKeyDown(e){
   switch (e.code){
     case 'Tab':
-      adjustCenterPre(true)
-      break
+        adjustCenterPre(true)
+        break
     case "KeyH":
     case "ArrowLeft":
-      handleMdHorizonMove(true,e.shiftKey)
-      break;
+        handleMdHorizonMove(true,e.shiftKey)
+        break;
     case "KeyJ":
     case "ArrowDown":
+        if($reactive.code.tocActive){
+          if(tocAnchors.value.length > 0){
+            if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
+              const index = currentHeadingIndex.value + 1;
+              handleAnchorClick(tocAnchors.value[index],index)
+              // tocRef.value.$el.children[1].children[0].scrollTop = `${(index> 5 ? index - 5 : 0) * 40}px`
+              tocScrollRef.value.scrollTo({
+                top: (index> 5 ? index - 5 : 0) * 42,
+                behavior: 'smooth'
+              })
+            }
+          }
+        }else{
+          if(e.ctrlKey || e.metaKey){
+            if(tocAnchors.value.length > 0){
+              if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
+                const index = currentHeadingIndex.value + 1;
+                handleAnchorClick(tocAnchors.value[index],index)
+              }
+            }
+          }
+        }
+        adjustCenterPre()
+        break;
     case "KeyK":
     case "ArrowUp":
-      adjustCenterPre()
-      break;
+        if($reactive.code.tocActive){
+          if(tocAnchors.value.length > 0){
+            if(currentHeadingIndex.value !== 0){
+              const index = currentHeadingIndex.value - 1;
+              handleAnchorClick(tocAnchors.value[index],index)
+              tocScrollRef.value.scrollTo({
+                top: (index> 5 ? index - 5 : 0) * 42,
+                behavior: 'smooth'
+              })
+            }
+          }
+        }else{
+          if(e.ctrlKey || e.metaKey){
+            if(tocAnchors.value.length > 0){
+              if(currentHeadingIndex.value !== 0){
+                const index = currentHeadingIndex.value - 1;
+                handleAnchorClick(tocAnchors.value[index],index)
+              }
+            }
+          }
+        }
+        adjustCenterPre()
+        break;
     case "KeyL":
     case "ArrowRight":
-      handleMdHorizonMove(false,e.shiftKey)
-      break;
+        handleMdHorizonMove(false,e.shiftKey)
+        break;
     case 'KeyT':
-      if($reactive.common.shortcutActive){
-        return
-      }
-      if($reactive.code.infoActive){
-        $reactive.code.infoActive = false
-      }
-      $reactive.code.tocActive = !$reactive.code.tocActive;
-      break;
+        if($reactive.common.shortcutActive){
+          return
+        }
+        if($reactive.code.infoActive){
+          $reactive.code.infoActive = false
+        }
+        $reactive.code.tocActive = ! $reactive.code.tocActive;
+        break;
     case 'Space':
-      if($normal.md.pre){
-        utools.copyText($normal.md.pre.querySelector('code').innerText)
-        $message.info("已复制该代码块内容")
+        if($reactive.code.tocActive){
+          $reactive.code.tocActive = false
+          break
+        }
+        if($reactive.code.infoActive){
+          $reactive.code.infoActive = false
+          break
+        }
+        if($reactive.common.shortcutActive){
+          $reactive.common.shortcutActive = false
+          break
+        }
+        if($normal.md.pre){
+          utools.copyText($normal.md.pre.querySelector('code').innerText)
+          $message.info("已复制该代码块内容")
+        }
+        break
+  }
+}
+function handleTocShow(){
+  // 计算 屏幕正中央的heading
+  // const headings = _getVisiableBlocks('h1,h2,h3,h4,h5,h6');
+  // console.log(headings)
+  if(tocAnchors.value.length > 0){
+    // 获取窗口大小
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const middleHeight = windowHeight / 2;
+    let finalIndex = tocAnchors.value.length -1;
+    for (let i = 0; i < tocAnchors.value.length; i++) {
+      const heading = preview.value.$el.querySelector(`[data-v-md-line="${tocAnchors.value[i].lineIndex}"]`);
+      if(heading){
+        const rect = heading.getBoundingClientRect();
+        // after: break
+        if(rect.top < middleHeight){
+          finalIndex = i;
+        }else{
+          break;
+        }
       }
-      break
+    }
+    currentHeadingIndex.value = finalIndex
+    if(finalIndex >= 0){
+      tocScrollRef.value.scrollTo({
+        top: (finalIndex> 5 ? finalIndex - 5 : 0) * 42,
+        behavior: 'smooth'
+      })
+    }
+
   }
 }
 
-function handleAnchorClick(anchor) {
+function handleAnchorClick(anchor,index) {
   const { lineIndex } = anchor;
 
   const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
-  console.log(heading)
   if (heading) {
     // Note: If you are using the preview mode of the editing component, the method name here is changed to previewScrollToTarget
     preview.value.scrollToTarget({
@@ -254,20 +356,21 @@ function handleAnchorClick(anchor) {
       scrollContainer: $normal.scroll.codeVerticalInvoker.scrollbarInstRef.containerRef,
       top: 200,
     });
+    currentHeadingIndex.value = index
   }
 }
+
 onMounted(()=>{
   const anchors = preview.value.$el.querySelectorAll('h1,h2,h3,h4,h5,h6');
   const titles = Array.from(anchors).filter((title) => !!title.innerText.trim());
-  if(!titles.length){
-   return
+  if(titles.length > 0){
+    const hTags = Array.from(new Set(titles.map(title => title.tagName))).sort()
+    tocAnchors.value = titles.map((el)=>({
+      title: el.innerText,
+      lineIndex: el.getAttribute('data-v-md-line'),
+      indent: hTags.indexOf(el.tagName)
+    }))
   }
-  const hTags = Array.from(new Set(titles.map(title => title.tagName))).sort()
-  tocTitles.value = titles.map((el)=>({
-    title: el.innerText,
-    lineIndex: el.getAttribute('data-v-md-line'),
-    indent: hTags.indexOf(el.tagName)
-  }))
   document.addEventListener('click',handleClickUrl)
   document.addEventListener('keydown',handleKeyDown)
 })
@@ -309,14 +412,15 @@ onUnmounted(()=>{
     }
   }
 }
-.toc-link:hover{
-  color: #de414c;
-}
-#dark-app{
-  .toc-link:hover{
-    color:#ff7875;
+.toc-link{
+  &:hover,&.active{
+    color: var(--global-color)
+  }
+  &.active{
+    font-weight: bold
   }
 }
+
 // 适配 暗黑模式
 #dark-app .github-markdown-body{
   background-image: linear-gradient(90deg, rgba(145, 142, 142, 0.04) 3%, transparent 0), linear-gradient(1turn, rgba(201, 194, 197, 0.04) 3%, transparent 0);

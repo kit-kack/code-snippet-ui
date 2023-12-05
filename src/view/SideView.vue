@@ -71,7 +71,7 @@
           自定义标签被清除后，只会影响到编辑界面/辅助标签选择界面的标签选择
         </n-tooltip>
         <template v-if="refreshFlag">
-          <n-space>
+          <n-space style="padding: 0 10px">
             <normal-tag type="clear" v-for="tag in tagColorManager.all()" :content="tag" @tag-refresh="dealWithTagRefresh"/>
           </n-space>
         </template>

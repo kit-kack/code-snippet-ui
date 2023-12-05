@@ -30,11 +30,15 @@ export function dealWithCodeView(e,ctrlFlag){
             break;
         case "KeyJ":
         case "ArrowDown":
-            doScrollForCodeView(Direction.DOWN,e.shiftKey);
+            if(!ctrlFlag){
+                doScrollForCodeView(Direction.DOWN,e.shiftKey);
+            }
             break;
         case "KeyK":
         case "ArrowUp":
-            doScrollForCodeView(Direction.UP,e.shiftKey);
+            if(!ctrlFlag){
+                doScrollForCodeView(Direction.UP,e.shiftKey);
+            }
             break;
         case "KeyL":
         case "ArrowRight":
