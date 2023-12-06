@@ -234,7 +234,21 @@ function handleKeyDown(e){
         if($reactive.code.tocActive){
           if(tocAnchors.value.length > 0){
             if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
-              const index = currentHeadingIndex.value + 1;
+              let index = currentHeadingIndex.value + 1;
+              if(e.altKey){
+                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+                let ind = -1;
+                for (let i = index; i < tocAnchors.value.length; i++) {
+                  if(tocAnchors.value[i].indent === indent){
+                    ind = i;
+                    break
+                  }
+                }
+                if(ind === -1){
+                  return;
+                }
+                index = ind;
+              }
               handleAnchorClick(tocAnchors.value[index],index)
               // tocRef.value.$el.children[1].children[0].scrollTop = `${(index> 5 ? index - 5 : 0) * 40}px`
               tocScrollRef.value.scrollTo({
@@ -251,6 +265,23 @@ function handleKeyDown(e){
                 handleAnchorClick(tocAnchors.value[index],index)
               }
             }
+          }else if(e.altKey){
+            if(tocAnchors.value.length > 0){
+              if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
+                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+                let index = -1;
+                for (let i = currentHeadingIndex.value + 1; i < tocAnchors.value.length; i++) {
+                  if(tocAnchors.value[i].indent === indent){
+                    index = i;
+                    break
+                  }
+                }
+                if(index === -1){
+                  return;
+                }
+                handleAnchorClick(tocAnchors.value[index],index)
+              }
+            }
           }
         }
         adjustCenterPre()
@@ -260,7 +291,21 @@ function handleKeyDown(e){
         if($reactive.code.tocActive){
           if(tocAnchors.value.length > 0){
             if(currentHeadingIndex.value !== 0){
-              const index = currentHeadingIndex.value - 1;
+              let index = currentHeadingIndex.value - 1;
+              if(e.altKey){
+                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+                let ind = -1;
+                for (let i = index; i >= 0; i --) {
+                  if(tocAnchors.value[i].indent === indent){
+                    ind = i;
+                    break
+                  }
+                }
+                if(ind === -1){
+                  return;
+                }
+                index = ind;
+              }
               handleAnchorClick(tocAnchors.value[index],index)
               tocScrollRef.value.scrollTo({
                 top: (index> 5 ? index - 5 : 0) * 42,
@@ -273,6 +318,23 @@ function handleKeyDown(e){
             if(tocAnchors.value.length > 0){
               if(currentHeadingIndex.value !== 0){
                 const index = currentHeadingIndex.value - 1;
+                handleAnchorClick(tocAnchors.value[index],index)
+              }
+            }
+          }else if(e.altKey){
+            if(tocAnchors.value.length > 0){
+              if(currentHeadingIndex.value !== 0){
+                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+                let index = -1;
+                for (let i = currentHeadingIndex.value - 1; i >= 0; i --) {
+                  if(tocAnchors.value[i].indent === indent){
+                    index = i;
+                    break
+                  }
+                }
+                if(index === -1){
+                  return;
+                }
                 handleAnchorClick(tocAnchors.value[index],index)
               }
             }
