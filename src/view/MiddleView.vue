@@ -13,7 +13,7 @@
   <n-drawer v-model:show="$reactive.main.settingActive" :width="380" placement="right">
     <side-view/>
   </n-drawer>
-  <n-drawer display-directive="show" v-model:show="$reactive.common.shortcutActive" placement="left" :width="380">
+  <n-drawer  v-model:show="$reactive.common.shortcutActive" placement="left" :width="380">
     <n-scrollbar style="max-height: 99%" :ref="(el) => $normal.scroll.helpInvoker= el" >
       <shortcut-pane/>
     </n-scrollbar>
@@ -102,7 +102,7 @@ watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.ut
   GLOBAL_HIERARCHY.search(search).then(list => {
     const isSameLength = $list.value.length === list.length;
     if(isSameLength){
-      if(list.length === 0){
+      if(list.length === 0 && $reactive.utools.search){
         // 不做任何改变
         if(!$reactive.main.isFullScreenShow){
           topNavShow.value = false;

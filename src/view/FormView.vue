@@ -107,7 +107,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"></path><path d="M12 9v6"></path><path d="M6 19a2 2 0 0 1-2-2v-4l-1-1l1-1V7a2 2 0 0 1 2-2"></path><path d="M18 19a2 2 0 0 0 2-2v-4l1-1l-1-1V7a2 2 0 0 0-2-2"></path></g></svg>                        </template>
                       </n-button>
                     </template>
-                    使用占位符(Alt+X)
+                    使用占位符
                   </n-tooltip>
                   <div id="form-code-language-select">
                     <n-select
@@ -127,7 +127,7 @@
               </div>
             </n-tab-pane>
 
-            <n-tab-pane name="path" tab="关联" :disabled="formProperties.codeSource === 'code'">
+            <n-tab-pane name="link" tab="关联" :disabled="formProperties.codeSource === 'code'">
               <template v-if="codeTemplate.path || codeTemplate.dir">
                 <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
                   <n-list-item style="height: 100px">
@@ -214,7 +214,7 @@
   </base-modal>
   <n-modal v-model:show="showFuncModal"
            preset="card"
-           title="选择占位符(Alt+C)"
+           title="选择占位符"
            style="width: 66%"
            :auto-focus="false"
 
@@ -258,7 +258,7 @@ const tags = computed(()=>{
     }
   })
 })
-const currentTab = ref((codeTemplate.path || codeTemplate.dir)? 'path':(formProperties.codeSource === 'link' ?'path':'code'))  // 当前Tab页
+const currentTab = ref((codeTemplate.path || codeTemplate.dir)? 'link':(formProperties.codeSource === 'link' ?'link':'code'))  // 当前Tab页
 const codeTextArea = ref()
 const showInternetLinkModal = ref(false)
 const showFuncModal = ref(false)
@@ -359,38 +359,43 @@ function handleUpdate(){
         window.$message.warning("请按要求填写")
       }else{
         codeTemplate.name = codeTemplate.name.trim()
-        //
-        if(currentTab.value === 'path'){
-          // link
-          if(codeTemplate.dir){
-            // dir
-            if(codeTemplate.ref){
-              if(codeTemplate.ref === "local"){
-                if(!codeTemplate.path){
-                  $message.warning("请提供 [关联目录路径]")
-                  return;
-                }
-              }
-            }else{
-              // normal
-            }
-          }else{
-            // file
-            if(!codeTemplate.path){
-              $message.warning("请提供 [关联项]")
-              return;
-            }
-          }
-        }else{
-          // code
+        if(currentTab.value === 'code'){  // code
           if(!codeTemplate.code){
             $message.warning("代码不能为空")
             return;
           }
+          codeTemplate.dir = undefined;
+          codeTemplate.ref = undefined;
+          codeTemplate.path = undefined;
+          codeTemplate.local = undefined;
+          if(codeTemplate.type === undefined){
+            codeTemplate.type = configManager.get('default_language')?? 'plaintext';
+          }
+        }else{ // link
+          if(codeTemplate.dir){ // dir
+            if(codeTemplate.ref){
+              if(!codeTemplate.path){
+                $message.warning("请提供 [关联目录路径]")
+                return;
+              }
+            }else{
+              // normal
+              codeTemplate.path = undefined;
+            }
+            codeTemplate.type = undefined;
+          }else{ // file
+            if(!codeTemplate.path){
+              $message.warning("请提供 [关联项]")
+              return;
+            }
+            if(codeTemplate.type === undefined){
+              codeTemplate.type = configManager.get('default_language')?? 'plaintext';
+            }
+          }
+          codeTemplate.code = undefined;
         }
-        if(codeTemplate.type === undefined){
-          codeTemplate.type = configManager.get('default_language')?? 'plaintext';
-        }
+        codeTemplate.temp = undefined;
+        codeTemplate.now = undefined;
         if(edit){
           const id = codeTemplate.id ?? codeTemplate.name;
           if(id === $normal.lastQueryCodeSnippetId){
@@ -451,11 +456,52 @@ function keyDownHandler(e){
         }else{
           codeTemplate.type = 'x-plaintext'
         }
-        showFuncModal.value = true;
+        showFuncModal.value =  ! showFuncModal.value;
       }
     }else if(e.code === 'KeyZ'){
       $reactive.common.shortcutActive = ! $reactive.common.shortcutActive
+    }else if(e.code === 'KeyQ'){
+      if(formProperties.codeSource !== "code" && formProperties.linkType !== "dir"){
+        if(currentTab.value === 'code'){
+          currentTab.value = 'link'
+        }
+        importLocalFile()
+      }
+    }else if(e.code === 'KeyW'){
+      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "dir"){
+
+        if(currentTab.value === 'code'){
+          currentTab.value = 'link'
+        }
+        showInternetLinkModal.value = true
+      }
+    }else if(e.code === 'KeyA'){
+      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
+
+        if(currentTab.value === 'code'){
+          currentTab.value = 'link'
+        }
+        importLocalDir()
+      }
+    }else if(e.code === 'KeyS'){
+      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
+
+        if(currentTab.value === 'code'){
+          currentTab.value = 'link'
+        }
+        setAsNormalDir();
+      }
+    }else if(e.code === 'KeyD'){
+      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
+
+        if(currentTab.value === 'code'){
+          currentTab.value = 'link'
+        }
+        importHierarchyJS()
+      }
     }
+
+
   }
 }
 function handleChooseCommand(command){

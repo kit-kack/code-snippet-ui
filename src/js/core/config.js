@@ -23,9 +23,7 @@ export const configManager = {
             this.configs["strategy_item_code_show"] = 0;
         }
         if(this.configs['lite']){
-            if(this.configs['strategy_item_code_show'] < 2){
-                $reactive.main.isFullScreenShow = false;
-            }
+            $reactive.main.isFullScreenShow = this.configs['strategy_item_code_show'] === 2;
         }
         $reactive.code.isPure = this.configs['pure_mode']
         if(!(this.configs["strategy_theme"] >= 0 && this.configs["strategy_theme"] <= 4)){

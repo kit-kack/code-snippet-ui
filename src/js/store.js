@@ -113,7 +113,7 @@ const $reactive = reactive({
         // 搜索结果是否只有一个元素
         isOnlyOneElement: false,
         // 是否处于【完整UI】
-        isFullScreenShow: false,
+        isFullScreenShow: true,
         // 用来进行重度刷新
         deepRefresh: true,
     },

@@ -165,11 +165,26 @@ const datas = [
       feature: "退出Quit",
       shortcut: [CtrlStr+"-Q",CtrlStr+"-S"],
     },{
-      feature: "快速启用 子代码片段",
-      shortcut: ['Alt+X',"Alt+C"]
+      feature: "本地文件",
+      shortcut: 'Alt+Q'
+    },{
+      feature: "网络文件",
+      shortcut: 'Alt+W'
+    },{
+      feature: "本地目录",
+      shortcut: 'Alt+A'
+    },{
+      feature: "普通目录",
+      shortcut: 'Alt+S'
+    },{
+      feature: "自定义目录",
+      shortcut: 'Alt+D'
     },{
       feature: "查看『快捷方式』",
       shortcut: 'Alt+Z'
+    },{
+      feature: "快速启用 子代码片段",
+      shortcut: ['Alt+X',"Alt+C"]
     }]
   }
 ]
