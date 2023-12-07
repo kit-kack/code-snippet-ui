@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.6.2](https://github.com/littledot-kit/code-snippet-ui/compare/v2.6.1...v2.6.2) (2023-12-07)
+
+
+### Features
+
+* 代码预览界面新增“纯净模式”；响应式暗亮模式切换 ([719705d](https://github.com/littledot-kit/code-snippet-ui/commit/719705d8b22a0d7e2394e84b5cbffb9cc0ef2a12))
+* 适配uTools 4.4.0 推送功能 ([f4865d8](https://github.com/littledot-kit/code-snippet-ui/commit/f4865d8ebfdb15543f6d4d219c003aa5b9f6c549))
+* 支持 markdown alt+(J K)键 ([ffc56e4](https://github.com/littledot-kit/code-snippet-ui/commit/ffc56e4808a5e6061af4e1a37056036b67745c7d))
+* Markdown目录TOC支持；一些界面优化 ([a778fde](https://github.com/littledot-kit/code-snippet-ui/commit/a778fde6d7192ee55764e363b0f8f606e7b2ec85))
+
+
+### Bug Fixes
+
+* 编辑界面支持快捷键；修复lite show bug ([f99d71a](https://github.com/littledot-kit/code-snippet-ui/commit/f99d71aa59c1c1cc8ed7f5850f8016cf8b4bfd59))
+* 修复 vim一些按键控制处理逻辑 ([39eef24](https://github.com/littledot-kit/code-snippet-ui/commit/39eef24025e692055d871a77e1b553fbadc3becd))
+* 修复app restart 问题 ([8c62b63](https://github.com/littledot-kit/code-snippet-ui/commit/8c62b63baa3346ca0df6da3dade66389edde9adf))
+* 压缩pinyin_xxx.js ([b589a1d](https://github.com/littledot-kit/code-snippet-ui/commit/b589a1d09cd7ac902ba2014ec4bc0ad271a90bd1))
+* 优化ListItem显示 ([a77635b](https://github.com/littledot-kit/code-snippet-ui/commit/a77635b61dc57ca4389aaf6fe91e5687838390b0))
+* 优化vim shortcut ([1e89a09](https://github.com/littledot-kit/code-snippet-ui/commit/1e89a096d67f90b725898c3ffec98b585b80d282))
+* vim控制优化 ([f0c2fe6](https://github.com/littledot-kit/code-snippet-ui/commit/f0c2fe6625d12d7b82965f3a860de68f7afb287f))
+
 ### [2.6.1](https://github.com/littledot-kit/code-snippet-ui/compare/v2.6.0...v2.6.1) (2023-11-30)
 
 ## [2.6.0](https://github.com/littledot-kit/code-snippet-ui/compare/v2.5.1...v2.6.0) (2023-11-23)
