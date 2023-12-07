@@ -51,6 +51,8 @@ const $normal = {
         variables: {},
         // 上述输入变量的默认值
         defaultValues: {},
+        // 当前代码片段名
+        snippetName: null,
     },
     // beta测试
     beta:{

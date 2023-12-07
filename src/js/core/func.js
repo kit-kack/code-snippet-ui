@@ -636,6 +636,7 @@ export const formatManager = {
                 this.codeBuffer = result.code;
                 $normal.funcs.variables = result.vars;
                 $normal.funcs.defaultValues = result.defaultValues;
+                $normal.funcs.snippetName = $reactive.currentSnippet.name
                 $reactive.common.variableActive = true;
                 return null;
             }else{

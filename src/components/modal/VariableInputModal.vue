@@ -1,6 +1,6 @@
 <template>
   <base-modal
-              :title="$reactive.currentSnippet.name"
+              :title="$normal.funcs.snippetName"
               @cancel="doCancel"
               @confirm="doYes">
     <n-scrollbar style="max-height: 60vh">

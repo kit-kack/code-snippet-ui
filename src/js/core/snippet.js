@@ -181,7 +181,7 @@ export const codeSnippetManager = {
         }
     },
     /**
-     * 满足多种查询要求
+     * 指定目录层级搜索
      * @param {string | null} name
      * @param {string | null} prefix
      * @return {CodeSnippet[]}
@@ -213,6 +213,25 @@ export const codeSnippetManager = {
         // 进行排序处理
         return list;
     },
+    deepQuery(name){
+        // first root
+        const list = [];
+        for (const codeSnippet of this.rootSnippetMap.values()) {
+            if(!codeSnippet.dir && match(name,codeSnippet.name) !== null){
+                list.push(codeSnippet)
+            }
+        }
+        // then sub
+        for (const doc of utools.db.allDocs(SUB_CODE_PREFIX)) {
+            const snippet = doc.data;
+            if(!snippet.dir && match(name,snippet.name) !== null){
+                list.push(snippet)
+            }
+        }
+        return list
+
+    },
+
     backup(zip,dirname){
         let count = 0;
         for (const doc of utools.db.allDocs(CODE_PREFIX)) {

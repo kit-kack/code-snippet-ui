@@ -157,9 +157,11 @@ utools.onPluginEnter((data)=>{
 })
 
 try{
+    let result = [];
+    let num = undefined;
     utools.onMainPush(({code,type,payload})=>{
-        let name = payload;
-        let num = undefined;
+        let name = payload.toLowerCase();
+        num = undefined;
         if(configManager.get('beta_sub_snippet_search')){
             const index = payload.lastIndexOf('$')
             if(index !== -1){
@@ -167,24 +169,18 @@ try{
                 num =  (+payload.slice(index+1))??1;
             }
         }
-        let flag = true;
-        const array = codeSnippetManager.queryForMany(name,null)
-        return array.filter(cs => !cs.dir)
-            .map(cs =>{
-            flag = !flag;
-            return {
-                text: cs.desc? (cs.name+'📢'+cs.desc):cs.name,
-                id: cs.id,
-                icon: '/code.png',
-                num: num
-            }
-        })
-
+        result = codeSnippetManager.deepQuery(name).slice(0,6)
+        return result.map((cs,index) =>({
+                text: cs.name,
+                index: index,
+                icon: cs.type?.startsWith('x-')? '/code-x.png': '/code.png',
+                tags: [cs.desc]
+            }))
     },({code,type,payload,option})=>{
-        $reactive.currentSnippet = codeSnippetManager.rootSnippetMap.get(option.id);
+        $reactive.currentSnippet = result[option.index];
         // $reactive.core.selectedIndex = 0;
         $index.value = 0;
-        copyCode(true,option.num,true)
+        copyCode(true,num,true)
         return $reactive.currentSnippet.type?.startsWith('x-')
     })
 }catch (_){}

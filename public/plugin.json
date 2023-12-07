@@ -4,7 +4,7 @@
   "pluginName": "code-snippet",
   "description": "管理您的代码片段，支持Vim操作方式",
   "author": "kitkack",
-  "logo": "coding.png",
+  "logo": "logo.png",
   "main": "index.html",
   "preload": "preload.js",
   "development": {
