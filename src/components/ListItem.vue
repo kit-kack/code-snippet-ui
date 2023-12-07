@@ -27,16 +27,8 @@
             <n-ellipsis >
               <!-- 标题 -->
               <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
-              <!-- 本地&网络 -->
-              <span class="snippet-item__desc" style="margin-left: 10px;" >{{pair.desc}}</span>
-              <template v-if="configManager.get('strategy_item_code_show') > 0 ">
-                <!-- 描述（标题右侧） -->
-                <span class="snippet-item__desc" style="margin-left: 10px;">{{snippet.desc}}</span>
-              </template>
-              <template v-else>
-                <!-- 子代码片段 -->
-                <span class="snippet-item__desc"  style="margin-left: 5px;">{{getSideInfo()}}</span>
-              </template>
+              <!-- 描述（标题右侧）  子代码片段 -->
+              <span class="snippet-item__desc">{{ configManager.get('strategy_item_code_show') > 0 ? snippet.desc: pair.sideInfo}}</span>
             </n-ellipsis>
           </div>
         </n-scrollbar>
@@ -55,20 +47,20 @@
       <template v-if="configManager.get('strategy_item_code_show') > 0">
         <!-- 代码 -->
         <template v-if="configManager.get('strategy_item_code_show') > 1">
-          <multi-line-code :type="pair.type" :code="pair.code" :active="$index === index"/>
+          <multi-line-code :type="pair.renderType" :code="pair.code" :active="$index === index"/>
         </template>
         <template v-else>
-          <single-line-code :type="pair.type" :code="pair.code"/>
+          <single-line-code :type="pair.renderType" :code="pair.code"/>
         </template>
         <!-- no-code-desc -->
         <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
-              {{getSideInfo()}}
+              {{pair.sideInfo}}
         </span>
       </template>
       <template v-else>
         <!-- 描述（标题下方） -->
         <n-ellipsis :tooltip="false">
-          <span class="snippet-item__desc" style="margin-left: 6px">{{snippet.desc}}</span>
+          <span class="snippet-item__desc" style="margin-left: 6px;">{{snippet.desc}}</span>
         </n-ellipsis>
       </template>
 
@@ -79,7 +71,7 @@
                color: snippet.dir ? $normal.theme.globalColor: '#888'
              }"
       >
-              {{snippet.dir? '目录':(snippet.type?? 'plaintext')}}
+              {{pair.showType}}
       </span>
     </n-card>
 
@@ -137,7 +129,6 @@ import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
 import {copyCode} from "../js/utils/copy";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
-import {isNetWorkUri} from "../js/utils/common";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -149,26 +140,33 @@ const isShowBtn = computed(()=>{
 })
 const isHover = ref(false)
 const pair = computed(()=>{
-
+  // type
+  let showType = props.snippet.type?? 'plaintext';
+  let renderType = showType;
   let code;
-  if(configManager.get('strategy_item_code_show') === 0){
-    // show tag
-    if(props.snippet.dir){
-      if(props.snippet.ref){
-        if(props.snippet.ref === "local"){
-          code = "本地"
-        }else{
-          code = "自定义";
-        }
+  // sideInfo
+  let sideInfo = '';
+  if(props.snippet.sections){
+    if(props.snippet.sections.length > 0){
+      if(props.snippet.keyword){
+        sideInfo = '✬×'+props.snippet.sections.length;
+      }else{
+        sideInfo = '⚑×'+props.snippet.sections.length;
       }
-    }else if(props.snippet.path){
-      code = isNetWorkUri(props.snippet.path) ? "网络": "本地"
     }
-    return {
-      desc: code   // 用作desc
+  }else if(props.snippet.keyword){
+    sideInfo = '✬'
+  }
+  if(props.snippet.dir){
+    if(props.snippet.ref === "local"){
+      showType = "本地目录"
+    }else if(props.snippet.ref === "custom"){
+      showType = "自定义目录"
+    }else{
+      showType = "目录"
     }
-
-  }else{
+  }
+  if(configManager.get('strategy_item_code_show') > 0){
     if(props.snippet.dir){
       if(props.snippet.ref){
         if(props.snippet.ref === "local"){
@@ -179,42 +177,21 @@ const pair = computed(()=>{
       }else{
         code = "[普通目录] ";
       }
+      renderType = 'markdown';
     }else{
       // file
       code = props.snippet.code;
-      if(code){
-        return {
-          code: code,
-          type: props.snippet.type ?? 'plaintext'
-        }
-      }
       if(props.snippet.path){
-        return {
-          code: '[关联文件]: '+props.snippet.path,
-          type: 'markdown'
-        }
+        code = '[关联文件]: '+props.snippet.path;
+        renderType = 'markdown';
       }
     }
   }
   return {
-    code: code,
-    type: 'markdown'
+    showType,renderType,code,sideInfo
   }
-
 })
 
-function getSideInfo(){
-  if(props.snippet.sections){
-    if(props.snippet.sections.length > 0){
-      if(props.snippet.keyword){
-        return '★×'+props.snippet.sections.length;
-      }else{
-        return '⚑×'+props.snippet.sections.length;
-      }
-    }
-  }
-  return props.snippet.keyword? '★':''
-}
 const getSelectedStyle =(selected,isHoverRef)=>{
   let style = utools.isDarkColors()? 'backgroundColor: #2a2a2c':'backgroundColor: #fff';
   if(isHoverRef){
@@ -357,6 +334,7 @@ function doItemRefresh(){
   color: rgb(169, 168, 168);
   transform: scale(0.9); /* 用缩放来解决 */
   transform-origin: 0 0;  /* 左对齐 */
+  margin-left: 10px;
 }
 .snippet-item__top {
   position: absolute;
