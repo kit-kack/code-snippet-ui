@@ -58,6 +58,7 @@ export async function load_backup(path){
         maskClosable: false,
         onPositiveClick:()=>{
             utools.outPlugin();
+            window.preload.closePlugin()
         }
     })
 }

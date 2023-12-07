@@ -68,4 +68,7 @@ export function getDirname(p){
 export function getFinalPath(dir,p){
     return path.join(dir,p)
 }
+export function closePlugin(){
+    require('process').exit()
+}
 export const _clipboard = clipboard;
