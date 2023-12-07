@@ -177,11 +177,8 @@ const CODE_VIEW_SHORTCUTS = [{
     feature: "复制代码块内容",
     shortcut: "Space"
   },{
-    feature: "跳转前后相邻小节",
+    feature: "跳转前后小节",
     shortcut: [CtrlStr+ " + J", CtrlStr+" + K"]
-  },{
-    feature: "跳转前后同级小节",
-    shortcut: ["Alt + J", "Alt + K"]
   }]
 
 

@@ -102,7 +102,7 @@
 
 <script setup>
 import {configManager} from "../js/core/config";
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import {computed, onMounted, onUnmounted, ref, watchPostEffect} from "vue";
 import {section_generate} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
 import {calculateTime, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
@@ -224,13 +224,13 @@ onMounted(()=>{
     $normal.scroll.codeVerticalInvoker = verticalScroller.value;
     $reactive.code.isRendering = pair.value.renderable;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
-      renderFormatBlock(pair.value.renderable && $reactive.code.isRendering)
-      watch(()=>$reactive.code.isRendering,(newValue)=>{
-        renderFormatBlock(newValue)
-      },{
-        flush:'post',
-        immediate:true
-      })
+      if(pair.value.renderable){
+        watchPostEffect(()=>{
+          renderFormatBlock($reactive.code.isRendering)
+        })
+      }else{
+        renderFormatBlock(false)
+      }
     }
 })
 

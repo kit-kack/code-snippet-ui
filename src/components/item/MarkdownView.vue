@@ -38,6 +38,7 @@ import {$normal, $reactive} from "../../js/store";
 import {nextTick, onMounted, onUnmounted, ref} from "vue";
 import {isNetWorkUri} from "../../js/utils/common";
 import {utools_browser_open} from "../../js/core/base";
+import _ from "lodash";
 
 const preview = ref()
 const tocScrollRef = ref()
@@ -235,7 +236,7 @@ function handleKeyDown(e){
           if(tocAnchors.value.length > 0){
             if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
               let index = currentHeadingIndex.value + 1;
-              if(e.altKey){
+              if(e.shiftKey){
                 const indent = tocAnchors.value[currentHeadingIndex.value].indent;
                 let ind = -1;
                 for (let i = index; i < tocAnchors.value.length; i++) {
@@ -260,30 +261,32 @@ function handleKeyDown(e){
         }else{
           if(e.ctrlKey || e.metaKey){
             if(tocAnchors.value.length > 0){
+              adjustCurrentHeading()
               if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
                 const index = currentHeadingIndex.value + 1;
                 handleAnchorClick(tocAnchors.value[index],index)
               }
             }
-          }else if(e.altKey){
-            if(tocAnchors.value.length > 0){
-              adjustCurrentHeading()
-              if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
-                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
-                let index = -1;
-                for (let i = currentHeadingIndex.value + 1; i < tocAnchors.value.length; i++) {
-                  if(tocAnchors.value[i].indent === indent){
-                    index = i;
-                    break
-                  }
-                }
-                if(index === -1){
-                  return;
-                }
-                handleAnchorClick(tocAnchors.value[index],index)
-              }
-            }
           }
+          // else if(e.altKey){
+          //   if(tocAnchors.value.length > 0){
+          //     adjustCurrentHeading()
+          //     if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
+          //       const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+          //       let index = -1;
+          //       for (let i = currentHeadingIndex.value + 1; i < tocAnchors.value.length; i++) {
+          //         if(tocAnchors.value[i].indent === indent){
+          //           index = i;
+          //           break
+          //         }
+          //       }
+          //       if(index === -1){
+          //         return;
+          //       }
+          //       handleAnchorClick(tocAnchors.value[index],index)
+          //     }
+          //   }
+          // }
         }
         adjustCenterPre()
         break;
@@ -293,7 +296,7 @@ function handleKeyDown(e){
           if(tocAnchors.value.length > 0){
             if(currentHeadingIndex.value !== 0){
               let index = currentHeadingIndex.value - 1;
-              if(e.altKey){
+              if(e.shiftKey){
                 const indent = tocAnchors.value[currentHeadingIndex.value].indent;
                 let ind = -1;
                 for (let i = index; i >= 0; i --) {
@@ -317,30 +320,48 @@ function handleKeyDown(e){
         }else{
           if(e.ctrlKey || e.metaKey){
             if(tocAnchors.value.length > 0){
-              if(currentHeadingIndex.value !== 0){
-                const index = currentHeadingIndex.value - 1;
-                handleAnchorClick(tocAnchors.value[index],index)
+              const top = adjustCurrentHeadingUpward();
+              if(_.isUndefined(top)){
+                return
               }
-            }
-          }else if(e.altKey){
-            if(tocAnchors.value.length > 0){
-              adjustCurrentHeading()
-              if(currentHeadingIndex.value !== 0){
-                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
-                let index = -1;
-                for (let i = currentHeadingIndex.value - 1; i >= 0; i --) {
-                  if(tocAnchors.value[i].indent === indent){
-                    index = i;
-                    break
-                  }
-                }
-                if(index === -1){
-                  return;
-                }
+              let index = currentHeadingIndex.value;
+              if(top < 0){
+                // 先回正 当前小节
+                index ++;
+              }
+              if(index !== 0){
+                index --;
                 handleAnchorClick(tocAnchors.value[index],index)
               }
             }
           }
+          // else if(e.altKey){
+          //   if(tocAnchors.value.length > 0){
+          //     const top = adjustCurrentHeadingUpward();
+          //     if(_.isUndefined(top)){
+          //       return
+          //     }
+          //     let index = currentHeadingIndex.value;
+          //     if(top < 0){
+          //       // 先回正 当前小节
+          //       index ++;
+          //     }
+          //     if(index !== 0){
+          //       const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+          //       let ind = -1;
+          //       for (let i = index -1; i >= 0; i --) {
+          //         if(tocAnchors.value[i].indent === indent){
+          //           ind = i;
+          //           break
+          //         }
+          //       }
+          //       if(ind === -1){
+          //         return;
+          //       }
+          //       handleAnchorClick(tocAnchors.value[ind],ind)
+          //     }
+          //   }
+          // }
         }
         adjustCenterPre()
         break;
@@ -406,17 +427,44 @@ function adjustCurrentHeading(scrollable){
     }
   }
 }
+function adjustCurrentHeadingUpward(){
+  let top;
+  if(tocAnchors.value.length > 0) {
+    // 获取窗口大小
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const middleHeight = windowHeight / 2;
+    let finalIndex = tocAnchors.value.length - 1;
+    for (let i = 0; i < tocAnchors.value.length; i++) {
+      const heading = preview.value.$el.querySelector(`[data-v-md-line="${tocAnchors.value[i].lineIndex}"]`);
+      if (heading) {
+        const rect = heading.getBoundingClientRect();
+        // after: break
+        if (rect.top < middleHeight) {
+          finalIndex = i;
+          top = rect.top;
+        } else {
+          break;
+        }
+      }
+    }
+    currentHeadingIndex.value = finalIndex
+  }
+  return top
+}
 
 function handleAnchorClick(anchor,index) {
   const { lineIndex } = anchor;
 
   const heading = preview.value.$el.querySelector(`[data-v-md-line="${lineIndex}"]`);
   if (heading) {
+    // 获取窗口大小
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+    const middleHeight = windowHeight / 2;
     // Note: If you are using the preview mode of the editing component, the method name here is changed to previewScrollToTarget
     preview.value.scrollToTarget({
       target: heading,
       scrollContainer: $normal.scroll.codeVerticalInvoker.scrollbarInstRef.containerRef,
-      top: 200,
+      top: middleHeight - 20,
     });
     currentHeadingIndex.value = index
   }
