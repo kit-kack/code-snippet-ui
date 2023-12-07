@@ -96,7 +96,10 @@ utools.onPluginOut(processExit => {
 
 
 const enterApp = (data) => {
-    if($reactive.appRestart){
+    if($normal.entry){
+        $normal.entry = false;
+        $reactive.appRestart = false;
+    }else if($reactive.appRestart){
         $reactive.appRestart = false;
         $reactive.main.settingActive = false;
         $reactive.code.infoActive = false;
@@ -140,11 +143,13 @@ utools.onPluginEnter((data)=>{
         $index.value = 0;
         if($reactive.currentSnippet.dir){
             GLOBAL_HIERARCHY.changeHierarchy('redirect',prefix)
+            $normal.entry = true;
             enterApp(data)
         }else{
             copyCode(true,undefined,true)
                 .then(input =>{
                     if(input){
+                        $normal.entry = true;
                         enterApp(data)
                     }else{
                         utools.outPlugin();
@@ -181,7 +186,8 @@ try{
         // $reactive.core.selectedIndex = 0;
         $index.value = 0;
         copyCode(true,num,true)
-        return $reactive.currentSnippet.type?.startsWith('x-')
+        $normal.entry = $reactive.currentSnippet.type?.startsWith('x-');
+        return $normal.entry
     })
 }catch (_){}
 

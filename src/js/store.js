@@ -43,6 +43,8 @@ const $normal = {
     keepSelectedStatus: false,
     // utools快速记录的代码
     quickCode: null,
+    // 非核心Command进入插件
+    entry: false,
     // 占位符相关
     funcs:{
         // 【变量输入】界面遇到select直接使用vim键
