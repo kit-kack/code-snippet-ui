@@ -50,14 +50,13 @@ const up = _.throttle(()=>{
   utools.simulateKeyboardTap('up')
 },120)
 const keyDownHandler = (e)=>{
-  e.stopImmediatePropagation();
   if(e.ctrlKey){
     if(e.code === 'KeyQ'){
       e.stopImmediatePropagation();
       emit('cancel')
     }else if(e.code === 'KeyS'){
+      e.stopImmediatePropagation();
       emit('confirm')
-      e.preventDefault();
     }else if(e.code === 'KeyJ'){
       down();
     }else if(e.code === 'KeyK'){

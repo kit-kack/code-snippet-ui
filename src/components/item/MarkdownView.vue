@@ -8,7 +8,7 @@
   ></v-md-preview>
   <n-drawer
       v-model:show="$reactive.code.tocActive"
-      @after-enter="handleTocShow"
+      @after-enter="adjustCurrentHeading(true)"
       display-directive="show"
       :show-mask="false"
       :width="300" placement="right">
@@ -267,6 +267,7 @@ function handleKeyDown(e){
             }
           }else if(e.altKey){
             if(tocAnchors.value.length > 0){
+              adjustCurrentHeading()
               if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
                 const indent = tocAnchors.value[currentHeadingIndex.value].indent;
                 let index = -1;
@@ -323,6 +324,7 @@ function handleKeyDown(e){
             }
           }else if(e.altKey){
             if(tocAnchors.value.length > 0){
+              adjustCurrentHeading()
               if(currentHeadingIndex.value !== 0){
                 const indent = tocAnchors.value[currentHeadingIndex.value].indent;
                 let index = -1;
@@ -375,35 +377,33 @@ function handleKeyDown(e){
         break
   }
 }
-function handleTocShow(){
-  // 计算 屏幕正中央的heading
-  // const headings = _getVisiableBlocks('h1,h2,h3,h4,h5,h6');
-  // console.log(headings)
-  if(tocAnchors.value.length > 0){
+function adjustCurrentHeading(scrollable){
+  if(tocAnchors.value.length > 0) {
     // 获取窗口大小
     const windowHeight = window.innerHeight || document.documentElement.clientHeight;
     const middleHeight = windowHeight / 2;
-    let finalIndex = tocAnchors.value.length -1;
+    let finalIndex = tocAnchors.value.length - 1;
     for (let i = 0; i < tocAnchors.value.length; i++) {
       const heading = preview.value.$el.querySelector(`[data-v-md-line="${tocAnchors.value[i].lineIndex}"]`);
-      if(heading){
+      if (heading) {
         const rect = heading.getBoundingClientRect();
         // after: break
-        if(rect.top < middleHeight){
+        if (rect.top < middleHeight) {
           finalIndex = i;
-        }else{
+        } else {
           break;
         }
       }
     }
     currentHeadingIndex.value = finalIndex
-    if(finalIndex >= 0){
-      tocScrollRef.value.scrollTo({
-        top: (finalIndex> 5 ? finalIndex - 5 : 0) * 42,
-        behavior: 'smooth'
-      })
+    if(scrollable){
+      if(finalIndex >= 0){
+        tocScrollRef.value.scrollTo({
+          top: (finalIndex> 5 ? finalIndex - 5 : 0) * 42,
+          behavior: 'smooth'
+        })
+      }
     }
-
   }
 }
 

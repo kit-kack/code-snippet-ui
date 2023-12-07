@@ -71,8 +71,6 @@
                 :autosize="{maxRows:4}"/>
             <p class="func-impl-preset-content" style="bottom: 5px">}</p>
           </div>
-
-
         </n-form-item>
       </n-form>
     </base-modal>

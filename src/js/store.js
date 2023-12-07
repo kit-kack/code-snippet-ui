@@ -67,6 +67,12 @@ const $normal = {
         pre: null,
         // 对应pre的索引
         index: null,
+    },
+    keyboard:{
+        // 上次按下的键
+        lastPressedKey: null,
+        // 是否长按键
+        isLongPressed: false,
     }
 }
 

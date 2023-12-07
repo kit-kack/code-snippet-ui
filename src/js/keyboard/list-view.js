@@ -13,6 +13,7 @@ import {Direction, doScrollForListView, doScrollForMultiLineCode} from "../utils
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import _ from "lodash";
 import {dealWithCommonView} from "./core";
+import {copyCode} from "../utils/copy";
 
 
 const debMoveDown = _.throttle(function(){
@@ -58,15 +59,15 @@ const debItemMoveRight = _.throttle(function(){
 export function dealWithListView(e,ctrlFlag,lastPressedKey){
     // active
     if($reactive.main.settingActive){
+        if($reactive.setting.funcEditActive){
+            return;
+        }
         // prevent any possible event
         if ( e.code === 'Enter' || e.code === 'Tab') {
             e.preventDefault();
         } else if (e.code === 'KeyQ' || e.code === 'Slash') {
             $reactive.main.settingActive = false;
         }
-        return;
-    }
-    if($reactive.setting.funcEditActive){
         return;
     }
 
@@ -93,6 +94,13 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             }
         }
         return;
+    }else if (e.code === 'Enter') {
+        if($reactive.currentSnippet.dir){
+            return;
+        }
+        copyCode(true,$normal.beta.subSnippetNum)
+        // handleCopy(true)
+        return;
     }
 
 
@@ -107,6 +115,17 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
         case "Slash": // / ?
             switchToFullUIMode();
             $reactive.main.settingActive = true;
+            break;
+        case "Space":
+            // 空格额外处理
+            if(e.repeat && !$normal.keyboard.isLongPressed){
+                if($reactive.utools.subItemSelectedIndex === -1){
+                    if(!$reactive.currentSnippet.dir){
+                        GLOBAL_HIERARCHY.changeView(CODE_VIEW)
+                    }
+                    $normal.keyboard.isLongPressed = true;
+                }
+            }
             break;
         case "KeyS":
             utools.setSubInputValue('')

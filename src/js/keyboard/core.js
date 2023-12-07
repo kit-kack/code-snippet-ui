@@ -1,4 +1,4 @@
-import {$index, $normal, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, switchToFullUIMode,} from "../store"
+import {$index, $normal, $reactive, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, switchToFullUIMode,} from "../store"
 import {isNetWorkUri} from "../utils/common";
 import {Direction, doScrollForHelpView} from "../utils/scroller";
 import {copyCode} from "../utils/copy";
@@ -6,10 +6,8 @@ import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {dealWithListView} from "./list-view";
 import {dealWithCodeView} from "./code-view";
 
-// 控制长按键
-let longKeyDown = false;
-let lastTabTime = 0;  // 计算上次按下Tab时间
-let lastPressedKey = null;
+// 上次按键时间
+let lastPressedTime = 0;
 
 
 function dealWithHelpViewOnly(e){
@@ -34,6 +32,7 @@ function dealWithHelpViewOnly(e){
  * ListView & CodeView
  */
 export function dealWithCommonView(e,ctrlFlag){
+    e.preventDefault()
     switch (e.code){
         case 'KeyC':
         case 'KeyY':
@@ -100,8 +99,8 @@ export function dealWithCommonView(e,ctrlFlag){
         case 'KeyN':
             if(ctrlFlag){
                 GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
-                break
             }
+            break
     }
 }
 
@@ -125,45 +124,21 @@ export function initKeyboardListener() {
             return;
         }
 
-        // super key
-        if (e.code === 'Enter') {
-            if($reactive.currentSnippet.dir){
-                return;
-            }
-            copyCode(true,$normal.beta.subSnippetNum)
-            // handleCopy(true)
-            return;
-        }
-        const gap = e.timeStamp - lastTabTime;
-        let pressedKey = lastPressedKey;
+        const gap = e.timeStamp - lastPressedTime;
+        let pressedKey = $normal.keyboard.lastPressedKey;
         if(gap > 300){
             pressedKey = null;
         }
-        e.preventDefault();
         const ctrlFlag = e.ctrlKey || e.metaKey;
         // 剩余处理
         if ($reactive.currentMode === LIST_VIEW) {
-            // 空格额外处理
-            if(e.code === 'Space'){
-                if($reactive.utools.subItemSelectedIndex === -1){
-                    if(e.repeat && !longKeyDown){
-                        if(!$reactive.currentSnippet.dir){
-                            GLOBAL_HIERARCHY.changeView(CODE_VIEW)
-                        }
-                        // router.replace('/code')
-                        longKeyDown = true;
-                    }
-                }
-                return;
-            }
-
             dealWithListView(e,ctrlFlag,pressedKey)
         } else {
             dealWithCodeView(e,ctrlFlag)
         }
         //
-        lastPressedKey = e.code;
-        lastTabTime = e.timeStamp;
+        $normal.keyboard.lastPressedKey = e.code;
+        lastPressedTime = e.timeStamp;
     }
     document.onkeyup = e => {
         if ($reactive.main.settingActive | $reactive.utools.focused || $index.value < 0 || $reactive.currentMode >= EDIT_VIEW) {
@@ -171,10 +146,8 @@ export function initKeyboardListener() {
         }
         if (e.code === 'Space') {
             e.preventDefault();
-            if (longKeyDown) {
-                longKeyDown = false;
-                // $normal.keepSelectedStatus = true;
-                // switchToListView()
+            if ($normal.keyboard.isLongPressed) {
+                $normal.keyboard.isLongPressed = false;
                 GLOBAL_HIERARCHY.changeView(LIST_VIEW)
                 return;
             }
