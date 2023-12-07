@@ -27,9 +27,9 @@
             <n-ellipsis >
               <!-- 标题 -->
               <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
-              <!-- 描述（标题右侧）  子代码片段 -->
-              <span class="snippet-item__desc">{{ configManager.get('strategy_item_code_show') > 0 ? snippet.desc: pair.sideInfo}}</span>
             </n-ellipsis>
+            <!-- 描述（标题右侧）  子代码片段 -->
+            <span class="snippet-item__desc">{{ configManager.get('strategy_item_code_show') > 0 ? snippet.desc: pair.sideInfo}}</span>
           </div>
         </n-scrollbar>
       </template>
@@ -60,7 +60,7 @@
       <template v-else>
         <!-- 描述（标题下方） -->
         <n-ellipsis :tooltip="false">
-          <span class="snippet-item__desc" style="margin-left: 6px;">{{snippet.desc}}</span>
+          <span class="snippet-item__desc" style="margin-left: 0px;">{{snippet.desc}}</span>
         </n-ellipsis>
       </template>
 
@@ -295,6 +295,9 @@ function doItemRefresh(){
     position:relative;
     overflow: hidden;
   }
+  .n-card-header{
+    padding-left: 10px;
+  }
 }
 
 .snippet-item__tags{
@@ -344,7 +347,6 @@ function doItemRefresh(){
   height: 6px;
   background-color: transparent;
   border-radius: 50%;
-  z-index: 100;
 }
 .snippet-item__index{
   position: absolute;
