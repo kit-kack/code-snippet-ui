@@ -77,13 +77,13 @@
                       </n-button>
                     </template>
                     <n-space align="center">
-                      Tab键行为：
+                      Tab 行为：
                       <n-select
                           :options="tabOptions"
                           :default-value="configManager.get('default_tab')??0"
                           :theme-overrides="selectThemeOverrides"
                           @update-value="v=> configManager.set('default_tab',v)"
-                          style="width: 190px"
+                          style="width: 194px"
                       />
                     </n-space>
                     <n-space align="center">
@@ -507,7 +507,11 @@ function keyDownHandler(e){
 function handleChooseCommand(command){
   showFuncModal.value = false;
   if(codeTemplate.code){
-    codeTemplate.code += "{{"+command+"}}"
+    const start = codeTextArea.value.textareaElRef.selectionStart;
+    codeTemplate.code =
+        codeTemplate.code.slice(0,start)
+        + "{{"+command+"}}"
+        +codeTemplate.code.slice(start)
   }else{
     codeTemplate.code = "{{"+command+"}}"
   }
