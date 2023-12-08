@@ -179,6 +179,7 @@ try{
                 text: cs.name,
                 index: index,
                 icon: cs.type?.startsWith('x-')? '/code-x.png': '/code.png',
+                title: cs.path ? '[关联文件]：'+cs.path: cs.code,
                 tags: [cs.desc]
             }))
     },({code,type,payload,option})=>{

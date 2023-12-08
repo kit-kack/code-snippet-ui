@@ -296,7 +296,7 @@ function doItemRefresh(){
     overflow: hidden;
   }
   .n-card-header{
-    padding-left: 10px;
+    padding-left: 12px;
   }
 }
 
@@ -342,7 +342,7 @@ function doItemRefresh(){
 .snippet-item__top {
   position: absolute;
   top:11px;
-  left: 2px;
+  left: 1px;
   width: 6px;
   height: 6px;
   background-color: transparent;

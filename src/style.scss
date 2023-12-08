@@ -8,7 +8,7 @@
   --plugin-text-selected-background-color: rgba(0,0,0,.1);
   --scrollbar-thumb-background-color: #ccc;
 
-  --item-code-text-color: #696666;
+  --item-code-text-color: #a9a8a8;
   --item-code-scroller-border-color: #686869;
 
 }
@@ -71,5 +71,6 @@ p.func-desc i{
 .item-code{
   font-size: 12px;
   font-family: Consolas;
+  font-style: italic;
   color: var(--item-code-text-color);
 }
