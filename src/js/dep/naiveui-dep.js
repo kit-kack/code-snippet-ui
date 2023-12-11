@@ -29,7 +29,9 @@ import {
     NDialogProvider,
     NDynamicTags,
     NBreadcrumb,
-    NBreadcrumbItem
+    NBreadcrumbItem,
+    NCollapse,
+    NCollapseItem
 } from 'naive-ui'
 
 
@@ -63,7 +65,9 @@ const naive = create({
         NModal,
         NDialogProvider,
         NBreadcrumb,
-        NBreadcrumbItem
+        NBreadcrumbItem,
+        NCollapse,
+        NCollapseItem
     ]
 })
 

@@ -52,6 +52,7 @@ export function dealWithCommonView(e,ctrlFlag){
             // handleCopy(true)
             break;
         case 'KeyE':
+        case 'KeyI':
             if($reactive.currentSnippet.help){
                 $message.warning("内置文档，无法修改");
                 return;

@@ -25,8 +25,8 @@ const DEFAULT_FUNCS = {
     '日期与时间':{
         name: "日期与时间",
         desc: `获取日期与时间;
-【custom-time/自定义时间】需要携带格式化参数，例如<i>HH:mm:ss</i>`,
-        commands: ["now", "时间戳", "date", "日期", "time", "时间","custom-time", "自定义时间"],
+[pattern/自定义格式]需要携带格式化参数，例如<i>HH:mm:ss</i>`,
+        commands: ["now", "时间戳", "date", "日期", "time", "时间","pattern", "自定义格式"],
         expression: `\
 switch (command) {
     case "now":

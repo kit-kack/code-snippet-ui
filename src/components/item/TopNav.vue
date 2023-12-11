@@ -35,11 +35,11 @@ watch([()=>$list.value,()=>$reactive.currentMode],(newValue)=>{
     }
   }else{
     const now = dayjs();
-    word.value = now.format(`M月D日 ${weekdays[now.day()]} HH:mm`);
+    word.value = now.format(`YYYY/M/D ${weekdays[now.day()]} HH:mm`);
     if(!timer){
       timer = setInterval(()=>{
         const now = dayjs();
-        word.value = now.format(`M月D日 ${weekdays[now.day()]} HH:mm`);
+        word.value = now.format(`YYYY/M/D ${weekdays[now.day()]} HH:mm`);
       },10000)
     }
   }

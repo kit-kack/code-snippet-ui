@@ -5,6 +5,13 @@
 .n-dynamic-tags .n-button:not(.n-button--disabled):hover{
   --n-text-color-hover: #ccc !important;
 }
+.n-collapse-item__content-inner{
+  padding-top: 5px !important;
+}
+.n-collapse-item__header-main{
+  font-weight: bold !important;
+
+}
 #dark-app {
   .n-input{
     --n-color-focus: #454647 !important;

@@ -9,7 +9,7 @@
   --scrollbar-thumb-background-color: #ccc;
 
   --item-code-text-color: #a9a8a8;
-  --item-code-scroller-border-color: #686869;
+  --item-code-scroller-border-color: #ccc;
 
 }
 #dark-app{
@@ -19,7 +19,7 @@
   --scrollbar-thumb-background-color: #262626;
 
   --item-code-text-color: #a4a4a4;
-  --item-code-scroller-border-color: darkgray;
+  --item-code-scroller-border-color: #666666;
 }
 @import "style/naiveui";
 *{
@@ -59,7 +59,10 @@ p.func-desc i{
   font-size: 13px;
   font-style: normal;
 }
-
+p.tooltip b{
+  padding-left: 3px;
+  padding-right: 3px;
+}
 
 
 .item-code-scroller{
@@ -71,6 +74,6 @@ p.func-desc i{
 .item-code{
   font-size: 12px;
   font-family: Consolas;
-  font-style: italic;
+  //font-style: italic;
   color: var(--item-code-text-color);
 }

@@ -13,7 +13,7 @@
   <n-drawer v-model:show="$reactive.main.settingActive" :width="380" placement="right">
     <side-view/>
   </n-drawer>
-  <n-drawer  v-model:show="$reactive.common.shortcutActive" placement="left" :width="380">
+  <n-drawer  v-model:show="$reactive.common.shortcutActive" display-directive="show" placement="left" :width="380">
     <n-scrollbar style="max-height: 99%" :ref="(el) => $normal.scroll.helpInvoker= el" >
       <shortcut-pane/>
     </n-scrollbar>
