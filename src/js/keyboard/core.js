@@ -32,9 +32,11 @@ function dealWithHelpViewOnly(e){
  * ListView & CodeView
  */
 export function dealWithCommonView(e,ctrlFlag){
-    e.preventDefault()
     switch (e.code){
         case 'KeyC':
+            if(ctrlFlag){
+                break;
+            }
         case 'KeyY':
             if($reactive.currentSnippet.dir){
                 $message.warning("无法对目录进行此操作");

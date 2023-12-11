@@ -40,7 +40,7 @@ const show = computed(()=>{
 const getBtnStyle = ()=>{
   if($reactive.currentMode<= CODE_VIEW){
     return {
-      color: utools.isDarkColors()? '#444444':'#e3e3e3',
+      color: utools.isDarkColors()? '#3a3a3a':'#e3e3e3',
       textColor: configManager.getGlobalColor()
     }
   }else{
