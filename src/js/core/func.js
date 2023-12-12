@@ -4,6 +4,7 @@ import {utools_db_store} from "./base";
 import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
+import _ from "lodash";
 
 const GLOBAL_FUNC = "func";
 /**
@@ -504,16 +505,19 @@ export const formatManager = {
                             }
                         }else{
                             try{
-                                const value = new Function('return '+ result.param)()
+                                let value = new Function('return '+ result.param)()
                                 if(value){
-                                    if(Array.isArray(value)){
-                                        defaultVarValue[result._var] = value;
-                                    }else{
-                                        defaultVarValue[result._var] = [value];
+                                    if(!Array.isArray(value)){
+                                        value = [value];  // defaultVarValue[result._var] = value;
                                     }
+                                    // for
+                                    for (let i = 0; i < value.length; i++) {
+                                        value[i] = _.toString(value[i])
+                                    }
+                                    defaultVarValue[result._var] = value
                                 }
-                            }catch (_){
-
+                            }catch (e){
+                                $message.error(`{{${name}}}中的select param部分解析错误，原因为${e.message}`)
                             }
                         }
                     }

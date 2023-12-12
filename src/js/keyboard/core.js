@@ -42,6 +42,7 @@ export function dealWithCommonView(e,ctrlFlag){
                 $message.warning("无法对目录进行此操作");
                 return;
             }
+            e.preventDefault();
             copyCode(false);
             // handleCopy(false)
             break;
@@ -50,6 +51,7 @@ export function dealWithCommonView(e,ctrlFlag){
                 $message.warning("无法对目录进行此操作");
                 return;
             }
+            e.preventDefault();
             copyCode(true);
             // handleCopy(true)
             break;
@@ -78,6 +80,7 @@ export function dealWithCommonView(e,ctrlFlag){
                 $message.warning("无法对目录进行此操作");
                 return;
             }
+            e.preventDefault();
             copyCode(e.shiftKey || e.altKey || ctrlFlag,+e.code[5])
             break;
         case 'KeyZ':

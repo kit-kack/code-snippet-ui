@@ -63,7 +63,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             return;
         }
         // prevent any possible event
-        if ( e.code === 'Enter' || e.code === 'Tab') {
+        if ( e.code === 'Enter' || e.code === 'Tab' || e.code === 'Space') {
             e.preventDefault();
         } else if (e.code === 'KeyQ' || e.code === 'Slash') {
             $reactive.main.settingActive = false;
@@ -73,6 +73,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
 
     // super key
     if(e.code === 'Tab'){
+        e.preventDefault();
         if(lastPressedKey === 'Tab'){
             // UI 切换
             if(configManager.get('strategy_item_code_show') === 2){
@@ -95,6 +96,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
         }
         return;
     }else if (e.code === 'Enter') {
+        e.preventDefault();
         if($reactive.currentSnippet.dir){
             return;
         }
@@ -118,6 +120,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             break;
         case "Space":
             // 空格额外处理
+            e.preventDefault();
             if(e.repeat && !$normal.keyboard.isLongPressed){
                 if($reactive.utools.subItemSelectedIndex === -1){
                     if(!$reactive.currentSnippet.dir){

@@ -224,6 +224,7 @@ function handleMdHorizonMove(left,fast){
 function handleKeyDown(e){
   switch (e.code){
     case 'Tab':
+        e.preventDefault();
         adjustCenterPre(true)
         break
     case "KeyH":
