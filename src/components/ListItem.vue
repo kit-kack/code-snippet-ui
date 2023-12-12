@@ -44,14 +44,16 @@
         </n-scrollbar>
       </template>
 
-      <template v-if="configManager.get('strategy_item_code_show') > 0">
+      <template v-if="configManager.get('strategy_item_code_show')  === 2">
         <!-- 代码 -->
-        <template v-if="configManager.get('strategy_item_code_show') > 1">
-          <multi-line-code :type="pair.renderType" :code="pair.code" :active="$index === index"/>
-        </template>
-        <template v-else>
-          <single-line-code :type="pair.renderType" :code="pair.code"/>
-        </template>
+        <multi-line-code :type="pair.renderType" :code="pair.code" :active="$index === index"/>
+        <!-- no-code-desc -->
+        <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
+              {{pair.sideInfo}}
+        </span>
+      </template>
+      <template v-else-if="configManager.get('strategy_item_code_show') === 1">
+        <single-line-code :type="pair.renderType" :code="pair.code"/>
         <!-- no-code-desc -->
         <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
               {{pair.sideInfo}}
@@ -168,22 +170,21 @@ const pair = computed(()=>{
   }
   if(configManager.get('strategy_item_code_show') > 0){
     if(props.snippet.dir){
-      if(props.snippet.ref){
-        if(props.snippet.ref === "local"){
-          code = "[本地目录]: "+props.snippet.path;
-        }else{
-          code = "[自定义目录]: "+props.snippet.path;
-        }
+      if(props.snippet.ref === "local"){
+        code = "[本地目录]: "+props.snippet.path;
+      }else if(props.snippet.ref === "custom"){
+        code = "[自定义目录]: "+props.snippet.path;
       }else{
         code = "[普通目录] ";
       }
       renderType = 'markdown';
     }else{
       // file
-      code = props.snippet.code;
       if(props.snippet.path){
         code = '[关联文件]: '+props.snippet.path;
         renderType = 'markdown';
+      }else{
+        code = props.snippet.code;
       }
     }
   }

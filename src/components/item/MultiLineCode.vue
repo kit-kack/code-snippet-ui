@@ -21,9 +21,10 @@ import {getRealTypeAndValidStatus} from "../../js/utils/language";
 
 
 const props = defineProps(['code','type','active']);
-const pair = getRealTypeAndValidStatus(props.type)
+const pair = ref(getRealTypeAndValidStatus(props.type))
 const itemCodeScrollBar = ref();
 onUpdated(()=>{
+  pair.value = getRealTypeAndValidStatus(props.type)
   if(props.active){
     $normal.scroll.itemCodeInvoker = itemCodeScrollBar.value;
   }
