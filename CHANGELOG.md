@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.6.3](https://github.com/littledot-kit/code-snippet-ui/compare/v2.6.2...v2.6.3) (2023-12-12)
+
+
+### Bug Fixes
+
+* 导入数据后强制关闭插件 ([4cc52b8](https://github.com/littledot-kit/code-snippet-ui/commit/4cc52b8a6274db9a50dcc48b9a709f364fe937b0))
+* 禁用Tab等键 浏览器默认行为 ([5b3bb3d](https://github.com/littledot-kit/code-snippet-ui/commit/5b3bb3dfd4c570576e856aa8859930e7257c0f5f))
+* 美化CodeView SideInfo ([092217e](https://github.com/littledot-kit/code-snippet-ui/commit/092217e61faa05990f8be6833203cab09bf5e827))
+* 修复元素多行代码块渲染语言缓存bug ([271ae45](https://github.com/littledot-kit/code-snippet-ui/commit/271ae452524777ccd3820b78f4d41deb0c7bfa90))
+* 修复子代码片段高亮；优化Markdown前后小节控制移动问题 ([71b970d](https://github.com/littledot-kit/code-snippet-ui/commit/71b970dbe535fb897ad032daad0e8919a4423f24))
+* 修改一些样式 ([9396c5a](https://github.com/littledot-kit/code-snippet-ui/commit/9396c5aaa2fe769185d73db4c5835de03338db25))
+* 修改一些样式 ([5e7fa39](https://github.com/littledot-kit/code-snippet-ui/commit/5e7fa39e9cf218fdd98bff13ffe4d0d99d7e37fb))
+* 修改一些样式 ([320f479](https://github.com/littledot-kit/code-snippet-ui/commit/320f479c7e51d2fb714d96ad1cfabb3fdb6db4d2))
+* 修改一些样式 ([0cbd298](https://github.com/littledot-kit/code-snippet-ui/commit/0cbd298dfa2a1e6990f81c28ca31c6214c942485))
+* 优化listitem显示 ([7063c46](https://github.com/littledot-kit/code-snippet-ui/commit/7063c46714fd5d9b11eb4853b73a9cb97f6efc0a))
+
 ### [2.6.2](https://github.com/littledot-kit/code-snippet-ui/compare/v2.6.1...v2.6.2) (2023-12-07)
 
 
