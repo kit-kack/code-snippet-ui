@@ -174,6 +174,9 @@ const shortcuts = [{
   },{
     feature: "快速启用 子代码片段",
     shortcut: ['Alt + X',"Alt + C"]
+  },{
+    feature: "快速启用 uTools关键字",
+    shortcut: 'Alt + K'
   }]
 }]
 

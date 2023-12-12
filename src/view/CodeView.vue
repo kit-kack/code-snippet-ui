@@ -77,24 +77,43 @@
       </n-space>
     </div>
     <n-drawer v-model:show="$reactive.code.infoActive" :width="300" placement="right">
-      <n-drawer-content :title="snippet.name">
-        {{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字
-        <n-space>
-          <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
-        </n-space>
-        <ul>
-          <li v-if="snippet.sections?.length > 0">{{snippet.sections.length}} 个子代码片段</li>
-          <li v-if="snippet.keyword">已注册为uTools功能关键字</li>
-        </ul>
+      <n-drawer-content class="code-view-side-info">
+        <template #header>
+          {{snippet.name}}
+        </template>
+        <template #footer>
+          {{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字
+          <n-button v-if="snippet.keyword" :color="$normal.theme.globalColor" text style="margin-left: 5px" >
+            <template #icon>
+              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778z" fill="currentColor"></path></g></svg>
+            </template>
+          </n-button>
+        </template>
+        <p>
+          <span v-if="snippet.createTime" class="code-view-create-time" >创建于 {{calculateTime(snippet.createTime)}}</span>
+          {{snippet.desc??'暂无描述~'}}
+        </p>
+<!--        <p>{{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字</p>-->
+        <template v-if="!_.isEmpty(snippet.tags)">
+          <h4>标签</h4>
+          <n-space>
+            <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
+          </n-space>
+        </template>
+        <template v-if="!_.isEmpty(snippet.sections)">
+          <h4>子代码片段×{{snippet.sections.length}}</h4>
+          <n-space>
+            <span class="code-view-side-tag" v-for="section in snippet.sections">
+              {{section[0]+'~'+section[1]}}
+            </span>
+          </n-space>
+        </template>
         <template v-if="snippet.path">
-          <n-divider>
-            关联地址
-          </n-divider>
+          <h4>关联地址</h4>
           <div>{{snippet.path}}</div>
         </template>
 
-        <n-divider />
-        <div>{{snippet.desc??'暂无描述~'}}</div>
+
       </n-drawer-content>
     </n-drawer>
   </div>
@@ -111,6 +130,7 @@ import NormalTag from "../components/base/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import MarkdownView from "../components/item/MarkdownView.vue";
 import {renderFormatBlock} from "../js/core/func";
+import _ from "lodash";
 
 const verticalScroller = ref(null)
 /**
@@ -336,9 +356,48 @@ onUnmounted(()=>{
     z-index: 2;
   }
 }
-#dark-app .hljs-code-number{
-  color: #666;
-  border-right-color:  #3a3c41;
+.code-view-side-info {
+  h4{
+    font-weight: normal;
+    margin-top:20px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #efeff5;
+  }
+  p{
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #ecf0f3;
+  }
+  .code-view-create-time{
+    font-size: 12px;
+    font-style: italic;
+    float: right;
+    margin-right: -10px;
+    margin-top: -18px;
+  }
+  .code-view-side-tag{
+    font-size: 12px;
+    padding:0 5px;
+    border-radius: 2px;
+    background-color: #f0f0f0;
+  }
+}
+#dark-app {
+  .hljs-code-number{
+    color: #666;
+    border-right-color:  #3a3c41;
+  }
+  .code-view-side-info{
+    p{
+      background-color: #424244;
+    }
+    h4{
+      border-bottom-color: #666;
+    }
+    .code-view-side-tag{
+      background-color: #3a3c41;
+    }
+  }
 }
 
 </style>

@@ -499,6 +499,8 @@ function keyDownHandler(e){
         }
         importHierarchyJS()
       }
+    }else if(e.code === 'KeyK'){
+      codeTemplate.keyword = ! codeTemplate.keyword;
     }
 
 
