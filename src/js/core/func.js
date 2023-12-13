@@ -704,12 +704,8 @@ export const formatManager = {
 
 
 const _errorFormatBlockStyle = '<span style="color:red">';
-const _formatBlockStyle = utools.isDarkColors()?
-    '<span style="color:#ffa400;border-radius:3px;background-color:#414141;font-weight: bolder;">':
-    '<span style="color:#ffa400;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;">'
-const _assginBlockStyle = utools.isDarkColors()?
-    '<span style="color:#10be8e;border-radius:3px;background-color:#414141;font-weight: bolder;">' :
-    '<span style="color:#10be8e;border-radius:3px;background-color:#f1f1f1;font-weight: bolder;">'
+const _formatBlockStyle = '<span class="command-format">'
+const _assginBlockStyle = '<span class="command-assign">'
 
 const regex = /<([^>]+)>([^<]+)<\/[^>]+>/;
 function _resolveCommandFromSpan(command){

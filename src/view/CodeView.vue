@@ -398,6 +398,21 @@ onUnmounted(()=>{
       background-color: #3a3c41;
     }
   }
+  .command-format,.command-assign{
+    background-color: #414141;
+  }
+}
+.command-format{
+  color: #ffa400;
+  border-radius: 3px;
+  background-color: #f1f1f1;
+  font-weight: bolder;
+}
+.command-assign{
+  color: #10be8e;
+  border-radius: 3px;
+  background-color: #f1f1f1;
+  font-weight: bolder;
 }
 
 </style>

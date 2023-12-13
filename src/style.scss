@@ -28,13 +28,6 @@
   &::selection{
     background-color: var(--plugin-text-selected-background-color) !important;
   }
-  &::-webkit-scrollbar-track-piece{
-    background-color: transparent;
-  }
-  &::-webkit-scrollbar-thumb{
-    border-color: var(--plugin-background-color);
-    background-color: var(--scrollbar-thumb-background-color);
-  }
 }
 body#light-app{
   background-color: var(--plugin-background-color);

@@ -380,17 +380,21 @@ function handleKeyDown(e){
         $reactive.code.tocActive = ! $reactive.code.tocActive;
         break;
     case 'Space':
+        e.preventDefault();
         if($reactive.code.tocActive){
           $reactive.code.tocActive = false
-          break
+          return
         }
         if($reactive.code.infoActive){
           $reactive.code.infoActive = false
-          break
+          return
         }
         if($reactive.common.shortcutActive){
           $reactive.common.shortcutActive = false
-          break
+          return
+        }
+        if(e.repeat){
+          return;
         }
         if($normal.md.pre){
           utools.copyText($normal.md.pre.querySelector('code').innerText)
@@ -521,6 +525,15 @@ onUnmounted(()=>{
     code{
       font-family: 'Consolas' !important;
     }
+
+    &::-webkit-scrollbar-track-piece{
+      background-color: #f6f8fa;
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 5px !important;
+      border-color:  #f6f8fa;
+      background-color:  #ddd !important;
+    }
   }
 }
 .toc-link{
@@ -582,17 +595,16 @@ onUnmounted(()=>{
       background-color: #cccccc;
     }
     &::-webkit-scrollbar-track-piece{
-      background-color: var(--plugin-background-color);
+      background-color: #282c34;
     }
     &::-webkit-scrollbar-thumb {
       border-radius: 5px !important;
-      border: none !important;
-      background: rgba(0, 0, 0, 0.2) !important;
+
+      //border: none !important;
+      border-color:  #282c34;
+      background:  #777 !important;
     }
-    &::-webkit-scrollbar-track {
-      border-radius: 0;
-      background: rgba(0, 0, 0, 0.1);
-    }
+
   }
 
   a {
