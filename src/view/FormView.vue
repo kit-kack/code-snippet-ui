@@ -57,17 +57,6 @@
                    size="small">
             <n-tab-pane name="code" tab="代码" :disabled="formProperties.codeSource === 'link'">
               <div id="form-code">
-                <n-input
-                    v-model:value="codeTemplate.code"
-                    :placeholder="placeholders?.code ?? '请输入代码片段'"
-                    type="textarea"
-                    size="small"
-                    style="padding-top: 40px;padding-bottom: 10px;"
-                    :disabled="!properties.code"
-                    @keydown="handleKeyDown"
-                    ref="codeTextArea"
-                    show-count
-                    :autosize="{minRows: 9,maxRows: 9}"/>
                 <div id="form-code-top-nav">
                   <n-popover>
                     <template #trigger>
@@ -124,6 +113,30 @@
                     />
                   </div>
                 </div>
+                  <n-input
+                      v-model:value="codeTemplate.code"
+                      :placeholder="placeholders?.code ?? '请输入代码片段'"
+                      type="textarea"
+                      size="small"
+                      style="padding-top: 40px;padding-bottom: 10px;"
+                      wrap="off"
+                      rows="9"
+                      :disabled="!properties.code"
+                      @keydown="handleKeyDown"
+                      ref="codeTextArea"
+                      show-count
+                      :autosize="{minRows: 9,maxRows: 9}"
+                  />
+<!--                  <textarea-->
+<!--                      v-model="codeTemplate.code"-->
+<!--                      id="form-textarea"-->
+<!--                      :placeholder="placeholders?.code ?? '请输入代码片段'"-->
+<!--                      wrap="off"-->
+<!--                      :disabled="!properties.code"-->
+<!--                      @keydown="handleKeyDown"-->
+<!--                      ref="codeTextArea"-->
+<!--                  />-->
+<!--                <span id="form-textarea-counter">{{codeTemplate.code.length}}</span>-->
               </div>
             </n-tab-pane>
 
@@ -226,7 +239,7 @@
 </template>
 
 <script setup>
-import {computed, h, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
+import {computed, h, nextTick, onMounted, onUnmounted, reactive, ref, toRaw} from "vue";
 import {tagColorManager} from "../js/core/tag";
 import {configManager} from "../js/core/config";
 import {fullAlias, languages} from "../js/utils/language";
@@ -247,7 +260,7 @@ const properties = formProperties.allowUpdatedProperties;
 const placeholders = formProperties.placeholders;
 const edit = $reactive.currentMode === EDIT_VIEW;
 const codeTemplate = reactive(edit?{...toRaw($reactive.currentSnippet)} :{
-  code: $normal.quickCode,
+  code: $normal.quickCode ?? "",
   keyword: configManager.get('default_keyword_enable')
 })
 const tags = computed(()=>{
@@ -532,7 +545,7 @@ onUnmounted(()=>{
 })
 
 function handleKeyDown(e){
-  if(e.code === 'Tab'){
+  if(e.key === 'Tab'){
     let char;
     switch (configManager.get('default_tab')){
       case 1:
@@ -548,13 +561,69 @@ function handleKeyDown(e){
         return;
     }
     e.preventDefault();
-    const start = codeTextArea.value.textareaElRef.selectionStart;
+    let start = codeTextArea.value.textareaElRef.selectionStart;
     codeTemplate.code =
         codeTemplate.code.slice(0,start)
         +char
         +codeTemplate.code.slice(start)
+    nextTick(()=>{
+      start += char.length;
+      codeTextArea.value.textareaElRef.setSelectionRange(start,start)
+    })
+  }else if(e.key in matchedWords){
+    e.preventDefault()
+    let start = codeTextArea.value.textareaElRef.selectionStart;
+    codeTemplate.code =
+        codeTemplate.code.slice(0,start)
+        +e.key+ matchedWords[e.key]
+        +codeTemplate.code.slice(start)
+    nextTick(()=>{
+      start += 1;
+      codeTextArea.value.textareaElRef.setSelectionRange(start,start)
+    })
+  }else if(e.key === 'Backspace'){
+    let start = codeTextArea.value.textareaElRef.selectionStart;
+    if(start === codeTextArea.value.textareaElRef.selectionEnd && start < codeTemplate.code.length){
+      if(isMatchWord(codeTemplate.code[start-1],codeTemplate.code[start])){
+        e.preventDefault()
+        codeTemplate.code =
+            codeTemplate.code.slice(0,start-1)
+            +codeTemplate.code.slice(start+1)
+        nextTick(()=>{
+          start -= 1;
+          codeTextArea.value.textareaElRef.setSelectionRange(start,start)
+        })
+      }else if(codeTemplate.code[start] === '\n' && codeTemplate.code[start-1] === '\n'){
+        if(isMatchWord(codeTemplate.code[start-2],codeTemplate.code[start+1])){
+          e.preventDefault()
+          codeTemplate.code =
+              codeTemplate.code.slice(0,start-1)
+              +codeTemplate.code.slice(start+1)
+          nextTick(()=>{
+            start -= 1;
+            codeTextArea.value.textareaElRef.setSelectionRange(start,start)
+          })
+        }
+      }
+
+    }
   }
 }
+const matchedWords = {
+  '(':')',
+  '{':'}',
+  '[':']',
+  "'":"'",
+  '"':'"',
+  '`':'`'
+}
+function isMatchWord(a,b) {
+  if(a in matchedWords){
+    return matchedWords[a] === b
+  }
+  return false
+}
+
 
 const selectThemeOverrides = {
   peers:{
@@ -655,11 +724,9 @@ function handleClearPath(){
 <style lang="scss" scoped>
 
 #form-code{
+  box-sizing: border-box;
   position: relative;
   width: 100%;
-  height: 270px;
-  box-sizing: border-box;
-  padding: 0 5px;
 }
 #form-code-top-nav{
   position: absolute;
