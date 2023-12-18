@@ -40,11 +40,7 @@ switch (command) {
     case "时间":
         return new Date().toLocaleTimeString();
     default:
-        try {
-            return $._dayjs().format(param)
-        } catch (e) {
-            return e.message;
-        }
+        return $._dayjs().format(param)
 }`,
     },
     '剪切板': {
@@ -81,7 +77,10 @@ uuid可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选�
 switch (command){
     case "nanoid":
         if(param){
-            return $._nanoid(+param);
+            const num = +param;
+            if(!isNaN(num)){
+                return $._nanoid(num);
+            }
         }
         return $._nanoid();
     case "uuid":
@@ -106,7 +105,7 @@ switch (command){
                 }
                 return Math.trunc(num * (max-min)+min)
             }else{
-                return "[随机数]：格式错误"
+                throw "random: 格式错误"
             }
         }else{
             return num;
@@ -175,14 +174,26 @@ function _uuid(len, radix) {
  * @return Result
  * @private
  */
-function _parseVariable_Command_Param(text) {
+function _parseVariable_Command_Param(text,assignFlag) {
     /**
      * @type {Result}
      */
     const result = {};
     let index = text.indexOf(':');
     if(index === -1){  // only command
-        result.command = text;
+        // #var=value, find =
+        if(assignFlag){
+            index = text.indexOf('=');
+            if(index !== -1) {
+                result._var = text.slice(0, index)
+                result.param = text.slice(index + 1)
+                result.assign = true;
+            }else{
+                result.command = text;
+            }
+        }else{
+            result.command = text;
+        }
     }else{
         if(index === text.length-1){ // last
             // command : param
@@ -396,7 +407,7 @@ export const formatManager = {
             }
         }catch (e){
             console.error(e)
-            return '{{error: '+e.message+' }}';
+            return `{{${e}}}`;
         }
     },
     _initForEachRegex(){
@@ -414,7 +425,7 @@ export const formatManager = {
      * @private
      */
     async _format(code){
-        const formatBlocks = code.matchAll(/{{.+?}}/gs)
+        const formatBlocks = code.matchAll(/{{.+?}}\n?/gs)
         // 判断是否存在inputVars，并且同时进行切分
         /**
          *
@@ -430,19 +441,22 @@ export const formatManager = {
          * 对应【主动输入】中的默认值
          */
         const defaultVarValue = {};
+        // {{...}}x   的x位置
         let last = 0;
+        // 用来记录【位置X】
         let inputCount = 0;
         for (const formatBlock of formatBlocks) {
             // 判断是否为inputVar
             let name = formatBlock[0]
-            // pre
+            // {{...}}xxxxx{{...}} 中的 xxxxx部分直接添加进target
             target.push({
                 code: code.slice(last,formatBlock.index)
             })
-            // remaining
+            // 变更{{...}}x的x位置
             last = formatBlock.index + name.length;
             // current
-            name = name.slice(2,-2).trim()
+            const line = name.at(-1) === '\n'
+            name = name.slice(2,line? -3: -2).trim()
             if(name.startsWith('@')) {  // var
                 target.push({
                     variable: name.slice(1)
@@ -456,13 +470,18 @@ export const formatManager = {
 
                 // [variable::]command[:param]
                 // 1.parse
-                const result = _parseVariable_Command_Param(name)
+                const result = _parseVariable_Command_Param(name,assignFlag)
                 // assign：必须有变量赋值
-                if(assignFlag && !result._var ){
-                    target.push({
-                        code: formatBlock[0]  // 不解析
-                    })
-                    continue
+                if(assignFlag){
+                    if(!result._var){
+                        target.push({
+                            code: formatBlock[0]  // 不解析
+                        })
+                        continue
+                    }else if(result.assign){
+                        this.globalVar['@'+result._var] = result.param;
+                        continue;
+                    }
                 }
 
                 // -1:unknown 0:active input 1:normal command
@@ -557,6 +576,9 @@ export const formatManager = {
                         result.assign = true;
                     }
                     target.push(result)
+                    if(line){
+                        last--;
+                    }
                 }
             }
         }
@@ -592,7 +614,7 @@ export const formatManager = {
     async _expression(codes){
         // first deal with command
         for (const element of codes) {
-            if(element.command){
+            if(element.command || element.func){
                 switch (element.command){
                     case "input":
                     case "输入":
@@ -727,9 +749,11 @@ export function renderFormatBlock(flag){
             const text = substring.slice(2,-2).trim();
             let style = _errorFormatBlockStyle ;
             if(text.startsWith('#')) {
-                const result = _parseVariable_Command_Param(text.slice(1));
+                const result = _parseVariable_Command_Param(text.slice(1),true);
                 if (result._var) {
-                    if (result.command) {
+                    if(result.assign){
+                        style =  _assginBlockStyle
+                    }else if (result.command) {
                         if(!flag){
                             result.command = _resolveCommandFromSpan(result.command)
                         }
@@ -751,6 +775,8 @@ export function renderFormatBlock(flag){
                     if(_get_command_key(result.command)){
                         style = _formatBlockStyle
                     }
+                }else  if (result.param) {
+                    style = _formatBlockStyle
                 }
             }
             return style+substring+'</span>'
