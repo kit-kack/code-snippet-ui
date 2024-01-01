@@ -14,7 +14,7 @@
         <template v-if="GLOBAL_HIERARCHY.currentHierarchy.core" >
           <n-tooltip :show-arrow="false">
             <template #trigger>
-              <n-button :color="$normal.theme.globalColor" text @click="codeTemplate.keyword = !codeTemplate.keyword" style="width: 60px" >
+              <n-button :focusable="false" :color="$normal.theme.globalColor" text @click="codeTemplate.keyword = !codeTemplate.keyword" style="width: 60px" >
                 <template #icon>
                   <template v-if="codeTemplate.keyword">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778z" fill="currentColor"></path></g></svg>
@@ -54,13 +54,14 @@
                    v-model:value="currentTab"
                    justify-content="space-evenly"
                    type="line"
+                   :on-before-leave="()=> properties.code"
                    size="small">
             <n-tab-pane name="code" tab="代码" :disabled="formProperties.codeSource === 'link'">
               <div id="form-code">
                 <div id="form-code-top-nav">
                   <n-popover>
                     <template #trigger>
-                      <n-button  quaternary style="position: absolute;">
+                      <n-button :focusable="false" quaternary style="position: absolute;">
                         <template #icon>
                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M32 26v-2h-2.101a4.968 4.968 0 0 0-.732-1.753l1.49-1.49l-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 26 20.101V18h-2v2.101a4.968 4.968 0 0 0-1.753.732l-1.49-1.49l-1.414 1.414l1.49 1.49A4.968 4.968 0 0 0 20.101 24H18v2h2.101a4.968 4.968 0 0 0 .732 1.753l-1.49 1.49l1.414 1.414l1.49-1.49a4.968 4.968 0 0 0 1.753.732V32h2v-2.101a4.968 4.968 0 0 0 1.753-.732l1.49 1.49l1.414-1.414l-1.49-1.49A4.968 4.968 0 0 0 29.899 26zm-7 2a3 3 0 1 1 3-3a3.003 3.003 0 0 1-3 3z" fill="currentColor"></path><circle cx="7" cy="20" r="2" fill="currentColor"></circle><path d="M14 20a4 4 0 1 1 4-4a4.012 4.012 0 0 1-4 4zm0-6a2 2 0 1 0 2 2a2.006 2.006 0 0 0-2-2z" fill="currentColor"></path><circle cx="21" cy="12" r="2" fill="currentColor"></circle><path d="M13.02 28.271L3 22.427V9.574l11-6.416l11.496 6.706l1.008-1.728l-12-7a1 1 0 0 0-1.008 0l-12 7A1 1 0 0 0 1 9v14a1 1 0 0 0 .496.864L12.013 30z" fill="currentColor"></path></svg>                        </template>
                       </n-button>
@@ -91,7 +92,7 @@
                   </n-popover>
                   <n-tooltip v-if="codeTemplate.type && codeTemplate.type.startsWith('x-')">
                     <template #trigger>
-                      <n-button  quaternary style="position: absolute; left: 50px" @click="showFuncModal = true" >
+                      <n-button :focusable="false" quaternary style="position: absolute; left: 50px" @click="showFuncModal = true" >
                         <template #icon>
                           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"></path><path d="M12 9v6"></path><path d="M6 19a2 2 0 0 1-2-2v-4l-1-1l1-1V7a2 2 0 0 1 2-2"></path><path d="M18 19a2 2 0 0 0 2-2v-4l1-1l-1-1V7a2 2 0 0 0-2-2"></path></g></svg>                        </template>
                       </n-button>
@@ -100,8 +101,10 @@
                   </n-tooltip>
                   <div id="form-code-language-select">
                     <n-select
+                        :focusable="false"
                         v-model:value="codeTemplate.type"
                         filterable
+                        show-on-focus
                         placeholder="选择代码类型"
                         :options="languages"
                         :default-value="configManager.get('default_language')??'plaintext'"
@@ -162,7 +165,11 @@
                           :render-tag="renderCodeTypeTag"
                           :theme-overrides="selectThemeOverrides"
                       />
-                      <n-button @click="handleClearPath" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error" :disabled="!properties.code">
+                      <n-button v-if="codeTemplate.conf" @click="openConfModal(null)" style="position: absolute; right:50px; bottom: 0px;" :color="$normal.theme.globalColor" quaternary circle :disabled="!properties.code">
+                        <template #icon>
+                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M10 4h4v4h-4zM4 16h4v4H4zm0-6h4v4H4zm0-6h4v4H4zm12 0h4v4h-4zm-5 13.86V20h2.1l5.98-5.97l-2.12-2.12zm3-5.83V10h-4v4h2.03zm6.85-.47l-1.41-1.41c-.2-.2-.51-.2-.71 0l-1.06 1.06l2.12 2.12l1.06-1.06c.2-.2.2-.51 0-.71z" fill="currentColor"></path></svg>                        </template>
+                      </n-button>
+                      <n-button @click="handleClearPath()" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error" :disabled="!properties.code">
                         <template #icon>
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M12 1.75a3.25 3.25 0 0 1 3.245 3.066L15.25 5h5.25a.75.75 0 0 1 .102 1.493L20.5 6.5h-.796l-1.28 13.02a2.75 2.75 0 0 1-2.561 2.474l-.176.006H8.313a2.75 2.75 0 0 1-2.714-2.307l-.023-.174L4.295 6.5H3.5a.75.75 0 0 1-.743-.648L2.75 5.75a.75.75 0 0 1 .648-.743L3.5 5h5.25A3.25 3.25 0 0 1 12 1.75zm6.197 4.75H5.802l1.267 12.872a1.25 1.25 0 0 0 1.117 1.122l.127.006h7.374c.6 0 1.109-.425 1.225-1.002l.02-.126L18.196 6.5zM13.75 9.25a.75.75 0 0 1 .743.648L14.5 10v7a.75.75 0 0 1-1.493.102L13 17v-7a.75.75 0 0 1 .75-.75zm-3.5 0a.75.75 0 0 1 .743.648L11 10v7a.75.75 0 0 1-1.493.102L9.5 17v-7a.75.75 0 0 1 .75-.75zm1.75-6a1.75 1.75 0 0 0-1.744 1.606L10.25 5h3.5A1.75 1.75 0 0 0 12 3.25z" fill="currentColor"></path></g></svg>
                         </template>
@@ -205,7 +212,7 @@
       <div id="form-btn">
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button id="cancel" strong secondary type="warning"  @click="handleCancel">
+            <n-button :focusable="false" id="cancel" strong secondary type="warning"  @click="handleCancel">
               取消 (Q)
             </n-button>
           </template>
@@ -213,7 +220,7 @@
         </n-tooltip>
         <n-tooltip trigger="hover">
           <template #trigger>
-            <n-button strong secondary type="success"   @click="handleUpdate">
+            <n-button :focusable="false" strong secondary type="success"   @click="handleUpdate">
               保存 (S)
             </n-button>
           </template>
@@ -249,9 +256,10 @@ import ConfigSwitch from "../components/base/ConfigSwitch.vue";
 import FuncSelectPane from "../components/modal/FuncChooseModal.vue";
 import NormalTag from "../components/base/NormalTag.vue";
 import BaseModal from "../components/modal/BaseModal.vue";
-import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
+import {GLOBAL_HIERARCHY, loadValidHierarchyJS} from "../js/hierarchy/core";
 import {isNetWorkUri} from "../js/utils/common";
 import {utools_browser_open} from "../js/core/base";
+import {isArray as _isArray} from "lodash-es"
 
 
 const form = ref()
@@ -439,8 +447,10 @@ function keyDownHandler(e){
   if(showInternetLinkModal.value){
     return
   }
+  if($reactive.common.variableActive){
+    return;
+  }
   if(e.ctrlKey){
-    console.log('xxx')
     if(e.code === 'KeyQ'){
       handleCancel();
     }else if(e.code === 'KeyS'){
@@ -498,7 +508,6 @@ function keyDownHandler(e){
       }
     }else if(e.code === 'KeyS'){
       if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
-
         if(currentTab.value === 'code'){
           currentTab.value = 'link'
         }
@@ -506,7 +515,6 @@ function keyDownHandler(e){
       }
     }else if(e.code === 'KeyD'){
       if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
-
         if(currentTab.value === 'code'){
           currentTab.value = 'link'
         }
@@ -515,8 +523,6 @@ function keyDownHandler(e){
     }else if(e.code === 'KeyK'){
       codeTemplate.keyword = ! codeTemplate.keyword;
     }
-
-
   }
 }
 function handleChooseCommand(command){
@@ -680,6 +686,48 @@ function importLocalDir(){
     codeTemplate.ref = "local";
   }
 }
+function openConfModal(config){
+  if(!config){
+    const hierarchy = loadValidHierarchyJS(codeTemplate.path);
+    if(hierarchy && hierarchy.conf) {
+      config = hierarchy.conf
+    }
+  }
+  if(!config){
+    $message.warning('无配置项')
+    return
+  }
+  const variables = [];
+  const defaultValues = {};
+  for (let key in config) {
+    const item = config[key];
+    const isValidOptions = _isArray(item.value) && item.value.length > 0;
+    variables.push([key, isValidOptions? "select":"input",item.name])
+    if(isValidOptions){
+      // conf
+      if(codeTemplate.conf && key in codeTemplate.conf){
+        defaultValues[key] = Array.from(new Set([codeTemplate.conf[key].toString(),...item.value]))
+      }else{
+        defaultValues[key] = item.value;
+      }
+    }else {
+      defaultValues[key] = (codeTemplate.conf && key in codeTemplate.conf)? codeTemplate.conf[key]: item.value;
+    }
+  }
+  $normal.funcs.snippetName = '自定义目录配置项'
+  $normal.funcs.variables = variables;
+  $normal.funcs.defaultValues = defaultValues;
+  $reactive.common.variableActive = true;
+  $normal.funcs.syncDataFunc = syncData;
+
+}
+function syncData(results){
+  const obj = {};
+  for (const result of results) {
+    obj[result.name] = result.value;
+  }
+  codeTemplate.conf = obj;
+}
 function importHierarchyJS(){
   const realPathList = utools.showOpenDialog({
     title: '指定你的【自定义目录】代码实现文件' ,
@@ -696,10 +744,18 @@ function importHierarchyJS(){
     ]
   })
   if (realPathList != null) {
-    codeTemplate.path = realPathList[0];
-    // 解析类型
-    codeTemplate.dir = true;
-    codeTemplate.ref = "custom";
+    const hierarchy = loadValidHierarchyJS(realPathList[0]);
+    if(hierarchy){
+      codeTemplate.path = realPathList[0];
+      // 解析类型
+      codeTemplate.dir = true;
+      codeTemplate.ref = "custom";
+      if(hierarchy.conf){
+        openConfModal(hierarchy.conf);
+      }
+    }else {
+      $message.warning("无效的自定义目录代码实现文件")
+    }
   }
 }
 function setAsNormalDir() {
@@ -727,15 +783,15 @@ function handleClearPath(){
   box-sizing: border-box;
   position: relative;
   width: 100%;
+  height: 260px;
 }
 #form-code-top-nav{
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% - 10px);
+  width: 100%;
   height: 37px;
   box-sizing: border-box;
-  margin-left: 5px;
   border-bottom: 1px solid #efeff2;
   padding: 1px;
   z-index: 3;

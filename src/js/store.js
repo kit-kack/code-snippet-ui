@@ -53,6 +53,8 @@ const $normal = {
         variables: {},
         // 上述输入变量的默认值
         defaultValues: {},
+        // 同步codeTemplate数据
+        syncDataFunc: null,
         // 当前代码片段名
         snippetName: null,
     },
@@ -139,6 +141,8 @@ const $reactive = reactive({
         focused: true,
         // utools输入框内容
         search: '',
+        // 控制按键
+        vimDisabled: false,
         // 用来进行轻度刷新
         searchRefreshValue: 0,
         // 选择元素子索引，控制右键菜单（Vim模式）

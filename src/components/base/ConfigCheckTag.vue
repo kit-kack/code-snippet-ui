@@ -1,19 +1,17 @@
 <template>
-  <template v-if="props.icon">
-    <n-tag size="small" checkable v-model:checked="checked" @update-checked="updateConfigValue" >{{title}}
-      <template #icon>{{icon}}</template>
-    </n-tag>
-  </template>
-  <template v-else>
-    <n-tag size="small" checkable v-model:checked="checked" @update-checked="updateConfigValue" >{{title}}</n-tag>
-  </template>
+  <n-tag size="small" checkable v-model:checked="checked" @update-checked="updateConfigValue" >{{title}}</n-tag>
 </template>
 
 <script setup>
 import {configManager} from "../../js/core/config";
 import {ref} from "vue";
 
-const props = defineProps(['title','config','icon'])
+/**
+ * @typedef {Object} Props
+ * @property {string} title 标题
+ * @property {ConfigItem} config 配置项
+ */
+const props = defineProps(['title','config'])
 const emit = defineEmits(['refresh'])
 /**
  * @type {Ref<boolean>}

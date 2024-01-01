@@ -1,4 +1,4 @@
-import _ from "lodash";
+import {isArray as _isArray} from "lodash-es"
 const chineseRegex=/[\u4E00-\u9FA5]/
 
 /**
@@ -29,7 +29,7 @@ function advancedFuzzyCompare(query,target,chineseMatchDisabled){
                 }
             }else{
                 const result = window.pinyinUtil.getFirstLetter(t,true);
-                if(_.isArray(result) && result?.length > 0){
+                if(_isArray(result) && result?.length > 0){
                     if(result.findIndex(item => item.toLowerCase() === q) !== -1){
                         offset_result.push(t_index);
                         // break

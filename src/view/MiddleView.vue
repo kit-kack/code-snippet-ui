@@ -20,7 +20,7 @@
   </n-drawer>
   <aid-tag-pane/>
 
-  <variable-input-alert v-if="$reactive.common.variableActive"/>
+  <variable-input-modal v-if="$reactive.common.variableActive"/>
 
   <div id="extra" v-if="$reactive.currentMode=== LIST_VIEW && $reactive.main.isFullScreenShow" @mouseenter="expanded = true" @mouseleave="expanded = false">
     <template v-if="expanded || $reactive.main.isButtonFixed">
@@ -84,7 +84,7 @@ import VimStatusBar from "../components/VimStatusBar.vue";
 import ShortcutPane from "../components/pane/ShortcutPane.vue";
 import {ref, watch} from "vue";
 import {NButton, useDialog, useMessage} from 'naive-ui'
-import VariableInputAlert from "../components/modal/VariableInputModal.vue";
+import VariableInputModal from "../components/modal/VariableInputModal.vue";
 import {$list, $normal, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, refreshListView} from "../js/store";
 import ListView from "./ListView.vue";
 import CodeView from "./CodeView.vue";

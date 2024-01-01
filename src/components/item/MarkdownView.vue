@@ -21,8 +21,7 @@
             'active': currentHeadingIndex === index
           }"
             :style="{ padding: `10px 0 10px ${anchor.indent * 20}px` }"
-            @click="handleAnchorClick(anchor,index)"
-        >
+            @click="handleAnchorClick(anchor,index)">
           <n-ellipsis>
             <a  style="cursor: pointer">{{ anchor.title }}</a>
           </n-ellipsis>
@@ -38,7 +37,6 @@ import {$normal, $reactive} from "../../js/store";
 import {nextTick, onMounted, onUnmounted, ref} from "vue";
 import {isNetWorkUri} from "../../js/utils/common";
 import {utools_browser_open} from "../../js/core/base";
-import _ from "lodash";
 
 const preview = ref()
 const tocScrollRef = ref()
@@ -204,6 +202,9 @@ function adjustCenterPre(tab){
 }
 
 function handleMdHorizonMove(left,fast){
+  if(!$normal.md.pre){
+    adjustCenterPre()
+  }
   if($normal.md.pre){
     const distance = fast? 50 : 10;
     if(left){
@@ -322,7 +323,7 @@ function handleKeyDown(e){
           if(e.ctrlKey || e.metaKey){
             if(tocAnchors.value.length > 0){
               const top = adjustCurrentHeadingUpward();
-              if(_.isUndefined(top)){
+              if(top === null){
                 return
               }
               let index = currentHeadingIndex.value;
@@ -433,7 +434,7 @@ function adjustCurrentHeading(scrollable){
   }
 }
 function adjustCurrentHeadingUpward(){
-  let top;
+  let top = null;
   if(tocAnchors.value.length > 0) {
     // 获取窗口大小
     const windowHeight = window.innerHeight || document.documentElement.clientHeight;

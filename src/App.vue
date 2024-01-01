@@ -14,9 +14,9 @@ import {theme, themeOverrides} from "./js/theme";
 import {watch} from "vue";
 import MiddleView from "./view/MiddleView.vue";
 import {$normal, $reactive, LIST_VIEW} from "./js/store";
-import _ from "lodash";
+import {debounce as _debounce} from "lodash-es"
 
-const handleUtoolsTextChange =  _.debounce((text)=>{
+const handleUtoolsTextChange =  _debounce((text)=>{
   text = text.trim();
   if(text.length === 0){
     $reactive.utools.search = null;

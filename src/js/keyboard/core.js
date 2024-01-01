@@ -42,6 +42,10 @@ export function dealWithCommonView(e,ctrlFlag){
                 $message.warning("无法对目录进行此操作");
                 return;
             }
+            if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
+                $message.warning("无法对链接进行此操作");
+                return;
+            }
             e.preventDefault();
             copyCode(false);
             // handleCopy(false)
@@ -49,6 +53,10 @@ export function dealWithCommonView(e,ctrlFlag){
         case 'KeyP':
             if($reactive.currentSnippet.dir){
                 $message.warning("无法对目录进行此操作");
+                return;
+            }
+            if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
+                $message.warning("无法对链接进行此操作");
                 return;
             }
             e.preventDefault();
@@ -78,6 +86,10 @@ export function dealWithCommonView(e,ctrlFlag){
         case 'Digit9':
             if($reactive.currentSnippet.dir){
                 $message.warning("无法对目录进行此操作");
+                return;
+            }
+            if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
+                $message.warning("无法对链接进行此操作");
                 return;
             }
             e.preventDefault();
@@ -117,6 +129,9 @@ export function dealWithCommonView(e,ctrlFlag){
  */
 export function initKeyboardListener() {
     document.onkeydown = e => {
+        if($reactive.utools.vimDisabled){
+            return;
+        }
         // ignore  update view or create view
         if ($reactive.currentMode >= EDIT_VIEW) {
             return;
@@ -147,7 +162,7 @@ export function initKeyboardListener() {
         lastPressedTime = e.timeStamp;
     }
     document.onkeyup = e => {
-        if ($reactive.main.settingActive | $reactive.utools.focused || $index.value < 0 || $reactive.currentMode >= EDIT_VIEW) {
+        if ($reactive.utools.vimDisabled || $reactive.main.settingActive | $reactive.utools.focused || $index.value < 0 || $reactive.currentMode >= EDIT_VIEW) {
             return;
         }
         if (e.code === 'Space') {

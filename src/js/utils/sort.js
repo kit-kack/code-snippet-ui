@@ -1,6 +1,11 @@
 import {configManager} from "../core/config";
 import {match} from "./fuzzy";
 import {$reactive} from "../store";
+import {hierachyHubManager} from "../core/hub";
+import {GLOBAL_HIERARCHY} from "../hierarchy/core";
+import {lowercaseIncludes} from "./common";
+import {fullAlias} from "./language";
+import {isEmpty as _isEmpty} from "lodash-es"
 
 /**
  * 根据属性产生对应的排序函数
@@ -28,54 +33,115 @@ const CREATE_TIME_COMPARE = _compare("createTime");
 const TIME_COMPARE = _compare("time");
 const COUNT_COMPARE  = _compare("count");
 
-export function handleArrayForHierarchy(list,topList,sorted,highlighted,name){
+
+export function handleArrayForHierarchy(result,name,tags,type){
+    if(_isEmpty(result.snippets)){
+        return [];
+    }
+    if(type){
+        type = fullAlias(type.toLowerCase());
+    }
+    let tagFilter = false;
+    if(!_isEmpty(tags)){
+        tagFilter = true;
+        tags = tags.map(value => value.toLowerCase())
+    }
     // 筛选出 置顶列表中的片段
     const topSnippets = [];
+    const normalSnippets = [];
     const now = $reactive.utools.search + '-' + Date.now();
-    const needHighlight = name && !highlighted;
-    if(topList && topList.length > 0){
-        list = list.filter(snippet =>{
-            if(needHighlight){
-                snippet.temp = match(name,snippet.name);
-            }
-            const id = snippet.id ?? snippet.name;
-            snippet.now = now + '-' + id;
-            const index = topList.indexOf(id);
-            if(index === -1){
-                snippet.index = undefined;
-                return true;
+    const nameFilter = name && result.unfiltered;
+    const needHighlight = name && !result.highlighted && !nameFilter;
+    const topList = hierachyHubManager.getTopList();
+    const snippetHub = hierachyHubManager.currentHub.snippets;
+    const override_support = snippetHub && !GLOBAL_HIERARCHY.currentHierarchy.core
+
+    for (const snippet of result.snippets) {
+        const item = {...snippet}
+        // name filter
+        if(nameFilter){
+            const result = match(name,snippet.name)
+            if(result !== null){
+                item.temp = result;
             }else{
-                snippet.index = index;
-                topSnippets.push(snippet)
-                return false;
+                continue;
             }
-        })
-    }else{
-        list.forEach(snippet =>{
-            if(needHighlight){
-                snippet.temp = match(name,snippet.name);
+        }
+        const id = snippet.id ??snippet.name;
+        item.now = now + '-' + id;
+        // properties override
+        if(override_support){
+            const snippetData = snippetHub[id];
+            if(snippetData){
+                for (const key in snippetData) {
+                    if(snippetData[key]){
+                        item[key] = snippetData[key]
+                    }
+                }
             }
-            snippet.now = now + '-' + snippet.id + '-' + snippet.name;
-            snippet.index = undefined;
-        })
+        }
+        // type filter
+        if(type){
+            if (type.length === 0) {  // dir
+                if(!snippet.dir){
+                    continue;
+                }
+            }else{
+                if(fullAlias(snippet.type)!== type){
+                    continue
+                }
+            }
+        }
+        // tags filter
+        if(tagFilter){
+            if(snippet.tags){
+                let notFound = true;
+                for(const tag of tags){
+                    if(lowercaseIncludes(snippet.tags,tag)){
+                        notFound = false;
+                        break;
+                    }
+                }
+                if(notFound){
+                    continue;
+                }
+            }else{
+                continue;
+            }
+        }
+
+        if(needHighlight){
+            item.temp = match(name,snippet.name);
+        }
+
+        // top
+        const index = topList.indexOf(id);
+        if(index === -1){
+            normalSnippets.push(item)
+        }else{
+            item.index = index;
+            topSnippets.push(item);
+        }
+
     }
+
     // 对 topSnippets进行排序
     topSnippets.sort((a,b)=> a.index - b.index)
-    if(!sorted){
+    if(!result.sorted){
         switch (configManager.getSortKey()){
             case 0:   // 创建时间
-                list.sort(CREATE_TIME_COMPARE)
+                normalSnippets.sort(CREATE_TIME_COMPARE)
                 break;
             case 1:   // 最近访问时间
-                list.sort(TIME_COMPARE)
+                normalSnippets.sort(TIME_COMPARE)
                 break;
             case 2:  // 粘贴使用次数
-                list.sort(COUNT_COMPARE)
+                normalSnippets.sort(COUNT_COMPARE)
                 break;
             default:  // 自然排序
-                list.sort((a,b)=>a.name.localeCompare(b.name))
+                normalSnippets.sort((a,b)=>a.name.localeCompare(b.name))
                 break;
         }
     }
-    return topSnippets.concat(list);
+    return topSnippets.concat(normalSnippets);
 }

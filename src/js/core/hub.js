@@ -1,6 +1,6 @@
 import {utools_db_store} from "./base";
 import {$index} from "../store";
-import _ from "lodash";
+import { clone as _clone } from "lodash-es"
 /**
  *
  * Snippet Hierarchy Hub 职责
@@ -38,7 +38,7 @@ export const hierachyHubManager = {
         this.changeHub(null)
     },
     _syncTopList(){
-      this.currentClonedTopList = _.clone(this.currentHub.topList)??[]
+      this.currentClonedTopList = _clone(this.currentHub.topList)??[]
     },
 
     changeHub(prefix){
@@ -119,34 +119,36 @@ export const hierachyHubManager = {
         }
         this.store();
     },
-    /**
-     *
-     * @param {string} name
-     * @param {string} desc
-     * @param {string[]} tags
-     * @param {string} type
-     */
-    handle_local_dir_storage(name,desc,tags,type){
+    handle_desc_tags_type(name,obj){
         if (!this.currentHub.snippets) {
             this.currentHub.snippets = {};
         }
         const snippetHub = this.currentHub.snippets;
 
         const temp = snippetHub[name] ?? {};
-        if(desc){
-            temp.desc = desc;
-        }else{
-            delete temp.desc
+        if("desc" in obj){
+            const desc = obj.desc;
+            if(desc){
+                temp.desc = desc;
+            }else{
+                delete temp.desc
+            }
         }
-        if(tags && tags.length > 0){
-            temp.tags = tags;
-        }else{
-            delete temp.tags
+        if("tags" in obj){
+            const tags = obj.tags;
+            if(tags && tags.length > 0){
+                temp.tags = tags;
+            }else{
+                delete temp.tags
+            }
         }
-        if(type){
-            temp.type = type;
-        }else{
-            delete temp.type
+        if("type" in obj){
+            const type = obj.type;
+            if(type){
+                temp.type = type;
+            }else{
+                delete temp.type
+            }
         }
         // 后置处理
         if(Object.keys(temp).length === 0){
@@ -157,6 +159,44 @@ export const hierachyHubManager = {
         }
         this.store();
     },
+    // /**
+    //  *
+    //  * @param {string} name
+    //  * @param {string} desc
+    //  * @param {string[]} tags
+    //  * @param {string} type
+    //  */
+    // handle_local_dir_storage(name,desc,tags,type){
+    //     if (!this.currentHub.snippets) {
+    //         this.currentHub.snippets = {};
+    //     }
+    //     const snippetHub = this.currentHub.snippets;
+    //
+    //     const temp = snippetHub[name] ?? {};
+    //     if(desc){
+    //         temp.desc = desc;
+    //     }else{
+    //         delete temp.desc
+    //     }
+    //     if(tags && tags.length > 0){
+    //         temp.tags = tags;
+    //     }else{
+    //         delete temp.tags
+    //     }
+    //     if(type){
+    //         temp.type = type;
+    //     }else{
+    //         delete temp.type
+    //     }
+    //     // 后置处理
+    //     if(Object.keys(temp).length === 0){
+    //         delete snippetHub[name]
+    //     }else{
+    //         // 保存数据
+    //         snippetHub[name] = temp;
+    //     }
+    //     this.store();
+    // },
     removeElement(name){
         // top
         const topList = this.currentHub.topList ?? [];

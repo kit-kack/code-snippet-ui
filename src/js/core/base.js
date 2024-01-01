@@ -1,5 +1,4 @@
-import _ from "lodash";
-
+import {isEmpty} from "lodash-es";
 /**
  * 操作使其同utools.dbStorage.setItem操作
  * @param key
@@ -28,7 +27,7 @@ export function utools_db_store(key, value){
 export function utools_browser_open(href){
     const idleBrowsers = utools.getIdleUBrowsers();
     const browser = utools.ubrowser.goto(href).show()
-    if(_.isEmpty(idleBrowsers)){
+    if(isEmpty(idleBrowsers)){
         browser.run({
             center: true
         })

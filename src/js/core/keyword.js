@@ -1,4 +1,4 @@
-import _ from "lodash";
+import {isEmpty as _isEmpty} from "lodash-es";
 import {codeSnippetManager} from "./snippet";
 import {utools_db_store} from "./base";
 
@@ -74,11 +74,11 @@ export function batch_delete_utools_keyword(prefix){
 export function adapt_old_utools_keyword(){
     const oldKeywords = "code-snippet-keyword";
     const featues = utools.getFeatures([oldKeywords])
-    if(_.isEmpty(featues)){
+    if(_isEmpty(featues)){
         return
     }
     const cmds = featues[0].cmds;
-    if(_.isEmpty(cmds)){
+    if(_isEmpty(cmds)){
         return;
     }
     for (const codeSnippet of codeSnippetManager.rootSnippetMap.values()) {

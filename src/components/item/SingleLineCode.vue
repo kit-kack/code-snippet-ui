@@ -12,9 +12,10 @@
 <script setup>
 import {configManager} from "../../js/core/config";
 import {getRealTypeAndValidStatus} from "../../js/utils/language";
+import {onUpdated, ref} from "vue";
 
 const props = defineProps(['code','type']);
-const pair = getRealTypeAndValidStatus(props.type)
+const pair = ref(getRealTypeAndValidStatus(props.type))
 /**
  *
  * @param {string} code
@@ -23,6 +24,9 @@ const pair = getRealTypeAndValidStatus(props.type)
 function handleCode(code){
   return code.slice(0,200).replaceAll("\n",'↩')
 }
+onUpdated(()=>{
+  pair.value = getRealTypeAndValidStatus(props.type)
+})
 </script>
 
 <style scoped>

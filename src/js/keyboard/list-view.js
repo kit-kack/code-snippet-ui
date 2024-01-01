@@ -11,24 +11,24 @@ import {
 } from "../store"
 import {Direction, doScrollForListView, doScrollForMultiLineCode} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
-import _ from "lodash";
+import { throttle as _throttle } from "lodash-es"
 import {dealWithCommonView} from "./core";
 import {copyCode} from "../utils/copy";
 
 
-const debMoveDown = _.throttle(function(){
+const debMoveDown = _throttle(function(){
     $reactive.utools.subItemSelectedIndex = -1;
     $index.value++;
     // console.log($reactive.core.selectedIndex)
     doScrollForListView();
 },120)
-const debMoveUp = _.throttle(function(){
+const debMoveUp = _throttle(function(){
     $index.value--;
     $reactive.utools.subItemSelectedIndex = -1;
     // $var.scroll.listInvoker?.("up")
     doScrollForListView()
 },120)
-const debItemMoveLeft = _.throttle(function(){
+const debItemMoveLeft = _throttle(function(){
     if($reactive.main.isDel){
         $reactive.utools.subItemSelectedIndex = $reactive.utools.subItemSelectedIndex === 0? 1:0;
     }else{
@@ -39,7 +39,7 @@ const debItemMoveLeft = _.throttle(function(){
         }
     }
 },120)
-const debItemMoveRight = _.throttle(function(){
+const debItemMoveRight = _throttle(function(){
     if($reactive.main.isDel){
         $reactive.utools.subItemSelectedIndex = $reactive.utools.subItemSelectedIndex === 0? 1:0;
     }else{
@@ -100,6 +100,10 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
         if($reactive.currentSnippet.dir){
             return;
         }
+        if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
+            utools.shellOpenExternal($reactive.currentSnippet.path)
+            return;
+        }
         copyCode(true,$normal.beta.subSnippetNum)
         // handleCopy(true)
         return;
@@ -123,7 +127,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             e.preventDefault();
             if(e.repeat && !$normal.keyboard.isLongPressed){
                 if($reactive.utools.subItemSelectedIndex === -1){
-                    if(!$reactive.currentSnippet.dir){
+                    if(!$reactive.currentSnippet.dir && !$reactive.currentSnippet.link){
                         GLOBAL_HIERARCHY.changeView(CODE_VIEW)
                     }
                     $normal.keyboard.isLongPressed = true;
@@ -229,6 +233,8 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
         case 'KeyV':
             if($reactive.currentSnippet.dir){
                 GLOBAL_HIERARCHY.changeHierarchy("next")
+            }else if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
+                utools.shellOpenExternal($reactive.currentSnippet.path)
             }else{
                 GLOBAL_HIERARCHY.changeView(CODE_VIEW)
                 // router.replace('/code')

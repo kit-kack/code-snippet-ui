@@ -4,7 +4,7 @@ import {utools_db_store} from "./base";
 import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
-import _ from "lodash";
+import { toString as _toString } from "lodash-es";
 
 const GLOBAL_FUNC = "func";
 /**
@@ -171,6 +171,7 @@ function _uuid(len, radix) {
 /**
  * 解析 [variable::]command[:param]
  * @param {string} text
+ * @param assignFlag
  * @return Result
  * @private
  */
@@ -461,6 +462,9 @@ export const formatManager = {
                 target.push({
                     variable: name.slice(1)
                 })
+                if(line){
+                    last--;
+                }
             }else{
                 let assignFlag = false;
                 if(name.startsWith('#')){
@@ -531,7 +535,7 @@ export const formatManager = {
                                     }
                                     // for
                                     for (let i = 0; i < value.length; i++) {
-                                        value[i] = _.toString(value[i])
+                                        value[i] = _toString(value[i])
                                     }
                                     defaultVarValue[result._var] = value
                                 }

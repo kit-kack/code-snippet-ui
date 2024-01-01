@@ -16,52 +16,66 @@ import {localDirectoryHierarchy} from "./h-local-dir";
 import {handleArrayForHierarchy} from "../utils/sort";
 import {deleteHub, hierachyHubManager} from "../core/hub";
 import {nextTick, toRaw} from "vue";
-import {lowercaseIncludes} from "../utils/common";
-import {fullAlias} from "../utils/language";
 import {codeSnippetManager} from "../core/snippet";
 import {defaultHelpSnippet} from "../some";
 import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
-import _ from "lodash";
+import {isFunction as _isFunction, isArray as _isArray } from "lodash-es";
 
-function _loadValidHierarchyJS(path) {
+
+export function loadValidHierarchyJS(path) {
     const hierarchy = window.preload.dynamicLoadJS(path);
     if (hierarchy) {
         // check method
-        if(!_.isFunction(hierarchy.search)){
+        if(!_isFunction(hierarchy.search)){
             utools.showNotification('该JS文件导出的对象必须有search方法')
             return null;
         }
+        // conf permit write
+        Object.defineProperty(hierarchy,"conf",{
+            writable:false,
+            configurable: false
+        })
     }
     return hierarchy;
 }
+const EXT = Object.freeze({
+    getTopList(){
+        return hierachyHubManager.currentClonedTopList;
+    },
+    store(name,obj){
+        return hierachyHubManager.handle_desc_tags_type(name,obj)
+    }
+})
 
 export const GLOBAL_HIERARCHY = {
     currentHierarchy: rootHierachy,
-    currentPrefixStr: null,
     currentPrefixIdStr: null,
-    currentPrefixArray: null,
-    currentPrefixIdArray: [],
+    currentPrefixSnippetArray: [],
+    // currentPrefixSnippetArray副本
+    currentPrefixSnippetArrayTemp: [],
     /**
      * @type {HierarchyConfig}
      */
     currentConfig: DEFAULT_ROOT_HIERARCHY_CONFIG,
+    lastSearchResult: null,
     /**
      * 修改层级
      * @param {"root" | "prev" | "next" | "custom" | "redirect" } mode
      * @param {any} [param] custom-number:指定索引位，redirect-string:指定前缀
      */
     changeHierarchy(mode,param){
+        this.lastSearchResult = null;
         switch (mode){
             case "root":
                 if($reactive.currentPrefix.length > 0 ){
                     $reactive.currentPrefix = [];
                     $normal.hierarchyPath = [];
-                    this.currentPrefixIdArray = [];
+                    this.currentPrefixSnippetArray = [];
                 }
                 break
             case "prev":
                 $reactive.currentPrefix.pop();
-                this.currentPrefixIdArray.pop()
+                this.currentPrefixSnippetArray.pop()
                 const result = $normal.hierarchyPath.pop();
                 if(result){
                     $index.value = result.index;
@@ -74,7 +88,7 @@ export const GLOBAL_HIERARCHY = {
                 if($reactive.currentPrefix.length > 0 ){
                     $reactive.currentPrefix = [];
                     $normal.hierarchyPath = [];
-                    this.currentPrefixIdArray = [];
+                    this.currentPrefixSnippetArray = [];
                 }
                 // 只是h-root的导向
                 if(param !== null){
@@ -82,8 +96,12 @@ export const GLOBAL_HIERARCHY = {
                         $normal.hierarchyPath.push({
                             index: 0
                         })
+                        // TODO: 这里将 id 设为 prefix，可能会导致一些显示方面的问题
                         $reactive.currentPrefix.push(prefix)
-                        this.currentPrefixIdArray.push(prefix)
+                        this.currentPrefixSnippetArray.push({
+                            id: prefix,
+                            dir: true
+                        })
                     }
                 }
                 // redirect后续逻辑同next
@@ -110,7 +128,7 @@ export const GLOBAL_HIERARCHY = {
                         break
                 }
                 $reactive.currentPrefix.push($reactive.currentSnippet.name)
-                this.currentPrefixIdArray.push(this.currentHierarchy.core? $reactive.currentSnippet.id : $reactive.currentSnippet.name)
+                this.currentPrefixSnippetArray.push(toRaw($reactive.currentSnippet))
                 // 改变index
                 $index.value = 0;
                 doScrollForListView();
@@ -121,7 +139,7 @@ export const GLOBAL_HIERARCHY = {
                 if(ind < $reactive.currentPrefix.length){
                     $reactive.currentPrefix.splice(ind,$reactive.currentPrefix.length)
                     $normal.hierarchyPath.splice(ind,$reactive.currentPrefix.length)
-                    this.currentPrefixIdArray.splice(ind,$reactive.currentPrefix.length)
+                    this.currentPrefixSnippetArray.splice(ind,$reactive.currentPrefix.length)
                 }
                 break
         }
@@ -131,10 +149,19 @@ export const GLOBAL_HIERARCHY = {
             if(temp.local){
                 // local dir
                 this.currentHierarchy = localDirectoryHierarchy;
-            }else if(temp.value) {
-                this.currentHierarchy = _loadValidHierarchyJS(temp.value)
-                // null
-                if (this.currentHierarchy === null) {
+            }else if(temp.value && mode !== 'prev') {
+                this.currentHierarchy = loadValidHierarchyJS(temp.value)
+                if(this.currentHierarchy){
+                    // init
+                    if(this.currentHierarchy.init){
+                        try{
+                            this.currentHierarchy.init(toRaw($reactive.currentSnippet.conf))
+                        }catch (e){
+                            $message.error(e.toString())
+                            this.currentHierarchy = rootHierachy;
+                        }
+                    }
+                }else{ // null
                     this.currentHierarchy = rootHierachy;
                 }
             }else{ // normal
@@ -146,18 +173,18 @@ export const GLOBAL_HIERARCHY = {
         }
         // 相应值 改变
         if($reactive.currentPrefix && $reactive.currentPrefix.length > 0){
-            this.currentPrefixStr = $reactive.currentPrefix.join('/')
-            this.currentPrefixArray = $reactive.currentPrefix.slice()
-            this.currentPrefixIdStr = this.currentPrefixIdArray.join('/')
+            let id = ""
+            for(const snippet of this.currentPrefixSnippetArray){
+                id += (snippet.id ?? snippet.name) + '/'
+            }
+            this.currentPrefixIdStr = id.slice(0,-1)
         }else{
-            // root
-            this.currentPrefixStr = null;
-            this.currentPrefixArray = null;
             this.currentPrefixIdStr = null
         }
+        this.currentPrefixSnippetArrayTemp = this.currentPrefixSnippetArray.slice()
         hierachyHubManager.changeHub(this.currentPrefixIdStr)
         // config
-        this.currentConfig = this.currentHierarchy.getConfig?.(this.currentPrefixArray) ?? {};
+        this.currentConfig = this.currentHierarchy.getConfig?.(this.currentPrefixSnippetArrayTemp) ?? {};
         if(mode === "redirect"){
             utools_focus_or_blur(true)
         }else{
@@ -214,24 +241,36 @@ export const GLOBAL_HIERARCHY = {
         let result;
         $normal.beta.subSnippetNum = undefined;
         let name = null;
+        let type = null;
+        let tags = [];
         if(searchWord == null || searchWord.length === 0){
             $reactive.main.aidTagActive = false;
             $normal.beta.tempTags = [];
             try{
-                result = await this.currentHierarchy.search(this.currentPrefixArray,null,hierachyHubManager.getTopList())
-                if(_.isArray(result)){
+                $reactive.utools.vimDisabled = true;
+                if(this.lastSearchResult) {
+                    result = this.lastSearchResult;
+                }else{
+                    result = await this.currentHierarchy.search(this.currentPrefixSnippetArrayTemp,null,EXT)
+                }
+                if(_isArray(result)){
                     result = {
                         snippets: result
                     }
                 }
+                // cache
+                if(result.unfiltered && this.lastSearchResult!== result){
+                    this.lastSearchResult = result;
+                }
             }catch (e) {
-                utools.showNotification(e.message)
+                $message.error(e.toString())
+                utools.showNotification(e.toString())
+            }finally {
+                $reactive.utools.vimDisabled = false;
             }
 
         }else{
             const words = searchWord.split(/\s/).filter(v=>v.length>=1)
-            let type = null;
-            let tags = [];
             let tagFlag = false;
             for (let word of words) {
                 if(word[0] === '@'){
@@ -266,52 +305,36 @@ export const GLOBAL_HIERARCHY = {
             $reactive.main.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
             $normal.beta.tempTags = tags;
             try{
-                result = await this.currentHierarchy.search(this.currentPrefixArray,name,hierachyHubManager.getTopList())
-                if(_.isArray(result)){
+                $reactive.utools.vimDisabled = true;
+                if(this.lastSearchResult){
+                    result = this.lastSearchResult;
+                }else{
+                    result = await this.currentHierarchy.search(this.currentPrefixSnippetArrayTemp,name,EXT)
+                }
+                if(_isArray(result)){
                     result = {
                         snippets: result
                     }
                 }
+                // cache
+                if(result.unfiltered && this.lastSearchResult!== result){
+                    this.lastSearchResult = result;
+                }
             }catch (e) {
-                utools.showNotification(e.message)
+                $message.error(e.toString())
+                utools.showNotification(e.toString())
+            }finally {
+                $reactive.utools.vimDisabled = false;
             }
-            if(result && result.snippets){
-                // tags
-                if(tags !== null && tags.length > 0){
-                    tags = tags.map(value => value.toLowerCase())
-                    result.snippets = result.snippets.filter(codeSnippet=>{
-                        if(codeSnippet.tags == null){
-                            return false;
-                        }
-                        for(const tag of tags){
-                            if(lowercaseIncludes(codeSnippet.tags,tag)){
-                                return true;
-                            }
-                        }
-                        return false;
-                    })
-                }
-                // type
-                if(type !== null){
-                    if (type.length === 0) {
-                        result.snippets = result.snippets.filter(snippet => snippet.dir)
-                    }else{
-                        type = fullAlias(type.toLowerCase());
-                        result.snippets = result.snippets.filter(codeSnippet=>fullAlias(codeSnippet.type) === type)
-                    }
-                }
-            }
-
         }
         let array;
         // sort
         if(result){
-            array = result.snippets ?? [];
-            array = handleArrayForHierarchy(array,hierachyHubManager.getTopList(),result.sorted,result.highlighted,name)
+            array = handleArrayForHierarchy(result,name,tags,type)
         }else{
             array = [];
         }
-        // only appear : root & no-search & readme_close
+        // only appear : root & no-search & !readme_close
         if(!configManager.get('readme_close') ){
             if(!this.currentPrefixIdStr && !searchWord){
                 array.unshift(defaultHelpSnippet)
@@ -354,7 +377,7 @@ export const GLOBAL_HIERARCHY = {
          * @param {string} name
          */
         containName(name){
-            return GLOBAL_HIERARCHY.currentHierarchy.checkNameRepeat?.(GLOBAL_HIERARCHY.currentPrefixArray,name)
+            return GLOBAL_HIERARCHY.currentHierarchy.checkNameRepeat?.(GLOBAL_HIERARCHY.currentPrefixSnippetArrayTemp,name)
         },
         /**
          * 新增或修改 代码片段
@@ -367,7 +390,7 @@ export const GLOBAL_HIERARCHY = {
                 snippet.keyword = undefined;
             }
             try{
-                GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixArray,snippet,oldName);
+                GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixSnippetArrayTemp,snippet,oldName,EXT);
             }catch (e){
                 $message.error(e.message)
             }
@@ -409,7 +432,7 @@ export const GLOBAL_HIERARCHY = {
                 if(GLOBAL_HIERARCHY.currentHierarchy.core){
                     codeSnippetManager.update(toRaw(snippet),GLOBAL_HIERARCHY.currentPrefixIdStr);
                 }else{
-                    hierachyHubManager.handleSections(key,snippet.sections)
+                    hierachyHubManager.handleSections(key,toRaw(snippet.sections))
                 }
                 return;
             default:
@@ -423,7 +446,7 @@ export const GLOBAL_HIERARCHY = {
      */
     remove(snippet){
         try{
-            this.currentHierarchy.remove?.(this.currentPrefixArray,snippet);
+            this.currentHierarchy.remove?.(this.currentPrefixSnippetArrayTemp,snippet);
         }catch (e){
             $message.error(e.message)
         }

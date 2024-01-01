@@ -20,7 +20,7 @@
         </template>
         <template v-else>
           <div class="hljs-container" v-code>
-            <n-scrollbar  x-scrollable :ref="(el)=> $normal.scroll.codeHorizontalInvoker = el">
+            <n-scrollbar  x-scrollable :ref="(el)=> $normal.scroll.codeHorizontalInvoker = el" style="padding-bottom: 2px">
               <template v-if="pair.valid">
                 <highlightjs :language="pair.type" :autodetect="false" :code="pair.code" width="100%"/>
               </template>
@@ -94,13 +94,13 @@
           {{snippet.desc??'暂无描述~'}}
         </p>
 <!--        <p>{{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字</p>-->
-        <template v-if="!_.isEmpty(snippet.tags)">
+        <template v-if="!_isEmpty(snippet.tags)">
           <h4>标签</h4>
           <n-space>
             <normal-tag type="raw" v-for="item in snippet.tags"  :key="item" :content="item"/>
           </n-space>
         </template>
-        <template v-if="!_.isEmpty(snippet.sections)">
+        <template v-if="!_isEmpty(snippet.sections)">
           <h4>子代码片段×{{snippet.sections.length}}</h4>
           <n-space>
             <span class="code-view-side-tag" v-for="section in snippet.sections">
@@ -130,7 +130,7 @@ import NormalTag from "../components/base/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import MarkdownView from "../components/item/MarkdownView.vue";
 import {renderFormatBlock} from "../js/core/func";
-import _ from "lodash";
+import {isEmpty as _isEmpty} from "lodash-es"
 
 const verticalScroller = ref(null)
 /**
@@ -193,21 +193,30 @@ function getCode(){
 function getCodeFromPath(){
   // 分析path
   if(isNetWorkPath){
-    // network
-    if(snippet.type !== 'image' && snippet.type !== 'x-image'){
-      fetch(snippet.path).then(resp=>{
-        if(resp.ok){
-          resp.text().then(value=>{
-            // 刷新页面
-            $reactive.currentCode = value;
-            doRefresh();
-          })
-        }else{
-          $reactive.currentCode = "网络文件[ "+snippet.path +" ]数据抓取失败!"
-        }
+    if(GLOBAL_HIERARCHY.currentHierarchy.resolveUrl){
+      GLOBAL_HIERARCHY.currentHierarchy.resolveUrl(snippet.path,snippet.type).then(successData =>{
+        $reactive.currentCode = successData;
+        doRefresh();
+      },error =>{
+        $reactive.currentCode = "网络文件[ " + snippet.path + " ]数据抓取失败!原因为 " + error
       })
-      return "网络文件[ "+snippet.path +" ]数据正在获取中..."
+    }else{
+      // network
+      if(snippet.type !== 'image' && snippet.type !== 'x-image') {
+        fetch(snippet.path).then(resp => {
+          if (resp.ok) {
+            resp.text().then(value => {
+              // 刷新页面
+              $reactive.currentCode = value;
+              doRefresh();
+            })
+          } else {
+            $reactive.currentCode = "网络文件[ " + snippet.path + " ]数据抓取失败!"
+          }
+        })
+      }
     }
+    return "网络文件[ "+snippet.path +" ]数据正在获取中..."
   }else{
     // local
     try{
@@ -273,8 +282,9 @@ onUnmounted(()=>{
   }
 
   .hljs-container pre{
+    box-sizing: border-box;
     width: 100%;
-    padding-left: 10px;
+    padding-left: 5px;
     padding-right: 10px;
     z-index: 1;
     background: transparent;

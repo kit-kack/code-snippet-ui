@@ -6,7 +6,7 @@
     <n-scrollbar style="max-height: 60vh">
       <div style="padding-right: 6px">
         <template v-for="(template,index) in templates">
-          <p style="font-size: 13px;margin: 5px">{{template.label}}</p>
+          <p style="font-size: 13px;margin: 5px">{{template.desc ?? template.name}}</p>
           <template v-if="template.type === 'input'">
             <n-input v-model:value="template.value" clearable placeholder="输入值"/>
           </template>
@@ -24,15 +24,20 @@
 </template>
 
 <script setup>
-import {$normal, $reactive, handleRecoverLiteShow} from "../../js/store";
+import {$normal, $reactive, CODE_VIEW, handleRecoverLiteShow, LIST_VIEW} from "../../js/store";
 import {ref} from "vue";
 import {formatManager} from "../../js/core/func";
 import BaseModal from "./BaseModal.vue";
 
+/**
+ * $normal.funcs.variabls item
+ * [ name, type, desc ]
+ */
 const templates = ref( $normal.funcs.variables.map(en =>{
   if(en[1] === 'input'){
     return {
-      label: en[0],
+      name: en[0],
+      desc: en[2],
       value: $normal.funcs.defaultValues[en[0]],
       type: en[1]
     }
@@ -40,8 +45,9 @@ const templates = ref( $normal.funcs.variables.map(en =>{
     const array = $normal.funcs.defaultValues[en[0]]??[]
     if(array.length === 0){
       return {
-        label: en[0],
-        type: en[1]
+        name: en[0],
+        type: en[1],
+        desc: en[2],
       }
     }else{
       let first = array[0];
@@ -50,8 +56,9 @@ const templates = ref( $normal.funcs.variables.map(en =>{
         first = first.slice(0,ind)
       }
       return {
-        label: en[0],
+        name: en[0],
         type: en[1],
+        desc: en[2],
         value: first,
         option: array.map(item => {
           const index = item.indexOf('||')
@@ -75,19 +82,26 @@ const templates = ref( $normal.funcs.variables.map(en =>{
 
 function doCancel(){
   $reactive.common.variableActive = false;
-  handleRecoverLiteShow();
+  if($reactive.currentMode === LIST_VIEW){
+    handleRecoverLiteShow();
+  }
 }
 
 function doYes(){
-  // 将值写入到pairs中
-  for (const template of templates.value) {
-      formatManager.globalVar['@'+template.label] = template.value;
+  if($reactive.currentMode <= CODE_VIEW){
+    // 将值写入到pairs中
+    for (const template of templates.value) {
+      formatManager.globalVar['@'+template.name] = template.value;
+    }
+    // 继续进行解析
+    formatManager.continueFormat();
+    // 关闭
+    $reactive.common.variableActive = false;
+    handleRecoverLiteShow();
+  }else{
+    $normal.funcs.syncDataFunc(templates.value)
+    $reactive.common.variableActive = false;
   }
-  // 继续进行解析
-  formatManager.continueFormat();
-  // 关闭
-  $reactive.common.variableActive = false;
-  handleRecoverLiteShow();
 }
 
 </script>

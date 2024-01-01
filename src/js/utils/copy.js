@@ -1,7 +1,7 @@
 import {$index, $normal, $reactive} from "../store";
 import {formatManager} from "../core/func";
 import {isNetWorkUri} from "./common";
-import _ from "lodash"
+import { isEmpty as _isEmpty } from "lodash-es"
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
@@ -127,7 +127,7 @@ export async function copyCode(isPasted,num,noView){
         if(num < 0){
             _notify("子代码片段序号非法",noView);
         }else if(num === 0){
-            if(_.isEmpty($reactive.currentSnippet.sections)){
+            if(_isEmpty($reactive.currentSnippet.sections)){
                 _notify("当前代码片段没有子代码片段，故不支持该操作",noView)
             }else{
                 if(!$reactive.currentCode){

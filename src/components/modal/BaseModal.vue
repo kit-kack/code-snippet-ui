@@ -35,7 +35,7 @@
 <script setup>
 import {CtrlStr} from "../../js/some";
 import {onMounted, onUnmounted} from "vue";
-import _ from "lodash";
+import { throttle } from "lodash-es"
 import {$normal} from "../../js/store";
 
 const props = defineProps({
@@ -43,10 +43,10 @@ const props = defineProps({
   'title': String
 })
 const emit = defineEmits(['update:show','cancel','confirm'])
-const down = _.throttle(()=>{
+const down = throttle(()=>{
   utools.simulateKeyboardTap('down')
 },120);
-const up = _.throttle(()=>{
+const up = throttle(()=>{
   utools.simulateKeyboardTap('up')
 },120)
 const keyDownHandler = (e)=>{
