@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.6.4](https://github.com/littledot-kit/code-snippet-ui/compare/v2.6.3...v2.6.4) (2024-01-02)
+
+
+### Features
+
+* 改进【自定义目录】 ([b0d7db0](https://github.com/littledot-kit/code-snippet-ui/commit/b0d7db00b2c8ed5ecd39a98e7db03cef4df1c03b))
+* beta功能-特殊标签 ([64b74af](https://github.com/littledot-kit/code-snippet-ui/commit/64b74afff5bae91e8de344537a75a797cdd7ad68))
+
+
+### Bug Fixes
+
+* 优化占位符处理 ([535b243](https://github.com/littledot-kit/code-snippet-ui/commit/535b243d0905ec35e69b8ca81daf95f73cdd924a))
+* 优化FormView TextArea输入 ([8e65470](https://github.com/littledot-kit/code-snippet-ui/commit/8e654707c282717d15401f137fb05f4c0c170d7c))
+* Space默认浏览器行为禁用；占位符渲染支持主题响应式切换 ([61f1367](https://github.com/littledot-kit/code-snippet-ui/commit/61f1367d9cade8d9c6e1346387a152c84a8c40f3))
+
 ### [2.6.3](https://github.com/littledot-kit/code-snippet-ui/compare/v2.6.2...v2.6.3) (2023-12-12)
 
 

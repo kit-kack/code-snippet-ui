@@ -1,7 +1,7 @@
 {
   "name": "code-snippet-ui",
   "private": true,
-  "version": "2.6.3",
+  "version": "2.6.4",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
