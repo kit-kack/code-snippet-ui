@@ -137,7 +137,7 @@ export function initKeyboardListener() {
             return;
         }
         // common
-        if($reactive.common.variableActive){
+        if($reactive.common.variableActive || $reactive.main.tagColorActive){
             return;
         }
         if($reactive.common.shortcutActive){

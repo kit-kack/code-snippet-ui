@@ -1,14 +1,14 @@
 <template>
   <template v-if="type === 'raw'">
-    <n-tag size="small" class="tag" :color="colorStyle" >{{props.content}}</n-tag>
+    <n-tag size="small" class="tag" :round="isSpecial"  :style="colorStyle" >{{props.content}}</n-tag>
   </template>
   <template v-else-if="type === 'closable'">
-    <n-tag closable size="small" :color="colorStyle">{{props.content}}</n-tag>
+    <n-tag closable size="small" :round="isSpecial" :style="colorStyle" >{{props.content}}</n-tag>
   </template>
   <template v-else-if="type === 'clear'">
     <n-tooltip>
       <template #trigger>
-        <n-tag closable class="tag" size="small" :color="colorStyle" @close="handleClose">{{props.content}}</n-tag>
+        <n-tag closable class="tag" size="small" :style="colorStyle"  @close="handleClose">{{props.content}}</n-tag>
       </template>
       <template v-if="tagColorManager.tags[props.content] === null">
         <span style="color: indianred">清除标签</span>
@@ -19,63 +19,42 @@
     </n-tooltip>
   </template>
   <template v-else>
-    <n-popover trigger="click" raw :show-arrow="false" >
-      <template #trigger>
-        <n-tag class="tag"  :bordered="false" size="small" :color="colorStyle" > {{props.content}}</n-tag>
-      </template>
-      <color-picker :instance="instance" is-styled/>
-    </n-popover>
+    <n-tag
+        @click="handleTagClick"
+        :round="isSpecial"
+        :bordered="isSpecial"
+        :style="colorStyle"  class="tag"  size="small" > {{props.content}}
+    </n-tag>
   </template>
 </template>
 
 <script setup>
 
-import {ref} from "vue";
-import Color from "../../js/lib/color.js";
+import {computed} from "vue";
 import {tagColorManager} from "../../js/core/tag";
-import ColorPicker from "./ColorPicker.vue";
-import {$normal} from "../../js/store";
+import {$normal, $reactive} from "../../js/store";
 
 const props = defineProps({
   "content": String,
   "type": String,
-  "followTheme": Boolean
+  "isSpecial": Boolean
 })
-const colorStyle = ref(getColorStyle(props.followTheme? $normal.theme.tagColor :  tagColorManager.get(props.content)))
-function getColorStyle(color){
-  if(color[0]==='#'){
-    color = Color.hexaToRbga(color)
-  }
-  return {
-    color: Color(color).lightenByRatio(1),
-    textColor:color
-  };
-}
+const colorStyle = computed(()=>{
+  return tagColorManager.get(props.content);
+})
+
 /**
  *
  * @type {EmitFn<string[]>} to  refresh ListView or SideView
  */
 const emit = defineEmits(['tagRefresh'])
-const instance = {
-  title: "更改颜色",
-  color:colorStyle.value.textColor,
-  handleUpdate: c=>{
-    if(c == null){
-      c = tagColorManager.get(props.content)
-    }
-    colorStyle.value = getColorStyle(c)
-  },
-  handleConfirm: c=>{
-    if(c[0]==='#'){
-      c = Color.hexaToRbga(c)
-    }
-    tagColorManager.update(props.content,c)
-    emit('tagRefresh')
-  }
-}
 function handleClose(){
   tagColorManager.clear(props.content)
   emit('tagRefresh')
+}
+function handleTagClick(){
+  $reactive.main.tagName = props.content;
+  $reactive.main.tagColorActive = true;
 }
 
 </script>
@@ -83,5 +62,10 @@ function handleClose(){
 <style scoped>
 .tag{
   height: 14px;
+  line-height: 1;
+  padding: 2px 5px;
+}
+.special{
+  margin-top: 6px;
 }
 </style>

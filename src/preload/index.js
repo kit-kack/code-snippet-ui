@@ -24,14 +24,14 @@ export const readFile = fs.readFileSync;
 export const readREADME_MD = () => fs.readFileSync(path.join(__dirname,'README.md')).toString();
 export const writeFile = fs.writeFileSync;
 export const renameFile = fs.renameSync;
-const localConfigDirPath = path.join(utools.getPath('appData'),'./code-snippet-utools')
-export const writeConfigFile = (p,data) =>{
-    if(!fs.existsSync(localConfigDirPath)){
-        fs.mkdirSync(localConfigDirPath)
+export const removeFile = fs.unlink;
+export const writeConfigFile = (dir,filename,data)=>{
+    if(!fs.existsSync(dir)){
+        fs.mkdirSync(dir)
     }
-    p = path.join(localConfigDirPath,p)
+    const p = path.join(dir,filename);
     fs.writeFileSync(p,data)
-    return p;
+    return p
 }
 
 export const dynamicLoadJS = (path) =>{

@@ -24,12 +24,12 @@
       <template #header>
         <n-scrollbar x-scrollable>
           <div class="snippet-item-head__left">
-            <n-ellipsis >
+            <n-ellipsis>
               <!-- 标题 -->
               <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
+              <!-- 描述（标题右侧）  子代码片段 -->
+              <span class="snippet-item__desc">{{ configManager.get('strategy_item_code_show') > 0 ? snippet.desc: pair.sideInfo}}</span>
             </n-ellipsis>
-            <!-- 描述（标题右侧）  子代码片段 -->
-            <span class="snippet-item__desc">{{ configManager.get('strategy_item_code_show') > 0 ? snippet.desc: pair.sideInfo}}</span>
           </div>
         </n-scrollbar>
       </template>
@@ -38,7 +38,10 @@
         <n-scrollbar x-scrollable :size="10" style="max-width: 250px;margin-left: 5px">
           <div class="snippet-item__tags">
             <n-space :wrap="false">
-              <normal-tag v-for="item in snippet.tags" :key="item" :content="item" @tag-refresh="doItemRefresh"/>
+              <normal-tag v-for="item in snippet.tags"
+                          :key="item"
+                          :is-special="snippet.editor?.[item]"
+                          :content="item" @tag-refresh="doItemRefresh"/>
             </n-space>
           </div>
         </n-scrollbar>

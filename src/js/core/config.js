@@ -61,6 +61,18 @@ export const configManager = {
     },
     getSortKey(){
         return this.configs["strategy_sort"]?? 0;
+    },
+    /**
+     * @param {ConfPath} path
+     */
+    getSubItem(path){
+        return utools.db.get(NEW_GLOBAL_CONFIG + "/" + path)?.data
+    },
+    /**
+     * @param {ConfPath} path
+     * @param config
+     */
+    setSubItem(path,config){
+        utools_db_store(NEW_GLOBAL_CONFIG + "/" + path,config)
     }
-
 }

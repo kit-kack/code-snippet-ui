@@ -21,7 +21,7 @@
   <aid-tag-pane/>
 
   <variable-input-modal v-if="$reactive.common.variableActive"/>
-
+  <tag-color-change-modal v-if="$reactive.main.tagColorActive"/>
   <div id="extra" v-if="$reactive.currentMode=== LIST_VIEW && $reactive.main.isFullScreenShow" @mouseenter="expanded = true" @mouseleave="expanded = false">
     <template v-if="expanded || $reactive.main.isButtonFixed">
       <n-space vertical style="padding-bottom: 6px">
@@ -94,6 +94,7 @@ import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {configManager} from "../js/core/config";
 import TopNav from "../components/item/TopNav.vue";
 import {doScrollForListView} from "../js/utils/scroller";
+import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";
 const expanded = ref(false)
 window.$message = useMessage();
 window.$dialog = useDialog();

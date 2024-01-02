@@ -1,6 +1,7 @@
 import {utools_db_store} from "./base";
 
 const GLOBAL_TAGS = "tags";
+const NEW_GLOBAL_TAGS = "tag";
 export const tagColorManager={
     // tag Color Map
     // key: tag name
@@ -12,11 +13,29 @@ export const tagColorManager={
         if(this.isInited){
             return;
         }
-        this.tags = utools.db.get(GLOBAL_TAGS)?.data ?? {}
+        let data = utools.db.get(GLOBAL_TAGS)?.data;
+        if(data){
+            // convert
+            for (const tag in data) {
+                if(data[tag]){
+                    this.tags[tag] = null;
+                }else{
+                    this.tags[tag] = {
+                        "background": data[tag],
+                        "color": "white"
+                    }
+                }
+            }
+            // remove
+            this.writeToDB();
+            utools.db.remove(GLOBAL_TAGS)
+        }else{
+            this.tags = utools.db.get(NEW_GLOBAL_TAGS)?.data ?? {}
+        }
         this.isInited = true;
     },
     writeToDB(){
-        utools_db_store(GLOBAL_TAGS,this.tags)
+        utools_db_store(NEW_GLOBAL_TAGS,this.tags)
     },
 
     /**
@@ -24,10 +43,13 @@ export const tagColorManager={
      * @return {string} - color string
      */
     get(tag){
-        return this.tags[tag]?? (utools.isDarkColors()? '#5E5E5EFF':'#64696FAD');
+        return this.tags[tag]?? {
+            "background":utools.isDarkColors()?  "linear-gradient(135deg,#304352,#d7d2cc)": "#eaeaea",
+            "color": utools.isDarkColors()?  "#FFFFFF": "#929292"
+        };
     },
-    update(tag,color){
-        this.tags[tag] = color;
+    update(tag,style){
+        this.tags[tag] = style;
         this.writeToDB();
     },
     clear(tag){

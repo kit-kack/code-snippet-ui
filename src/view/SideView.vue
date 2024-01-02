@@ -40,6 +40,16 @@
             开启后，可以通过 name$num 搜索复制粘贴 name对应的num号子代码片段
           </n-tooltip>
         </n-space>
+        <n-space>
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <config-check-tag title="💡特殊标签" config="beta_special_tag"/>
+            </template>
+            开启后，为代码片段添加VSCode标签即可写入到VSCode代码片段中，IDEA、Sublime Text等同理
+            <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
+          </n-tooltip>
+          <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>
+        </n-space>
       </n-space>
       <n-divider>
         个性化设置
@@ -90,10 +100,12 @@ import ConfigCheckTag from "../components/base/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
 import FuncPane from "../components/pane/FuncEditPane.vue";
-import {refreshListView, refreshSearchResult} from "../js/store";
+import {$reactive, refreshListView, refreshSearchResult} from "../js/store";
 import CustomView from "../components/pane/CustomPane.vue";
 import {generate_backup, load_backup} from "../js/core/backup";
 import {backupFilePath} from "../js/some";
+import BaseModal from "../components/modal/BaseModal.vue";
+import SpecialTagConfigModal from "../components/modal/SpecialTagConfigModal.vue";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);

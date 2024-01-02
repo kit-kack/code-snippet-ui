@@ -1,5 +1,8 @@
 import {codeSnippetManager} from "../core/snippet";
 import {GLOBAL_HIERARCHY} from "./core";
+import {configManager} from "../core/config";
+import {SPECIAL_TAG_HANDLER} from "../editor/editor";
+import {defaultHelpSnippet} from "../some";
 
 /**
  *
@@ -42,6 +45,10 @@ export const rootHierachy = {
         return codeSnippetManager.contain(name,GLOBAL_HIERARCHY.currentPrefixIdStr)
     },
     createOrEdit(prefix,snippet,oldName){
+        // editor
+        if(configManager.get('beta_special_tag')){
+            SPECIAL_TAG_HANDLER.accept(snippet,true)
+        }
         if(oldName){
             // update
             codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)
@@ -51,6 +58,14 @@ export const rootHierachy = {
         }
     },
     remove(prefix,snippet){
+        if(snippet.id === defaultHelpSnippet.id){
+            configManager.set('readme_close',true)
+            return;
+        }
+        // editor
+        if(configManager.get('beta_special_tag')){
+            SPECIAL_TAG_HANDLER.accept(snippet,false)
+        }
         codeSnippetManager.del(snippet.id,GLOBAL_HIERARCHY.currentPrefixIdStr)
     }
 }

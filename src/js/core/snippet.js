@@ -1,4 +1,4 @@
-import {defaultHelpSnippet} from "../some";
+import {defaultHelpSnippet, localConfigDirPath} from "../some";
 import {match} from "../utils/fuzzy";
 import {utools_db_store} from "./base";
 import {tagColorManager} from "./tag";
@@ -93,10 +93,6 @@ export const codeSnippetManager = {
      * @param {string | null} prefix
      */
     del(id,prefix){
-        if(id === defaultHelpSnippet.id){
-            configManager.set('readme_close',true)
-            return;
-        }
         let snippet = null;
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix);
@@ -265,7 +261,7 @@ export const codeSnippetManager = {
                         const customJSZip = zip.file(`${dirname}/custom/${obj.count}.custom.js`)
                         if(customJSZip){
                             // 写入文件
-                            obj.data.path = window.preload.writeConfigFile(`./${obj.count}.custom.js`,await customJSZip.async("string"))
+                            obj.data.path = window.preload.writeConfigFile(localConfigDirPath,`./${obj.count}.custom.js`,await customJSZip.async("string"))
                         }
                     }
                     // 注册关键字

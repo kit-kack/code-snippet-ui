@@ -114,6 +114,9 @@ const $reactive = reactive({
     main:{
         // 【辅助标签选择】界面
         aidTagActive: false,
+        // tagColor
+        tagColorActive: false,
+        tagName: null,
         // 【设置】界面
         settingActive: false,
         // 是否固定按钮
@@ -132,6 +135,8 @@ const $reactive = reactive({
     setting:{
         // 【占位符编辑】界面
         funcEditActive: false,
+        // 特殊标签配置 界面
+        specialTagConfigActive: false,
     },
     // 插件应用重启
     appRestart: false,
