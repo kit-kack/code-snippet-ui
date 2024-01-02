@@ -11,16 +11,17 @@ declare interface CodeSnippetCore{
     code?: string,
     // 路径 (本地 或者 网络)，设置该属性后该代码片段将成为 关联文件
     path?: string,
+    link?: boolean,  // 对应设置path项而言，是否为单纯的链接导向，而无法查看内容
     // 是否为(普通)目录
     dir?: boolean,
     // ================================================
-
     // 代码片段描述部分
     desc?: string,
     // 标签
     tags?: string[],
     // 代码片段 语言类型
     type?: string,
+
 
     //  如果你不使用内置排序策略，其实没必要设置下面这些属性
     // 上次访问代码片段时间, 使用时间戳表示
@@ -46,7 +47,12 @@ declare interface CodeSnippet extends CodeSnippetCore{
     // now: 主动用于避免搜索数据重复使用
     now?: number
     // 高亮匹配
-    temp?: string
+    temp?: string,
+    editor: {
+        vscode: boolean,
+        sublime_text: boolean,
+        idea: boolean
+    }
 }
 
 declare interface Func {
@@ -103,9 +109,7 @@ declare interface HierarchyConfig{
     /**
      * 预置格式化占位符
      */
-    funcs?: {
-        [key: string]: (param) => any;
-    }
+    funcs?: Record<string, (param) => any>
 }
 declare type SearchResult = CodeSnippet[] | {
     /**
@@ -117,29 +121,40 @@ declare type SearchResult = CodeSnippet[] | {
      */
     highlighted: boolean,
     /**
+     * 是否未进行依据搜索词进行过滤；若为true，则使用插件内置搜索过滤策略
+     */
+    unfiltered: boolean,
+    /**
      * 代码片段结果集
      */
     snippets: CodeSnippet[]
 }
-// 基本定义
-declare interface Hierarchy{
+declare interface HierarchyCore{
+    conf?: {
+        [key: string]:{
+            name: string,
+            value?: string | string[]
+        }
+    },
+
     /**
-     * 是否为内置核心；该属性不暴露设置
+     * 关联目录初始化,抛出异常则初始化失败
      */
-    core?: boolean,
-    inline?: boolean,
+    init?: (conf: {
+        [key in keyof typeof this.conf & string]: string
+    })=> void | never,
     /**
      * 查询代码片段
      * @param prefix 当前目录层级前缀
      * @param search 处理过的搜索词
-     * @param topList 已置顶的代码片段（修改没有作用，只能用来获取）
+     * @param ext
      * @return
      */
-    search(prefix:string[],search: string | null,topList: string[]): SearchResult  | Promise<SearchResult>,
+    search(prefix:CodeSnippet[],search: string | null,ext: any): SearchResult  | Promise<SearchResult>,
     /**
      * 判断代码片段名是否重复
      */
-    checkNameRepeat?: (prefix: string[] | null, name: string) => boolean;
+    checkNameRepeat?: (prefix: CodeSnippet[], name: string) => boolean;
     /**
      * 新增或修改 代码片段
      * （当oldName不为空时为修改操作，否则为新增操作）
@@ -147,17 +162,60 @@ declare interface Hierarchy{
      * @param {CodeSnippet} snippet 代码片段
      * @param {string} oldName 如果不为空则为修改操作，否则为新增操作
      */
-    createOrEdit?: (prefix: string[] | null, snippet: CodeSnippet, oldName?: string) => void;
+    createOrEdit?: (prefix: CodeSnippet[], snippet: CodeSnippet, oldName?: string,ext: any) => void;
     /**
      * 删除代码片段
      * @param {string} name
      */
-    remove?: (prefix:string[] | null,snippet: CodeSnippet) => void;
+    remove?: (prefix:CodeSnippet[],snippet: CodeSnippet) => void;
     /**
      * 获取配置
      */
-    getConfig?: (prefix:string[] | null) => HierarchyConfig;
+    getConfig?: (prefix:CodeSnippet[]) => HierarchyConfig;
+    /**
+     * 解析数据
+     */
+    resolveUrl?: (url: string,type: string) => Promise<string>;
 }
+// 基本定义
+declare interface Hierarchy extends HierarchyCore{
+    /**
+     * 是否为内置核心；该属性不暴露设置
+     */
+    core?: boolean,
+    inline?: boolean,
+}
+declare interface Editor{
+    /**
+     * 写入代码片段
+     * @param {string} name 代码片段名，一般为缩写
+     * @param {string} code 代码片段内容
+     * @param {string} desc 描述
+     * @param {string} dir 存放目录
+     */
+    update(dir: string ,name: string,code: string,desc?: string),
+
+    /**
+     * 移除代码片段
+     * @param {string} name 代码片段名，一般为缩写
+     * @param {string} dir 存放目录
+     */
+    remove(dir: string,name: string)
+}
+declare interface EditorConfig{
+    tags:{
+        "VSCode":{
+            enabled: true,
+            path: "xxxx"
+        },
+        "Sublime Text":{
+            enabled: true,
+            path: "xxxx"
+        }
+    }
+}
+declare type ConfPath =
+    "editor"
 
 declare type ConfigItem =
       "strategy_theme"                           // 主题
@@ -169,6 +227,7 @@ declare type ConfigItem =
     | "default_keyword_enable"                       // 默认是否启用uTools关键字
     | "beta_tag_aid_choose"                      // 标签辅助选择
     | "beta_sub_snippet_search"                  // 允许搜索子代码片段
+    | "beta_special_tag"                         // 特殊标签
     | "version"                                  // 插件版本
     | "lite"                                     // 列表UI模式
     | "readme_close"                             // 说明文档显示

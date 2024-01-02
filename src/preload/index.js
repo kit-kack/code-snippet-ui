@@ -34,9 +34,13 @@ export const writeConfigFile = (dir,filename,data)=>{
     return p
 }
 
-export const dynamicLoadJS = (path) =>{
+export const dynamicLoadJS = (p) =>{
     try{
-        return require(path)
+        // compare with "utools://git-repo.js"
+        if(p.startsWith('utools://')){
+            p = path.join(__dirname,'hierarchy',p.slice(9))
+        }
+        return require(p)
     }catch (e){
         utools.showNotification('JS文件解析错误：' + e.message);
         return null

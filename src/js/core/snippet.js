@@ -232,7 +232,11 @@ export const codeSnippetManager = {
         let count = 0;
         for (const doc of utools.db.allDocs(CODE_PREFIX)) {
             if(doc.data.ref === "custom"){
-                zip.file(`${dirname}/custom/${count}.custom.js`,window.preload.readFile(doc.data.path).toString())
+                if(!doc.data.path.startsWith("utools://")){
+                    try{
+                        zip.file(`${dirname}/custom/${count}.custom.js`,window.preload.readFile(doc.data.path).toString())
+                    }catch (_){}
+                }
             }
             zip.file(`${dirname}/${count}.json`,JSON.stringify({
                 data: doc.data,
@@ -258,10 +262,16 @@ export const codeSnippetManager = {
                 const obj = JSON.parse(await item.async("string"))
                 if(obj._id && obj.data){
                     if(obj.data.ref === "custom"){
-                        const customJSZip = zip.file(`${dirname}/custom/${obj.count}.custom.js`)
-                        if(customJSZip){
-                            // 写入文件
-                            obj.data.path = window.preload.writeConfigFile(localConfigDirPath,`./${obj.count}.custom.js`,await customJSZip.async("string"))
+                        if(!obj.data.path.startsWith("utools://")){
+                            const customJSZip = zip.file(`${dirname}/custom/${obj.count}.custom.js`)
+                            if(customJSZip){
+                                try{
+                                    // 写入文件
+                                    obj.data.path = window.preload.writeConfigFile(localConfigDirPath,`./${obj.count}.custom.js`,await customJSZip.async("string"))
+                                }catch (_){
+                                    obj.data.path = "not found"
+                                }
+                            }
                         }
                     }
                     // 注册关键字

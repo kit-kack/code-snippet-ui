@@ -193,21 +193,13 @@
                   </n-divider>
                   <n-button @click="importLocalDir" quaternary type="primary" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">本地目录</n-button>
                   <n-button @click="setAsNormalDir" quaternary type="info" >普通目录</n-button>
-                  <n-popover v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">
-                    <template #trigger>
-                      <n-button @click="importHierarchyJS" quaternary type="error" >💡自定义目录(代码实现)</n-button>
-                    </template>
-                    <n-button type="info" @click="utools_browser_open('https://flowus.cn/share/87c95fcc-e9f2-420d-a6d3-6578cd424e58')" text>查看教程</n-button>
-                  </n-popover>
+                  <n-button @click="showCustomHiearchyModal = true" quaternary type="error" >自定义目录</n-button>
                 </template>
               </template>
             </n-tab-pane>
           </n-tabs>
         </template>
       </n-form-item>
-
-
-
 
       <div id="form-btn">
         <n-tooltip trigger="hover">
@@ -242,6 +234,16 @@
     <n-scrollbar style="max-height: 60vh;width:100%;padding-right:10px" :x-scrollable="false">
       <func-select-pane @choose="handleChooseCommand"/>
     </n-scrollbar>
+  </n-modal>
+  <n-modal v-model:show="showCustomHiearchyModal" preset="card" title="自定义目录" style="width: 66%" :auto-focus="false">
+    <n-popover>
+      <template #trigger>
+        <n-button @click="importHierarchyJS" quaternary type="primary" >💡本地代码实现</n-button>
+      </template>
+      <n-button type="info" @click="utools_browser_open('https://flowus.cn/share/87c95fcc-e9f2-420d-a6d3-6578cd424e58')" text>查看教程</n-button>
+    </n-popover>
+    <n-divider title-placement="left">预设</n-divider>
+    <n-button @click="openHierarchyJS('utools://git-repo.js')" quaternary>Github/Gitee</n-button>
   </n-modal>
 </template>
 
@@ -283,6 +285,7 @@ const currentTab = ref((codeTemplate.path || codeTemplate.dir)? 'link':(formProp
 const codeTextArea = ref()
 const showInternetLinkModal = ref(false)
 const showFuncModal = ref(false)
+const showCustomHiearchyModal = ref(false)
 const url = ref()
 const linkDesc = computed(()=>{
   if(codeTemplate.dir){
@@ -697,6 +700,9 @@ function openConfModal(config){
     $message.warning('无配置项')
     return
   }
+  if(!codeTemplate.conf){
+    codeTemplate.conf = {}
+  }
   const variables = [];
   const defaultValues = {};
   for (let key in config) {
@@ -728,6 +734,23 @@ function syncData(results){
   }
   codeTemplate.conf = obj;
 }
+function openHierarchyJS(path){
+  if(showCustomHiearchyModal.value){
+    showCustomHiearchyModal.value = false
+  }
+  const hierarchy = loadValidHierarchyJS(path);
+  if(hierarchy){
+    codeTemplate.path = path;
+    // 解析类型
+    codeTemplate.dir = true;
+    codeTemplate.ref = "custom";
+    if(hierarchy.conf){
+      openConfModal(hierarchy.conf);
+    }
+  }else {
+    $message.warning("无效的自定义目录代码实现文件")
+  }
+}
 function importHierarchyJS(){
   const realPathList = utools.showOpenDialog({
     title: '指定你的【自定义目录】代码实现文件' ,
@@ -744,18 +767,7 @@ function importHierarchyJS(){
     ]
   })
   if (realPathList != null) {
-    const hierarchy = loadValidHierarchyJS(realPathList[0]);
-    if(hierarchy){
-      codeTemplate.path = realPathList[0];
-      // 解析类型
-      codeTemplate.dir = true;
-      codeTemplate.ref = "custom";
-      if(hierarchy.conf){
-        openConfModal(hierarchy.conf);
-      }
-    }else {
-      $message.warning("无效的自定义目录代码实现文件")
-    }
+    openHierarchyJS(realPathList[0])
   }
 }
 function setAsNormalDir() {

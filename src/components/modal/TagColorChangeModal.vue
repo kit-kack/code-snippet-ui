@@ -5,7 +5,7 @@
       color: instance.color
     }"   :bordered="false" size="small"  > {{$reactive.main.tagName}}
     </n-tag>
-    <h5 @click="instance.picker = !instance.picker">背景色</h5>
+    <h5 @click="instance.picker = !instance.picker">背景色(点击切换)</h5>
     <template v-if="instance.picker">
       <n-color-picker
           style="width: 50%"

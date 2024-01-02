@@ -7,9 +7,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "release": "standard-version",
-    "release-major": "standard-version --release-as major",
-    "release-minor": "standard-version --release-as minor",
-    "release-patch": "standard-version --release-as patch"
+    "X.*.*": "standard-version --release-as major",
+    "*.X.*": "standard-version --release-as minor",
+    "*.*.X": "standard-version --release-as patch"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
