@@ -243,7 +243,7 @@
       <n-button type="info" @click="utools_browser_open('https://flowus.cn/share/87c95fcc-e9f2-420d-a6d3-6578cd424e58')" text>查看教程</n-button>
     </n-popover>
     <n-divider title-placement="left">预设</n-divider>
-    <n-button @click="openHierarchyJS('utools://git-repo.js')" quaternary>Github/Gitee</n-button>
+    <n-button @click="openHierarchyJS('plugin://git-repo.js')" quaternary>Github/Gitee</n-button>
   </n-modal>
 </template>
 

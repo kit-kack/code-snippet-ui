@@ -232,7 +232,7 @@ export const codeSnippetManager = {
         let count = 0;
         for (const doc of utools.db.allDocs(CODE_PREFIX)) {
             if(doc.data.ref === "custom"){
-                if(!doc.data.path.startsWith("utools://")){
+                if(!doc.data.path.startsWith("plugin://")){
                     try{
                         zip.file(`${dirname}/custom/${count}.custom.js`,window.preload.readFile(doc.data.path).toString())
                     }catch (_){}
@@ -262,7 +262,7 @@ export const codeSnippetManager = {
                 const obj = JSON.parse(await item.async("string"))
                 if(obj._id && obj.data){
                     if(obj.data.ref === "custom"){
-                        if(!obj.data.path.startsWith("utools://")){
+                        if(!obj.data.path.startsWith("plugin://")){
                             const customJSZip = zip.file(`${dirname}/custom/${obj.count}.custom.js`)
                             if(customJSZip){
                                 try{

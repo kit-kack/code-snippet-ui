@@ -36,8 +36,8 @@ export const writeConfigFile = (dir,filename,data)=>{
 
 export const dynamicLoadJS = (p) =>{
     try{
-        // compare with "utools://git-repo.js"
-        if(p.startsWith('utools://')){
+        // compare with "plugin://git-repo.js"
+        if(p.startsWith('plugin://')){
             p = path.join(__dirname,'hierarchy',p.slice(9))
         }
         return require(p)
