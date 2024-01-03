@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="修改标签配色" @cancel="$reactive.main.tagColorActive = false" @confirm="store()">
+  <base-modal title="修改标签配色" @cancel="operate(false)" @confirm="operate(true)">
     <n-tag class="tag" :style="{
       background: instance.background,
       color: instance.color
@@ -39,7 +39,7 @@
 
 <script setup>
 import BaseModal from "./BaseModal.vue";
-import {$reactive, refreshSearchResult} from "../../js/store";
+import {$reactive, handleRecoverLiteShow, refreshSearchResult} from "../../js/store";
 import {tagColorManager} from "../../js/core/tag";
 import {ref} from "vue";
 
@@ -85,14 +85,16 @@ function changePreset(index){
   instance.value.background = DEFAULT_INSTANCE[index].background
   instance.value.color = DEFAULT_INSTANCE[index].color
 }
-function store(){
-  tagColorManager.update($reactive.main.tagName,{
-    background:  instance.value.background,
-    color:  instance.value.color
-  })
+function operate(confirm){
+  if(confirm){
+    tagColorManager.update($reactive.main.tagName,{
+      background:  instance.value.background,
+      color:  instance.value.color
+    })
+    refreshSearchResult()
+  }
+  handleRecoverLiteShow();
   $reactive.main.tagColorActive = false
-  // refreshListView();
-  refreshSearchResult()
 }
 </script>
 

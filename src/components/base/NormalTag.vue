@@ -32,7 +32,7 @@
 
 import {computed} from "vue";
 import {tagColorManager} from "../../js/core/tag";
-import {$normal, $reactive} from "../../js/store";
+import {$reactive, switchToFullUIMode} from "../../js/store";
 
 const props = defineProps({
   "content": String,
@@ -54,6 +54,7 @@ function handleClose(){
 }
 function handleTagClick(){
   $reactive.main.tagName = props.content;
+  switchToFullUIMode();
   $reactive.main.tagColorActive = true;
 }
 

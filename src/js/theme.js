@@ -148,7 +148,9 @@ function getThemeOverrides(){
             borderPressed: border,
             textColorPressed: utools.isDarkColors()? 'white': 'black',
             textColorHover: gc,
-            textColorFocus: gc
+            textColorFocus: gc,
+            textColorTextHover: gc,
+            textColorTextFocus: gc,
         },
         Tabs:{
             tabTextColorHoverLine: gc,
@@ -157,6 +159,11 @@ function getThemeOverrides(){
             tabTextColorHoverBar: gc,
             barColor: gc
         },
+        Checkbox:{
+            colorChecked: gc,
+            borderChecked: border,
+            borderFocus: border,
+        }
         // DynamicTags:{
         //     peers:{
         //         Tag:{

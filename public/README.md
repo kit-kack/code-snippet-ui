@@ -6,7 +6,7 @@
 2. <span style="color:red">重构</span> 【自定义目录】实现，并提供预设方案`预览Gitee/Github仓库代码`
 3. <span style="color:green">新增</span> Beta功能-`特殊标签`
 4. <span style="color:skyblue">完善</span> 占位符处理
-<hr/>
+---
 
 [[TOC]]
 
@@ -190,6 +190,8 @@ hello, {{clipboard}}  // 返回剪切板复制内容
 > 该功能同样适用于**聚合模式**下的uTools搜索框直接搜索功能
 
 ### 3.3 特殊标签✨
+> 仅适用于 根目录及其普通目录下的普通代码片段
+
 开启后，为代码片段添加`VSCode`标签即可写入到`VSCode`代码片段中，`IDEA`、`Sublime Text`等同理
 > 前提需要配置：勾选应用，并配置相应 官方代码片段存放目录 路径
 

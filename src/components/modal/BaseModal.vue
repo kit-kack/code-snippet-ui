@@ -21,7 +21,7 @@
           </n-tooltip>
           <n-tooltip trigger="hover">
             <template #trigger>
-              <n-button :focusable="false" quaternary type="success" @click="$emit('confirm')">确定 (S)</n-button>
+              <n-button :focusable="false" quaternary :color="$normal.theme.globalColor" @click="$emit('confirm')">确定 (S)</n-button>
             </template>
             {{CtrlStr+'+S'}}
           </n-tooltip>

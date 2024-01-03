@@ -505,6 +505,9 @@ onUnmounted(()=>{
   background-size: 20px 20px;
   background-position: 50%;
 
+  hr{
+    height: 2px !important;
+  }
   h1{
     text-align: center;
     border-bottom-color: transparent;
@@ -576,6 +579,9 @@ onUnmounted(()=>{
 
   blockquote{
     border-left-color: #515154;
+  }
+  hr{
+    background-color: #515154;
   }
 
   h1,h2{
