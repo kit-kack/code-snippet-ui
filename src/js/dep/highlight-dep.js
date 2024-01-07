@@ -13,11 +13,11 @@ import css from 'highlight.js/lib/languages/css'
 // import cmake from 'highlight.js/lib/languages/cmake'
 // d: dart diff dockerfile
 import dart from 'highlight.js/lib/languages/dart'
-// import dockerfile from 'highlight.js/lib/languages/dockerfile'
+import dockerfile from 'highlight.js/lib/languages/dockerfile'
 // e: erlang
 import erlang from 'highlight.js/lib/languages/erlang'
 // f: f# fortan
-import fsharp from 'highlight.js/lib/languages/fsharp'
+// import fsharp from 'highlight.js/lib/languages/fsharp'
 // import fortan from 'highlight.js/lib/languages/fortran'
 // g: go graphql groovy
 import go from 'highlight.js/lib/languages/go'
@@ -85,8 +85,9 @@ const languages = {
     "cpp": cpp,
     "css": css,
     "dart": dart,
+    "dockerfile": dockerfile,
     "erlang": erlang,
-    "fsharp": fsharp,
+    // "fsharp": fsharp,
     "go": go,
     "graphql": graphql,
     "groovy": groovy,
