@@ -49,6 +49,16 @@ export const rootHierachy = {
         if(configManager.get('beta_special_tag')){
             SPECIAL_TAG_HANDLER.accept(snippet,true)
         }
+        // sync
+        snippet.nativeId = undefined;
+        if(snippet.path){
+            snippet.nativeId = utools.getNativeId();
+        }
+        if(snippet.ref){
+            if(!snippet.ref.startsWith('plugin://')){
+                snippet.nativeId = utools.getNativeId();
+            }
+        }
         if(oldName){
             // update
             codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)

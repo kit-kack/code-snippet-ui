@@ -115,10 +115,12 @@ export function convertValidFileSuffix(type){
 }
 
 export function fullAlias(type){
-    if(type.length>2 && type.startsWith('x-')){
-        return 'x-'+_alias(type.slice(2))
-    }else {
-        return _alias(type);
+    if(type){
+        if(type.length>2 && type.startsWith('x-')){
+            return 'x-'+_alias(type.slice(2))
+        }else {
+            return _alias(type);
+        }
     }
 }
 

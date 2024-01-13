@@ -19,8 +19,14 @@ export const codeSnippetManager = {
         if (this.isInited) {
             return;
         }
+        const nativeId = utools.getNativeId();
         for (const doc of utools.db.allDocs(CODE_PREFIX)) {
             const payload = doc.data;
+            if(payload.nativeId){
+                if(payload.nativeId !== nativeId){
+                    continue;
+                }
+            }
             if(payload.count == null){
                 payload.count = 0;
             }
@@ -192,6 +198,7 @@ export const codeSnippetManager = {
          * @type {CodeSnippet[]}
          */
         let list = [];
+        // const searchContent = configManager.get('beta_content_search')
         if(name){
             for (const codeSnippet of map.values()) {
                 const result = match(name,codeSnippet.name)
@@ -199,6 +206,18 @@ export const codeSnippetManager = {
                     codeSnippet.temp = result;
                     list.push(codeSnippet)
                 }
+                // else if(searchContent){
+                //     //
+                //     if(codeSnippet.dir || codeSnippet.path || codeSnippet.link){
+                //         continue;
+                //     }
+                //     if(codeSnippet.code){
+                //         const lowercaseCode = codeSnippet.code.toLowerCase();
+                //         if(lowercaseCode.includes(name)){
+                //             list.push(codeSnippet)
+                //         }
+                //     }
+                // }
             }
         }else{
             for (let codeSnippet of map.values()) {

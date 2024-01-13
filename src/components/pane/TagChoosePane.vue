@@ -37,13 +37,22 @@ function updateTagCheck(tag,flag){
     // add
     if(!lowercaseIncludes($normal.beta.tempTags,tag)){
       // 修改uTools输入框
-      utools.setSubInputValue(`#${tag} ${$reactive.utools.search}`)
+      if(tag.includes(' ')){
+        tag = '#'+tag+'#'
+      }else{
+        tag = '#'+tag;
+      }
+      utools.setSubInputValue(`${tag} ${$reactive.utools.search}`)
     }
   }else{
     // del
     if(lowercaseIncludes($normal.beta.tempTags,tag)){
       // 删除
-      tag = '#'+tag;
+      if(tag.includes(' ')){
+        tag = '#'+tag+'#'
+      }else{
+        tag = '#'+tag;
+      }
       utools.setSubInputValue($reactive.utools.search.replace(new RegExp(tag,'gi'),'').trim())
     }
   }

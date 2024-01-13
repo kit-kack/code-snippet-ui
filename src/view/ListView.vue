@@ -41,7 +41,6 @@ import ListItem from "../components/ListItem.vue";
 import {DynamicScroller, DynamicScrollerItem} from "vue-virtual-scroller";
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import {computed, onMounted} from "vue";
-import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";
 const cursorStyle = computed(()=>{
   return $reactive.main.isCursorShow? '': 'none';
 })

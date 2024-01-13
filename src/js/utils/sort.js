@@ -35,6 +35,8 @@ const COUNT_COMPARE  = _compare("count");
 
 
 export function handleArrayForHierarchy(result,name,tags,type){
+    console.log(name,tags,type)
+    console.log(result)
     if(_isEmpty(result.snippets)){
         return [];
     }
@@ -82,7 +84,7 @@ export function handleArrayForHierarchy(result,name,tags,type){
         }
         // type filter
         if(type){
-            if (type.length === 0) {  // dir
+            if (type === '@') {  // dir
                 if(!snippet.dir){
                     continue;
                 }

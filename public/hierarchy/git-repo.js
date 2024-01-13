@@ -112,7 +112,7 @@ module.exports = {
             }
         }
     },
-    async search(prefix, search) {
+    async search(prefix) {
         if(!this.subModuleLoaded){
             let res = await fetch(this.requestInfo.subModuleUrl,this.requestInfo.options);
             if(res.status === 200){

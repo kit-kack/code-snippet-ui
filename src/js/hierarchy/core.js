@@ -19,6 +19,7 @@ import {nextTick, toRaw} from "vue";
 import {codeSnippetManager} from "../core/snippet";
 import {defaultHelpSnippet} from "../some";
 import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
+import {resolveSearchWord} from "../utils/fuzzy"
 import {isFunction as _isFunction, isArray as _isArray } from "lodash-es";
 
 
@@ -242,7 +243,7 @@ export const GLOBAL_HIERARCHY = {
         $normal.beta.subSnippetNum = undefined;
         let name = null;
         let type = null;
-        let tags = [];
+        let tags = null;
         if(searchWord == null || searchWord.length === 0){
             $reactive.main.aidTagActive = false;
             $normal.beta.tempTags = [];
@@ -270,39 +271,11 @@ export const GLOBAL_HIERARCHY = {
             }
 
         }else{
-            const words = searchWord.split(/\s/).filter(v=>v.length>=1)
-            let tagFlag = false;
-            for (let word of words) {
-                if(word[0] === '@'){
-                    if(word.length !== 1){
-                        type = word.slice(1)
-                    }else{
-                        type = '';
-                    }
-                }else if(word[0] === '#'){
-                    if(word.length !== 1){
-                        tags.push(word.slice(1))
-                    }else{
-                        tagFlag = true;
-                    }
-                }else{
-                    if(configManager.get('beta_sub_snippet_search')){
-                        const index = word.lastIndexOf('$')
-                        if(index !== -1){
-                            name = word.slice(0,index)
-                            $normal.beta.subSnippetNum = (+word.slice(index+1))??1;
-                        }else{
-                            name =  word;
-                        }
-                    }else{
-                        name = word;
-                    }
-                }
-            }
-            if(name){
-                name = name.toLowerCase()
-            }
-            $reactive.main.aidTagActive = (tagFlag && configManager.get('beta_tag_aid_choose'));
+            const aspects = resolveSearchWord(searchWord)
+            name = aspects.word
+            type = aspects.type
+            tags = aspects.tags
+            $reactive.main.aidTagActive = (aspects.tagFlag && configManager.get('beta_tag_aid_choose'));
             $normal.beta.tempTags = tags;
             try{
                 $reactive.utools.vimDisabled = true;

@@ -619,4 +619,7 @@ onUnmounted(()=>{
   }
 }
 
+.v-md-pre-wrapper.copy-code-mode .v-md-copy-code-btn:active{
+  box-shadow: none;
+}
 </style>

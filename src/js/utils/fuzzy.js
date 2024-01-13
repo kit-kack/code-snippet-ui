@@ -1,4 +1,6 @@
 import {isArray as _isArray} from "lodash-es"
+import {configManager} from "../core/config";
+import {$normal} from "../store";
 const chineseRegex=/[\u4E00-\u9FA5]/
 
 /**
@@ -78,5 +80,63 @@ export function match(query,target){
         }
     }
     return null;
+}
+
+
+/**
+ * @param {string} searchWord
+ */
+export function resolveSearchWord(searchWord){
+    const tags = [];
+    let type;
+    let tagFlag = false;
+    let lastBlock= 0;
+    let word = searchWord.split(/\s/)
+        .filter(v=>{
+            if(v){
+                const first = v[0];
+                // @
+                if(first === '@'){
+                    type = v.slice(1);
+                    lastBlock = 1;
+                }else if(first === '#'){
+                    if (v.length !== 1) {
+                        tags.push(v.slice(1))
+                        lastBlock = 2;
+                    }else{
+                        tagFlag = true;
+                    }
+                }else{
+                    if(lastBlock){
+                        const last = v[v.length-1];
+                        if(lastBlock === 1){
+                            if(last === '@'){
+                                type = type + ' ' + v.slice(0,v.length-1);
+                                return false
+                            }
+                        }else if(lastBlock === 2){
+                            if(last === '#'){
+                                tags[tags.length - 1] = tags.at(-1) + ' ' + v.slice(0,v.length-1);
+                                return false
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+        })
+        .join(' ');
+    if(configManager.get('beta_sub_snippet_search')){
+        const index = word.lastIndexOf('$')
+        if(index !== -1){
+            $normal.beta.subSnippetNum = (+word.slice(index+1))??1;
+            word = word.slice(0,index)
+        }
+    }
+    if(word){
+        word = word.trim().toLowerCase();
+    }
+    console.log({word,type,tagFlag,tags})
+    return {word,type,tagFlag,tags}
 }
 

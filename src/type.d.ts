@@ -52,7 +52,8 @@ declare interface CodeSnippet extends CodeSnippetCore{
         vscode: boolean,
         sublime_text: boolean,
         idea: boolean
-    }
+    },
+    nativeId?: string
 }
 
 declare interface Func {
@@ -202,18 +203,6 @@ declare interface Editor{
      */
     remove(dir: string,name: string)
 }
-declare interface EditorConfig{
-    tags:{
-        "VSCode":{
-            enabled: true,
-            path: "xxxx"
-        },
-        "Sublime Text":{
-            enabled: true,
-            path: "xxxx"
-        }
-    }
-}
 declare type ConfPath =
     "editor"
 
@@ -228,6 +217,7 @@ declare type ConfigItem =
     | "beta_tag_aid_choose"                      // 标签辅助选择
     | "beta_sub_snippet_search"                  // 允许搜索子代码片段
     | "beta_special_tag"                         // 特殊标签
+    | "beta_content_search"                      // 允许搜索内容
     | "version"                                  // 插件版本
     | "lite"                                     // 列表UI模式
     | "readme_close"                             // 说明文档显示
