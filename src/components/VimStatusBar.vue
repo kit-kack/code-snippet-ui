@@ -2,7 +2,7 @@
   <div id="extra-left" v-if="show" >
     <n-tooltip trigger="hover" >
       <template #trigger>
-        <n-button  round strong  :="getBtnStyle()" @click="handleVimStatusBarClick()">
+        <n-button :focusable="false"  round strong  :="getBtnStyle()" @click="handleVimStatusBarClick()">
           <template #icon>
             <svg :fill="$reactive.currentMode < EDIT_VIEW? configManager.getGlobalColor():'white'"
                  version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 512 512"

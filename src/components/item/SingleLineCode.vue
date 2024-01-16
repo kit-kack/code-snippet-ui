@@ -22,7 +22,7 @@ const pair = ref(getRealTypeAndValidStatus(props.type))
  * @return {*}
  */
 function handleCode(code){
-  return code.slice(0,200).replaceAll("\n",'↩')
+  return code.slice(0,200).replaceAll("\n",'↩\n')
 }
 onUpdated(()=>{
   pair.value = getRealTypeAndValidStatus(props.type)

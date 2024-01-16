@@ -40,6 +40,7 @@
             filterable
             multiple
             tag
+            show-on-focus
             :placeholder="placeholders?.tags ?? '可选：请选择或输入标签'"
             :show-arrow="false"
             :options="tags"

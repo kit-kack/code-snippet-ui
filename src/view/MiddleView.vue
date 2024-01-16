@@ -82,7 +82,7 @@
 import SideView from "./SideView.vue";
 import VimStatusBar from "../components/VimStatusBar.vue";
 import ShortcutPane from "../components/pane/ShortcutPane.vue";
-import {ref, watch} from "vue";
+import {defineAsyncComponent, ref, watch} from "vue";
 import {NButton, useDialog, useMessage} from 'naive-ui'
 import VariableInputModal from "../components/modal/VariableInputModal.vue";
 import {$list, $normal, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, refreshListView} from "../js/store";
