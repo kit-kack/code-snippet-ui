@@ -121,6 +121,8 @@ export function fullAlias(type){
         }else {
             return _alias(type);
         }
+    }else {
+        return ''
     }
 }
 

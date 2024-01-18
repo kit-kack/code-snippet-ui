@@ -85,6 +85,7 @@ function modifyCSSVar(){
 function getThemeOverrides(){
     configManager.init();
     const gc = $normal.theme.globalColor;
+    const bg = $normal.theme.selectedColor;
     const borderHover = `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
     const border = `1px solid ${gc}`
     const textOrCaretColorVar =  utools.isDarkColors()? 'white': '#4b4e51';
@@ -94,6 +95,13 @@ function getThemeOverrides(){
     const borderFoucs =  `1px solid ${utools.isDarkColors()? '#737475':'#aaa'}`
 
     return {
+        Breadcrumb:{
+            itemTextColorHover: gc,
+            itemTextColorPressed: gc,
+            itemColorHover: bg,
+            itemColorPressed:bg,
+            fontSize: '12px'
+        },
         Switch:{
             railColorActive: gc
         },

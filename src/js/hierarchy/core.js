@@ -19,7 +19,7 @@ import {nextTick, toRaw} from "vue";
 import {codeSnippetManager} from "../core/snippet";
 import {defaultHelpSnippet} from "../some";
 import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
-import {resolveSearchWord} from "../utils/fuzzy"
+import {resolveSearchWord} from "../utils/resolve"
 import {isFunction as _isFunction, isArray as _isArray } from "lodash-es";
 
 
@@ -246,7 +246,7 @@ export const GLOBAL_HIERARCHY = {
         let tags = null;
         if(searchWord == null || searchWord.length === 0){
             $reactive.main.aidTagActive = false;
-            $normal.beta.tempTags = [];
+            $reactive.main.selectedTag = null;
             try{
                 $reactive.utools.vimDisabled = true;
                 if(this.lastSearchResult) {
@@ -272,11 +272,19 @@ export const GLOBAL_HIERARCHY = {
 
         }else{
             const aspects = resolveSearchWord(searchWord)
+            if (aspects.word){
+                if(configManager.get('beta_sub_snippet_search')){
+                    const index = aspects.word.lastIndexOf('$')
+                    if(index !== -1){
+                        $normal.beta.subSnippetNum = (+aspects.word.slice(index+1))??1;
+                        aspects.word = aspects.word.slice(0,index).trim()
+                    }
+                }
+            }
             name = aspects.word
             type = aspects.type
-            tags = aspects.tags
-            $reactive.main.aidTagActive = (aspects.tagFlag && configManager.get('beta_tag_aid_choose'));
-            $normal.beta.tempTags = tags;
+            tags = aspects.tag
+            $reactive.main.selectedTag = aspects.tag?? null;
             try{
                 $reactive.utools.vimDisabled = true;
                 if(this.lastSearchResult){

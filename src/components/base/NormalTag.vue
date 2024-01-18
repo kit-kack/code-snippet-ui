@@ -37,10 +37,11 @@ import {$reactive, switchToFullUIMode} from "../../js/store";
 const props = defineProps({
   "content": String,
   "type": String,
-  "isSpecial": Boolean
+  "isSpecial": Boolean,
+  "defaultTheme": Boolean
 })
 const colorStyle = computed(()=>{
-  return tagColorManager.get(props.content);
+  return tagColorManager.get(props.content,props.defaultTheme);
 })
 
 /**

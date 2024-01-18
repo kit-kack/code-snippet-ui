@@ -40,13 +40,17 @@ export const tagColorManager={
 
     /**
      * @param {string} tag
-     * @return {string} - color string
+     * @param {boolean} [isDefaultTheme]
      */
-    get(tag){
-        return this.tags[tag]?? {
+    get(tag,isDefaultTheme){
+        const defaultTheme = {
             "background":utools.isDarkColors()?  "linear-gradient(135deg,#304352,#d7d2cc)": "#eaeaea",
             "color": utools.isDarkColors()?  "#FFFFFF": "#929292"
         };
+        if(isDefaultTheme){
+            return defaultTheme;
+        }
+        return this.tags[tag]?? defaultTheme;
     },
     update(tag,style){
         this.tags[tag] = style;

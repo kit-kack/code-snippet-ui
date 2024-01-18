@@ -18,7 +18,6 @@
       <shortcut-pane/>
     </n-scrollbar>
   </n-drawer>
-  <aid-tag-pane/>
 
   <variable-input-modal v-if="$reactive.common.variableActive"/>
   <tag-color-change-modal v-if="$reactive.main.tagColorActive"/>
@@ -82,19 +81,19 @@
 import SideView from "./SideView.vue";
 import VimStatusBar from "../components/VimStatusBar.vue";
 import ShortcutPane from "../components/pane/ShortcutPane.vue";
-import {defineAsyncComponent, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import {NButton, useDialog, useMessage} from 'naive-ui'
 import VariableInputModal from "../components/modal/VariableInputModal.vue";
 import {$list, $normal, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, refreshListView} from "../js/store";
 import ListView from "./ListView.vue";
 import CodeView from "./CodeView.vue";
 import FormView from "./FormView.vue";
-import AidTagPane from "../components/pane/TagChoosePane.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {configManager} from "../js/core/config";
 import TopNav from "../components/item/TopNav.vue";
 import {doScrollForListView} from "../js/utils/scroller";
 import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";
+
 const expanded = ref(false)
 window.$message = useMessage();
 window.$dialog = useDialog();

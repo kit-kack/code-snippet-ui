@@ -116,7 +116,9 @@ const $reactive = reactive({
         aidTagActive: false,
         // tagColor
         tagColorActive: false,
+        tagSet: new Set(),
         tagName: null,
+        selectedTag: null,
         // 【设置】界面
         settingActive: false,
         // 是否固定按钮

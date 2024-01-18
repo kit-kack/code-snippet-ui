@@ -27,20 +27,18 @@
       </n-divider>
       <n-space vertical align="center">
         <n-space>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <config-check-tag title="💡标签辅助选择" config="beta_tag_aid_choose"/>
-            </template>
-            开启后，输入框输入#后，会辅助提示选择标签
-          </n-tooltip>
+<!--          <n-tooltip trigger="hover">-->
+<!--            <template #trigger>-->
+<!--              <config-check-tag title="💡标签辅助选择" config="beta_tag_aid_choose"/>-->
+<!--            </template>-->
+<!--            开启后，输入框输入#后，会辅助提示选择标签-->
+<!--          </n-tooltip>-->
           <n-tooltip trigger="hover">
             <template #trigger>
               <config-check-tag title="💡搜索子代码片段" config="beta_sub_snippet_search"/>
             </template>
             开启后，可以通过 name$num 搜索复制粘贴 name对应的num号子代码片段
           </n-tooltip>
-        </n-space>
-        <n-space>
           <n-tooltip trigger="hover">
             <template #trigger>
               <config-check-tag title="💡特殊标签" config="beta_special_tag"/>
@@ -48,12 +46,12 @@
             开启后，为代码片段添加VSCode标签即可写入到VSCode代码片段中，IDEA、Sublime Text等同理
             <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
           </n-tooltip>
-<!--          <n-tooltip trigger="hover">-->
-<!--            <template #trigger>-->
-<!--              <config-check-tag title="搜索匹配代码片段内容" config="beta_content_search"/>-->
-<!--            </template>-->
-<!--            开启后，name不仅会匹配代码片段名，也会匹配代码片段内容-->
-<!--          </n-tooltip>-->
+          <!--          <n-tooltip trigger="hover">-->
+          <!--            <template #trigger>-->
+          <!--              <config-check-tag title="搜索匹配代码片段内容" config="beta_content_search"/>-->
+          <!--            </template>-->
+          <!--            开启后，name不仅会匹配代码片段名，也会匹配代码片段内容-->
+          <!--          </n-tooltip>-->
           <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>
         </n-space>
       </n-space>

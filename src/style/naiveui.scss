@@ -35,3 +35,15 @@
 #dark-app .n-dynamic-tags .n-button{
   --n-text-color-pressed: #adadaf !important;
 }
+.n-breadcrumb .n-breadcrumb-item .n-breadcrumb-item__link{
+  padding: 0 !important;
+}
+.n-dropdown-option{
+  transition: background-color .3s;
+}
+.n-dropdown-option:hover{
+  background-color: #f3f3f5;
+}
+#dark-app .n-dropdown-option:hover{
+  background-color: #59595e;
+}

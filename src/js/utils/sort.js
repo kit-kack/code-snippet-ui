@@ -1,6 +1,6 @@
 import {configManager} from "../core/config";
 import {match} from "./fuzzy";
-import {$reactive} from "../store";
+import {$normal, $reactive} from "../store";
 import {hierachyHubManager} from "../core/hub";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {lowercaseIncludes} from "./common";
@@ -34,19 +34,16 @@ const TIME_COMPARE = _compare("time");
 const COUNT_COMPARE  = _compare("count");
 
 
-export function handleArrayForHierarchy(result,name,tags,type){
-    console.log(name,tags,type)
-    console.log(result)
+export function handleArrayForHierarchy(result,name,tag,type){
+    $reactive.main.tagSet.clear();
     if(_isEmpty(result.snippets)){
         return [];
     }
     if(type){
         type = fullAlias(type.toLowerCase());
     }
-    let tagFilter = false;
-    if(!_isEmpty(tags)){
-        tagFilter = true;
-        tags = tags.map(value => value.toLowerCase())
+    if(tag){
+        tag = tag.toLowerCase();
     }
     // 筛选出 置顶列表中的片段
     const topSnippets = [];
@@ -83,9 +80,13 @@ export function handleArrayForHierarchy(result,name,tags,type){
             }
         }
         // type filter
-        if(type){
-            if (type === '@') {  // dir
-                if(!snippet.dir){
+        if(type === ''){
+            if(!snippet.dir){
+                continue;
+            }
+        }else if(type){
+            if(type === '@'){
+                if(!snippet.link){
                     continue;
                 }
             }else{
@@ -95,20 +96,19 @@ export function handleArrayForHierarchy(result,name,tags,type){
             }
         }
         // tags filter
-        if(tagFilter){
+        if(tag){
             if(snippet.tags){
-                let notFound = true;
-                for(const tag of tags){
-                    if(lowercaseIncludes(snippet.tags,tag)){
-                        notFound = false;
-                        break;
-                    }
-                }
-                if(notFound){
+                if(!lowercaseIncludes(snippet.tags,tag)){
                     continue;
                 }
             }else{
                 continue;
+            }
+        }
+        // collect snippet tag
+        if(snippet.tags){
+            for (const tag of snippet.tags) {
+                $reactive.main.tagSet.add(tag)
             }
         }
 
