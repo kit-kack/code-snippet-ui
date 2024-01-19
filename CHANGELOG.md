@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.7.0](https://github.com/kit-kack/code-snippet-ui/compare/v2.6.4...v2.7.0) (2024-01-19)
+
+
+### Features
+
+* 移除highlight非主流编程语言 ([6903dca](https://github.com/kit-kack/code-snippet-ui/commit/6903dcad92130faefea89d73c213c7085ea6fb1d))
+* 移除highlight非主流编程语言 ([43580cb](https://github.com/kit-kack/code-snippet-ui/commit/43580cbc9fd066196b30cecc5db3b94da6924e73))
+
+
+### Bug Fixes
+
+* 上线优化 ([dd75082](https://github.com/kit-kack/code-snippet-ui/commit/dd750823e32fe15bc8e91edbe70071ced27e6012))
+* 完善数据导入 ([2a64297](https://github.com/kit-kack/code-snippet-ui/commit/2a6429738910338e4e01c7ba72b38ec1258e79a9))
+* 修改 utools:// 为 plugin:// ([cd95e77](https://github.com/kit-kack/code-snippet-ui/commit/cd95e77fb5db35a00a6e9a781f8bac9c69ad0b0e))
+* search匹配修复、数据同步冲突修复 ([624d70d](https://github.com/kit-kack/code-snippet-ui/commit/624d70d1727156fd075561584816b53925d40b23))
+* sync ([0f42e82](https://github.com/kit-kack/code-snippet-ui/commit/0f42e82fb4fb01ac78bd2a697ff9abacdd1d8671))
+
 ### [2.6.4](https://github.com/littledot-kit/code-snippet-ui/compare/v2.6.3...v2.6.4) (2024-01-02)
 
 
