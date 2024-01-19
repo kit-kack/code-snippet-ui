@@ -28,6 +28,16 @@
   &::selection{
     background-color: var(--plugin-text-selected-background-color) !important;
   }
+  &::-webkit-scrollbar-track-piece{
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb{
+    border-color: var(--plugin-background-color);
+    background-color: var(--scrollbar-thumb-background-color);
+  }
+  &::-webkit-scrollbar-corner{
+    background-color: transparent;
+  }
 }
 body#light-app{
   background-color: var(--plugin-background-color);
@@ -69,4 +79,22 @@ p.tooltip b{
   font-family: Consolas;
   //font-style: italic;
   color: var(--item-code-text-color);
+}
+
+.command-format{
+  color: #ffa400;
+  border-radius: 3px;
+  background-color: #f1f1f1;
+  font-weight: bolder;
+}
+.command-assign{
+  color: #10be8e;
+  border-radius: 3px;
+  background-color: #f1f1f1;
+  font-weight: bolder;
+}
+#dark-app {
+  .command-format,.command-assign{
+    background-color: #414141;
+  }
 }

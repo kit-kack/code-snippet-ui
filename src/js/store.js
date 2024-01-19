@@ -134,6 +134,9 @@ const $reactive = reactive({
         // 用来进行重度刷新
         deepRefresh: true,
     },
+    form:{
+        fullScreen: false,
+    },
     setting:{
         // 【占位符编辑】界面
         funcEditActive: false,

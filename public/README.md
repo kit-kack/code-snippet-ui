@@ -2,10 +2,9 @@
 
 新版本速览✨
 
-1. <span style="color:red">重构</span> 标签配色自定义
-2. <span style="color:red">重构</span> 【自定义目录】实现，并提供预设方案`预览Gitee/Github仓库代码`
-3. <span style="color:green">新增</span> Beta功能-`特殊标签`
-4. <span style="color:skyblue">完善</span> 占位符处理
+1. <span style="color:green">新增</span> 代码编辑支持高亮显示 
+2. <span style="color:green">优化</span> 改进标签选择，请在主界面点击上面的ALL切换
+3. <span style="color:red">修复</span> 数据同步冲突问题
 ---
 
 [[TOC]]

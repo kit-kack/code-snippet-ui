@@ -1,10 +1,12 @@
-import {$normal, $reactive, switchToFullUIMode} from "../store";
+import {$normal, $reactive, LIST_VIEW, switchToFullUIMode} from "../store";
 import {copyOrPaste} from "../utils/copy";
 import {utools_db_store} from "./base";
 import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import { toString as _toString } from "lodash-es";
+import hljs from "highlight.js/lib/core";
+import {getRealTypeAndValidStatus} from "../utils/language";
 
 const GLOBAL_FUNC = "func";
 /**
@@ -744,10 +746,11 @@ function _resolveCommandFromSpan(command){
 }
 /**
  * 渲染formatBlock
- * @param {boolean} flag - 是否在渲染模式
+ * @param selector
+ * @param normal
  */
-export function renderFormatBlock(flag){
-    const codeViewer = document.querySelector(flag? '#code-view  div.v-md-editor-preview > div.github-markdown-body':'#code-view pre > code')
+export function renderFormatBlock(selector,normal){
+    const codeViewer = document.querySelector(selector)
     if(codeViewer){
         codeViewer.innerHTML = codeViewer.innerHTML.replace(/{{.+?}}/gs,(substring)=>{
             const text = substring.slice(2,-2).trim();
@@ -758,7 +761,7 @@ export function renderFormatBlock(flag){
                     if(result.assign){
                         style =  _assginBlockStyle
                     }else if (result.command) {
-                        if(!flag){
+                        if(normal){
                             result.command = _resolveCommandFromSpan(result.command)
                         }
                         if (_get_command_key(result.command)) {
@@ -773,7 +776,7 @@ export function renderFormatBlock(flag){
             }else{
                 const result = _parseVariable_Command_Param(text);
                 if(result.command){
-                    if(!flag){
+                    if(normal){
                         result.command = _resolveCommandFromSpan(result.command)
                     }
                     if(_get_command_key(result.command)){
@@ -786,4 +789,38 @@ export function renderFormatBlock(flag){
             return style+substring+'</span>'
         })
     }
+}
+export function replaceRenderBlock(code){
+    return code.replace(/{{.+?}}/gs,(substring)=>{
+        const text = substring.slice(2,-2).trim();
+        let style = _errorFormatBlockStyle ;
+        if(text.startsWith('#')) {
+            const result = _parseVariable_Command_Param(text.slice(1),true);
+            if (result._var) {
+                if(result.assign){
+                    style =  _assginBlockStyle
+                }else if (result.command) {
+                    result.command = _resolveCommandFromSpan(result.command)
+                    if (_get_command_key(result.command)) {
+                        style =  _assginBlockStyle
+                    }
+                }else  if (result.param) {
+                    style = _assginBlockStyle
+                }
+            }
+        }else if(text.startsWith('@')){
+            style = _formatBlockStyle
+        }else{
+            const result = _parseVariable_Command_Param(text);
+            if(result.command){
+                result.command = _resolveCommandFromSpan(result.command)
+                if(_get_command_key(result.command)){
+                    style = _formatBlockStyle
+                }
+            }else  if (result.param) {
+                style = _formatBlockStyle
+            }
+        }
+        return style+substring+'</span>'
+    })
 }

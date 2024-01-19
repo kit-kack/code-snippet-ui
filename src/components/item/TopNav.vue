@@ -1,6 +1,6 @@
 <template>
   <div id="top-nav" :class="{
-    'non-code-view': $reactive.currentMode !== CODE_VIEW
+    'non-code-view': $reactive.currentMode !== CODE_VIEW && !$reactive.form.fullScreen
   }">
     <n-scrollbar x-scrollable style="max-width: 60vw"  :ref="(el)=> $normal.scroll.hierarchyInvoker = el">
       <n-breadcrumb style="padding-left: 10px" class="top-nav-item" >
@@ -15,15 +15,25 @@
 
   </div>
   <div class="snippet-count-info">
-    <n-dropdown size="small" placement="bottom-start" trigger="click" :options="tagOptions" :render-icon="renderIcon" style="max-height: min(240px, calc(100vh * 0.7) )" :disabled="$reactive.currentMode !== LIST_VIEW" scrollable>
+    <n-button
+        quaternary
+        :color="$normal.theme.globalColor"
+        @click="$reactive.form.fullScreen = false"
+        style="height: 15px" size="small"  v-if="$reactive.currentMode > CODE_VIEW && $reactive.form.fullScreen">
+      退出全屏
+      <template #icon>
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" fill="currentColor"></path></svg>
+      </template>
+    </n-button>
+    <n-dropdown v-else size="small" placement="bottom-start" trigger="click" :options="tagOptions" :render-icon="renderIcon" style="max-height: min(240px, calc(100vh * 0.7) )" :disabled="$reactive.currentMode !== LIST_VIEW" scrollable>
       <template v-if="$reactive.main.selectedTag === null">
-          <span style="font-weight: bold">ALL</span>
+        <span style="font-weight: bold">ALL</span>
       </template>
       <template v-else>
         <normal-tag :content="$reactive.main.selectedTag" type="raw"/>
       </template>
     </n-dropdown>
-    • {{word}} {{$reactive.main.isFullScreenShow? '◈': '◇'}}
+    <span> • {{word}} {{$reactive.main.isFullScreenShow? '◈': '◇'}}</span>
   </div>
 </template>
 <script setup>
@@ -144,6 +154,9 @@ const tagOptions = computed(()=>{
 }
 .snippet-count-info *{
   user-select: none !important;
+}
+.snippet-count-info > * {
+  vertical-align: middle;
 }
 .n-breadcrumb .n-breadcrumb-item .n-breadcrumb-item__link{
   padding: 0 !important;

@@ -1,4 +1,4 @@
-import {$index, $normal} from "../store";
+import {$index, $normal, $reactive} from "../store";
 import {configManager} from "../core/config";
 
 
@@ -38,6 +38,34 @@ function _controlScrollBar(scrollBar,direction,fast){
             break;
     }
 }
+// /**
+//  * 控制原生元素滚动条滚动
+//  * @param scrollBar
+//  * @param {number} direction
+//  * @param {boolean} fast
+//  * @private
+//  */
+// function _rawControlScrollBar(scrollBar,direction,fast){
+//     const distance = fast? 50: 10;
+//     switch (direction){
+//         case Direction.LEFT:
+//             scrollBar.scrollLeft -= distance;
+//             break;
+//         case Direction.DOWN:
+//             scrollBar.scrollTop += distance;
+//             break;
+//         case Direction.UP:
+//             scrollBar.scrollTop -= distance;
+//             break;
+//         case Direction.RIGHT:
+//             scrollBar.scrollLeft += distance;
+//             break;
+//         case Direction.RESET:
+//             scrollBar.scrollTop = 0;
+//             scrollBar.scrollLeft = 0;
+//             break;
+//     }
+// }
 
 /**
  * 控制多行代码块滚动

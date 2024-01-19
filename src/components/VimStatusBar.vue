@@ -34,6 +34,10 @@ const show = computed(()=>{
     if($reactive.code.isPure){
       return false;
     }
+  }else if($reactive.currentMode > CODE_VIEW){
+    if($reactive.form.fullScreen){
+      return false;
+    }
   }
   return !$reactive.utools.focused && $reactive.main.isFullScreenShow
 })

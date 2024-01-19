@@ -19,6 +19,15 @@
           </template>
         </template>
         <template v-else>
+<!--          <code-editor :value="$reactive.currentCode"-->
+<!--                       :ref="(el) => $normal.scroll.newCodeInvoker = el?.$el?.children?.[0]?.children?.[0]?.children?.[1]"-->
+<!--                       font-size="14px"-->
+<!--                       padding="5px"-->
+<!--                       height="auto"-->
+<!--                       read-only-->
+<!--                       :header="false"-->
+<!--                       code-on-->
+<!--                       line-nums width="100%" :languages="[[pair.type]]"/>-->
           <div class="hljs-container" v-code>
             <n-scrollbar  x-scrollable :ref="(el)=> $normal.scroll.codeHorizontalInvoker = el" style="padding-bottom: 2px">
               <template v-if="pair.valid">
@@ -190,6 +199,7 @@ function getCode(){
   }
   return snippet.code;
 }
+
 function getCodeFromPath(){
   // 分析path
   if(isNetWorkPath){
@@ -245,9 +255,8 @@ function getNumShow(num){
   return ['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][num]
 }
 
-
-
-
+const MARKDOWN_BLOCK = '#code-view  div.v-md-editor-preview > div.github-markdown-body'
+const NORMAL_BLOCK = '#code-view pre > code'
 onMounted(()=>{
     // $normal.updateCacheCodeFunc = updateCachedCode
     $normal.scroll.codeVerticalInvoker = verticalScroller.value;
@@ -255,10 +264,10 @@ onMounted(()=>{
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
       if(pair.value.renderable){
         watchPostEffect(()=>{
-          renderFormatBlock($reactive.code.isRendering)
+          renderFormatBlock($reactive.code.isRendering ? MARKDOWN_BLOCK: NORMAL_BLOCK,!$reactive.code.isRendering)
         })
       }else{
-        renderFormatBlock(false)
+        renderFormatBlock(NORMAL_BLOCK,true)
       }
     }
 })
@@ -346,11 +355,10 @@ onUnmounted(()=>{
 
 /** 行数样式 */
 .hljs-code-number {
-  padding: 0 10px 0 10px;
-  color: #999;
+  padding: 0 8px 0 8px;
   font-size: 14px;
   list-style: none;
-  border-right: 1px solid #dcdfe5;
+  border-right: 1px solid #e1e2e3;
   user-select:none;
   z-index: 1;
 
@@ -361,8 +369,9 @@ onUnmounted(()=>{
   li{
     line-height: 12px;
     padding: 5px 0;
-    font-size: 14px;
-    text-align: center;
+    font-size: 12px;
+    text-align: right;
+    opacity: 0.3;
     z-index: 2;
   }
 }
@@ -412,17 +421,6 @@ onUnmounted(()=>{
     background-color: #414141;
   }
 }
-.command-format{
-  color: #ffa400;
-  border-radius: 3px;
-  background-color: #f1f1f1;
-  font-weight: bolder;
-}
-.command-assign{
-  color: #10be8e;
-  border-radius: 3px;
-  background-color: #f1f1f1;
-  font-weight: bolder;
-}
+
 
 </style>

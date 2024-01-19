@@ -29,6 +29,9 @@ export const configManager = {
         if(!(this.configs["strategy_theme"] >= 0 && this.configs["strategy_theme"] <= 4)){
             this.configs["strategy_theme"] = 0;
         }
+        if(this.configs["default_tab"] === 0){
+            this.configs["default_tab"] = 1;
+        }
         // init theme
         adjustTheme(this.configs["strategy_theme"])
         // show help snippet
