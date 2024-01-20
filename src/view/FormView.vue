@@ -70,76 +70,75 @@
                      :on-before-leave="()=> properties.code"
                      size="small">
               <n-tab-pane name="code" tab="代码" :disabled="formProperties.codeSource === 'link'">
-                <div id="form-code-top-nav">
-                  <n-popover>
-                    <template #trigger>
-                      <n-button :focusable="false" quaternary style="position: absolute;">
-                        <template #icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M32 26v-2h-2.101a4.968 4.968 0 0 0-.732-1.753l1.49-1.49l-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 26 20.101V18h-2v2.101a4.968 4.968 0 0 0-1.753.732l-1.49-1.49l-1.414 1.414l1.49 1.49A4.968 4.968 0 0 0 20.101 24H18v2h2.101a4.968 4.968 0 0 0 .732 1.753l-1.49 1.49l1.414 1.414l1.49-1.49a4.968 4.968 0 0 0 1.753.732V32h2v-2.101a4.968 4.968 0 0 0 1.753-.732l1.49 1.49l1.414-1.414l-1.49-1.49A4.968 4.968 0 0 0 29.899 26zm-7 2a3 3 0 1 1 3-3a3.003 3.003 0 0 1-3 3z" fill="currentColor"></path><circle cx="7" cy="20" r="2" fill="currentColor"></circle><path d="M14 20a4 4 0 1 1 4-4a4.012 4.012 0 0 1-4 4zm0-6a2 2 0 1 0 2 2a2.006 2.006 0 0 0-2-2z" fill="currentColor"></path><circle cx="21" cy="12" r="2" fill="currentColor"></circle><path d="M13.02 28.271L3 22.427V9.574l11-6.416l11.496 6.706l1.008-1.728l-12-7a1 1 0 0 0-1.008 0l-12 7A1 1 0 0 0 1 9v14a1 1 0 0 0 .496.864L12.013 30z" fill="currentColor"></path></svg>                        </template>
-                      </n-button>
-                    </template>
-                    <n-space align="center">
-                      Tab 行为：
+                <div id="form-code">
+                  <div id="form-code-top-nav">
+                    <n-popover>
+                      <template #trigger>
+                        <n-button :focusable="false" quaternary style="position: absolute;">
+                          <template #icon>
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><path d="M32 26v-2h-2.101a4.968 4.968 0 0 0-.732-1.753l1.49-1.49l-1.414-1.414l-1.49 1.49A4.968 4.968 0 0 0 26 20.101V18h-2v2.101a4.968 4.968 0 0 0-1.753.732l-1.49-1.49l-1.414 1.414l1.49 1.49A4.968 4.968 0 0 0 20.101 24H18v2h2.101a4.968 4.968 0 0 0 .732 1.753l-1.49 1.49l1.414 1.414l1.49-1.49a4.968 4.968 0 0 0 1.753.732V32h2v-2.101a4.968 4.968 0 0 0 1.753-.732l1.49 1.49l1.414-1.414l-1.49-1.49A4.968 4.968 0 0 0 29.899 26zm-7 2a3 3 0 1 1 3-3a3.003 3.003 0 0 1-3 3z" fill="currentColor"></path><circle cx="7" cy="20" r="2" fill="currentColor"></circle><path d="M14 20a4 4 0 1 1 4-4a4.012 4.012 0 0 1-4 4zm0-6a2 2 0 1 0 2 2a2.006 2.006 0 0 0-2-2z" fill="currentColor"></path><circle cx="21" cy="12" r="2" fill="currentColor"></circle><path d="M13.02 28.271L3 22.427V9.574l11-6.416l11.496 6.706l1.008-1.728l-12-7a1 1 0 0 0-1.008 0l-12 7A1 1 0 0 0 1 9v14a1 1 0 0 0 .496.864L12.013 30z" fill="currentColor"></path></svg>                        </template>
+                        </n-button>
+                      </template>
+                      <n-space align="center">
+                        Tab 行为：
+                        <n-select
+                            :options="tabOptions"
+                            :default-value="configManager.get('default_tab')??0"
+                            :theme-overrides="selectThemeOverrides"
+                            @update-value="v=> configManager.set('default_tab',v)"
+                            style="width: 194px"
+                        />
+                      </n-space>
+                      <n-space align="center">
+                        默认语言：
+                        <n-select
+                            filterable
+                            placeholder="选择默认语言"
+                            :options="languages"
+                            :default-value="configManager.get('default_language')??'plaintext'"
+                            tag
+                            @update-value="v=> configManager.set('default_language',v)"
+                            :theme-overrides="selectThemeOverrides"
+                        />
+                      </n-space>
+                      <config-switch title="默认是否注册uTools关键字" config="default_keyword_enable"/>
+                    </n-popover>
+                    <n-tooltip>
+                      <template #trigger>
+                        <n-button :focusable="false" quaternary style="position: absolute; left: 50px" @click="requestFullScreen(true)" >
+                          <template #icon>
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M5 6a1 1 0 0 1 1-1h2a1 1 0 0 0 0-2H6a3 3 0 0 0-3 3v2a1 1 0 0 0 2 0V6zm0 12a1 1 0 0 0 1 1h2a1 1 0 1 1 0 2H6a3 3 0 0 1-3-3v-2a1 1 0 1 1 2 0v2zM18 5a1 1 0 0 1 1 1v2a1 1 0 1 0 2 0V6a3 3 0 0 0-3-3h-2a1 1 0 1 0 0 2h2zm1 13a1 1 0 0 1-1 1h-2a1 1 0 1 0 0 2h2a3 3 0 0 0 3-3v-2a1 1 0 1 0-2 0v2z" fill="currentColor"></path></g></svg>
+                          </template>
+                        </n-button>
+                      </template>
+                      进入全屏
+                    </n-tooltip>
+                    <n-tooltip v-if="finalType.startsWith('x-')">
+                      <template #trigger>
+                        <n-button :focusable="false" quaternary style="position: absolute; left: 100px" @click="showFuncModal = true" >
+                          <template #icon>
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"></path><path d="M12 9v6"></path><path d="M6 19a2 2 0 0 1-2-2v-4l-1-1l1-1V7a2 2 0 0 1 2-2"></path><path d="M18 19a2 2 0 0 0 2-2v-4l1-1l-1-1V7a2 2 0 0 0-2-2"></path></g></svg>                        </template>
+                        </n-button>
+                      </template>
+                      使用占位符
+                    </n-tooltip>
+                    <div id="form-code-language-select">
                       <n-select
-                          :options="tabOptions"
-                          :default-value="configManager.get('default_tab')??0"
-                          :theme-overrides="selectThemeOverrides"
-                          @update-value="v=> configManager.set('default_tab',v)"
-                          style="width: 194px"
-                      />
-                    </n-space>
-                    <n-space align="center">
-                      默认语言：
-                      <n-select
+                          :focusable="false"
+                          v-model:value="codeTemplate.type"
                           filterable
-                          placeholder="选择默认语言"
+                          show-on-focus
+                          placeholder="选择代码类型"
                           :options="languages"
                           :default-value="configManager.get('default_language')??'plaintext'"
                           tag
-                          @update-value="v=> configManager.set('default_language',v)"
+                          :disabled="!properties.type"
+                          @update:value="handleTypeChange()"
+                          :render-tag="renderCodeTypeTag"
                           :theme-overrides="selectThemeOverrides"
                       />
-                    </n-space>
-                    <config-switch title="默认是否注册uTools关键字" config="default_keyword_enable"/>
-                  </n-popover>
-                  <n-tooltip>
-                    <template #trigger>
-                      <n-button :focusable="false" quaternary style="position: absolute; left: 50px" @click="requestFullScreen(true)" >
-                        <template #icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M5 6a1 1 0 0 1 1-1h2a1 1 0 0 0 0-2H6a3 3 0 0 0-3 3v2a1 1 0 0 0 2 0V6zm0 12a1 1 0 0 0 1 1h2a1 1 0 1 1 0 2H6a3 3 0 0 1-3-3v-2a1 1 0 1 1 2 0v2zM18 5a1 1 0 0 1 1 1v2a1 1 0 1 0 2 0V6a3 3 0 0 0-3-3h-2a1 1 0 1 0 0 2h2zm1 13a1 1 0 0 1-1 1h-2a1 1 0 1 0 0 2h2a3 3 0 0 0 3-3v-2a1 1 0 1 0-2 0v2z" fill="currentColor"></path></g></svg>
-                        </template>
-                      </n-button>
-                    </template>
-                    进入全屏
-                  </n-tooltip>
-                  <n-tooltip v-if="finalType.startsWith('x-')">
-                    <template #trigger>
-                      <n-button :focusable="false" quaternary style="position: absolute; left: 100px" @click="showFuncModal = true" >
-                        <template #icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"></path><path d="M12 9v6"></path><path d="M6 19a2 2 0 0 1-2-2v-4l-1-1l1-1V7a2 2 0 0 1 2-2"></path><path d="M18 19a2 2 0 0 0 2-2v-4l1-1l-1-1V7a2 2 0 0 0-2-2"></path></g></svg>                        </template>
-                      </n-button>
-                    </template>
-                    使用占位符
-                  </n-tooltip>
-                  <div id="form-code-language-select">
-                    <n-select
-                        :focusable="false"
-                        v-model:value="codeTemplate.type"
-                        filterable
-                        show-on-focus
-                        placeholder="选择代码类型"
-                        :options="languages"
-                        :default-value="configManager.get('default_language')??'plaintext'"
-                        tag
-                        :disabled="!properties.type"
-                        @update:value="handleTypeChange()"
-                        :render-tag="renderCodeTypeTag"
-                        :theme-overrides="selectThemeOverrides"
-                    />
+                    </div>
                   </div>
-                </div>
-                <!--              <div id="form-code">-->
-
                 <!--                  <n-input-->
                 <!--                      v-model:value="codeTemplate.code"-->
                 <!--                      :placeholder="placeholders?.code ?? '请输入代码片段'"-->
@@ -154,26 +153,14 @@
                 <!--                      show-count-->
                 <!--                      :autosize="{minRows: 9,maxRows: 9}"-->
                 <!--                  />-->
-
-                <!--                  <textarea-->
-                <!--                      v-model="codeTemplate.code"-->
-                <!--                      id="form-textarea"-->
-                <!--                      :placeholder="placeholders?.code ?? '请输入代码片段'"-->
-                <!--                      wrap="off"-->
-                <!--                      :disabled="!properties.code"-->
-                <!--                      @keydown="handleKeyDown"-->
-                <!--                      ref="codeTextArea"-->
-                <!--                  />-->
-                <!--                <span id="form-textarea-counter">{{codeTemplate.code.length}}</span>-->
-                <!--              </div>-->
-                <code-editor v-model="codeTemplate.code"
-                             ref="codeEditorRef"
-                             font-size="14px"
-                             height="220px"
-                             :header="false"
-                             padding="5px"
-                             line-nums
-                             @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/>
+                  <code-editor v-model="codeTemplate.code"
+                               ref="codeEditorRef"
+                               font-size="14px"
+                               height="220px"
+                               :header="false"
+                               padding="5px"
+                               line-nums
+                               @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/></div>
               </n-tab-pane>
 
               <n-tab-pane name="link" tab="关联" :disabled="formProperties.codeSource === 'code'">
@@ -910,9 +897,17 @@ function handleClearPath(){
 
 #form-code{
   box-sizing: border-box;
-  position: relative;
   width: 100%;
-  height: 260px;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  transition: all .3s;
+  z-index: 1000;
+}
+#form-code:hover{
+  border-color: #ccc;
+}
+#dark-app #form-code:hover{
+  border-color: #555758;
 }
 #form-code-top-nav{
   position: relative;
@@ -928,6 +923,10 @@ function handleClearPath(){
 }
 #dark-app #form-code-top-nav{
   border-bottom-color: #848586;
+  background:#454647;
+}
+#dark-app #form-view #form-code .code-editor{
+  background:#454647 ;
 }
 #form-code-language-select{
   width:230px;

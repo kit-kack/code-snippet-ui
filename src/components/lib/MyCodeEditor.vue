@@ -48,6 +48,7 @@
             :autofocus="autofocus"
             spellcheck="false"
             @keydown.tab.prevent.stop="tab"
+            @keydown.enter.prevent.stop="enter"
             @scroll="calcScrollDistance"
             :value="modelValue == undefined ? content : modelValue"
             @input="updateValue"
@@ -80,8 +81,6 @@
 <script>
 import hljs from "../../js/dep/highlight-dep";
 import {configManager} from "../../js/core/config";
-// import "simple-code-editor/themes/themes-base16.css";
-// import "simple-code-editor/themes/themes.css";
 
 export default {
   name: "CodeEditor",
@@ -245,6 +244,33 @@ export default {
         this.content =
             this.content.substring(0, cursorPosition) + tabChar + this.content.substring(cursorPosition);
         this.cursorPosition = cursorPosition + tabChar.length;
+        this.insertTab = true;
+      }
+    },
+    enter(){
+      // $message.info("enter")
+      const cursorPosition = this.$refs.textarea.selectionStart;
+      // const tabChar = this.tabWidth();
+      let lineChar = '\n';
+      const currentLineStart = this.$refs.textarea.value.lastIndexOf('\n',cursorPosition-1) + 1;
+      let end = currentLineStart;
+      while (end < cursorPosition){
+        const char = this.$refs.textarea.value.charAt(end);
+        if(char === '\r' || char=== '\t' || char === ' '){
+          end++
+        }else{
+          break;
+        }
+      }
+      if(end > currentLineStart){
+        lineChar += this.$refs.textarea.value.slice(currentLineStart,end);
+      }
+      if (document.execCommand("insertText")) {
+        document.execCommand("insertText", false, lineChar);
+      } else {
+        this.content =
+            this.content.substring(0, cursorPosition) + lineChar + this.content.substring(cursorPosition);
+        this.cursorPosition = cursorPosition + lineChar.length;
         this.insertTab = true;
       }
     },
