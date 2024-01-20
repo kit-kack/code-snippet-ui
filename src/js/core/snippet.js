@@ -1,8 +1,7 @@
-import {defaultHelpSnippet, localConfigDirPath} from "../some";
+import {localConfigDirPath} from "../some";
 import {match} from "../utils/fuzzy";
 import {utools_db_store} from "./base";
 import {tagColorManager} from "./tag";
-import {configManager} from "./config";
 import {batch_delete_utools_keyword, delete_utools_keyword, register_utools_keyword} from "./keyword";
 
 const CODE_PREFIX = "code/";

@@ -54,6 +54,8 @@ declare interface CodeSnippet extends CodeSnippetCore{
         idea: boolean
     },
     nativeId?: string
+    // TODO: desc 作为MD渲染
+    descAsMd?: boolean
 }
 
 declare interface Func {

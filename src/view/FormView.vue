@@ -57,6 +57,7 @@
               :options="tags"
               :disabled="!properties.tags"
               :render-tag="renderTag"
+              :render-label="renderTagSelectLabel"
           />
         </n-form-item>
 
@@ -285,7 +286,6 @@
 import {
   computed,
   h,
-  nextTick,
   onMounted,
   onUnmounted,
   reactive,
@@ -324,8 +324,47 @@ const finalType = computed(()=>{
   return codeTemplate.type ?? (configManager.get('default_language') ?? 'plaintext')
 })
 watch(()=> codeTemplate.type,(newValue)=>{
-  codeEditorRef.value.changeLang([getRealTypeAndValidStatus(newValue).type])
+  if(currentTab.value === 'code'){
+    codeEditorRef.value?.changeLang?.([getRealTypeAndValidStatus(newValue).type])
+  }
 })
+const renderTagSelectLabel = (option) => {
+  return h(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          alignItems: 'center'
+        }
+      },
+      [
+        h(
+            'div',
+            {
+              style:{
+                width: '16px',
+                height: '16px',
+                borderRadius: '50%',
+                background: tagColorManager.get(option.label).background
+              }
+            },
+            null
+        ),
+        h(
+            'div',
+            {
+              style: {
+                marginLeft: '12px',
+                padding: '4px 0'
+              }
+            },
+            [
+              option.label
+            ]
+        )
+      ]
+  )
+}
 const tags = computed(()=>{
   return tagColorManager.all().map(v=>{
     return {
@@ -335,11 +374,9 @@ const tags = computed(()=>{
   })
 })
 const currentTab = ref((codeTemplate.path || codeTemplate.dir)? 'link':(formProperties.codeSource === 'link' ?'link':'code'))  // 当前Tab页
-const codeTextArea = ref()
 const showInternetLinkModal = ref(false)
 const showFuncModal = ref(false)
 const showCustomHiearchyModal = ref(false)
-const fullScreen = ref(false)
 const language = computed(()=>{
   return [[ getRealTypeAndValidStatus(finalType.value).type]]
 })

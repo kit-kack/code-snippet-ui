@@ -27,7 +27,7 @@
     </n-button>
     <n-dropdown v-else size="small" placement="bottom-start" trigger="click" :options="tagOptions" :render-icon="renderIcon" style="max-height: min(240px, calc(100vh * 0.7) )" :disabled="$reactive.currentMode !== LIST_VIEW" scrollable>
       <template v-if="$reactive.main.selectedTag === null">
-        <span style="font-weight: bold">ALL</span>
+        <n-button size="small" text style="font-weight: bold;font-size: 12px">ALL</n-button>
       </template>
       <template v-else>
         <normal-tag :content="$reactive.main.selectedTag" type="raw"/>

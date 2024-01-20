@@ -1,6 +1,6 @@
 <template>
   <template v-if="type === 'raw'">
-    <n-tag size="small" class="tag" :round="isSpecial"  :style="colorStyle" >{{props.content}}</n-tag>
+    <n-tag size="small" class="tag raw" :round="isSpecial"  :style="colorStyle" >{{props.content}}</n-tag>
   </template>
   <template v-else-if="type === 'closable'">
     <n-tag closable size="small" :round="isSpecial" :style="colorStyle" >{{props.content}}</n-tag>
@@ -69,5 +69,12 @@ function handleTagClick(){
 }
 .special{
   margin-top: 6px;
+}
+.tag.raw{
+  transition: all .5s;
+}
+.tag.raw:hover{
+  border-radius: 10px;
+  box-shadow: #ccc 0 1px 4px;
 }
 </style>

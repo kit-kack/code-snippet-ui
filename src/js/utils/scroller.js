@@ -1,4 +1,4 @@
-import {$index, $normal, $reactive} from "../store";
+import {$index, $normal} from "../store";
 import {configManager} from "../core/config";
 
 

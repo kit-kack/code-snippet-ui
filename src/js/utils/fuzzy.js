@@ -1,6 +1,5 @@
 import {isArray as _isArray} from "lodash-es"
-import {configManager} from "../core/config";
-import {$normal} from "../store";
+
 const chineseRegex=/[\u4E00-\u9FA5]/
 
 /**

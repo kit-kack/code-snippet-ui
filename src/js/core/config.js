@@ -69,13 +69,19 @@ export const configManager = {
      * @param {ConfPath} path
      */
     getSubItem(path){
-        return utools.db.get(NEW_GLOBAL_CONFIG + "/" + path)?.data
+        const key = NEW_GLOBAL_CONFIG + "/" + path;
+        const doc = utools.db.get(key);
+        if(doc){
+            localStorage.setItem(key,JSON.stringify(doc.data))
+            utools.db.remove(key)
+        }
+        return JSON.parse(localStorage.getItem(key))
     },
     /**
      * @param {ConfPath} path
      * @param config
      */
     setSubItem(path,config){
-        utools_db_store(NEW_GLOBAL_CONFIG + "/" + path,config)
+        localStorage.setItem(NEW_GLOBAL_CONFIG + "/" + path,JSON.stringify(config))
     }
 }

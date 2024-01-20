@@ -1,6 +1,6 @@
 import {configManager} from "../core/config";
 import {match} from "./fuzzy";
-import {$normal, $reactive} from "../store";
+import {$reactive} from "../store";
 import {hierachyHubManager} from "../core/hub";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {lowercaseIncludes} from "./common";

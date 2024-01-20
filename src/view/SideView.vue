@@ -108,7 +108,6 @@ import {$reactive, refreshListView, refreshSearchResult} from "../js/store";
 import CustomView from "../components/pane/CustomPane.vue";
 import {generate_backup, load_backup} from "../js/core/backup";
 import {backupFilePath} from "../js/some";
-import BaseModal from "../components/modal/BaseModal.vue";
 import SpecialTagConfigModal from "../components/modal/SpecialTagConfigModal.vue";
 
 const refreshFlag = ref(true)

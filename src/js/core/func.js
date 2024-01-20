@@ -1,12 +1,10 @@
-import {$normal, $reactive, LIST_VIEW, switchToFullUIMode} from "../store";
+import {$normal, $reactive, switchToFullUIMode} from "../store";
 import {copyOrPaste} from "../utils/copy";
 import {utools_db_store} from "./base";
 import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
-import { toString as _toString } from "lodash-es";
-import hljs from "highlight.js/lib/core";
-import {getRealTypeAndValidStatus} from "../utils/language";
+import {toString as _toString} from "lodash-es";
 
 const GLOBAL_FUNC = "func";
 /**
