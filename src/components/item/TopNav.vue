@@ -96,27 +96,28 @@ const renderIcon = (option) => {
     )
   }
 }
+const ALL_TAG = {
+  label: 'ALL',
+  value: 'ALL',
+  default:true,
+  props:{
+    onClick:()=>{
+      $reactive.main.selectedTag = null;
+      replaceOrAddTag($reactive.utools.search,null)
+    }
+  }
+}
 const tagOptions = computed(()=>{
+  if($reactive.main.tagSet.size=== 0){
+    return [ ALL_TAG];
+  }
   const tags = [
-    {
-      label: 'ALL',
-      value: 'ALL',
-      default:true,
-      props:{
-        onClick:()=>{
-          $reactive.main.selectedTag = null;
-          replaceOrAddTag($reactive.utools.search,null)
-        }
-      }
-    },
+    ALL_TAG,
     {
       type: 'divider',
       key: 'divider'
     }
   ];
-  if($reactive.main.tagSet.size=== 0){
-    return;
-  }
   for (let key of $reactive.main.tagSet.keys()) {
     tags.push({
       label: key,
@@ -137,6 +138,9 @@ const tagOptions = computed(()=>{
   position: relative;
   height: 15px;
   width: 100%;
+  * {
+    user-select: none;
+  }
 }
 .top-nav-item{
   height: 15px;

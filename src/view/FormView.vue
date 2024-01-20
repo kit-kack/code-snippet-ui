@@ -546,6 +546,13 @@ function keyDownHandler(e){
   if($reactive.common.variableActive){
     return;
   }
+  if(e.code === 'F11'){
+    if(currentTab.value !== 'code'){
+      return;
+    }
+    e.preventDefault();
+    $reactive.form.fullScreen = !$reactive.form.fullScreen;
+  }
   if(e.ctrlKey){
     if(e.code === 'KeyQ'){
       handleCancel();
@@ -618,6 +625,11 @@ function keyDownHandler(e){
       }
     }else if(e.code === 'KeyK'){
       codeTemplate.keyword = ! codeTemplate.keyword;
+    }else if(e.code === 'KeyF'){
+      if(currentTab.value !== 'code'){
+        return;
+      }
+      $reactive.form.fullScreen = !$reactive.form.fullScreen;
     }
   }
 }

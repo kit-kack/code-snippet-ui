@@ -149,6 +149,7 @@ utools.onPluginEnter((data)=>{
             copyCode(true,undefined,true)
                 .then(input =>{
                     if(input){
+                        $normal.funcs.snippetName = $reactive.currentSnippet.name;
                         $normal.entry = true;
                         enterApp(data)
                     }else{
@@ -186,7 +187,9 @@ try{
         $reactive.currentSnippet = result[option.index];
         // $reactive.core.selectedIndex = 0;
         $index.value = 0;
-        copyCode(true,num,true)
+        copyCode(true,num,true).then(v =>{
+            utools.outPlugin();
+        })
         $normal.entry = $reactive.currentSnippet.type?.startsWith('x-');
         return $normal.entry
     })

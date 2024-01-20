@@ -177,6 +177,9 @@ const shortcuts = [{
   },{
     feature: "快速启用 uTools关键字",
     shortcut: 'Alt + K'
+  },{
+    feature: "全屏编辑代码",
+    shortcut: ['F11','Alt+F']
   }]
 }]
 
