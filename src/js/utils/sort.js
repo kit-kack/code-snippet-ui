@@ -81,24 +81,24 @@ export function handleArrayForHierarchy(result,name,tag,type){
         }
         // type filter
         if(type === ''){
-            if(!snippet.dir){
+            if(!item.dir){
                 continue;
             }
         }else if(type){
             if(type === '@'){
-                if(!snippet.link){
+                if(!item.link){
                     continue;
                 }
             }else{
-                if(fullAlias(snippet.type)!== type){
+                if(fullAlias(item.type).toLowerCase()!== type){
                     continue
                 }
             }
         }
         // tags filter
         if(tag){
-            if(snippet.tags){
-                if(!lowercaseIncludes(snippet.tags,tag)){
+            if(item.tags){
+                if(!lowercaseIncludes(item.tags,tag)){
                     continue;
                 }
             }else{
@@ -106,8 +106,8 @@ export function handleArrayForHierarchy(result,name,tag,type){
             }
         }
         // collect snippet tag
-        if(snippet.tags){
-            for (const tag of snippet.tags) {
+        if(item.tags){
+            for (const tag of item.tags) {
                 $reactive.main.tagSet.add(tag)
             }
         }

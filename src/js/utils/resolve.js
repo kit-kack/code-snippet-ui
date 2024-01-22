@@ -79,7 +79,7 @@ export function replaceOrAddTag(searchWord,tag){
             }
         }
         temp = temp.trim();
-        utools.setSubInputValue(temp+ ' ')
+        utools.setSubInputValue(temp)
     }else{
         let temp = '';
         if(tag){
@@ -88,7 +88,7 @@ export function replaceOrAddTag(searchWord,tag){
                 temp += '#'
             }
         }
-        utools.setSubInputValue(temp+ ' ')
+        utools.setSubInputValue(temp)
     }
 
     if(!$reactive.utools.focused){

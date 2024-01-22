@@ -57,7 +57,6 @@ export async function load_backup(path){
         positiveText: "确定退出插件",
         maskClosable: false,
         onPositiveClick:()=>{
-            utools.outPlugin();
             window.preload.closePlugin()
         }
     })

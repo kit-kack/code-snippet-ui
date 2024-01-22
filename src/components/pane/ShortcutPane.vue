@@ -172,14 +172,14 @@ const shortcuts = [{
     feature: "查看『快捷方式』",
     shortcut: 'Alt + Z'
   },{
-    feature: "快速启用 子代码片段",
+    feature: "快速启用 占位符处理",
     shortcut: ['Alt + X',"Alt + C"]
   },{
     feature: "快速启用 uTools关键字",
     shortcut: 'Alt + K'
   },{
     feature: "全屏编辑代码",
-    shortcut: ['F11','Alt+F']
+    shortcut: ['F11','Alt + F']
   }]
 }]
 
