@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.1](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.0...v2.7.1) (2024-01-23)
+
+
+### Features
+
+* 支持代码编辑高亮 ([314d6f3](https://github.com/kit-kack/code-snippet-ui/commit/314d6f39efd6d9f5decf889af6b3a2cd138489a5))
+
 ## [2.7.0](https://github.com/kit-kack/code-snippet-ui/compare/v2.6.4...v2.7.0) (2024-01-19)
 
 
