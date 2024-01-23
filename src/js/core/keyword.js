@@ -1,7 +1,3 @@
-import {isEmpty as _isEmpty} from "lodash-es";
-import {codeSnippetManager} from "./snippet";
-import {utools_db_store} from "./base";
-
 const KEYWORD_PREFIX = 'keyword/';
 
 /**
@@ -71,24 +67,24 @@ export function batch_delete_utools_keyword(prefix){
     }
 }
 
-export function adapt_old_utools_keyword(){
-    const oldKeywords = "code-snippet-keyword";
-    const featues = utools.getFeatures([oldKeywords])
-    if(_isEmpty(featues)){
-        return
-    }
-    const cmds = featues[0].cmds;
-    if(_isEmpty(cmds)){
-        return;
-    }
-    for (const codeSnippet of codeSnippetManager.rootSnippetMap.values()) {
-        if(cmds.includes(codeSnippet.name)){
-            delete codeSnippet.feature;
-            codeSnippet.keyword = true;
-            utools_db_store("code/"+codeSnippet.id,codeSnippet)
-            register_utools_keyword(codeSnippet,null,false)
-        }
-    }
-    // final delete
-    utools.removeFeature(oldKeywords)
-}
+// export function adapt_old_utools_keyword(){
+//     const oldKeywords = "code-snippet-keyword";
+//     const featues = utools.getFeatures([oldKeywords])
+//     if(_isEmpty(featues)){
+//         return
+//     }
+//     const cmds = featues[0].cmds;
+//     if(_isEmpty(cmds)){
+//         return;
+//     }
+//     for (const codeSnippet of codeSnippetManager.rootSnippetMap.values()) {
+//         if(cmds.includes(codeSnippet.name)){
+//             delete codeSnippet.feature;
+//             codeSnippet.keyword = true;
+//             utools_db_store("code/"+codeSnippet.id,codeSnippet)
+//             register_utools_keyword(codeSnippet,null,false)
+//         }
+//     }
+//     // final delete
+//     utools.removeFeature(oldKeywords)
+// }

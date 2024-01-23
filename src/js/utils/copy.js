@@ -134,8 +134,6 @@ export async function copyCode(isPasted,num,noView){
                     _notify("当前代码片段不支持",noView)
                     return;
                 }
-
-                // TODO: 现版本 简单处理
                 const lines = $reactive.currentCode.split('\n')
                 let str = '';
                 for (const section of $reactive.currentSnippet.sections) {

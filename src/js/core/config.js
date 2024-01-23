@@ -1,10 +1,8 @@
 import {utools_db_store} from "./base";
-import {defaultHelpSnippet} from "../some";
+import {defaultHelpSnippet, localConfigDirPath} from "../some";
 import {adjustTheme} from "../theme";
 import {$normal, $reactive} from "../store";
-import {adapt_old_utools_keyword} from "./keyword";
 
-const GLOBAL_CONFIG = "config"
 const NEW_GLOBAL_CONFIG = "conf"
 export const configManager = {
     configs: {},
@@ -13,9 +11,6 @@ export const configManager = {
         if(this.isInited){
             return;
         }
-        // TODO: 下个大版本移除
-        utools.db.remove(GLOBAL_CONFIG)
-        adapt_old_utools_keyword()
         // data
         this.configs = utools.db.get(NEW_GLOBAL_CONFIG)?.data ?? {}
         // init item code show
@@ -69,19 +64,24 @@ export const configManager = {
      * @param {ConfPath} path
      */
     getSubItem(path){
-        const key = NEW_GLOBAL_CONFIG + "/" + path;
-        const doc = utools.db.get(key);
+        // TODO: 下一个版本移除 v2.7.2
+        const oldKey = NEW_GLOBAL_CONFIG + "/" + path;
+        const doc = localStorage.getItem(oldKey)
         if(doc){
-            localStorage.setItem(key,JSON.stringify(doc.data))
-            utools.db.remove(key)
+            localStorage.removeItem(oldKey)
+            this.setSubItem(path,doc)
+            return JSON.parse(doc);
         }
-        return JSON.parse(localStorage.getItem(key))
+        const key = NEW_GLOBAL_CONFIG + "-" + path + '.json';
+        try{
+            return JSON.parse(window.preload.readFile(window.preload.getFinalPath(localConfigDirPath,key)).toString());
+        }catch (_){}
     },
     /**
      * @param {ConfPath} path
      * @param config
      */
     setSubItem(path,config){
-        localStorage.setItem(NEW_GLOBAL_CONFIG + "/" + path,JSON.stringify(config))
+        preload.writeConfigFile(localConfigDirPath,NEW_GLOBAL_CONFIG + "-" + path + '.json',JSON.stringify(config))
     }
 }
