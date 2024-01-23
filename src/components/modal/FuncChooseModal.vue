@@ -3,16 +3,9 @@
   <template v-for="(func,key) in formatManager.funcMap">
     <div class="func" @mouseenter="descShow[key] = true"
          @mouseleave="descShow[key] = false">
-
         <n-collapse-item :title="func.name">
           <p class="func-desc" v-html="func.desc?.replaceAll('\n','<br/>')??'暂无描述'"></p>
         </n-collapse-item>
-
-<!--      <h4>⚡{{func.name}}</h4>-->
-<!--      <n-scrollbar style="max-height:100px;margin-bottom: 5px;padding-right: 10px" x-scrollable-->
-<!--      >-->
-<!--        <p class="func-desc" v-html="func.desc?.replaceAll('\n','<br/>')??'暂无描述'"></p>-->
-<!--      </n-scrollbar>-->
       <n-button tertiary size="tiny" v-for="command in func.commands"
                 @click="$emit('choose',command)" >
         {{command}}
@@ -44,6 +37,9 @@ const descShow = ref({})
   }
   .n-button{
     margin: 5px;
+  }
+  .n-button:hover{
+    color: var(--global-color);
   }
 }
 

@@ -162,3 +162,17 @@ export function recongizeFileType(type){
     }
     return type.trim().toLowerCase();
 }
+export const MATCHED_WORDS = {
+  '(':')',
+  '{':'}',
+  '[':']',
+  "'":"'",
+  '"':'"',
+  '`':'`'
+}
+export function isMatchedWord(a,b){
+    if(a in MATCHED_WORDS){
+        return MATCHED_WORDS[a] === b;
+    }
+    return false
+}

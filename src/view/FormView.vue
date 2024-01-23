@@ -99,6 +99,7 @@
                             tag
                             @update-value="v=> configManager.set('default_language',v)"
                             :theme-overrides="selectThemeOverrides"
+                            :render-tag="renderCodeTypeTag"
                         />
                       </n-space>
                       <config-switch title="默认是否注册uTools关键字" config="default_keyword_enable"/>
@@ -668,88 +669,6 @@ onUnmounted(()=>{
   hljs.removePlugin(X_PLUGIN)
   document.removeEventListener('keydown',keyDownHandler)
 })
-
-// function handleKeyDown(e){
-//   if(e.key === 'Tab'){
-//     let char;
-//     switch (configManager.get('default_tab')){
-//       case 1:
-//         char = '\t';
-//         break;
-//       case 2:
-//         char = '  ';
-//         break;
-//       case 4:
-//         char = '    ';
-//         break;
-//       default:
-//         return;
-//     }
-//     e.preventDefault();
-//     let start = codeTextArea.value.textareaElRef.selectionStart;
-//     codeTemplate.code =
-//         codeTemplate.code.slice(0,start)
-//         +char
-//         +codeTemplate.code.slice(start)
-//     nextTick(()=>{
-//       start += char.length;
-//       codeTextArea.value.textareaElRef.setSelectionRange(start,start)
-//     })
-//   }else if(e.key in matchedWords){
-//     e.preventDefault()
-//     let start = codeTextArea.value.textareaElRef.selectionStart;
-//     codeTemplate.code =
-//         codeTemplate.code.slice(0,start)
-//         +e.key+ matchedWords[e.key]
-//         +codeTemplate.code.slice(start)
-//     nextTick(()=>{
-//       start += 1;
-//       codeTextArea.value.textareaElRef.setSelectionRange(start,start)
-//     })
-//   }else if(e.key === 'Backspace'){
-//     let start = codeTextArea.value.textareaElRef.selectionStart;
-//     if(start === codeTextArea.value.textareaElRef.selectionEnd && start < codeTemplate.code.length){
-//       if(isMatchWord(codeTemplate.code[start-1],codeTemplate.code[start])){
-//         e.preventDefault()
-//         codeTemplate.code =
-//             codeTemplate.code.slice(0,start-1)
-//             +codeTemplate.code.slice(start+1)
-//         nextTick(()=>{
-//           start -= 1;
-//           codeTextArea.value.textareaElRef.setSelectionRange(start,start)
-//         })
-//       }else if(codeTemplate.code[start] === '\n' && codeTemplate.code[start-1] === '\n'){
-//         if(isMatchWord(codeTemplate.code[start-2],codeTemplate.code[start+1])){
-//           e.preventDefault()
-//           codeTemplate.code =
-//               codeTemplate.code.slice(0,start-1)
-//               +codeTemplate.code.slice(start+1)
-//           nextTick(()=>{
-//             start -= 1;
-//             codeTextArea.value.textareaElRef.setSelectionRange(start,start)
-//           })
-//         }
-//       }
-//
-//     }
-//   }
-// }
-// const matchedWords = {
-//   '(':')',
-//   '{':'}',
-//   '[':']',
-//   "'":"'",
-//   '"':'"',
-//   '`':'`'
-// }
-// function isMatchWord(a,b) {
-//   if(a in matchedWords){
-//     return matchedWords[a] === b
-//   }
-//   return false
-// }
-
-
 const selectThemeOverrides = {
   peers:{
     InternalSelection:{

@@ -47,8 +47,7 @@
             ref="textarea"
             :autofocus="autofocus"
             spellcheck="false"
-            @keydown.tab.prevent.stop="tab"
-            @keydown.enter.prevent.stop="enter"
+            @keydown="handleKeyDown"
             @scroll="calcScrollDistance"
             :value="modelValue == undefined ? content : modelValue"
             @input="updateValue"
@@ -81,6 +80,7 @@
 <script>
 import hljs from "../../js/dep/highlight-dep";
 import {configManager} from "../../js/core/config";
+import {isMatchedWord, MATCHED_WORDS} from "../../js/utils/language";
 
 export default {
   name: "CodeEditor",
@@ -236,26 +236,15 @@ export default {
       this.$emit("lang", lang[0]);
     },
     tab() {
-      if (document.execCommand("insertText")) {
-        document.execCommand("insertText", false, this.tabWidth());
-      } else {
-        const cursorPosition = this.$refs.textarea.selectionStart;
-        const tabChar = this.tabWidth();
-        this.content =
-            this.content.substring(0, cursorPosition) + tabChar + this.content.substring(cursorPosition);
-        this.cursorPosition = cursorPosition + tabChar.length;
-        this.insertTab = true;
-      }
+      document.execCommand("insertText", false, this.tabWidth());
     },
-    enter(){
-      // $message.info("enter")
+    enter(shift){
       const cursorPosition = this.$refs.textarea.selectionStart;
-      // const tabChar = this.tabWidth();
       let lineChar = '\n';
-      const currentLineStart = this.$refs.textarea.value.lastIndexOf('\n',cursorPosition-1) + 1;
+      const currentLineStart = this.modelValue.lastIndexOf('\n',cursorPosition-1) + 1;
       let end = currentLineStart;
       while (end < cursorPosition){
-        const char = this.$refs.textarea.value.charAt(end);
+        const char = this.modelValue.charAt(end);
         if(char === '\r' || char=== '\t' || char === ' '){
           end++
         }else{
@@ -263,15 +252,24 @@ export default {
         }
       }
       if(end > currentLineStart){
-        lineChar += this.$refs.textarea.value.slice(currentLineStart,end);
+        lineChar += this.modelValue.slice(currentLineStart,end);
       }
-      if (document.execCommand("insertText")) {
+      if(shift){
+        // 向后寻找下一个\n
+        const currentLineEnd =  this.modelValue.indexOf('\n',cursorPosition + 1)
+        if(currentLineEnd === -1){
+          const temp = this.modelValue+lineChar;
+          this.cursorPosition = temp.length;
+          this.insertTab = true;
+          this.$emit("update:modelValue",temp)
+        }else{
+          const temp = this.modelValue.slice(0,currentLineEnd) + lineChar + this.modelValue.slice(currentLineEnd);
+          this.cursorPosition = currentLineEnd + lineChar.length;
+          this.insertTab = true;
+          this.$emit("update:modelValue",temp)
+        }
+      }else {
         document.execCommand("insertText", false, lineChar);
-      } else {
-        this.content =
-            this.content.substring(0, cursorPosition) + lineChar + this.content.substring(cursorPosition);
-        this.cursorPosition = cursorPosition + lineChar.length;
-        this.insertTab = true;
       }
     },
     calcScrollDistance(e) {
@@ -314,12 +312,44 @@ export default {
         lineNum++;
         position = str.indexOf("\n", position + 1);
       }
-      // heightNum
-      const singleLineHeight = this.$refs.lineNums.firstChild.offsetHeight;
-      const heightNum = parseInt(this.textareaHeight / singleLineHeight) - 1;
       // displayed lineNum
       this.lineNum = lineNum;
     },
+    handleKeyDown(e){
+      if(e.key === 'Tab'){
+        e.preventDefault();
+        this.tab();
+      }else if(e.key === 'Enter') {
+        e.preventDefault();
+        this.enter(e.shiftKey);
+      }else if(e.key === 'Backspace'){
+        let start = this.$refs.textarea.selectionStart;
+        if(start === this.$refs.textarea.selectionEnd && start < this.modelValue.length){
+          if(isMatchedWord(this.modelValue[start-1],this.modelValue[start])){
+            e.preventDefault()
+            this.cursorPosition = start -1;
+            this.insertTab = true;
+            this.$emit("update:modelValue",this.modelValue.slice(0,start-1)+this.modelValue.slice(start+1))
+          }else if(this.modelValue[start] === '\n' && this.modelValue[start-1] === '\n'){
+            if(isMatchedWord(this.modelValue[start-2],this.modelValue[start+1])){
+              e.preventDefault()
+              this.cursorPosition = start -1;
+              this.insertTab = true;
+              this.$emit("update:modelValue",this.modelValue.slice(0,start-1)+this.modelValue.slice(start+1))
+            }
+          }
+        }
+      }else if(e.key in MATCHED_WORDS){
+        e.preventDefault()
+        let start = this.$refs.textarea.selectionStart;
+        this.cursorPosition = start+1;
+        this.insertTab = true;
+        this.$emit("update:modelValue", this.modelValue.slice(0,start)
+            +e.key+ MATCHED_WORDS[e.key]
+            +this.modelValue.slice(start));
+
+      }
+    }
   },
   mounted() {
     this.$emit("lang", this.languages[0][0]);
