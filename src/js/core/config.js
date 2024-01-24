@@ -38,15 +38,13 @@ export const configManager = {
         this.isInited = true;
     },
     /**
-     *
-     * @param { ConfigItem } config
+     * @param {ConfigItem} config
      * @return {any}
      */
     get(config){
         return this.configs[config]
     },
     /**
-     *
      * @param {ConfigItem} config
      * @param value
      */

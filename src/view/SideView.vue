@@ -46,12 +46,14 @@
             开启后，为代码片段添加VSCode标签即可写入到VSCode代码片段中，IDEA、Sublime Text等同理
             <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
           </n-tooltip>
-          <!--          <n-tooltip trigger="hover">-->
-          <!--            <template #trigger>-->
-          <!--              <config-check-tag title="搜索匹配代码片段内容" config="beta_content_search"/>-->
-          <!--            </template>-->
-          <!--            开启后，name不仅会匹配代码片段名，也会匹配代码片段内容-->
-          <!--          </n-tooltip>-->
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <config-check-tag title="💡扩充搜索范围" config="beta_wide_snippet_search"/>
+            </template>
+            开启后，name在原有匹配片段名的基础上，还将匹配：
+            <n-checkbox :focusable="false" :checked="betaSearchAspects.desc" @update:checked="handleChangeBetaSearchAspects('desc',$event)">描述说明</n-checkbox>
+            <n-checkbox :focusable="false" :checked="betaSearchAspects.content" @update:checked="handleChangeBetaSearchAspects('content',$event)">代码内容（仅支持普通代码片段）</n-checkbox>
+          </n-tooltip>
           <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>
         </n-space>
       </n-space>
@@ -112,6 +114,14 @@ import SpecialTagConfigModal from "../components/modal/SpecialTagConfigModal.vue
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
+const betaSearchAspects = ref({
+  desc: !configManager.get('beta_wide_desc_close'),
+  content: !configManager.get('beta_wide_content_close'),
+})
+function handleChangeBetaSearchAspects(type,value){
+  betaSearchAspects.value[type] = value;
+  configManager.set(`beta_wide_${type}_close`,!value)
+}
 const dealWithTagRefresh = ()=>{
   refreshListView()
   doRefresh();

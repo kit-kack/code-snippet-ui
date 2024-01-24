@@ -3,6 +3,7 @@ import {match} from "../utils/fuzzy";
 import {utools_db_store} from "./base";
 import {tagColorManager} from "./tag";
 import {batch_delete_utools_keyword, delete_utools_keyword, register_utools_keyword} from "./keyword";
+import {configManager} from "./config";
 
 const CODE_PREFIX = "code/";
 const SUB_CODE_PREFIX = "#code/"
@@ -197,30 +198,40 @@ export const codeSnippetManager = {
          * @type {CodeSnippet[]}
          */
         let list = [];
-        // const searchContent = configManager.get('beta_content_search')
+        const betaDescSearch = !configManager.get('beta_wide_desc_close');
+        const betaContentSearchClose = configManager.get('beta_wide_content_close');
+        const betaSearch = configManager.get('beta_wide_snippet_search') && (betaDescSearch || !betaContentSearchClose);
         if(name){
             for (const codeSnippet of map.values()) {
                 const result = match(name,codeSnippet.name)
                 if(result !== null){
                     codeSnippet.temp = result;
+                    codeSnippet.matchType = undefined;
                     list.push(codeSnippet)
+                } else if(betaSearch){
+                    // desc
+                    if(betaDescSearch && codeSnippet.desc){
+                        if(codeSnippet.desc.toLowerCase().includes(name)){
+                            codeSnippet.matchType = 1;
+                            list.push(codeSnippet)
+                            continue
+                        }
+                    }
+                    // pass
+                    if(betaContentSearchClose || codeSnippet.dir || codeSnippet.path || codeSnippet.link){
+                        continue;
+                    }
+                    // code 💛
+                    if(codeSnippet.code && codeSnippet.code.toLowerCase().includes(name)){
+                        codeSnippet.matchType = 2;
+                        list.push(codeSnippet)
+                    }
                 }
-                // else if(searchContent){
-                //     //
-                //     if(codeSnippet.dir || codeSnippet.path || codeSnippet.link){
-                //         continue;
-                //     }
-                //     if(codeSnippet.code){
-                //         const lowercaseCode = codeSnippet.code.toLowerCase();
-                //         if(lowercaseCode.includes(name)){
-                //             list.push(codeSnippet)
-                //         }
-                //     }
-                // }
             }
         }else{
             for (let codeSnippet of map.values()) {
                 codeSnippet.temp = undefined;
+                codeSnippet.matchType = undefined;
                 list.push(codeSnippet)
             }
         }
@@ -230,16 +241,57 @@ export const codeSnippetManager = {
     deepQuery(name){
         // first root
         const list = [];
+        const betaDescSearch = !configManager.get('beta_wide_desc_close');
+        const betaContentSearchClose = configManager.get('beta_wide_content_close');
+        const betaSearch = configManager.get('beta_wide_snippet_search') && (betaDescSearch || !betaContentSearchClose);
         for (const codeSnippet of this.rootSnippetMap.values()) {
             if(!codeSnippet.dir && match(name,codeSnippet.name) !== null){
+                codeSnippet.matchType = undefined;
                 list.push(codeSnippet)
+            }else if(betaSearch){
+                // desc
+                if(betaDescSearch && codeSnippet.desc){
+                    if(codeSnippet.desc.toLowerCase().includes(name)){
+                        codeSnippet.matchType = 1;
+                        list.push(codeSnippet)
+                        continue
+                    }
+                }
+                // pass
+                if(betaContentSearchClose || codeSnippet.dir || codeSnippet.path || codeSnippet.link){
+                    continue;
+                }
+                // code 💛
+                if(codeSnippet.code && codeSnippet.code.toLowerCase().includes(name)){
+                    codeSnippet.matchType = 2;
+                    list.push(codeSnippet)
+                }
             }
         }
         // then sub
         for (const doc of utools.db.allDocs(SUB_CODE_PREFIX)) {
             const snippet = doc.data;
             if(!snippet.dir && match(name,snippet.name) !== null){
+                snippet.matchType = undefined;
                 list.push(snippet)
+            }else if(betaSearch){
+                // desc
+                if(betaDescSearch && snippet.desc){
+                    if(snippet.desc.toLowerCase().includes(name)){
+                        snippet.matchType = 1;
+                        list.push(snippet)
+                        continue
+                    }
+                }
+                // pass
+                if(betaContentSearchClose || snippet.dir || snippet.path || snippet.link){
+                    continue;
+                }
+                // code 💛
+                if(snippet.code && snippet.code.toLowerCase().includes(name)){
+                    snippet.matchType = 2;
+                    list.push(snippet)
+                }
             }
         }
         return list

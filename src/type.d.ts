@@ -56,6 +56,8 @@ declare interface CodeSnippet extends CodeSnippetCore{
     nativeId?: string
     // TODO: desc 作为MD渲染
     descAsMd?: boolean
+    // 匹配类型
+    matchType?: 1 | 2
 }
 
 declare interface Func {
@@ -216,7 +218,10 @@ declare type ConfigItem =
     | "default_tab"                              // 编辑界面Tab键行为： 0-原生 1-\t 2-2个空格 4-4个空格
     | "default_language"                         // 默认语言
     | "default_keyword_enable"                       // 默认是否启用uTools关键字
-    | "beta_tag_aid_choose"                      // 标签辅助选择
+// @deprecated    | "beta_tag_aid_choose"                      // 标签辅助选择
+    | "beta_wide_snippet_search"                 // 允许扩充搜索范围
+    | "beta_wide_desc_close"                     // 关闭描述匹配
+    | "beta_wide_content_close"                  // 关闭内容匹配
     | "beta_sub_snippet_search"                  // 允许搜索子代码片段
     | "beta_special_tag"                         // 特殊标签
     | "beta_content_search"                      // 允许搜索内容

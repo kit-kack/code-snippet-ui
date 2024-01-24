@@ -25,7 +25,6 @@
 <script setup>
 
 import BaseModal from "./BaseModal.vue";
-import {NButton} from "naive-ui";
 import {$reactive} from "../../js/store";
 import {ref, toRaw} from "vue";
 import {configManager} from "../../js/core/config";

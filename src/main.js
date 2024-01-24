@@ -181,7 +181,7 @@ try{
                 index: index,
                 icon: cs.type?.startsWith('x-')? '/code-x.png': '/code.png',
                 title: cs.path ? '[关联文件]：'+cs.path: cs.code,
-                tags: [cs.desc]
+                tags: [cs.desc,cs.matchType > 0 ? (cs.matchType === 1 ? '📗描述匹配' : '📘内容匹配') : undefined]
             }))
     },({code,type,payload,option})=>{
         $reactive.currentSnippet = result[option.index];

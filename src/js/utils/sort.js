@@ -14,6 +14,11 @@ import {isEmpty as _isEmpty} from "lodash-es"
  */
 function _compare(property){
     return function (a,b){
+        // first compare matchType
+        const result = (a.matchType ?? 0) - (b.matchType ?? 0);
+        if(result !== 0){
+            return result;
+        }
         if(a[property] == null){
             return (b[property] == null)? a.name.localeCompare(b.name) : 1;
         }else if(b[property] == null){
@@ -54,18 +59,11 @@ export function handleArrayForHierarchy(result,name,tag,type){
     const topList = hierachyHubManager.getTopList();
     const snippetHub = hierachyHubManager.currentHub.snippets;
     const override_support = snippetHub && !GLOBAL_HIERARCHY.currentHierarchy.core
-
+    const betaDescSearch = !configManager.get('beta_wide_desc_close');
+    const betaContentSearchClose = configManager.get('beta_wide_content_close');
+    const betaSearch = configManager.get('beta_wide_snippet_search') && (betaDescSearch || !betaContentSearchClose);
     for (const snippet of result.snippets) {
         const item = {...snippet}
-        // name filter
-        if(nameFilter){
-            const result = match(name,snippet.name)
-            if(result !== null){
-                item.temp = result;
-            }else{
-                continue;
-            }
-        }
         const id = snippet.id ??snippet.name;
         item.now = now + '-' + id;
         // properties override
@@ -76,6 +74,26 @@ export function handleArrayForHierarchy(result,name,tag,type){
                     if(snippetData[key]){
                         item[key] = snippetData[key]
                     }
+                }
+            }
+        }
+        // name filter
+        if(nameFilter){
+            const result = match(name,item.name)
+            if(result !== null){
+                item.temp = result;
+            }else if(betaSearch){
+                // desc
+                if(betaDescSearch && item.desc){
+                    if(item.desc.toLowerCase().includes(name)){
+                        item.matchType = 1;
+                    }
+                }else if(betaContentSearchClose || item.dir || item.path || item.link){
+                    continue;
+                }else if(item.code && item.code.toLowerCase().includes(name)){
+                    item.matchType = 2;
+                }else{
+                    continue;
                 }
             }
         }
@@ -119,14 +137,13 @@ export function handleArrayForHierarchy(result,name,tag,type){
         // top
         const index = topList.indexOf(id);
         if(index === -1){
+            item.index = undefined;
             normalSnippets.push(item)
         }else{
             item.index = index;
             topSnippets.push(item);
         }
-
     }
-
     // 对 topSnippets进行排序
     topSnippets.sort((a,b)=> a.index - b.index)
     if(!result.sorted){
@@ -141,7 +158,14 @@ export function handleArrayForHierarchy(result,name,tag,type){
                 normalSnippets.sort(COUNT_COMPARE)
                 break;
             default:  // 自然排序
-                normalSnippets.sort((a,b)=>a.name.localeCompare(b.name))
+                normalSnippets.sort((a,b) =>{
+                    const result = (a.matchType ?? 0) - (b.matchType ?? 0)
+                    if(result === 0){
+                        return a.name.localeCompare(b.name);
+                    }else{
+                        return result;
+                    }
+                })
                 break;
         }
     }

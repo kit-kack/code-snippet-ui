@@ -152,16 +152,21 @@ const pair = computed(()=>{
   let code;
   // sideInfo
   let sideInfo = '';
+  if(props.snippet.matchType === 1){
+    sideInfo = '📗描述匹配';
+  }else if(props.snippet.matchType === 2){
+    sideInfo = '📘内容匹配';
+  }
   if(props.snippet.sections){
     if(props.snippet.sections.length > 0){
       if(props.snippet.keyword){
-        sideInfo = '✬×'+props.snippet.sections.length;
+        sideInfo = '✬×'+props.snippet.sections.length + ' ' + sideInfo;
       }else{
-        sideInfo = '⚑×'+props.snippet.sections.length;
+        sideInfo = '⚑×'+props.snippet.sections.length + ' ' + sideInfo;
       }
     }
   }else if(props.snippet.keyword){
-    sideInfo = '✬'
+    sideInfo = '✬' + ' ' + sideInfo;
   }
   if(props.snippet.dir){
     // if(props.snippet.ref === "local"){
