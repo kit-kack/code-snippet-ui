@@ -16,7 +16,7 @@
   </div>
   <div class="snippet-count-info">
     <n-button
-        quaternary
+        text
         :color="$normal.theme.globalColor"
         @click="$reactive.form.fullScreen = false"
         style="height: 15px" size="small"  v-if="$reactive.currentMode > CODE_VIEW && $reactive.form.fullScreen">

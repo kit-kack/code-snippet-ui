@@ -17,8 +17,7 @@ const DEFAULT_FUNCS = {
         desc: `弹出输入框，用户主动输入值;
 [input/输入]可选参数：任意值（作为输入框默认值）
 [select/选择]必需参数：字符串数组,例如<i>['a','b','c']</i>
-额外说明：如果没有使用变量接收，默认输入的值会被保存到名为<i>位置X</i>的变量，故请勿将自定义的变量设置为<i>位置X</i>的形式
-`,
+额外说明：如果没有使用变量接收，默认输入的值会被保存到名为<i>位置X</i>的变量，故请勿将自定义的变量设置为<i>位置X</i>的形式`,
         commands: ["input","输入","select","选择"],
         expression: '内置提供，无函数实现',
         default: true
@@ -46,8 +45,7 @@ switch (command) {
     '剪切板': {
         name: "剪切板",
         desc: `获取剪切板内容;
-可选参数：<i>小写</i>/<i>lowercase</i>/<i>大写</i>/<i>uppercase</i>/<i>去空格</i>/<i>trim</i>
-        `,
+可选参数：<i>小写</i>/<i>lowercase</i>/<i>大写</i>/<i>uppercase</i>/<i>去空格</i>/<i>trim</i>`,
         commands: ["clipboard","剪切板"],
         expression: `\
 const data = $._clipboard.readText();
@@ -70,8 +68,7 @@ switch (param){
         desc: `获取随机数/nanoid/uuid;
 random可选参数：<i>min..max</i>（来指定范围） 
 nanoid可选参数：<i>size</i>(来指定id字符数量)
-uuid可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）  
-`,
+uuid可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）`,
         commands: ["random", "nanoid","uuid"],
         expression: `\
 switch (command){

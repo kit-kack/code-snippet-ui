@@ -74,10 +74,10 @@
   </div>
 </template>
 <script setup>
-import {ref, toRaw} from "vue";
+import {h, ref, toRaw} from "vue";
 import {formatManager} from "../../js/core/func";
 import {getRefreshFunc} from "../../js/utils/common";
-import {$reactive} from "../../js/store";
+import {$normal, $reactive} from "../../js/store";
 import BaseModal from "../modal/BaseModal.vue";
 import CodeEditor from "../lib/MyCodeEditor.vue";
 
@@ -135,12 +135,56 @@ function enterAddView(){
   $reactive.setting.funcEditActive = true;
 }
 function doDel(key){
-  formatManager.del(key)
-  doRefresh()
+  $dialog.error({
+    autoFocus: false,
+    closable: false,
+    title: '删除操作',
+    content: ()=> h(
+        'div',
+        [
+          '确定要删除分组 ',
+            h('span',
+                {
+                  style:{
+                    fontWeight: 'bolder',
+                  }
+                },key),
+          ' 以及相关占位符吗？',
+        ]
+    ),
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick(){
+      formatManager.del(key)
+      doRefresh()
+    }
+  })
 }
 function doReset(){
-  formatManager.reset();
-  doRefresh()
+  $dialog.error({
+    autoFocus: false,
+    closable: false,
+    title: '重置操作',
+    content: ()=> h(
+        'div',
+        [
+          '确定要进行 ',
+          h('span',
+              {
+                style:{
+                  fontWeight: 'bolder',
+                }
+              },'重置'),
+          ' 吗？',
+        ]
+    ),
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick(){
+      formatManager.reset();
+      doRefresh()
+    }
+  })
 }
 function enterEditView(key,value){
   pair.value = {

@@ -1,4 +1,4 @@
-import {$index, $normal, $reactive, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, switchToFullUIMode,} from "../store"
+import {$index, $normal, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, switchToFullUIMode,} from "../store"
 import {isNetWorkUri} from "../utils/common";
 import {Direction, doScrollForHelpView} from "../utils/scroller";
 import {copyCode} from "../utils/copy";
@@ -181,6 +181,28 @@ export function initKeyboardListener() {
                     // 处理 Vim 操作
                     $normal.spaceInvoker[$reactive.utools.subItemSelectedIndex]?.()
                 }
+            }
+        }
+    }
+    document.onmousedown = e =>{
+        if(e.button < 3){
+            return;
+        }
+        if($reactive.currentMode === LIST_VIEW){
+            if(e.button === 3){ // back
+                GLOBAL_HIERARCHY.changeHierarchy('prev')
+            }else if(e.button === 4){  // next
+                if($reactive.currentSnippet.dir){
+                    GLOBAL_HIERARCHY.changeHierarchy("next")
+                }else if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
+                    utools.shellOpenExternal($reactive.currentSnippet.path)
+                }else{
+                    GLOBAL_HIERARCHY.changeView(CODE_VIEW)
+                }
+            }
+        }else if($reactive.currentMode === CODE_VIEW){
+            if(e.button === 3){
+                GLOBAL_HIERARCHY.changeView(LIST_VIEW)
             }
         }
     }

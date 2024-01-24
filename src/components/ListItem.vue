@@ -286,6 +286,10 @@ function doViewCode(){
     $reactive.utools.subItemSelectedIndex = -1;
     return;
   }
+  if(props.snippet.dir){
+    GLOBAL_HIERARCHY.changeHierarchy("next")
+    return
+  }
   GLOBAL_HIERARCHY.changeView(CODE_VIEW);
 }
 function doEdit(){
