@@ -17,7 +17,7 @@
           {{$index}}{{$reactive.utools.subItemSelectedIndex > -1? `#${$reactive.utools.subItemSelectedIndex}`:''}}
         </n-button>
       </template>
-      {{($reactive.currentMode <= CODE_VIEW)? 'Never a negative acknowledge why it is impossible.':'明知道没有结果，又何必再继续呢？'}}
+      {{($reactive.currentMode <= CODE_VIEW)? 'Vim模式启用中':'Vim模式不可用'}}
     </n-tooltip>
   </div>
 

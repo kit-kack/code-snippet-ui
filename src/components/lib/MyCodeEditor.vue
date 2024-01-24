@@ -20,7 +20,6 @@
     <div class="hljs">
       <div
           class="code-area"
-          :style="{ borderRadius: header ? '0 0 ' + borderRadius + ' ' + borderRadius : borderRadius }"
       >
         <div
             v-if="showLineNums"
@@ -40,7 +39,7 @@
             :readOnly="readOnly"
             :style="{
             fontSize: fontSize,
-            padding: '5px 10px 40px 10px',
+            padding: '5px 10px 10px 10px',
             marginLeft: showLineNums ? lineNumsWidth + 'px' : '0',
             width: showLineNums ? 'calc(100% - ' + lineNumsWidth + 'px)' : '100%',
           }"
@@ -68,7 +67,7 @@
             top: top + 'px',
             left: left + 'px',
             fontSize: fontSize,
-            padding: '5px 10px 40px 10px'
+            padding: '5px 10px 10px 10px'
           }">
         </code>
       </pre>
