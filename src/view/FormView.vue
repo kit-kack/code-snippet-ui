@@ -196,7 +196,9 @@
                           </template>
                         </n-button>
                       </div>
-                      <div style="margin-left: 8px;margin-top: 10px">{{(codeTemplate.dir&&!codeTemplate.ref)? '📢无预设内容，其内容受父目录控制':codeTemplate.path}}</div>
+                      <n-ellipsis style="max-width: 600px;margin-left: 8px;margin-top: 10px">
+                        {{(codeTemplate.dir&&!codeTemplate.ref)? '📢无预设内容，其内容受父目录控制':codeTemplate.path}}
+                      </n-ellipsis>
                     </n-list-item>
                   </n-list>
                 </template>

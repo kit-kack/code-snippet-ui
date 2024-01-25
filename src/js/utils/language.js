@@ -41,6 +41,8 @@ function _alias(type){
             return 'dart';
         case 'f#':
             return 'fsharp';
+        case 'gradle':
+            return 'groovy';
         case 'img':
             return 'image';
         case 'js':

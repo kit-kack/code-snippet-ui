@@ -57,12 +57,7 @@ export const tagColorManager={
         this.writeToDB();
     },
     clear(tag){
-        if(this.tags[tag] === null){
-            this.tags[tag] = undefined;
-        }else{
-            //处理 颜色
-            this.tags[tag] = null;
-        }
+        this.tags[tag] = undefined;
         this.writeToDB();
     },
     add(tag){  // 仅适用旧版本

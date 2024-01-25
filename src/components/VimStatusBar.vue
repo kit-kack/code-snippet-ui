@@ -1,6 +1,6 @@
 <template>
   <div id="extra-left" v-if="show" >
-    <n-tooltip trigger="hover" >
+    <n-tooltip trigger="hover" :show-arrow="false" :keep-alive-on-hover="false">
       <template #trigger>
         <n-button :focusable="false"  round strong  :="getBtnStyle()" @click="handleVimStatusBarClick()">
           <template #icon>

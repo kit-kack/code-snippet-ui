@@ -377,9 +377,13 @@ export default {
   position: relative;
   background: white;
 }
-#dark-app .code-editor{
+#dark-app #form-view .code-editor{
   background: #303133;
 }
+#dark-app .code-editor{
+  background: #454647;
+}
+
 .code-editor > div {
   width: 100%;
   height: 100%;

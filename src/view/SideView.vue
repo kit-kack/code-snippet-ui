@@ -23,16 +23,10 @@
         </n-space>
       </n-space>
       <n-divider>
-        测试Beta
+        Beta功能
       </n-divider>
       <n-space vertical align="center">
         <n-space>
-<!--          <n-tooltip trigger="hover">-->
-<!--            <template #trigger>-->
-<!--              <config-check-tag title="💡标签辅助选择" config="beta_tag_aid_choose"/>-->
-<!--            </template>-->
-<!--            开启后，输入框输入#后，会辅助提示选择标签-->
-<!--          </n-tooltip>-->
           <n-tooltip trigger="hover">
             <template #trigger>
               <config-check-tag title="💡搜索子代码片段" config="beta_sub_snippet_search"/>
@@ -81,10 +75,10 @@
         <n-tooltip>
           <template #trigger>
             <n-divider>
-              💡清除自定义标签（若有关联颜色先清除颜色）
+              💡清除自定义标签
             </n-divider>
           </template>
-          自定义标签被清除后，只会影响到编辑界面/辅助标签选择界面的标签选择
+          清除无用的标签，后续只会影响到编辑界面中的标签选择
         </n-tooltip>
         <template v-if="refreshFlag">
           <n-space style="padding: 0 10px">

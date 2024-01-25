@@ -136,7 +136,9 @@ const tagOptions = computed(()=>{
 <style lang="scss" scoped>
 #top-nav{
   position: relative;
-  height: 15px;
+  box-sizing: border-box;
+  height: 17px;
+  padding-top: 2px;
   width: 100%;
   * {
     user-select: none;
@@ -150,7 +152,7 @@ const tagOptions = computed(()=>{
 .snippet-count-info{
   position: fixed;
   right: 10px;
-  top:0;
+  top:2px;
   height: 15px;
   font-size: 12px;
   line-height: 1.0;

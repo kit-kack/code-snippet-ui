@@ -6,17 +6,7 @@
     <n-tag closable size="small" :round="isSpecial" :style="colorStyle" >{{props.content}}</n-tag>
   </template>
   <template v-else-if="type === 'clear'">
-    <n-tooltip>
-      <template #trigger>
-        <n-tag closable class="tag" size="small" :style="colorStyle"  @close="handleClose">{{props.content}}</n-tag>
-      </template>
-      <template v-if="tagColorManager.tags[props.content] === null">
-        <span style="color: indianred">清除标签</span>
-      </template>
-      <template v-else>
-        清除颜色
-      </template>
-    </n-tooltip>
+    <n-tag closable class="tag" size="small" :style="colorStyle"  @close="handleClose">{{props.content}}</n-tag>
   </template>
   <template v-else>
     <n-tag
@@ -30,9 +20,10 @@
 
 <script setup>
 
-import {computed} from "vue";
+import {computed, h} from "vue";
 import {tagColorManager} from "../../js/core/tag";
 import {$reactive, switchToFullUIMode} from "../../js/store";
+import NormalTag from "./NormalTag.vue";
 
 const props = defineProps({
   "content": String,
@@ -50,8 +41,29 @@ const colorStyle = computed(()=>{
  */
 const emit = defineEmits(['tagRefresh'])
 function handleClose(){
-  tagColorManager.clear(props.content)
-  emit('tagRefresh')
+  $dialog.error({
+    autoFocus: false,
+    closable: false,
+    title: '删除操作',
+    content: ()=> h(
+        'div',
+        [
+          '确定要删除标签 ',
+          h(NormalTag,
+              {
+                content: props.content,
+                type: 'raw'
+              },null),
+          ' 吗？',
+        ]
+    ),
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick(){
+      tagColorManager.clear(props.content)
+      emit('tagRefresh')
+    }
+  })
 }
 function handleTagClick(){
   $reactive.main.tagName = props.content;
@@ -75,6 +87,6 @@ function handleTagClick(){
 }
 .tag.raw:hover{
   border-radius: 10px;
-  box-shadow: #ccc 0 1px 4px;
+  box-shadow: #ccc 0 0 2px;
 }
 </style>

@@ -284,7 +284,7 @@ onUnmounted(()=>{
   z-index: 1000;
   width: 100%;
   position: relative;
-  height: calc(100vh - 15px);
+  height: calc(100vh - 17px);
 
   .n-button{
     color: var(--global-color)

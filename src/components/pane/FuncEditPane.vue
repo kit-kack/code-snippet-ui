@@ -47,12 +47,12 @@
                 <n-dynamic-tags v-model:value="pair.commands"/>
               </n-form-item>
               <n-form-item label="描述" path="desc" label-placement="left">
-                <div style="width: 99%">
+                <div style="width: 99%;padding-left: 11px">
                   <code-editor v-model="pair.desc"
                                font-size="14px"
                                padding="5px"
                                line-nums
-                               :header="false" width="100%" :languages="[['html']]"/>
+                               :header="false" width="99%" :languages="[['html']]"/>
                 </div>
               </n-form-item>
             </n-scrollbar>
@@ -60,12 +60,14 @@
           <n-tab-pane name="impl" tab="代码实现">
               <div class="func-impl">
                 <p class="func-impl-preset-content" style="margin-bottom: 5px">function func(command,param){</p>
-                <code-editor v-model="pair.expression"
-                             font-size="14px"
-                             padding="5px"
-                             height="250px"
-                             line-nums
-                             :header="false" width="100%"/>
+                <div style="padding-left: 10px">
+                  <code-editor v-model="pair.expression"
+                               font-size="14px"
+                               padding="5px"
+                               height="250px"
+                               line-nums
+                               :header="false" width="100%"/>
+                </div>
                 <p class="func-impl-preset-content">}</p>
               </div>
           </n-tab-pane>
