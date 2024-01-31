@@ -370,6 +370,14 @@ export const GLOBAL_HIERARCHY = {
             if(!GLOBAL_HIERARCHY.currentHierarchy.core){
                 snippet.keyword = undefined;
             }
+            // 处理 desc
+            if(snippet.desc){
+                if(snippet.desc.trim().length === 0){
+                    snippet.desc = undefined;
+                }
+            }else {
+                snippet.desc = undefined;
+            }
             try{
                 GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixSnippetArrayTemp,snippet,oldName,EXT);
             }catch (e){

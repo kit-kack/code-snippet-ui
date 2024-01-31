@@ -100,9 +100,10 @@ export function doScrollForCodeView(direction,fast){
 /**
  * 控制【快捷方式】界面滚动
  * @param {number} direction
+ * @param fast
  */
-export function doScrollForHelpView(direction){
-    _controlScrollBar($normal.scroll.helpInvoker,direction,false);
+export function doScrollForHelpView(direction,fast){
+    _controlScrollBar($normal.scroll.helpInvoker,direction,fast);
 }
 
 /**

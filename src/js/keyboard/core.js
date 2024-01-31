@@ -13,10 +13,10 @@ let lastPressedTime = 0;
 function dealWithHelpViewOnly(e){
     switch (e.code){
         case 'KeyJ':
-            doScrollForHelpView(Direction.DOWN)
+            doScrollForHelpView(Direction.DOWN,e.shiftKey)
             break;
         case 'KeyK':
-            doScrollForHelpView(Direction.UP);
+            doScrollForHelpView(Direction.UP,e.shiftKey);
             break;
         case 'KeyG':
             doScrollForHelpView(Direction.RESET);

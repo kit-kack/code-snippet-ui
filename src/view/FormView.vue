@@ -670,6 +670,7 @@ onMounted(()=>{
 onUnmounted(()=>{
   hljs.removePlugin(X_PLUGIN)
   document.removeEventListener('keydown',keyDownHandler)
+  $reactive.form.fullScreen = false;
 })
 const selectThemeOverrides = {
   peers:{

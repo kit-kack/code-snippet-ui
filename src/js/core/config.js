@@ -49,6 +49,9 @@ export const configManager = {
      * @param value
      */
     set(config,value){
+        if(this.configs[config] === value){
+            return;
+        }
         this.configs[config] = value;
         utools_db_store(NEW_GLOBAL_CONFIG,this.configs)
     },

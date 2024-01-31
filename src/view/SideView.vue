@@ -26,31 +26,31 @@
         Beta功能
       </n-divider>
       <n-space vertical align="center">
-        <n-space>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <config-check-tag title="💡搜索子代码片段" config="beta_sub_snippet_search"/>
-            </template>
+        <n-popover :show-arrow="false" width="93%">
+          <template #trigger>
+            <n-space>
+              <config-check-tag title="💡搜索子代码片段" config="beta_sub_snippet_search" @mouseover="configIndex = 0"/>
+              <config-check-tag title="💡特殊标签" config="beta_special_tag" @mouseover="configIndex = 1"/>
+              <config-check-tag title="💡扩充搜索范围" config="beta_wide_snippet_search" @mouseover="configIndex = 2"/>
+              <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>
+            </n-space>
+          </template>
+          <template v-if="configIndex === 0">
             开启后，可以通过 name$num 搜索复制粘贴 name对应的num号子代码片段
-          </n-tooltip>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <config-check-tag title="💡特殊标签" config="beta_special_tag"/>
-            </template>
+          </template>
+          <template v-else-if="configIndex === 1">
             开启后，为代码片段添加VSCode标签即可写入到VSCode代码片段中，IDEA、Sublime Text等同理
             <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
-          </n-tooltip>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <config-check-tag title="💡扩充搜索范围" config="beta_wide_snippet_search"/>
-            </template>
+          </template>
+          <template v-else>
             开启后，name在原有匹配片段名的基础上，还将匹配：
             <n-checkbox :focusable="false" :checked="betaSearchAspects.desc" @update:checked="handleChangeBetaSearchAspects('desc',$event)">描述说明</n-checkbox>
             <n-checkbox :focusable="false" :checked="betaSearchAspects.content" @update:checked="handleChangeBetaSearchAspects('content',$event)">代码内容（仅支持普通代码片段）</n-checkbox>
-          </n-tooltip>
-          <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>
-        </n-space>
+          </template>
+        </n-popover>
       </n-space>
+
+
       <n-divider>
         个性化设置
       </n-divider>
@@ -108,6 +108,7 @@ import SpecialTagConfigModal from "../components/modal/SpecialTagConfigModal.vue
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
+const configIndex = ref(0);
 const betaSearchAspects = ref({
   desc: !configManager.get('beta_wide_desc_close'),
   content: !configManager.get('beta_wide_content_close'),
