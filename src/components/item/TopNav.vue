@@ -5,7 +5,7 @@
     <n-scrollbar x-scrollable style="max-width: 60vw"  :ref="(el)=> $normal.scroll.hierarchyInvoker = el">
       <n-breadcrumb style="padding-left: 10px" class="top-nav-item" >
         <n-breadcrumb-item  clickable @click="clearCurrentPrefix">
-          ◈
+          {{$reactive.main.isFullScreenShow ? '◈': '◇'}}
         </n-breadcrumb-item>
         <n-breadcrumb-item v-for="(p,index) in $reactive.currentPrefix" clickable @click="sliceCurrentPrefix(index)">
           {{p}}

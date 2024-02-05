@@ -79,7 +79,7 @@
 <script>
 import hljs from "../../js/dep/highlight-dep";
 import {configManager} from "../../js/core/config";
-import {isMatchedWord, MATCHED_WORDS} from "../../js/utils/language";
+import {INVERSE_MATCHED_WORDS, isMatchedWord, MATCHED_WORDS} from "../../js/utils/language";
 
 export default {
   name: "CodeEditor",
@@ -346,7 +346,13 @@ export default {
         this.$emit("update:modelValue", this.modelValue.slice(0,start)
             +e.key+ MATCHED_WORDS[e.key]
             +this.modelValue.slice(start));
-
+      }else if(e.key in INVERSE_MATCHED_WORDS){
+        let start = this.$refs.textarea.selectionStart;
+        if(e.key === this.modelValue[start] && INVERSE_MATCHED_WORDS[e.key] === this.modelValue[start-1]){
+          this.cursorPosition = start+1;
+          this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
+          e.preventDefault()
+        }
       }
     }
   },

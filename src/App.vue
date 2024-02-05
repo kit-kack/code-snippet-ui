@@ -2,7 +2,10 @@
   <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
     <n-message-provider>
       <n-dialog-provider>
-        <middle-view/>
+        <div id="app-core" :class="{forbid: !$reactive.main.isCursorShow}"
+             @mousemove="$reactive.main.isCursorShow = true">
+          <middle-view/>
+        </div>
       </n-dialog-provider>
     </n-message-provider>
   </n-config-provider>
@@ -55,5 +58,7 @@ watch(()=>$reactive.currentMode,(mode)=>{
 
 
 <style scoped>
-
+#app-core.forbid, #app-core.forbid *{
+  cursor: none !important;
+}
 </style>

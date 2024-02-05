@@ -285,7 +285,7 @@ import {
 } from "vue";
 import {tagColorManager} from "../js/core/tag";
 import {configManager} from "../js/core/config";
-import {fullAlias, getRealTypeAndValidStatus, languages} from "../js/utils/language";
+import {fullAlias, getFileName, getRealTypeAndValidStatus, languages} from "../js/utils/language";
 import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {CtrlStr} from "../js/some";
 import CodeEditor from '../components/lib/MyCodeEditor.vue';
@@ -439,6 +439,8 @@ const rules = {
 function renderCodeTypeTag({option}){
   if(option.value.length > 2 && option.value.startsWith('x-')){
     return option.label + ' （解析⚡）'
+  }else if(option.value === 'image'){
+    return option.label + ' （🖼️ beta）'
   }else{
     return option.label;
   }
@@ -690,6 +692,11 @@ const selectThemeOverrides = {
     }
   }
 }
+function setSnippetNameWhenUrl(url) {
+  if(!codeTemplate.name){
+    codeTemplate.name = getFileName(url);
+  }
+}
 function importLocalFile(){
   const realPathList = utools.showOpenDialog({
     title: '指定你的本地关联文件' ,
@@ -702,6 +709,7 @@ function importLocalFile(){
   if (realPathList != null) {
     const path = realPathList[0];
     codeTemplate.path = path;
+    setSnippetNameWhenUrl(path);
     // 解析类型
     const index = path.lastIndexOf('.');
     if(index === -1){
@@ -722,6 +730,7 @@ function importLocalDir(){
   })
   if (realPathList != null) {
     codeTemplate.path = realPathList[0];
+    setSnippetNameWhenUrl(realPathList[0]);
     // 解析类型
     codeTemplate.dir = true;
     codeTemplate.ref = "local";
@@ -779,6 +788,7 @@ function openHierarchyJS(path){
   const hierarchy = loadValidHierarchyJS(path);
   if(hierarchy){
     codeTemplate.path = path;
+    setSnippetNameWhenUrl(path);
     // 解析类型
     codeTemplate.dir = true;
     codeTemplate.ref = "custom";
@@ -815,6 +825,7 @@ function setAsNormalDir() {
 function handleSetUrlAsPath(){
   if(url.value && isNetWorkUri(url.value)){
     codeTemplate.path = url.value;
+    setSnippetNameWhenUrl(url.value);
     showInternetLinkModal.value = false;
   }else{
     $message.warning("请填写合法链接")

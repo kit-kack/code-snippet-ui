@@ -88,3 +88,8 @@ const networkRegex = /^\w+:\/\/.*/
 export function isNetWorkUri(uri){
     return  networkRegex.test(uri);
 }
+
+export function isSvg(content){
+    const c = content.trim();
+    return c.startsWith('<svg') && c.endsWith('</svg>')
+}

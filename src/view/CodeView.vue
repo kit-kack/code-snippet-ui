@@ -7,12 +7,10 @@
       <template v-if="refreshFlag">
         <template v-if="pair.renderable && $reactive.code.isRendering">
           <template v-if="pair.type === 'image'">
-            <div style="text-align: center">
-              <img :src="snippet.path??snippet.code" alt="图片加载失败了哦" style="width: 98vw;">
-            </div>
+            <image-render :url="snippet.path?? snippet.code"/>
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
-            <markdown-view/>
+            <markdown-render/>
           </template>
           <template v-else>
             未知渲染类型
@@ -137,9 +135,10 @@ import {calculateTime, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
 import {$normal, $reactive, LIST_VIEW} from "../js/store";
 import NormalTag from "../components/base/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
-import MarkdownView from "../components/item/MarkdownView.vue";
+import MarkdownRender from "../components/render/MarkdownRender.vue";
 import {renderFormatBlock} from "../js/core/func";
 import {isEmpty as _isEmpty} from "lodash-es"
+import ImageRender from "../components/render/ImageRender.vue";
 
 const verticalScroller = ref(null)
 /**

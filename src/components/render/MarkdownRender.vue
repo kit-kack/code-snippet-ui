@@ -32,11 +32,11 @@
   </n-drawer>
 </template>
 <script setup>
-
 import {$normal, $reactive} from "../../js/store";
 import {nextTick, onMounted, onUnmounted, ref} from "vue";
 import {isNetWorkUri} from "../../js/utils/common";
 import {utools_browser_open} from "../../js/core/base";
+import {RENDER_KEYHANDLER} from "../../js/keyboard/k-codeview";
 
 const preview = ref()
 const tocScrollRef = ref()
@@ -218,191 +218,163 @@ function handleMdHorizonMove(left,fast){
     }
   }
 }
+
 /**
- * 处理键盘事件
- * @param {KeyboardEvent} e
+ * @type KeyHandler
  */
-function handleKeyDown(e){
-  switch (e.code){
+const K_CODEVIEW_MARKDOWN = ({code,shift,ctrl,repeat})=>{
+  switch (code){
+    case 'KeyQ':
+      if($reactive.code.tocActive){
+        $reactive.code.tocActive = false
+        return true;
+      }
+      return;
+    case 'KeyS':
+      if($reactive.code.tocActive){
+        $reactive.code.infoActive = true;
+        $reactive.code.tocActive = false;
+        return true;
+      }
+      return;
     case 'Tab':
-        e.preventDefault();
-        adjustCenterPre(true)
-        break
+      adjustCenterPre(true)
+      break
     case "KeyH":
     case "ArrowLeft":
-        handleMdHorizonMove(true,e.shiftKey)
-        break;
+      handleMdHorizonMove(true,shift)
+      break;
     case "KeyJ":
     case "ArrowDown":
-        if($reactive.code.tocActive){
-          if(tocAnchors.value.length > 0){
-            if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
-              let index = currentHeadingIndex.value + 1;
-              if(e.shiftKey){
-                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
-                let ind = -1;
-                for (let i = index; i < tocAnchors.value.length; i++) {
-                  if(tocAnchors.value[i].indent === indent){
-                    ind = i;
-                    break
-                  }
+      if($reactive.code.tocActive){
+        if(tocAnchors.value.length > 0){
+          if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
+            let index = currentHeadingIndex.value + 1;
+            if(shift){
+              const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+              let ind = -1;
+              for (let i = index; i < tocAnchors.value.length; i++) {
+                if(tocAnchors.value[i].indent === indent){
+                  ind = i;
+                  break
                 }
-                if(ind === -1){
-                  return;
-                }
-                index = ind;
               }
-              handleAnchorClick(tocAnchors.value[index],index)
-              // tocRef.value.$el.children[1].children[0].scrollTop = `${(index> 5 ? index - 5 : 0) * 40}px`
-              tocScrollRef.value.scrollTo({
-                top: (index> 5 ? index - 5 : 0) * 42,
-                behavior: 'smooth'
-              })
-            }
-          }
-        }else{
-          if(e.ctrlKey || e.metaKey){
-            if(tocAnchors.value.length > 0){
-              adjustCurrentHeading()
-              if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
-                const index = currentHeadingIndex.value + 1;
-                handleAnchorClick(tocAnchors.value[index],index)
+              if(ind === -1){
+                return;
               }
+              index = ind;
             }
+            handleAnchorClick(tocAnchors.value[index],index)
+            // tocRef.value.$el.children[1].children[0].scrollTop = `${(index> 5 ? index - 5 : 0) * 40}px`
+            tocScrollRef.value.scrollTo({
+              top: (index> 5 ? index - 5 : 0) * 42,
+              behavior: 'smooth'
+            })
           }
-          // else if(e.altKey){
-          //   if(tocAnchors.value.length > 0){
-          //     adjustCurrentHeading()
-          //     if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
-          //       const indent = tocAnchors.value[currentHeadingIndex.value].indent;
-          //       let index = -1;
-          //       for (let i = currentHeadingIndex.value + 1; i < tocAnchors.value.length; i++) {
-          //         if(tocAnchors.value[i].indent === indent){
-          //           index = i;
-          //           break
-          //         }
-          //       }
-          //       if(index === -1){
-          //         return;
-          //       }
-          //       handleAnchorClick(tocAnchors.value[index],index)
-          //     }
-          //   }
-          // }
         }
-        adjustCenterPre()
-        break;
+      }else{
+        if(ctrl){
+          if(tocAnchors.value.length > 0){
+            adjustCurrentHeading()
+            if(currentHeadingIndex.value !== tocAnchors.value.length - 1){
+              const index = currentHeadingIndex.value + 1;
+              handleAnchorClick(tocAnchors.value[index],index)
+            }
+          }
+        }
+      }
+      adjustCenterPre()
+      return ;
     case "KeyK":
     case "ArrowUp":
-        if($reactive.code.tocActive){
-          if(tocAnchors.value.length > 0){
-            if(currentHeadingIndex.value !== 0){
-              let index = currentHeadingIndex.value - 1;
-              if(e.shiftKey){
-                const indent = tocAnchors.value[currentHeadingIndex.value].indent;
-                let ind = -1;
-                for (let i = index; i >= 0; i --) {
-                  if(tocAnchors.value[i].indent === indent){
-                    ind = i;
-                    break
-                  }
+      if($reactive.code.tocActive){
+        if(tocAnchors.value.length > 0){
+          if(currentHeadingIndex.value !== 0){
+            let index = currentHeadingIndex.value - 1;
+            if(shift){
+              const indent = tocAnchors.value[currentHeadingIndex.value].indent;
+              let ind = -1;
+              for (let i = index; i >= 0; i --) {
+                if(tocAnchors.value[i].indent === indent){
+                  ind = i;
+                  break
                 }
-                if(ind === -1){
-                  return;
-                }
-                index = ind;
               }
-              handleAnchorClick(tocAnchors.value[index],index)
-              tocScrollRef.value.scrollTo({
-                top: (index> 5 ? index - 5 : 0) * 42,
-                behavior: 'smooth'
-              })
+              if(ind === -1){
+                return true;
+              }
+              index = ind;
             }
+            handleAnchorClick(tocAnchors.value[index],index)
+            tocScrollRef.value.scrollTo({
+              top: (index> 5 ? index - 5 : 0) * 42,
+              behavior: 'smooth'
+            })
           }
-        }else{
-          if(e.ctrlKey || e.metaKey){
-            if(tocAnchors.value.length > 0){
-              const top = adjustCurrentHeadingUpward();
-              if(top === null){
-                return
-              }
-              let index = currentHeadingIndex.value;
-              if(top < 0){
-                // 先回正 当前小节
-                index ++;
-              }
-              if(index !== 0){
-                index --;
-                handleAnchorClick(tocAnchors.value[index],index)
-              }
-            }
-          }
-          // else if(e.altKey){
-          //   if(tocAnchors.value.length > 0){
-          //     const top = adjustCurrentHeadingUpward();
-          //     if(_.isUndefined(top)){
-          //       return
-          //     }
-          //     let index = currentHeadingIndex.value;
-          //     if(top < 0){
-          //       // 先回正 当前小节
-          //       index ++;
-          //     }
-          //     if(index !== 0){
-          //       const indent = tocAnchors.value[currentHeadingIndex.value].indent;
-          //       let ind = -1;
-          //       for (let i = index -1; i >= 0; i --) {
-          //         if(tocAnchors.value[i].indent === indent){
-          //           ind = i;
-          //           break
-          //         }
-          //       }
-          //       if(ind === -1){
-          //         return;
-          //       }
-          //       handleAnchorClick(tocAnchors.value[ind],ind)
-          //     }
-          //   }
-          // }
         }
-        adjustCenterPre()
-        break;
+      }else{
+        if(ctrl){
+          if(tocAnchors.value.length > 0){
+            const top = adjustCurrentHeadingUpward();
+            if(top === null){
+              return true
+            }
+            let index = currentHeadingIndex.value;
+            if(top < 0){
+              // 先回正 当前小节
+              index ++;
+            }
+            if(index !== 0){
+              index --;
+              handleAnchorClick(tocAnchors.value[index],index)
+            }
+          }
+        }
+      }
+      adjustCenterPre()
+      return;
     case "KeyL":
     case "ArrowRight":
-        handleMdHorizonMove(false,e.shiftKey)
-        break;
+      handleMdHorizonMove(false,shift)
+      break;
     case 'KeyT':
-        if($reactive.common.shortcutActive){
-          return
-        }
-        if($reactive.code.infoActive){
-          $reactive.code.infoActive = false
-        }
-        $reactive.code.tocActive = ! $reactive.code.tocActive;
-        break;
+      if($reactive.common.shortcutActive){
+        $reactive.common.shortcutActive = false
+        $reactive.code.tocActive = true
+        return true;
+      }
+      if($reactive.code.infoActive){
+        $reactive.code.infoActive = false
+        $reactive.code.tocActive = true
+        return true;
+      }
+      $reactive.code.tocActive = ! $reactive.code.tocActive;
+      break;
     case 'Space':
-        e.preventDefault();
-        if($reactive.code.tocActive){
-          $reactive.code.tocActive = false
-          return
-        }
-        if($reactive.code.infoActive){
-          $reactive.code.infoActive = false
-          return
-        }
-        if($reactive.common.shortcutActive){
-          $reactive.common.shortcutActive = false
-          return
-        }
-        if(e.repeat){
-          return;
-        }
-        if($normal.md.pre){
-          utools.copyText($normal.md.pre.querySelector('code').innerText)
-          $message.info("已复制该代码块内容")
-        }
-        break
+      if($reactive.code.tocActive){
+        $reactive.code.tocActive = false
+        return true
+      }
+      if($reactive.code.infoActive){
+        $reactive.code.infoActive = false
+        return true
+      }
+      if($reactive.common.shortcutActive){
+        $reactive.common.shortcutActive = false
+        return true
+      }
+      if(repeat){
+        return true;
+      }
+      if($normal.md.pre){
+        utools.copyText($normal.md.pre.querySelector('code').innerText)
+        $message.info("已复制该代码块内容")
+      }
+      break
+    default:
+      return $reactive.code.tocActive;
   }
+  return true;
 }
 function adjustCurrentHeading(scrollable){
   if(tocAnchors.value.length > 0) {
@@ -488,11 +460,13 @@ onMounted(()=>{
     }))
   }
   document.addEventListener('click',handleClickUrl)
-  document.addEventListener('keydown',handleKeyDown)
+  // document.addEventListener('keydown',handleKeyDown)
+  RENDER_KEYHANDLER.handle = K_CODEVIEW_MARKDOWN
 })
 onUnmounted(()=>{
   document.removeEventListener('click',handleClickUrl)
-  document.removeEventListener('keydown',handleKeyDown)
+  // document.removeEventListener('keydown',handleKeyDown)
+  RENDER_KEYHANDLER.handle = null
   $reactive.code.tocActive = false;
 })
 </script>

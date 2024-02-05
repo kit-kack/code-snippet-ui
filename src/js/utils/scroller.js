@@ -4,6 +4,7 @@ import {configManager} from "../core/config";
 
 export const Direction = {
     RESET:-1,
+    END: -2,
     DOWN:1,
     UP:2,
     // ---------
@@ -33,6 +34,9 @@ function _controlScrollBar(scrollBar,direction,fast){
         case Direction.RIGHT:
             scrollBar?.scrollBy?.({left: distance})
             break;
+        case Direction.END:
+            scrollBar?.scrollTo?.({top: 1e6,behavior:'smooth'})
+            break
         case Direction.RESET:
             scrollBar?.scrollTo?.({left:0,top:0,behavior:'smooth'})
             break;
@@ -88,6 +92,9 @@ export function doScrollForCodeView(direction,fast){
             break
         case Direction.UP:
         case Direction.DOWN:
+            _controlScrollBar($normal.scroll.codeVerticalInvoker,direction,fast)
+            break
+        case Direction.END:
             _controlScrollBar($normal.scroll.codeVerticalInvoker,direction,fast)
             break
         default:

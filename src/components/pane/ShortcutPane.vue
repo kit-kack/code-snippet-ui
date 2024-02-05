@@ -86,9 +86,12 @@ const shortcuts = [{
     feature: "退出Quit",
     shortcut: "Q"
   },{
-    feature: '回到开始',
-    shortcut: ["G"],
-    tooltip: "主界面：结合<b>Shift</b>键来控制 多行元素代码块"
+    feature: '移动到顶部',
+    shortcut: ["GG"],
+    tooltip: "主界面：结合<b>Alt</b>键来控制 多行元素代码块"
+  },{
+    feature: '移动到底部',
+    shortcut: ["Shift + G"],
   },{
     feature: '查看『快捷方式』',
     shortcut: ['Z']

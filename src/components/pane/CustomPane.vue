@@ -1,7 +1,7 @@
 <template>
   <n-space vertical align="center">
     <n-space>
-      <span>&nbsp;配色方案：</span>
+      配色方案
       <n-select
           v-model:value="colorSchemaRef"
           :options="colorSchemaOptions"
@@ -11,7 +11,7 @@
       />
     </n-space>
     <n-space>
-      元素代码块：
+      元素代码块
       <n-select  v-model:value="codeBlockRef" :options="codeBlockOptions" size="tiny" @update-value="handleCodeBlockChange"/>
     </n-space>
   </n-space>

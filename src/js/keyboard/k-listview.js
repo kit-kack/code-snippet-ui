@@ -1,19 +1,17 @@
-import {configManager} from "../core/config";
 import {
     $index, $list,
     $normal,
     $reactive,
     CODE_VIEW,
-    refreshListView,
-    refreshSearchResult,
+    refreshListView, refreshSearchResult,
     switchToFullUIMode,
-    utools_focus_or_blur,
-} from "../store"
+    utools_focus_or_blur
+} from "../store";
+import {configManager} from "../core/config";
 import {Direction, doScrollForListView, doScrollForMultiLineCode} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import { throttle as _throttle } from "lodash-es"
-import {dealWithCommonView} from "./core";
-import {copyCode} from "../utils/copy";
+import {K_COMMON} from "./k-common";
 
 
 const debMoveDown = _throttle(function(){
@@ -50,34 +48,35 @@ const debItemMoveRight = _throttle(function(){
         }
     }
 },120)
-
-
-
 /**
- * Only ListView
+ * @type {KeyHandler}
  */
-export function dealWithListView(e,ctrlFlag,lastPressedKey){
+export const K_LISTVIEW = (ext)=>{
+    const {code,double,long,shift,ctrl,repeat,alt} = ext;
     // active
     if($reactive.main.settingActive){
         if($reactive.setting.funcEditActive){
             return;
         }
         // prevent any possible event
-        if ( e.code === 'Enter' || e.code === 'Tab' || e.code === 'Space') {
-            e.preventDefault();
-        } else if (e.code === 'KeyQ' || e.code === 'Slash') {
+        if ( code === 'Enter' || code === 'Tab' || code === 'Space') {
+            return true;
+        } else if (code === 'KeyQ' || code === 'Slash') {
             $reactive.main.settingActive = false;
         }
         return;
     }
 
     // super key
-    if(e.code === 'Tab'){
-        e.preventDefault();
-        if(lastPressedKey === 'Tab'){
+    if(code === 'Tab'){
+        if(repeat){
+            return true;
+        }
+        if(double){
             // UI 切换
             if(configManager.get('strategy_item_code_show') === 2){
                 $reactive.main.isFullScreenShow = true;
+                $message.warning(' [多行元素代码块] 场景不支持切换UI模式')
                 return;
             }
             $reactive.main.isFullScreenShow = !$reactive.main.isFullScreenShow;
@@ -94,19 +93,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
                 utools_focus_or_blur(true)
             }
         }
-        return;
-    }else if (e.code === 'Enter') {
-        e.preventDefault();
-        if($reactive.currentSnippet.dir){
-            return;
-        }
-        if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
-            utools.shellOpenExternal($reactive.currentSnippet.path)
-            return;
-        }
-        copyCode(true,$normal.beta.subSnippetNum)
-        // handleCopy(true)
-        return;
+        return true;
     }
 
 
@@ -117,20 +104,16 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
 
     // vim操作下隐藏鼠标
     $reactive.main.isCursorShow = false;
-    switch (e.code){
+    switch (code){
         case "Slash": // / ?
             switchToFullUIMode();
             $reactive.main.settingActive = true;
             break;
         case "Space":
             // 空格额外处理
-            e.preventDefault();
-            if(e.repeat && !$normal.keyboard.isLongPressed){
-                if($reactive.utools.subItemSelectedIndex === -1){
-                    if(!$reactive.currentSnippet.dir && !$reactive.currentSnippet.link){
-                        GLOBAL_HIERARCHY.changeView(CODE_VIEW)
-                    }
-                    $normal.keyboard.isLongPressed = true;
+            if(long && $reactive.utools.subItemSelectedIndex === -1){
+                if(!$reactive.currentSnippet.dir && !$reactive.currentSnippet.link){
+                    GLOBAL_HIERARCHY.changeView(CODE_VIEW)
                 }
             }
             break;
@@ -144,7 +127,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             // 校验是否有效
             if($index.value=== -1){
                 $message.error("没有可选择的元素")
-            }else if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
+            }else if(shift && configManager.get('strategy_item_code_show') === 2){
                 doScrollForMultiLineCode(Direction.LEFT);
             }else{
                 debItemMoveLeft()
@@ -155,7 +138,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             if($reactive.main.isDel){
                 $reactive.main.isDel = false;
             }
-            if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
+            if(shift && configManager.get('strategy_item_code_show') === 2){
                 if ($index.value === -1) { // -1 >= 0-1
                     $message.error("没有可选择的元素")
                 }else {
@@ -174,7 +157,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             if($reactive.main.isDel){
                 $reactive.main.isDel = false;
             }
-            if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
+            if(shift && configManager.get('strategy_item_code_show') === 2){
                 if ($index.value === -1) {
                     $message.error("没有可选择的元素")
                 }else {
@@ -193,22 +176,21 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             // 校验是否有效
             if($index.value=== -1 ){
                 $message.error("没有可选择的元素")
-            }else if(e.shiftKey && configManager.get('strategy_item_code_show') === 2){
+            }else if(shift && configManager.get('strategy_item_code_show') === 2){
                 doScrollForMultiLineCode(Direction.RIGHT);
             }else{
                 debItemMoveRight();
             }
             break;
         case "KeyG":
-            if($index.value === -1){
-                // if(configManager.get("enabledBeep")){
-                //     core.shellBeep();
-                // }
-            }else if(e.shiftKey){
-                doScrollForMultiLineCode(Direction.RESET);
-            }else{
+            if(double){
                 $index.value = 0;
                 doScrollForListView();
+            }else if(shift){
+                $index.value = $list.value.length -1;
+                doScrollForListView();
+            }else if(alt){
+                doScrollForMultiLineCode(Direction.RESET);
             }
             break;
         case 'KeyT':
@@ -217,7 +199,6 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             }else{
                 GLOBAL_HIERARCHY.update(null,"top");
                 $normal.keepSelectedStatus = true;
-                // refreshListView(true)
                 refreshSearchResult();
             }
             break;
@@ -237,11 +218,10 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
                 utools.shellOpenExternal($reactive.currentSnippet.path)
             }else{
                 GLOBAL_HIERARCHY.changeView(CODE_VIEW)
-                // router.replace('/code')
             }
             break
         case 'KeyR':
-            if(ctrlFlag){
+            if(ctrl){
                 refreshListView()
             }else{
                 GLOBAL_HIERARCHY.changeHierarchy("root")
@@ -256,7 +236,7 @@ export function dealWithListView(e,ctrlFlag,lastPressedKey){
             }
             break;
         default:
-            dealWithCommonView(e,ctrlFlag)
+            return K_COMMON(ext);
     }
+    return true;
 }
-

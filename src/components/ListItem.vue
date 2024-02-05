@@ -101,7 +101,7 @@
             <selectable-button  :mid="350" type="primary" tip="预览" :index="1" @invoke="doViewCode" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M8.086 18.611l5.996-14.004a1 1 0 0 1 1.878.677l-.04.11l-5.996 14.004a1 1 0 0 1-1.878-.677l.04-.11l5.996-14.004L8.086 18.61zm-5.793-7.318l4-4a1 1 0 0 1 1.497 1.32l-.083.094L4.414 12l3.293 3.293a1 1 0 0 1-1.32 1.498l-.094-.084l-4-4a1 1 0 0 1-.083-1.32l.083-.094l4-4l-4 4zm14-4.001a1 1 0 0 1 1.32-.083l.093.083l4.001 4.001a1 1 0 0 1 .083 1.32l-.083.095l-4.001 3.995a1 1 0 0 1-1.497-1.32l.084-.095L19.584 12l-3.293-3.294a1 1 0 0 1 0-1.414z" fill="currentColor"></path></g></svg>
             </selectable-button>
-            <selectable-button :disabled="snippet.dir || snippet.link"  :mid="395"  type="info" tip="复制" :index="2" @invoke="copyCode(false)" >
+            <selectable-button :disabled="snippet.dir || snippet.link"  :mid="395"  type="info" tip="复制" :index="2" @invoke="snippetCopyOrPaste(false,false)" >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M5.503 4.627L5.5 6.75v10.504a3.25 3.25 0 0 0 3.25 3.25h8.616a2.251 2.251 0 0 1-2.122 1.5H8.75A4.75 4.75 0 0 1 4 17.254V6.75c0-.98.627-1.815 1.503-2.123zM17.75 2A2.25 2.25 0 0 1 20 4.25v13a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-13A2.25 2.25 0 0 1 8.75 2h9zm0 1.5h-9a.75.75 0 0 0-.75.75v13c0 .414.336.75.75.75h9a.75.75 0 0 0 .75-.75v-13a.75.75 0 0 0-.75-.75z" fill="currentColor"></path></g></svg>
             </selectable-button>
             <selectable-button :disabled="!GLOBAL_HIERARCHY.currentConfig?.remove" :mid="440"  type="error" tip="删除" :index="3" @invoke="$reactive.main.isDel = true;$reactive.utools.subItemSelectedIndex=1">
@@ -132,8 +132,8 @@ import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshSearchResult} f
 import NormalTag from "./base/NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
-import {copyCode} from "../js/utils/copy";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
+import {snippetCopyOrPaste} from "../js/keyboard/k-common";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -244,6 +244,9 @@ function handleClick(e){
   if(props.selected){
     return;
   }
+  if($reactive.main.isDel){
+    $reactive.main.isDel = false;
+  }
   $index.value = props.index;
 }
 function handleContextMenu(){
@@ -257,7 +260,7 @@ function handleDoubleClick(){
   if(props.snippet.dir){
     GLOBAL_HIERARCHY.changeHierarchy("next")
   }else{
-    copyCode(true)
+    snippetCopyOrPaste(true,false)
   }
 }
 function handleCancelTop(){

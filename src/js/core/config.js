@@ -55,6 +55,13 @@ export const configManager = {
         this.configs[config] = value;
         utools_db_store(NEW_GLOBAL_CONFIG,this.configs)
     },
+    /**
+     * @param {ConfigItem} config
+     */
+    toggle(config){
+        this.configs[config] = !this.configs[config];
+        utools_db_store(NEW_GLOBAL_CONFIG,this.configs)
+    },
     getGlobalColor(){
         return $normal.theme.globalColor;
     },
@@ -65,7 +72,7 @@ export const configManager = {
      * @param {ConfPath} path
      */
     getSubItem(path){
-        // TODO: 下一个版本移除 v2.7.2
+        // TODO: 下一个大版本移除 v2.7.2
         const oldKey = NEW_GLOBAL_CONFIG + "/" + path;
         const doc = localStorage.getItem(oldKey)
         if(doc){

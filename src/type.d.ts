@@ -73,6 +73,41 @@ declare interface Func {
     default?: boolean
 }
 
+/**
+ * 键盘快捷键处理
+ * @return 根直属：是否阻止默认行为； 子级：是否阻止后续匹配
+ */
+declare type KeyHandler = (ext:{
+    /**
+     * 等同于 e.code
+     */
+    code: string,
+    /**
+     * 等同于 e.ctrlKey || e.metaKey
+     */
+    ctrl: boolean,
+    /**
+     * 等同于 e.altKey
+     */
+    alt: boolean,
+    /**
+     * 等同于 e.shiftKey
+     */
+    shift: boolean
+    /**
+     * 连按两次按键
+     */
+    double: boolean,
+    /**
+     * 与 repeat 稍有不同，long只会触发一次
+     */
+    long: boolean,
+    /**
+     * 等同于 e.repeat
+     */
+    repeat: boolean
+})=> boolean | void
+
 
 declare interface HierarchyConfig{
     // 基本功能

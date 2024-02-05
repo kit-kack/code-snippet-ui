@@ -172,9 +172,28 @@ export const MATCHED_WORDS = {
   '"':'"',
   '`':'`'
 }
+export const INVERSE_MATCHED_WORDS =  (()=>{
+    const result = {};
+    Object.keys(MATCHED_WORDS).forEach(v=>{
+      result[MATCHED_WORDS[v]] = v
+    })
+    return result
+})()
 export function isMatchedWord(a,b){
     if(a in MATCHED_WORDS){
         return MATCHED_WORDS[a] === b;
     }
     return false
+}
+
+export function getFileName(url){
+    let index = url.lastIndexOf('/');
+    if(index > 0){
+        return url.slice(index+1);
+    }
+    index = url.lastIndexOf('\\');
+    if(index > 0){
+        return url.slice(index+1);
+    }
+    return url
 }

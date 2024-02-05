@@ -19,6 +19,42 @@
       </template>
       {{($reactive.currentMode <= CODE_VIEW)? 'Vim模式启用中':'Vim模式不可用'}}
     </n-tooltip>
+
+    <n-modal v-model:show="statisticsShow"
+             preset="card"
+             title="本地统计"
+             style="width: 66%"
+             :auto-focus="false"
+
+    >
+      <div id="statistics">
+        <template v-for="stat in statisticsManager.getStatistics()">
+          <template v-if="stat.label === '使用天数'">
+            <n-tooltip>
+              <template #trigger>
+                <n-statistic :label="stat.label">
+                  <n-number-animation show-separator :from="0" :to="stat.value[0]"/>
+                  /
+                  <n-number-animation show-separator :from="0" :to="stat.value[2]"/>
+                </n-statistic>
+              </template>
+              有效使用天数 / 安装天数
+            </n-tooltip>
+          </template>
+          <template v-else>
+            <n-statistic :label="stat.label">
+              <n-number-animation show-separator :from="0" :to="stat.value[0]"/>
+              /
+              <n-number-animation show-separator :from="0" :to="stat.value[1]"/>
+              /
+              <n-number-animation show-separator :from="0" :to="stat.value[2]"/>
+            </n-statistic>
+          </template>
+        </template>
+      </div>
+      <h5 style="font-weight: normal"><span style="font-weight: bold">今日 / 最近七日 / 总计</span> | 由于插件在v2.7.2版本才开始统计，数据仅供参考</h5>
+    </n-modal>
+
   </div>
 
 </template>
@@ -27,7 +63,9 @@
 import {configManager} from "../js/core/config";
 import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
-import {computed} from "vue";
+import {computed, ref} from "vue";
+import {statisticsManager} from "../js/core/statistics";
+const statisticsShow = ref(false)
 const show = computed(()=>{
   // !$reactive.utools.focused && $reactive.view.fullScreenShow
   if($reactive.currentMode === CODE_VIEW){
@@ -60,8 +98,8 @@ let clearCount = 0
 let lastTime = 0  // 时间
 function handleVimStatusBarClick(){
   if($reactive.currentMode === LIST_VIEW){
-    if(showCount === 7){
-      $message.success("花点时间去看看外面的风景吧")
+    if(showCount === 3){
+      statisticsShow.value = !statisticsShow.value
       showCount = 0;
     }else{
       showCount++;
@@ -89,12 +127,25 @@ function handleVimStatusBarClick(){
 
 </script>
 
-<style scoped>
+<style>
 #extra-left{
   position: fixed;
   left:20px;
   bottom: 12px;
   font-size: 12px;
   z-index: 2000;
+}
+#statistics{
+  font-size: 12px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+#statistics .n-statistic .n-statistic-value .n-statistic-value__content{
+  font-size: 12px !important;
 }
 </style>

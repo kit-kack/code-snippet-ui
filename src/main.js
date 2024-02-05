@@ -15,15 +15,17 @@ import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
 import {hierachyHubManager} from "./js/core/hub";
 import {generate_backup} from "./js/core/backup";
 import {adjustLightDarkTheme} from "./js/theme";
-import {initKeyboardListener} from "./js/keyboard/core";
+import {GLOBAL_KEYBOARD_HANDLER} from "./js/keyboard/core";
+import {CountType, statisticsManager} from "./js/core/statistics";
 // init
 configManager.init()
+statisticsManager.init()
 formatManager.init()
 hierachyHubManager.init()
 codeSnippetManager.init()
 function bindApp(){
     tagColorManager.init()
-    initKeyboardListener()
+    GLOBAL_KEYBOARD_HANDLER.init();
     const app = createApp(App)
 
     initNU(app)
@@ -114,6 +116,7 @@ const enterApp = (data) => {
         })
     }
     console.log('Enter App ...')
+    statisticsManager.count(CountType.VISITED)
     adjustLightDarkTheme()
     bindApp()
     if(data.code==='code-snippet-save'){

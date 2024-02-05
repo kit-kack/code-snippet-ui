@@ -2,47 +2,58 @@ import {$reactive, LIST_VIEW} from "../store";
 import {Direction, doScrollForCodeView} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {configManager} from "../core/config";
-import {dealWithCommonView} from "./core";
+import {K_COMMON} from "./k-common";
 
+export const RENDER_KEYHANDLER = {
+    handle: null
+}
 
-export function dealWithCodeView(e,ctrlFlag){
+/**
+ * @type {KeyHandler}
+ */
+export const K_CODEVIEW = (ext)=>{
+    const {code,ctrl,shift,double} = ext;
     // active
     if($reactive.code.infoActive){
-        if(e.code === 'KeyQ' || e.code === 'KeyS'){
+        if(code === 'KeyQ' || code === 'KeyS' || code === 'Space'){
             $reactive.code.infoActive = false
         }
         return
     }
-    if($reactive.code.tocActive){
-        if(e.code === 'KeyQ'){
-            $reactive.code.tocActive = false
-        }else if(e.code === 'KeyS'){
-            $reactive.code.infoActive = true;
-            $reactive.code.tocActive = false
+    // render
+    if(RENDER_KEYHANDLER.handle){
+        if(RENDER_KEYHANDLER.handle(ext)){
+            return true;
         }
-        return
     }
 
-    switch (e.code){
+    switch (code){
+        case "Tab":
+            utools.subInputBlur();
+            break;
         case "KeyH":
         case "ArrowLeft":
-            doScrollForCodeView(Direction.LEFT,e.shiftKey);
+            if(!ctrl){
+                doScrollForCodeView(Direction.LEFT,shift);
+            }
             break;
         case "KeyJ":
         case "ArrowDown":
-            if(!ctrlFlag){
-                doScrollForCodeView(Direction.DOWN,e.shiftKey);
+            if(!ctrl){
+                doScrollForCodeView(Direction.DOWN,shift);
             }
             break;
         case "KeyK":
         case "ArrowUp":
-            if(!ctrlFlag){
-                doScrollForCodeView(Direction.UP,e.shiftKey);
+            if(!ctrl){
+                doScrollForCodeView(Direction.UP,shift);
             }
             break;
         case "KeyL":
         case "ArrowRight":
-            doScrollForCodeView(Direction.RIGHT,e.shiftKey);
+            if(!ctrl){
+                doScrollForCodeView(Direction.RIGHT,shift);
+            }
             break;
         case 'KeyS':
             $reactive.code.infoActive = !$reactive.code.infoActive;
@@ -52,7 +63,11 @@ export function dealWithCodeView(e,ctrlFlag){
             GLOBAL_HIERARCHY.changeView(LIST_VIEW)
             break;
         case 'KeyG':
-            doScrollForCodeView(Direction.RESET,false);
+            if(double){
+                doScrollForCodeView(Direction.RESET,false)
+            }else if(shift){
+                doScrollForCodeView(Direction.END,false);
+            }
             break
         case 'KeyR':
             if($reactive.currentSnippet.path && $reactive.currentSnippet.type === 'image'){
@@ -61,17 +76,18 @@ export function dealWithCodeView(e,ctrlFlag){
             $reactive.code.isRendering = !$reactive.code.isRendering;
             break;
         case 'KeyP':
-            if(ctrlFlag){
+            if(ctrl){
                 $reactive.code.isPure = ! $reactive.code.isPure;
                 configManager.set('pure_mode',$reactive.code.isPure)
                 break
             }
         default:
-            dealWithCommonView(e,ctrlFlag)
+            return K_COMMON(ext);
         // case 'KeyB':
         //     if($reactive.currentSnippet.path){
         //         $normal.updateCacheCodeFunc?.()
         //     }
         //     break;
     }
+    return false;
 }

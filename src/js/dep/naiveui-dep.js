@@ -33,7 +33,9 @@ import {
     NBreadcrumbItem,
     NCollapse,
     NCollapseItem,
-    NDropdown
+    NDropdown,
+    NNumberAnimation,
+    NStatistic
 } from 'naive-ui'
 
 
@@ -71,7 +73,9 @@ const naive = create({
         NBreadcrumbItem,
         NCollapse,
         NCollapseItem,
-        NDropdown
+        NDropdown,
+        NNumberAnimation,
+        NStatistic
     ]
 })
 
