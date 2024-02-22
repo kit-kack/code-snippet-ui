@@ -560,8 +560,16 @@ function keyDownHandler(e){
   }
   if(e.ctrlKey){
     if(e.code === 'KeyQ'){
+      if(currentTab.value === 'code' && $reactive.form.fullScreen){
+        $reactive.form.fullScreen = false;
+        return;
+      }
       handleCancel();
     }else if(e.code === 'KeyS'){
+      if(currentTab.value === 'code' && $reactive.form.fullScreen){
+        $reactive.form.fullScreen = false;
+        return;
+      }
       handleUpdate();
       e.preventDefault();
     }

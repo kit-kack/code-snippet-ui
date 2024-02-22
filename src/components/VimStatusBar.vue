@@ -52,7 +52,7 @@
           </template>
         </template>
       </div>
-      <h5 style="font-weight: normal"><span style="font-weight: bold">今日 / 最近七日 / 总计</span> | 由于插件在v2.7.2版本才开始统计，数据仅供参考</h5>
+      <h5 style="font-weight: normal"><span style="font-weight: bold">今日 / 最近七日 / 总计</span> &nbsp;&nbsp;|&nbsp;&nbsp; 由于插件在v2.7.2版本才开始统计，数据仅供参考</h5>
     </n-modal>
 
   </div>

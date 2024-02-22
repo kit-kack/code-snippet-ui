@@ -499,6 +499,7 @@ onUnmounted(()=>{
     background-color: #fff5f5;
   }
   pre{
+    border-radius: 5px !important;
     border: 2px solid transparent;
     code{
       font-family: 'Consolas' !important;
@@ -512,6 +513,9 @@ onUnmounted(()=>{
       border-color:  #f6f8fa;
       background-color:  #ddd !important;
     }
+  }
+  a:hover{
+    text-decoration: underline !important;
   }
 }
 .toc-link{

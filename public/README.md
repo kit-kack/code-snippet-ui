@@ -3,9 +3,9 @@
 新版本速览✨
 
 1. <span style="color:#209a6e">新增</span> 代码编辑支持高亮显示 
-1. <span style="color:#209a6e">新增</span> Beta功能：扩充搜索范围 
-2. <span style="color:#5eacee">优化</span> 标签选择，请在主界面点击上面的ALL切换
-3. <span style="color:#5eacee">完善</span> 一些界面处理逻辑
+2. <span style="color:#209a6e">新增</span> Beta功能：扩充搜索范围 
+3. <span style="color:#5eacee">优化</span> 标签选择，请在主界面点击上面的ALL切换
+4. <span style="color:#5eacee">完善</span> 一些界面处理逻辑
 ---
 
 [[TOC]]
@@ -180,8 +180,8 @@ hello, {{clipboard}}  // 返回剪切板复制内容
 > 下面只是功能demo，可能并不完善，后续版本可能也会移除；若想使用，请在`设置`界面开启
 
 ### 3.1 搜索粘贴子代码片段
-输入`name$num`，可以搜索**粘贴**到 名字对应`name`的`num`号子代码片段
-> 这里的核心为**粘贴**，故会影响到Vim模式下`Enter`键的效果，但`P`键仍会保持原有粘贴全部内容的效果
+输入`name$num`，可以搜索**复制粘贴** 名字对应`name`的`num`号子代码片段
+> 这里的核心为**复制粘贴**，故会影响到Vim模式下`C`和`Enter`键的效果，但`Y`和`P`键仍会保持原有复制粘贴全部内容的效果
 
 > 该功能同样适用于**聚合模式**下的uTools搜索框直接搜索功能
 
