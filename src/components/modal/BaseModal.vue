@@ -5,6 +5,7 @@
            :title="title"
            :closable="false"
            :mask-closable="false"
+           :auto-focus="!vim"
            @close="$emit('cancel')"
            :style="{
              width: wide? '80%':'60%'
@@ -13,18 +14,24 @@
     <template #footer>
       <div style="width: 100%;position: relative">
         <n-space style="position: absolute; right: 3px">
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <n-button :focusable="false" quaternary @click="$emit('cancel')">取消 (Q)</n-button>
-            </template>
-            {{CtrlStr+'+Q'}}
-          </n-tooltip>
-          <n-tooltip trigger="hover">
-            <template #trigger>
-              <n-button :focusable="false" quaternary :color="$normal.theme.globalColor" @click="$emit('confirm')">确定 (S)</n-button>
-            </template>
-            {{CtrlStr+'+S'}}
-          </n-tooltip>
+          <template v-if="vim">
+            <n-button :focusable="false" quaternary @click="$emit('cancel')">取消 [Q]</n-button>
+            <n-button :focusable="false" quaternary :color="$normal.theme.globalColor" @click="$emit('confirm')">确定 [S]</n-button>
+          </template>
+          <template v-else>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-button :focusable="false" quaternary @click="$emit('cancel')">取消 (Q)</n-button>
+              </template>
+              {{CtrlStr+'+Q'}}
+            </n-tooltip>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-button :focusable="false" quaternary :color="$normal.theme.globalColor" @click="$emit('confirm')">确定 (S)</n-button>
+              </template>
+              {{CtrlStr+'+S'}}
+            </n-tooltip>
+          </template>
         </n-space>
       </div>
       <br/>
@@ -40,7 +47,8 @@ import {$normal} from "../../js/store";
 
 const props = defineProps({
   'wide': Boolean,
-  'title': String
+  'title': String,
+  vim: Boolean
 })
 const emit = defineEmits(['update:show','cancel','confirm'])
 const down = throttle(()=>{
@@ -50,7 +58,7 @@ const up = throttle(()=>{
   utools.simulateKeyboardTap('up')
 },120)
 const keyDownHandler = (e)=>{
-  if(e.ctrlKey){
+  if(props.vim ||e.ctrlKey){
     if(e.code === 'KeyQ'){
       e.stopImmediatePropagation();
       emit('cancel')

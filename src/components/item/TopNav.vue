@@ -15,11 +15,25 @@
 
   </div>
   <div class="snippet-count-info">
+    <template  v-if="$reactive.currentMode === CODE_VIEW && $reactive.code.sectionsChange">
+      <n-button
+          text
+          :color="$normal.theme.globalColor"
+          style="height: 15px" size="small" @click="$normal.handle_sections_change(true)" >
+        撤销
+      </n-button> - <n-button
+          text
+          :color="$normal.theme.globalColor"
+          style="height: 15px" size="small" @click="$normal.handle_sections_change(false)" >
+        保存
+      </n-button>
+    </template>
+
     <n-button
         text
         :color="$normal.theme.globalColor"
         @click="$reactive.form.fullScreen = false"
-        style="height: 15px" size="small"  v-if="$reactive.currentMode > CODE_VIEW && $reactive.form.fullScreen">
+        style="height: 15px" size="small"  v-else-if="$reactive.currentMode > CODE_VIEW && $reactive.form.fullScreen">
       退出全屏
       <template #icon>
         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" fill="currentColor"></path></svg>
@@ -27,7 +41,7 @@
     </n-button>
     <n-dropdown v-else size="small" placement="bottom-start" trigger="hover" :options="tagOptions" :render-icon="renderIcon" style="max-height: min(240px, calc(100vh * 0.7) )" :disabled="$reactive.currentMode !== LIST_VIEW" scrollable>
       <template v-if="$reactive.main.selectedTag === null">
-        <n-button size="small" text style="font-weight: bold;font-size: 12px">ALL</n-button>
+        <n-button size="small" text style="font-weight: bold;font-size: 12px;height: 15px">ALL</n-button>
       </template>
       <template v-else>
         <normal-tag :content="$reactive.main.selectedTag" type="raw"/>

@@ -161,6 +161,40 @@ function section_generate(section){
     return array;
 }
 
+/**
+ *
+ * @param {[number,number][]} section1
+ * @param {[number,number][]} section2
+ */
+function section_compare(section1,section2){
+    if(section1){
+        if(section2 && section1.length === section2.length){
+            for (let i = 0; i < section1.length; i++) {
+                if(section1[i][0] !== section2[i][0] || section1[i][1] !== section2[i][1]){
+                    return false
+                }
+            }
+            return true;
+        }
+        return false;
+    }else{
+        return !section2 || section2.length === 0
+    }
+}
+
+/**
+ * @param {[number,number][]} section
+ */
+function section_clone(section){
+    let array = [];
+    if(section && section.length > 0){
+        for (let i = 0; i < section.length; i++) {
+            array.push([section[i][0],section[i][1]])
+        }
+    }
+    return array
+}
+
 export {
-    section_add,section_del,section_contain,section_generate
+    section_add,section_del,section_contain,section_generate,section_compare,section_clone
 }

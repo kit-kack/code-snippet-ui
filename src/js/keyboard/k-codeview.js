@@ -1,4 +1,4 @@
-import {$reactive, LIST_VIEW} from "../store";
+import {$reactive, EDIT_VIEW, LIST_VIEW} from "../store";
 import {Direction, doScrollForCodeView} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {configManager} from "../core/config";
@@ -13,6 +13,10 @@ export const RENDER_KEYHANDLER = {
  */
 export const K_CODEVIEW = (ext)=>{
     const {code,ctrl,shift,double} = ext;
+    // modal
+    if($reactive.code.sectionsChangeModal){
+        return
+    }
     // active
     if($reactive.code.infoActive){
         if(code === 'KeyQ' || code === 'KeyS' || code === 'Space'){
@@ -60,7 +64,12 @@ export const K_CODEVIEW = (ext)=>{
             break;
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
-            GLOBAL_HIERARCHY.changeView(LIST_VIEW)
+            if($reactive.code.sectionsChange){
+                $reactive.code.sectionsChangeModal = true;
+                $reactive.code.sectionsChangeTriggerIsListView = true;
+            }else{
+                GLOBAL_HIERARCHY.changeView(LIST_VIEW);
+            }
             break;
         case 'KeyG':
             if(double){
@@ -74,6 +83,22 @@ export const K_CODEVIEW = (ext)=>{
                 return;
             }
             $reactive.code.isRendering = !$reactive.code.isRendering;
+            break;
+        case 'KeyE':
+        case 'KeyI':
+            if($reactive.currentSnippet.help){
+                $message.warning("内置文档，无法修改");
+                return;
+            }
+            if($reactive.common.shortcutActive){
+                $reactive.common.shortcutActive = false;
+            }
+            if($reactive.code.sectionsChange){
+                $reactive.code.sectionsChangeModal = true;
+                $reactive.code.sectionsChangeTriggerIsListView =false;
+            }else{
+                GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
+            }
             break;
         case 'KeyP':
             if(ctrl){

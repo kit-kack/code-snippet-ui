@@ -3,7 +3,6 @@ import './style.scss'
 import App from './App.vue'
 import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd-dep";
-import {section_add, section_contain, section_del} from "./js/utils/section";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
 import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, utools_focus_or_blur} from "./js/store";
@@ -30,62 +29,6 @@ function bindApp(){
 
     initNU(app)
     initVH(app)
-    app.directive("code", {
-        mounted(el) {
-            //获取代码片段
-            let collection = el.querySelector('code.hljs')?.innerHTML.split('\n');
-            let size = collection.length;
-            if(collection[size -1].trim() === ''){
-                size --;
-            }
-            //插入行数
-            let ul = document.createElement('ul')
-            for (let i = 1; i <= size; i++) {
-                let li = document.createElement('li')
-                li.innerText = i + ''
-                li.value = i;
-                ul.appendChild(li)
-            }
-            ul.onclick = (event)=>{
-                let target = event.target;
-                if(target && target.value){
-                    if($reactive.currentSnippet.sections){
-                        if(section_contain($reactive.currentSnippet.sections,target.value)){
-                            section_del($reactive.currentSnippet.sections,target.value,false)
-                        }else{
-                            section_add($reactive.currentSnippet.sections,target.value,false)
-                        }
-                    }else{
-                        $reactive.currentSnippet.sections = [[target.value,target.value]]
-                    }
-                    // 保存
-                    if($reactive.currentSnippet.help){
-                        return;
-                    }
-                    GLOBAL_HIERARCHY.update(null,"sections")
-                }
-            }
-            ul.oncontextmenu = (event) =>{
-                let target = event.target;
-                if(target && target.value){
-                    console.log(target.value)
-                    if($reactive.currentSnippet.sections){
-                        if(section_contain($reactive.currentSnippet.sections,target.value)){
-                            section_del($reactive.currentSnippet.sections,target.value,true)
-                        }else{
-                            section_add($reactive.currentSnippet.sections,target.value,true)
-                        }
-                    }else{
-                        $reactive.currentSnippet.sections = [[0,target.value]]
-                    }
-                    // 保存
-                    GLOBAL_HIERARCHY.update(null,"sections")
-                }
-            }
-            ul.classList.add('hljs-code-number')
-            el.prepend(ul)
-        }
-    })
     app.mount('#app')
 }
 utools.onPluginOut(processExit => {

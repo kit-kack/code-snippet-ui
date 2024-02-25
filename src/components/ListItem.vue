@@ -83,7 +83,7 @@
     <transition>
       <template v-if="$reactive.main.isDel && selected">
         <div class="snippet-item-btn">
-          <span style="color: gray">确认删除?</span>
+          <span style="color: gray">确定删除?</span>
           <selectable-button  :mid="395"  type="primary" tip="搞错了" :index="0" @invoke="$reactive.main.isDel = false;" >
             ✗
           </selectable-button>

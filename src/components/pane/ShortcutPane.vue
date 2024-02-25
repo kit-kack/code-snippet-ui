@@ -198,16 +198,5 @@ const shortcuts = [{
   height: 40px;
   padding: 0 5px
 }
-.shortcut{
-  font-size: 12px;
-  padding: 3px 5px 3px 5px;
-  margin-left: 5px;
-  border-radius: 5px;
-  /* 磨砂感背景 */
-  backdrop-filter: saturate(180%) blur(5px)!important;
-  -webkit-backdrop-filter: saturate(180%) blur(5px)!important;
-  /* 磨砂的背景颜色 */
-  background: rgba(191, 208, 229, 0.2) !important;
-}
 
 </style>

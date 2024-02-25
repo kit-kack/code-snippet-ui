@@ -109,7 +109,13 @@ const $reactive = reactive({
         // 是否正在渲染
         isRendering: false,
         // 是否处于【纯净模式】
-        isPure: false
+        isPure: false,
+        // sections是否发生变化
+        sectionsChange: false,
+        // secionts modal
+        sectionsChangeModal: false,
+        // sections trigger is listview or formview
+        sectionsChangeTriggerIsListView: false,
     },
     main:{
         // 【辅助标签选择】界面

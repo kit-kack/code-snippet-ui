@@ -26,7 +26,7 @@
 <!--                       :header="false"-->
 <!--                       code-on-->
 <!--                       line-nums width="100%" :languages="[[pair.type]]"/>-->
-          <div class="hljs-container" v-code>
+          <div class="hljs-container" v-code-line>
             <n-scrollbar  x-scrollable :ref="(el)=> $normal.scroll.codeHorizontalInvoker = el" style="padding-bottom: 2px">
               <template v-if="pair.valid">
                 <highlightjs :language="pair.type" :autodetect="false" :code="pair.code" width="100%"/>
@@ -36,7 +36,7 @@
               </template>
             </n-scrollbar>
             <div class="hljs-line-container">
-              <template v-for="(section,sindex) in snippet.sections">
+              <template v-for="(section,sindex) in snippetSections">
                 <div class="hljs-line-item"
                      v-for="(line,lindex) in section_generate(section)"
                      :style="{
@@ -50,6 +50,13 @@
         <div class="code-view-codearea-bottom"></div>
       </template>
     </n-scrollbar>
+    <base-modal v-if="$reactive.code.sectionsChangeModal"
+                vim
+                @cancel="exitWithHandlingSectionChange(false)"
+                @confirm="exitWithHandlingSectionChange(true)"
+    >
+      在退出之前，<strong>子代码片段发生变更</strong>，是否进行保存?
+    </base-modal>
 
     <div id="code-view-bottom-nav" v-if="!$reactive.code.isPure">
       <n-space>
@@ -108,7 +115,14 @@
           </n-space>
         </template>
         <template v-if="!_isEmpty(snippet.sections)">
-          <h4>子代码片段×{{snippet.sections.length}}</h4>
+          <h4>子代码片段×{{snippet.sections.length}}
+            <n-button
+                text
+                type="error"
+                style="height: 15px" size="small" @click="clearSnippetSections()" >
+              清空
+            </n-button>
+          </h4>
           <n-space>
             <span class="code-view-side-tag" v-for="section in snippet.sections">
               {{section[0]+'~'+section[1]}}
@@ -128,26 +142,118 @@
 
 <script setup>
 import {configManager} from "../js/core/config";
-import {computed, onMounted, onUnmounted, ref, watchPostEffect} from "vue";
-import {section_generate} from "../js/utils/section";
+import {computed, onMounted, onUnmounted, ref, watch, watchPostEffect} from "vue";
+import {
+  section_add,
+  section_clone,
+  section_compare,
+  section_contain,
+  section_del,
+  section_generate
+} from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
 import {calculateTime, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
-import {$normal, $reactive, LIST_VIEW} from "../js/store";
+import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import NormalTag from "../components/base/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import MarkdownRender from "../components/render/MarkdownRender.vue";
 import {renderFormatBlock} from "../js/core/func";
 import {isEmpty as _isEmpty} from "lodash-es"
 import ImageRender from "../components/render/ImageRender.vue";
+import BaseModal from "../components/modal/BaseModal.vue";
 
 const verticalScroller = ref(null)
 /**
  * @type CodeSnippet
  */
 const snippet = $reactive.currentSnippet;
+const snippetSections = ref(section_clone(snippet.sections))
+watch(snippetSections, (newValue, oldValue) => {
+  $reactive.code.sectionsChange = !section_compare(snippet.sections,newValue)
+},{
+  deep: true
+})
 const isNetWorkPath = snippet.path && isNetWorkUri(snippet.path)
 $reactive.currentCode = getCode()
 const refreshFlag = ref(true)
+const vCodeLine = {
+  mounted(el) {
+    //获取代码片段
+    let collection = el.querySelector('code.hljs')?.innerHTML.split('\n');
+    let size = collection.length;
+    if(collection[size -1].trim() === ''){
+      size --;
+    }
+    //插入行数
+    let ul = document.createElement('ul')
+    for (let i = 1; i <= size; i++) {
+      let li = document.createElement('li')
+      li.innerText = i + ''
+      li.value = i;
+      ul.appendChild(li)
+    }
+    ul.onclick = (event)=>{
+      let target = event.target;
+      if(target && target.value){
+        if(snippetSections.value){
+          if(section_contain(snippetSections.value,target.value)){
+            section_del(snippetSections.value,target.value,false)
+          }else{
+            section_add(snippetSections.value,target.value,false)
+          }
+        }else{
+          snippetSections.value = [[target.value,target.value]]
+        }
+      }
+    }
+    ul.oncontextmenu = (event) =>{
+      let target = event.target;
+      if(target && target.value){
+        if(snippetSections.value){
+          if(section_contain(snippetSections.value,target.value)){
+            section_del(snippetSections.value,target.value,true)
+          }else{
+            section_add(snippetSections.value,target.value,true)
+          }
+        }else{
+          snippetSections.value = [[0,target.value]]
+        }
+      }
+    }
+    ul.classList.add('hljs-code-number')
+    el.prepend(ul)
+  }
+}
+function handleSectionChange(clear){
+  if(clear){
+    snippetSections.value = section_clone($reactive.currentSnippet.sections);
+  }else{
+    $reactive.currentSnippet.sections = snippetSections.value;
+    GLOBAL_HIERARCHY.update(null,"sections");
+    $reactive.code.sectionsChange = false;
+  }
+}
+function exitWithHandlingSectionChange(confirm){
+  if(confirm){
+    handleSectionChange();
+  }
+  $reactive.code.sectionsChangeModal = false;
+  GLOBAL_HIERARCHY.changeView($reactive.code.sectionsChangeTriggerIsListView ? LIST_VIEW : EDIT_VIEW)
+}
+function clearSnippetSections(){
+  window.$dialog.error({
+    title: '清空所有子代码片段',
+    positiveText: '删除',
+    negativeText: '取消',
+    closable: false,
+    autoFocus: false,
+    onPositiveClick:()=>{
+      $reactive.currentSnippet.sections = undefined;
+      snippetSections.value = []
+      GLOBAL_HIERARCHY.update(null,"sections");
+    }
+  })
+}
 const pair = computed(()=>{
   // 分析类型
   const result = getRealTypeAndValidStatus(snippet.type);
@@ -260,6 +366,7 @@ onMounted(()=>{
     // $normal.updateCacheCodeFunc = updateCachedCode
     $normal.scroll.codeVerticalInvoker = verticalScroller.value;
     $reactive.code.isRendering = pair.value.renderable;
+    $normal.handle_sections_change = handleSectionChange;
     if(snippet.type && snippet.type.length>2 && snippet.type.startsWith('x-')){
       if(pair.value.renderable){
         watchPostEffect(()=>{
@@ -273,6 +380,8 @@ onMounted(()=>{
 
 onUnmounted(()=>{
   $reactive.code.infoActive = false;
+  $reactive.code.sectionsChange = false;
+  delete $normal.handle_sections_change;
 })
 
 </script>
@@ -372,6 +481,10 @@ onUnmounted(()=>{
     text-align: right;
     opacity: 0.3;
     z-index: 2;
+    &:hover{
+      color: var(--global-color);
+      text-decoration: underline;
+    }
   }
 }
 .code-view-side-info {

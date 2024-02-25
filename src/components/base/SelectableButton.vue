@@ -20,7 +20,10 @@
         </template>
       </n-button>
     </template>
-    {{tip}}{{selected?"（按下空格执行）":''}}
+    {{tip}}
+    <template v-if="selected">
+      <span class="shortcut">Space</span>
+    </template>
   </n-tooltip>
 </template>
 

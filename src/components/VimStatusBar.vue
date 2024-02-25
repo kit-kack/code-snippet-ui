@@ -62,9 +62,9 @@
 <script setup>
 import {configManager} from "../js/core/config";
 import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
-import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {computed, ref} from "vue";
 import {statisticsManager} from "../js/core/statistics";
+
 const statisticsShow = ref(false)
 const show = computed(()=>{
   // !$reactive.utools.focused && $reactive.view.fullScreenShow
@@ -105,23 +105,6 @@ function handleVimStatusBarClick(){
       showCount++;
     }
   }else if($reactive.currentMode === CODE_VIEW){
-    let now = Date.now();
-    if(now - lastTime < 500){
-      if(clearCount === 3){
-        $message.info("清除 所有高亮行")
-        $reactive.currentSnippet.sections = [];
-        if($reactive.currentSnippet.help){
-          return;
-        }
-        GLOBAL_HIERARCHY.update(null,"sections")
-        clearCount = 0;
-      }else{
-        clearCount++;
-      }
-    }else{
-      clearCount = 1;
-    }
-    lastTime = now;
   }
 }
 
