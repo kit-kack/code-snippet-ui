@@ -218,11 +218,6 @@ function _parseVariable_Command_Param(text,assignFlag) {
             }
         }
     }
-    // trim
-    result.command = result.command?.trim();
-    result.param = result.param?.trim();
-    result._var = result._var?.trim();
-
     return result;
 }
 
@@ -472,6 +467,10 @@ export const formatManager = {
                 // [variable::]command[:param]
                 // 1.parse
                 const result = _parseVariable_Command_Param(name,assignFlag)
+                // trim
+                result.command = result.command?.trim();
+                result.param = result.param?.trim();
+                result._var = result._var?.trim();
                 // assign：必须有变量赋值
                 if(assignFlag){
                     if(!result._var){
@@ -722,21 +721,58 @@ export const formatManager = {
 }
 
 
+function _getCommandClass(command) {
+    return _get_command_key(command.trim()) ? 'kitx-right-command': 'kitx-error-command';
+}
 
-
-
-
-const _errorFormatBlockStyle = '<span style="color:red">';
-const _formatBlockStyle = '<span class="command-format">'
-const _assginBlockStyle = '<span class="command-assign">'
-
-const regex = /<([^>]+)>([^<]+)<\/[^>]+>/;
-function _resolveCommandFromSpan(command){
-    const match = regex.exec(command);
-    if(match && match.length > 1){
-        return match[2].trim().toLowerCase()
+function _colorResult(text,assignFlag) {
+    let index = text.indexOf(':');
+    if(index === -1){  // only command
+        // #var=value, find =
+        if(assignFlag){
+            index = text.indexOf('=');
+            if(index !== -1) {
+                return `#<span class="kitx-var">${text.slice(0, index)}</span>=<span class="kitx-param">${text.slice(index + 1)}</span>`
+            }else{
+                return `<span class="kitx-error-command">#${text}</span>`
+            }
+        }else{
+            return `<span class="${_getCommandClass(text)}">${text}</span>`
+        }
     }else{
-        return command
+        if(index === text.length-1){ // last
+            // command : param
+            let command = text.slice(0,index);
+            if(assignFlag){
+                command = '#'+command
+            }
+            return `<span class="${_getCommandClass(command)}">${command}</span>:`
+        }else{
+            if(text[index+1] === ':'){
+                // variable :: command [:param]
+                const _var = text.slice(0,index)
+                const newText = text.slice(index+2);
+                index = newText.indexOf(':')
+                const prefix = assignFlag ? '#':'' ;
+                if(index !== -1){
+                    // command: param
+                    const command = newText.slice(0,index);
+                    const param = newText.slice(index+1)
+                    return prefix + `<span class="kitx-var">${_var}</span>::<span class="${_getCommandClass(command)}">${command}</span>:<span class="${param.startsWith('@') ? 'kitx-reference' : 'kitx-param' }">${param}</span>`
+                }else{
+                    // command
+                    return prefix + `<span class="kitx-var">${_var}</span>::<span class="${_getCommandClass(newText)}">${newText}</span>`
+                }
+            }else{
+                // command : param
+                let command = text.slice(0,index);
+                if(assignFlag){
+                    command = '#'+command
+                }
+                const param = text.slice(index+1);
+                return `<span class="${_getCommandClass(command)}">${command}</span>:<span class="${param.startsWith('@') ? 'kitx-reference' : 'kitx-param' }">${param}</span>`
+            }
+        }
     }
 }
 /**
@@ -748,74 +784,30 @@ export function renderFormatBlock(selector,normal){
     const codeViewer = document.querySelector(selector)
     if(codeViewer){
         codeViewer.innerHTML = codeViewer.innerHTML.replace(/{{.+?}}/gs,(substring)=>{
-            const text = substring.slice(2,-2).trim();
-            let style = _errorFormatBlockStyle ;
+            const text = substring.slice(2,-2);
+            let html = '<span class="kitx-snippet">{{';
             if(text.startsWith('#')) {
-                const result = _parseVariable_Command_Param(text.slice(1),true);
-                if (result._var) {
-                    if(result.assign){
-                        style =  _assginBlockStyle
-                    }else if (result.command) {
-                        if(normal){
-                            result.command = _resolveCommandFromSpan(result.command)
-                        }
-                        if (_get_command_key(result.command)) {
-                            style =  _assginBlockStyle
-                        }
-                    }else  if (result.param) {
-                        style = _assginBlockStyle
-                    }
-                }
+                html+= _colorResult(text.slice(1),true);
             }else if(text.startsWith('@')){
-                style = _formatBlockStyle
+                html+= `<span class="kitx-reference">${text}</span>`
             }else{
-                const result = _parseVariable_Command_Param(text);
-                if(result.command){
-                    if(normal){
-                        result.command = _resolveCommandFromSpan(result.command)
-                    }
-                    if(_get_command_key(result.command)){
-                        style = _formatBlockStyle
-                    }
-                }else  if (result.param) {
-                    style = _formatBlockStyle
-                }
+                html+= _colorResult(text);
             }
-            return style+substring+'</span>'
+            return html + '}}</span>'
         })
     }
 }
 export function replaceRenderBlock(code){
     return code.replace(/{{.+?}}/gs,(substring)=>{
-        const text = substring.slice(2,-2).trim();
-        let style = _errorFormatBlockStyle ;
+        const text = substring.slice(2,-2);
+        let html = '<span class="kitx-snippet">{{';
         if(text.startsWith('#')) {
-            const result = _parseVariable_Command_Param(text.slice(1),true);
-            if (result._var) {
-                if(result.assign){
-                    style =  _assginBlockStyle
-                }else if (result.command) {
-                    result.command = _resolveCommandFromSpan(result.command)
-                    if (_get_command_key(result.command)) {
-                        style =  _assginBlockStyle
-                    }
-                }else  if (result.param) {
-                    style = _assginBlockStyle
-                }
-            }
+            html+=  _colorResult(text.slice(1),true);
         }else if(text.startsWith('@')){
-            style = _formatBlockStyle
+            html+= `<span class="kitx-reference">${text}</span>`
         }else{
-            const result = _parseVariable_Command_Param(text);
-            if(result.command){
-                result.command = _resolveCommandFromSpan(result.command)
-                if(_get_command_key(result.command)){
-                    style = _formatBlockStyle
-                }
-            }else  if (result.param) {
-                style = _formatBlockStyle
-            }
+            html+= _colorResult(text);
         }
-        return style+substring+'</span>'
+        return html + '}}</span>'
     })
 }

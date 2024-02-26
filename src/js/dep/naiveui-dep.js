@@ -35,8 +35,7 @@ import {
     NCollapseItem,
     NDropdown,
     NNumberAnimation,
-    NStatistic,
-    NPopconfirm
+    NStatistic
 } from 'naive-ui'
 
 
@@ -76,8 +75,7 @@ const naive = create({
         NCollapseItem,
         NDropdown,
         NNumberAnimation,
-        NStatistic,
-        NPopconfirm
+        NStatistic
     ]
 })
 

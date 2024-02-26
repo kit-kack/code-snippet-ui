@@ -108,36 +108,34 @@ utools.onPluginEnter((data)=>{
     }
 })
 
-try{
-    let result = [];
-    let num = undefined;
-    utools.onMainPush(({code,type,payload})=>{
-        let name = payload.toLowerCase();
-        num = undefined;
-        if(configManager.get('beta_sub_snippet_search')){
-            const index = payload.lastIndexOf('$')
-            if(index !== -1){
-                name = payload.slice(0,index)
-                num =  (+payload.slice(index+1))??1;
-            }
+let result = [];
+let num = undefined;
+utools.onMainPush(({code,type,payload})=>{
+    let name = payload.toLowerCase();
+    num = undefined;
+    if(configManager.get('beta_sub_snippet_search')){
+        const index = payload.lastIndexOf('$')
+        if(index !== -1){
+            name = payload.slice(0,index)
+            num =  (+payload.slice(index+1))??1;
         }
-        result = codeSnippetManager.deepQuery(name).slice(0,6)
-        return result.map((cs,index) =>({
-                text: cs.name,
-                index: index,
-                icon: cs.type?.startsWith('x-')? '/code-x.png': '/code.png',
-                title: cs.path ? '[关联文件]：'+cs.path: cs.code,
-                tags: [cs.desc,cs.matchType > 0 ? (cs.matchType === 1 ? '📗描述匹配' : '📘内容匹配') : undefined]
-            }))
-    },({code,type,payload,option})=>{
-        $reactive.currentSnippet = result[option.index];
-        // $reactive.core.selectedIndex = 0;
-        $index.value = 0;
-        copyCode(true,num,true).then(v =>{
-            utools.outPlugin();
-        })
-        $normal.entry = $reactive.currentSnippet.type?.startsWith('x-');
-        return $normal.entry
+    }
+    result = codeSnippetManager.deepQuery(name).slice(0,6)
+    return result.map((cs,index) =>({
+        text: cs.name,
+        index: index,
+        icon: cs.type?.startsWith('x-')? '/code-x.png': '/code.png',
+        title: cs.path ? '[关联文件]：'+cs.path: cs.code,
+        tags: [cs.desc,cs.matchType > 0 ? (cs.matchType === 1 ? '📗描述匹配' : '📘内容匹配') : undefined]
+    }))
+},({code,type,payload,option})=>{
+    $reactive.currentSnippet = result[option.index];
+    // $reactive.core.selectedIndex = 0;
+    $index.value = 0;
+    copyCode(true,num,true).then(v =>{
+        utools.outPlugin();
     })
-}catch (_){}
+    $normal.entry = $reactive.currentSnippet.type?.startsWith('x-');
+    return $normal.entry
+})
 

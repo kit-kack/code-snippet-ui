@@ -81,21 +81,37 @@ p.tooltip b{
   color: var(--item-code-text-color);
 }
 
-.command-format{
-  color: #ffa400;
+.kitx-snippet{
   border-radius: 3px;
-  background-color: #f1f1f1;
-  font-weight: bolder;
+  background-color: #eaeef2 !important;
+  color: #c6c6c9;
+  .kitx-var{
+    color: #10be8e;
+    font-weight: bolder;
+  }
+  .kitx-right-command{
+    color: #ffa400;
+    font-weight: bolder;
+  }
+  .kitx-error-command{
+    color: #f30606;
+  }
+  .kitx-param{
+    color: #7e8088;
+  }
+  .kitx-reference{
+    color: #4078f2;
+    font-weight: bolder;
+  }
 }
-.command-assign{
-  color: #10be8e;
-  border-radius: 3px;
-  background-color: #f1f1f1;
-  font-weight: bolder;
-}
+
 #dark-app {
-  .command-format,.command-assign{
-    background-color: #414141;
+  .kitx-snippet{
+    background-color: #414141 !important;
+    color: #777;
+  }
+  .kitx-param{
+    color: #aaa;
   }
 }
 
