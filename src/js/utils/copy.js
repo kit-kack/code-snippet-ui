@@ -1,5 +1,5 @@
 import {$index, $normal, $reactive} from "../store";
-import {formatManager} from "../core/func";
+import {formatManager} from "../utools/func";
 import {isNetWorkUri} from "./common";
 import { isEmpty as _isEmpty } from "lodash-es"
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";

@@ -3,7 +3,7 @@ import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {K_SHORTCUT} from "./k-shortcut";
 import {K_CODEVIEW} from "./k-codeview";
 import {K_LISTVIEW} from "./k-listview";
-import {CountType, statisticsManager} from "../core/statistics";
+import {CountType, statisticsManager} from "../utools/statistics";
 
 export const GLOBAL_KEYBOARD_HANDLER = {
     isInited: false,

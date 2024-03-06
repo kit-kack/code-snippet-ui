@@ -60,10 +60,10 @@
 </template>
 
 <script setup>
-import {configManager} from "../js/core/config";
+import {configManager} from "../js/utools/config";
 import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {computed, ref} from "vue";
-import {statisticsManager} from "../js/core/statistics";
+import {statisticsManager} from "../js/utools/statistics";
 
 const statisticsShow = ref(false)
 const show = computed(()=>{

@@ -34,7 +34,7 @@ export const statisticsManager = {
     },
     _now(){
         const date = new Date();
-        return date.getDate() + date.getMonth() * 100 + date.getFullYear() * 10000;
+        return new Date(date.getFullYear(),date.getMonth(),date.getDate()).getTime();
     },
     writeToDB(){
         utools_db_store(GLOBAL_STATISTICS,this.data)
@@ -72,18 +72,19 @@ export const statisticsManager = {
 
     clearPreviousWeek(){
         const now = this._now();
+        const timestampOfSevenDay = 7 * 24 * 60 * 60 * 1000;
         for (let weekKey in this.data.visited.week) {
-            if(now - weekKey > 7){
+            if(now - weekKey > timestampOfSevenDay){
                 delete this.data.visited.week[weekKey]
             }
         }
         for (let weekKey in this.data.copyed.week) {
-            if(now - weekKey > 7){
+            if(now - weekKey > timestampOfSevenDay){
                 delete this.data.copyed.week[weekKey]
             }
         }
         for (let weekKey in this.data.vim.week) {
-            if(now - weekKey > 7){
+            if(now - weekKey > timestampOfSevenDay){
                 delete this.data.vim.week[weekKey]
             }
         }
@@ -106,7 +107,7 @@ export const statisticsManager = {
         return [
             this.data.used.total,
             'N/A',
-            (now - this.data.used.start)+1
+            Math.floor((now - this.data.used.start) / (24 * 60 * 60 * 1000))
         ]
     },
     getStatistics(){

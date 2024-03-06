@@ -6,16 +6,16 @@ import initVH from "./js/dep/vmd-dep";
 import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
 import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, utools_focus_or_blur} from "./js/store";
-import {tagColorManager} from "./js/core/tag";
-import {codeSnippetManager} from "./js/core/snippet";
-import {configManager} from "./js/core/config";
-import {formatManager} from "./js/core/func";
+import {tagColorManager} from "./js/utools/tag";
+import {codeSnippetManager} from "./js/utools/snippet";
+import {configManager} from "./js/utools/config";
+import {formatManager} from "./js/utools/func";
 import {GLOBAL_HIERARCHY} from "./js/hierarchy/core";
-import {hierachyHubManager} from "./js/core/hub";
-import {generate_backup} from "./js/core/backup";
+import {hierachyHubManager} from "./js/utools/hub";
+import {generate_backup} from "./js/utools/backup";
 import {adjustLightDarkTheme} from "./js/theme";
 import {GLOBAL_KEYBOARD_HANDLER} from "./js/keyboard/core";
-import {CountType, statisticsManager} from "./js/core/statistics";
+import {CountType, statisticsManager} from "./js/utools/statistics";
 // init
 configManager.init()
 statisticsManager.init()

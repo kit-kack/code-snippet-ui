@@ -1,7 +1,7 @@
 import {$reactive, EDIT_VIEW, LIST_VIEW} from "../store";
 import {Direction, doScrollForCodeView} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
-import {configManager} from "../core/config";
+import {configManager} from "../utools/config";
 import {K_COMMON} from "./k-common";
 
 export const RENDER_KEYHANDLER = {

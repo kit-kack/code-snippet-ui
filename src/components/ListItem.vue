@@ -126,7 +126,7 @@
 
 <script setup>
 import {computed, ref} from "vue";
-import {configManager} from "../js/core/config";
+import {configManager} from "../js/utools/config";
 import SelectableButton from "./base/SelectableButton.vue";
 import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshSearchResult} from "../js/store";
 import NormalTag from "./base/NormalTag.vue";

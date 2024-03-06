@@ -1,6 +1,6 @@
 import {VSCODE_EDITOR} from "./vscode";
 import {SUBLIME_TEXT_EDITOR} from "./sublime_text";
-import {configManager} from "../core/config";
+import {configManager} from "../utools/config";
 import {JETBRAINS_EDITOR} from "./jetbrains";
 
 export const VSCode_PATH = window.preload.getFinalPath(utools.getPath('appData'),'./Code/User/snippets');

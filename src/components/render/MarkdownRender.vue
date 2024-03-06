@@ -35,7 +35,7 @@
 import {$normal, $reactive} from "../../js/store";
 import {nextTick, onMounted, onUnmounted, ref} from "vue";
 import {isNetWorkUri} from "../../js/utils/common";
-import {utools_browser_open} from "../../js/core/base";
+import {utools_browser_open} from "../../js/utools/base";
 import {RENDER_KEYHANDLER} from "../../js/keyboard/k-codeview";
 
 const preview = ref()

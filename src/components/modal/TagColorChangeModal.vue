@@ -40,7 +40,7 @@
 <script setup>
 import BaseModal from "./BaseModal.vue";
 import {$reactive, handleRecoverLiteShow, refreshSearchResult} from "../../js/store";
-import {tagColorManager} from "../../js/core/tag";
+import {tagColorManager} from "../../js/utools/tag";
 import {ref} from "vue";
 
 const instance = ref({

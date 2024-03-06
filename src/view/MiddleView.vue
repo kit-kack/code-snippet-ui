@@ -89,7 +89,7 @@ import ListView from "./ListView.vue";
 import CodeView from "./CodeView.vue";
 import FormView from "./FormView.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
-import {configManager} from "../js/core/config";
+import {configManager} from "../js/utools/config";
 import TopNav from "../components/item/TopNav.vue";
 import {doScrollForListView} from "../js/utils/scroller";
 import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";

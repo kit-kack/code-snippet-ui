@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import {configManager} from "../../js/core/config";
+import {configManager} from "../../js/utools/config";
 import {ref} from "vue";
 
 /**

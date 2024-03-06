@@ -78,7 +78,7 @@
 
 <script>
 import hljs from "../../js/dep/highlight-dep";
-import {configManager} from "../../js/core/config";
+import {configManager} from "../../js/utools/config";
 import {INVERSE_MATCHED_WORDS, isMatchedWord, MATCHED_WORDS} from "../../js/utils/language";
 
 export default {

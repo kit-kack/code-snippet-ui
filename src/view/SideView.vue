@@ -100,8 +100,8 @@
 </template>
 
 <script setup>
-import {tagColorManager} from "../js/core/tag";
-import {configManager} from "../js/core/config";
+import {tagColorManager} from "../js/utools/tag";
+import {configManager} from "../js/utools/config";
 import {ref} from "vue";
 import NormalTag from "../components/base/NormalTag.vue";
 import ConfigCheckTag from "../components/base/ConfigCheckTag.vue";
@@ -110,7 +110,7 @@ import {getRefreshFunc} from "../js/utils/common";
 import FuncPane from "../components/pane/FuncEditPane.vue";
 import {$reactive, refreshListView, refreshSearchResult} from "../js/store";
 import CustomView from "../components/pane/CustomPane.vue";
-import {generate_backup, load_backup} from "../js/core/backup";
+import {generate_backup, load_backup} from "../js/utools/backup";
 import {backupFilePath} from "../js/some";
 import SpecialTagConfigModal from "../components/modal/SpecialTagConfigModal.vue";
 

@@ -77,7 +77,7 @@
 </template>
 <script setup>
 import {h, ref, toRaw} from "vue";
-import {formatManager} from "../../js/core/func";
+import {formatManager} from "../../js/utools/func";
 import {getRefreshFunc} from "../../js/utils/common";
 import {$normal, $reactive} from "../../js/store";
 import BaseModal from "../modal/BaseModal.vue";

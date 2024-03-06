@@ -19,7 +19,7 @@
 
 <script setup>
 import {h, ref} from "vue";
-import {configManager} from "../../js/core/config";
+import {configManager} from "../../js/utools/config";
 import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../../js/theme";
 import {refreshListView} from "../../js/store";
 

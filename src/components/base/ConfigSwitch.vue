@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import {configManager} from "../../js/core/config";
+import {configManager} from "../../js/utools/config";
 
 const props = defineProps(['config','title','icon'])
 const emit = defineEmits(['refresh'])

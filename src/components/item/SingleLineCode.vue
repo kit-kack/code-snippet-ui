@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import {configManager} from "../../js/core/config";
+import {configManager} from "../../js/utools/config";
 import {getRealTypeAndValidStatus} from "../../js/utils/language";
 import {onUpdated, ref} from "vue";
 

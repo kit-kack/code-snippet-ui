@@ -62,6 +62,7 @@ export function getAllFilesFromDir(path) {
             path: finalPath,
             dir: stat.isDirectory(),
             time: stat.atimeMs,
+            createTime: stat.ctimeMs
         }
     })
 }

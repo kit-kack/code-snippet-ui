@@ -1,5 +1,5 @@
 import {$index, $normal} from "../store";
-import {configManager} from "../core/config";
+import {configManager} from "../utools/config";
 
 
 export const Direction = {

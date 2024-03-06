@@ -1,4 +1,4 @@
-import {configManager} from "../core/config";
+import {configManager} from "../utools/config";
 import {
     $index,
     $normal,
@@ -14,14 +14,14 @@ import {
 import {DEFAULT_ROOT_HIERARCHY_CONFIG, rootHierachy} from "./h-root";
 import {localDirectoryHierarchy} from "./h-local-dir";
 import {handleArrayForHierarchy} from "../utils/sort";
-import {deleteHub, hierachyHubManager} from "../core/hub";
+import {deleteHub, hierachyHubManager} from "../utools/hub";
 import {nextTick, toRaw} from "vue";
-import {codeSnippetManager} from "../core/snippet";
+import {codeSnippetManager} from "../utools/snippet";
 import {defaultHelpSnippet} from "../some";
 import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
 import {resolveSearchWord} from "../utils/resolve"
 import {isFunction as _isFunction, isArray as _isArray } from "lodash-es";
-import {CountType, statisticsManager} from "../core/statistics";
+import {CountType, statisticsManager} from "../utools/statistics";
 
 
 export function loadValidHierarchyJS(path) {

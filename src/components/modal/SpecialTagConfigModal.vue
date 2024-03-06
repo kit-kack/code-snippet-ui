@@ -27,7 +27,7 @@
 import BaseModal from "./BaseModal.vue";
 import {$reactive} from "../../js/store";
 import {ref, toRaw} from "vue";
-import {configManager} from "../../js/core/config";
+import {configManager} from "../../js/utools/config";
 import {DEFAULT_CONF, SUBLIME_TEXT, VSCode, VSCode_PATH} from "../../js/editor/editor";
 const configs = ref(configManager.getSubItem('editor') ?? structuredClone(DEFAULT_CONF))
 

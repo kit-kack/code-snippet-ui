@@ -783,18 +783,7 @@ function _colorResult(text,assignFlag) {
 export function renderFormatBlock(selector,normal){
     const codeViewer = document.querySelector(selector)
     if(codeViewer){
-        codeViewer.innerHTML = codeViewer.innerHTML.replace(/{{.+?}}/gs,(substring)=>{
-            const text = substring.slice(2,-2);
-            let html = '<span class="kitx-snippet">{{';
-            if(text.startsWith('#')) {
-                html+= _colorResult(text.slice(1),true);
-            }else if(text.startsWith('@')){
-                html+= `<span class="kitx-reference">${text}</span>`
-            }else{
-                html+= _colorResult(text);
-            }
-            return html + '}}</span>'
-        })
+        codeViewer.innerHTML = replaceRenderBlock(codeViewer.innerHTML);
     }
 }
 export function replaceRenderBlock(code){

@@ -19,7 +19,7 @@
 
 <script setup>
 
-import {formatManager} from "../../js/core/func";
+import {formatManager} from "../../js/utools/func";
 import {ref} from "vue";
 
 defineEmits(['choose'])

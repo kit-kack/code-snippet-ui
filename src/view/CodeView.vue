@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import {configManager} from "../js/core/config";
+import {configManager} from "../js/utools/config";
 import {computed, onMounted, onUnmounted, ref, watch, watchPostEffect} from "vue";
 import {
   section_add,
@@ -157,7 +157,7 @@ import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import NormalTag from "../components/base/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import MarkdownRender from "../components/render/MarkdownRender.vue";
-import {renderFormatBlock} from "../js/core/func";
+import {renderFormatBlock} from "../js/utools/func";
 import {isEmpty as _isEmpty} from "lodash-es"
 import ImageRender from "../components/render/ImageRender.vue";
 import BaseModal from "../components/modal/BaseModal.vue";

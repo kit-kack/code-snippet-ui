@@ -21,7 +21,7 @@
 <script setup>
 
 import {computed, h} from "vue";
-import {tagColorManager} from "../../js/core/tag";
+import {tagColorManager} from "../../js/utools/tag";
 import {$reactive, switchToFullUIMode} from "../../js/store";
 import NormalTag from "./NormalTag.vue";
 

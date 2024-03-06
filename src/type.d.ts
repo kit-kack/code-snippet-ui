@@ -56,8 +56,8 @@ declare interface CodeSnippet extends CodeSnippetCore{
     nativeId?: string
     // TODO: desc 作为MD渲染
     descAsMd?: boolean
-    // 匹配类型
-    matchType?: 1 | 2
+    // 匹配类型 0-none 1-描述匹配 2-代码匹配
+    matchType?: 0 | 1 | 2
 }
 
 declare interface Func {

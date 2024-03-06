@@ -26,7 +26,7 @@
 <script setup>
 import {$normal, $reactive, CODE_VIEW, handleRecoverLiteShow, LIST_VIEW} from "../../js/store";
 import {ref} from "vue";
-import {formatManager} from "../../js/core/func";
+import {formatManager} from "../../js/utools/func";
 import BaseModal from "./BaseModal.vue";
 
 /**

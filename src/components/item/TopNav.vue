@@ -58,7 +58,7 @@ import {computed, h, ref, watch} from "vue";
 import dayjs from "dayjs";
 import NormalTag from "../base/NormalTag.vue";
 import {replaceOrAddTag} from "../../js/utils/resolve";
-import {tagColorManager} from "../../js/core/tag";
+import {tagColorManager} from "../../js/utools/tag";
 const word = ref(0);
 const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
 let timer = null;

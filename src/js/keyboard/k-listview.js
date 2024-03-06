@@ -7,7 +7,7 @@ import {
     switchToFullUIMode,
     utools_focus_or_blur
 } from "../store";
-import {configManager} from "../core/config";
+import {configManager} from "../utools/config";
 import {Direction, doScrollForListView, doScrollForMultiLineCode} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import { throttle as _throttle } from "lodash-es"
