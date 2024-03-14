@@ -41,20 +41,17 @@ export const snippetCopyOrPaste = (isPaste, supportSub) =>{
     }
 }
 /**
- * @type {KeyHandler}
+ * @type {KeyUpHandler}
  */
-export const K_COMMON = ({code,ctrl,shift,alt,repeat})=>{
+export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
     switch (code){
         case 'KeyC':
-            if(ctrl || repeat){
+            if(ctrl){
                 return;
             }
             snippetCopyOrPaste(false,true)
             break;
         case 'KeyY':
-            if(repeat){
-                return;
-            }
             snippetCopyOrPaste(false,false);
             break;
         case 'KeyP':
@@ -84,9 +81,6 @@ export const K_COMMON = ({code,ctrl,shift,alt,repeat})=>{
         case 'Digit7':
         case 'Digit8':
         case 'Digit9':
-            if(repeat){
-                return;
-            }
             if($reactive.currentSnippet.dir){
                 $message.warning("无法对目录进行此操作");
                 return;
@@ -97,10 +91,6 @@ export const K_COMMON = ({code,ctrl,shift,alt,repeat})=>{
             }
             copyCode(ctrl || shift || alt,+code[5])
             return true;
-        case 'KeyZ':
-            switchToFullUIMode()
-            $reactive.common.shortcutActive = !$reactive.common.shortcutActive;
-            break
         case 'KeyO':
             if($reactive.currentSnippet.path){
                 if(isNetWorkUri($reactive.currentSnippet.path)){
@@ -122,5 +112,17 @@ export const K_COMMON = ({code,ctrl,shift,alt,repeat})=>{
             }
             break
     }
-    return false;
+    return true;
+}
+/**
+ * @type {KeyDownHandler}
+ */
+export const K_COMMON_DOWN = ({code}) => {
+    switch (code){
+        case 'KeyZ':
+            switchToFullUIMode()
+            $reactive.common.shortcutActive = !$reactive.common.shortcutActive;
+            break
+    }
+    return true
 }

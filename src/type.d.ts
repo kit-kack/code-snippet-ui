@@ -72,12 +72,7 @@ declare interface Func {
     // 内置
     default?: boolean
 }
-
-/**
- * 键盘快捷键处理
- * @return 根直属：是否阻止默认行为； 子级：是否阻止后续匹配
- */
-declare type KeyHandler = (ext:{
+interface BaseExt {
     /**
      * 等同于 e.code
      */
@@ -94,6 +89,9 @@ declare type KeyHandler = (ext:{
      * 等同于 e.shiftKey
      */
     shift: boolean
+}
+
+interface Ext extends BaseExt {
     /**
      * 连按两次按键
      */
@@ -106,7 +104,14 @@ declare type KeyHandler = (ext:{
      * 等同于 e.repeat
      */
     repeat: boolean
-})=> boolean | void
+}
+
+/**
+ * 键盘快捷键处理
+ * @return 根直属：是否阻止默认行为； 子级：是否阻止后续匹配
+ */
+declare type KeyDownHandler = (ext: Ext)=> boolean | void
+declare type KeyUpHandler = (ext: BaseExt)=> boolean | void
 
 
 declare interface HierarchyConfig{

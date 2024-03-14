@@ -2,9 +2,9 @@ import {Direction, doScrollForHelpView} from "../utils/scroller";
 import {$reactive} from "../store";
 
 /**
- * @type {KeyHandler}
+ * @type {KeyDownHandler}
  */
-export const K_SHORTCUT = ({code,shift,double})=>{
+export const K_SHORTCUT_DOWN = ({code,shift,double})=>{
     switch (code){
         case 'KeyJ':
             doScrollForHelpView(Direction.DOWN,shift)
@@ -23,7 +23,7 @@ export const K_SHORTCUT = ({code,shift,double})=>{
         case 'KeyQ':
         case 'Space':
             $reactive.common.shortcutActive = false;
-            break;
+            break
         default:
             return false;
     }

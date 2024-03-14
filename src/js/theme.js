@@ -77,6 +77,8 @@ function adjustTheme(v){
 
 function modifyCSSVar(){
     document.documentElement.style.setProperty('--global-color', $normal.theme.globalColor);
+    document.documentElement.style.setProperty('--selected-color', $normal.theme.selectedColor);
+    document.documentElement.style.setProperty('--high-color', $normal.theme.highColor);
 }
 /**
  *

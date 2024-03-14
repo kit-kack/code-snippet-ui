@@ -13,7 +13,8 @@
           <template #suffix>
             <n-button text @click="openDirectory(tag)">
               <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>                  </template>
+                <svg-directory/>
+              </template>
             </n-button>
           </template>
         </n-input>
@@ -25,6 +26,7 @@
 <script setup>
 
 import BaseModal from "./BaseModal.vue";
+import SvgDirectory from "../../asserts/directory.svg";
 import {$reactive} from "../../js/store";
 import {ref, toRaw} from "vue";
 import {configManager} from "../../js/utools/config";

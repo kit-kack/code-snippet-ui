@@ -8,7 +8,7 @@
         <template v-for="(template,index) in templates">
           <p style="font-size: 13px;margin: 5px">{{template.desc ?? template.name}}</p>
           <template v-if="template.type === 'input'">
-            <n-input v-model:value="template.value" clearable placeholder="输入值"/>
+            <n-input @keydown.enter="handleEnter(index)" v-model:value="template.value" clearable placeholder="输入值"/>
           </template>
           <template v-else>
             <n-select v-model:value="template.value"
@@ -28,6 +28,7 @@ import {$normal, $reactive, CODE_VIEW, handleRecoverLiteShow, LIST_VIEW} from ".
 import {ref} from "vue";
 import {formatManager} from "../../js/utools/func";
 import BaseModal from "./BaseModal.vue";
+import {throttle} from "lodash-es";
 
 /**
  * $normal.funcs.variabls item
@@ -79,6 +80,16 @@ const templates = ref( $normal.funcs.variables.map(en =>{
 
   }
 }))
+const tab = throttle(()=>{
+  utools.simulateKeyboardTap('tab')
+},120)
+function handleEnter(index){
+  if(index === templates.value.length - 1){
+    doYes()
+    return;
+  }
+  tab();
+}
 
 function doCancel(){
   $reactive.common.variableActive = false;

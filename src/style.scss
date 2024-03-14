@@ -1,6 +1,8 @@
 @import "style/atom";
 :root{
   --global-color: white;
+  --selected-color: white;
+  --high-color: white;
 }
 #light-app{
   --utools-background-color: white;
@@ -84,6 +86,7 @@ p.tooltip b{
 .kitx-snippet{
   border-radius: 3px;
   background-color: #f5f5f5 !important;
+  transition: background-color .3s;
   color: #c6c6c9;
   .kitx-var{
     color: #10be8e;
@@ -104,7 +107,12 @@ p.tooltip b{
     font-weight: bolder;
   }
   &:hover{
-    background-color: #eaeef2 !important;
+    background-color: var(--global-color) !important;
+
+    color: white;
+    *{
+      color: white !important;
+    }
   }
 }
 
@@ -112,6 +120,14 @@ p.tooltip b{
   .kitx-snippet{
     background-color: #3a3a3c !important;
     color: #777;
+
+    &:hover{
+      background-color: var(--global-color) !important;
+      color: #303133;
+      *{
+        color: #303133 !important;
+      }
+    }
   }
   .kitx-param{
     color: #aaa;
@@ -123,9 +139,5 @@ span.shortcut{
   padding: 3px 5px 3px 5px;
   margin-left: 5px;
   border-radius: 5px;
-  /* 磨砂感背景 */
-  backdrop-filter: saturate(180%) blur(5px)!important;
-  -webkit-backdrop-filter: saturate(180%) blur(5px)!important;
-  /* 磨砂的背景颜色 */
   background: rgba(191, 208, 229, 0.2) !important;
 }

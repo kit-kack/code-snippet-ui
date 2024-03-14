@@ -6,8 +6,8 @@
         trigger="none" ref="verticalScroller">
       <template v-if="refreshFlag">
         <template v-if="pair.renderable && $reactive.code.isRendering">
-          <template v-if="pair.type === 'image'">
-            <image-render :url="snippet.path?? snippet.code"/>
+          <template v-if="pair.type === 'image' || pair.type === 'svg'">
+            <image-render :url="snippet.path?? snippet.code"  :type="getImageType(pair.type,snippet.path)"/>
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
             <markdown-render/>
@@ -70,7 +70,7 @@
         <template v-if="pair.renderable">
           <n-button quaternary
                     @click=" $reactive.code.isRendering = !$reactive.code.isRendering"
-                    :disabled="pair.type === 'image' && snippet.path"
+                    :disabled="pair.type === 'image'"
           >
             {{ $reactive.code.isRendering? '已渲染 [R]': '未渲染 [R]' }}
           </n-button>
@@ -85,12 +85,12 @@
         </n-button>
         <n-button strong quaternary circle  @click="handleClose">
           <template #icon>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M289.94 256l95-95A24 24 0 0 0 351 127l-95 95l-95-95a24 24 0 0 0-34 34l95 95l-95 95a24 24 0 1 0 34 34l95-95l95 95a24 24 0 0 0 34-34z" fill="currentColor"></path></svg>
+            <svg-close/>
           </template>
         </n-button>
       </n-space>
     </div>
-    <n-drawer v-model:show="$reactive.code.infoActive" :width="300" placement="right">
+    <n-drawer v-model:show="$reactive.code.infoActive" :width="300" placement="right" :auto-focus="false">
       <n-drawer-content class="code-view-side-info">
         <template #header>
           {{snippet.name}}
@@ -99,7 +99,7 @@
           {{calculateTime(snippet.time)}} • {{snippet.count??0}}次 • {{pair.count}}字
           <n-button v-if="snippet.keyword" :color="$normal.theme.globalColor" text style="margin-left: 5px" >
             <template #icon>
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><g fill="none"><path d="M10.788 3.102c.495-1.003 1.926-1.003 2.421 0l2.358 4.778l5.273.766c1.107.16 1.549 1.522.748 2.303l-3.816 3.719l.901 5.25c.19 1.104-.968 1.945-1.959 1.424l-4.716-2.48l-4.715 2.48c-.99.52-2.148-.32-1.96-1.423l.901-5.251l-3.815-3.72c-.801-.78-.359-2.141.748-2.302L8.43 7.88l2.358-4.778z" fill="currentColor"></path></g></svg>
+              <svg-star/>
             </template>
           </n-button>
         </template>
@@ -130,7 +130,30 @@
           </n-space>
         </template>
         <template v-if="snippet.path">
-          <h4>关联地址</h4>
+          <h4>关联地址
+            <n-button  v-if="isNetWorkUri(snippet.path)"
+                       @click="handleSelectOpenWay('openWithBrowser')"
+                       text
+                       style="height: 15px" size="small" :focusable="false">
+              <template #icon>
+                <svg-open/>
+              </template>
+            </n-button>
+            <n-dropdown v-else trigger="hover" :options="[
+                  {
+                    label: '默认打开',
+                    key: 'open',
+                  },
+                  {
+                    label: '资源管理器打开',
+                    key: 'openWithExplorer',
+                  }
+              ]" style="padding: 0" @select="handleSelectOpenWay">
+              <n-icon>
+                <svg-open/>
+              </n-icon>
+            </n-dropdown>
+          </h4>
           <div>{{snippet.path}}</div>
         </template>
 
@@ -152,7 +175,7 @@ import {
   section_generate
 } from "../js/utils/section";
 import {getRealTypeAndValidStatus} from "../js/utils/language";
-import {calculateTime, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
+import {calculateTime, getImageType, getRefreshFunc, isNetWorkUri} from "../js/utils/common";
 import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import NormalTag from "../components/base/NormalTag.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
@@ -161,6 +184,9 @@ import {renderFormatBlock} from "../js/utools/func";
 import {isEmpty as _isEmpty} from "lodash-es"
 import ImageRender from "../components/render/ImageRender.vue";
 import BaseModal from "../components/modal/BaseModal.vue";
+import SvgClose from "../asserts/close.svg"
+import SvgStar from "../asserts/star.svg"
+import SvgOpen from "../asserts/open.svg"
 
 const verticalScroller = ref(null)
 /**
@@ -257,10 +283,10 @@ function clearSnippetSections(){
 const pair = computed(()=>{
   // 分析类型
   const result = getRealTypeAndValidStatus(snippet.type);
-  if(result.type === 'image'){
+  if(result.type === 'image' || result.type === 'svg'){
     $reactive.code.isRendering = true;
   }
-  result.renderable = (result.type === 'markdown' || result.type === 'image')
+  result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'svg');
   if($reactive.currentCode){
     result.count = $reactive.currentCode.length;
     if($reactive.currentCode.length > 100000){
@@ -346,6 +372,19 @@ function handleClose(){
   $reactive.code.infoActive = false;
   $normal.keepSelectedStatus = true;
   GLOBAL_HIERARCHY.changeView(LIST_VIEW)
+}
+function handleSelectOpenWay(way){
+  switch (way){
+    case 'open':
+      utools.shellOpenPath(snippet.path)
+      break
+    case 'openWithExplorer':
+      utools.shellShowItemInFolder(snippet.path)
+      break
+    case 'openWithBrowser':
+      utools.shellOpenExternal(snippet.path)
+      break
+  }
 }
 // function updateCachedCode(){
 //   if(snippet.code){   // 清除缓存

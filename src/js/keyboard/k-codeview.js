@@ -1,18 +1,25 @@
-import {$reactive, EDIT_VIEW, LIST_VIEW} from "../store";
+import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../store";
 import {Direction, doScrollForCodeView} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {configManager} from "../utools/config";
-import {K_COMMON} from "./k-common";
+import {K_COMMON_DOWN, K_COMMON_UP} from "./k-common";
 
 export const RENDER_KEYHANDLER = {
+    /**
+     * @type KeyUpHandler | null
+     */
+    onKeyUp: null,
+    /**
+     * @type KeyDownHandler | null
+     */
+    onKeyDown: null,
     handle: null
 }
-
 /**
- * @type {KeyHandler}
+ * @type KeyDownHandler
  */
-export const K_CODEVIEW = (ext)=>{
-    const {code,ctrl,shift,double} = ext;
+export const K_CODEVIEW_DOWN = (ext)=>{
+    const {code,ctrl,shift,double,repeat} = ext;
     // modal
     if($reactive.code.sectionsChangeModal){
         return
@@ -25,16 +32,13 @@ export const K_CODEVIEW = (ext)=>{
         return
     }
     // render
-    if(RENDER_KEYHANDLER.handle){
-        if(RENDER_KEYHANDLER.handle(ext)){
+    if(RENDER_KEYHANDLER.onKeyDown){
+        if(RENDER_KEYHANDLER.onKeyDown(ext)){
             return true;
         }
     }
 
     switch (code){
-        case "Tab":
-            utools.subInputBlur();
-            break;
         case "KeyH":
         case "ArrowLeft":
             if(!ctrl){
@@ -59,8 +63,60 @@ export const K_CODEVIEW = (ext)=>{
                 doScrollForCodeView(Direction.RIGHT,shift);
             }
             break;
+        case 'KeyG':
+            if(double){
+                doScrollForCodeView(Direction.RESET,false)
+            }else if(shift){
+                doScrollForCodeView(Direction.END,false);
+            }
+            break
         case 'KeyS':
+            if(repeat){
+                return;
+            }
             $reactive.code.infoActive = !$reactive.code.infoActive;
+            break;
+
+        default:
+            return K_COMMON_DOWN(ext);
+        // case 'KeyB':
+        //     if($reactive.currentSnippet.path){
+        //         $normal.updateCacheCodeFunc?.()
+        //     }
+        //     break;
+    }
+    return true;
+}
+
+/**
+ * @type KeyUpHandler
+ */
+export const K_CODEVIEW_UP = (ext)=>{
+    const {code,ctrl,shift} = ext;
+
+    if(code === 'Space' && $normal.keyboard.longTabAsQuickView){
+        GLOBAL_HIERARCHY.changeView(LIST_VIEW)
+        $normal.keyboard.longTabAsQuickView = false
+        return true;
+    }
+    // modal
+    if($reactive.code.sectionsChangeModal){
+        return
+    }
+    // active
+    if($reactive.code.infoActive){
+        return
+    }
+    // render
+    if(RENDER_KEYHANDLER.onKeyUp){
+        if(RENDER_KEYHANDLER.onKeyUp(ext)){
+            return true;
+        }
+    }
+
+    switch (code){
+        case "Tab":
+            utools.subInputBlur();
             break;
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
@@ -71,15 +127,8 @@ export const K_CODEVIEW = (ext)=>{
                 GLOBAL_HIERARCHY.changeView(LIST_VIEW);
             }
             break;
-        case 'KeyG':
-            if(double){
-                doScrollForCodeView(Direction.RESET,false)
-            }else if(shift){
-                doScrollForCodeView(Direction.END,false);
-            }
-            break
         case 'KeyR':
-            if($reactive.currentSnippet.path && $reactive.currentSnippet.type === 'image'){
+            if($reactive.currentSnippet.type === 'image'){
                 return;
             }
             $reactive.code.isRendering = !$reactive.code.isRendering;
@@ -107,12 +156,12 @@ export const K_CODEVIEW = (ext)=>{
                 break
             }
         default:
-            return K_COMMON(ext);
+            return K_COMMON_UP(ext);
         // case 'KeyB':
         //     if($reactive.currentSnippet.path){
         //         $normal.updateCacheCodeFunc?.()
         //     }
         //     break;
     }
-    return false;
+    return true;
 }

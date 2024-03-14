@@ -235,6 +235,7 @@ export default {
       this.$emit("lang", lang[0]);
     },
     tab() {
+      // TODO: shift+tab 减去缩进
       document.execCommand("insertText", false, this.tabWidth());
     },
     enter(shift){
@@ -388,6 +389,9 @@ export default {
 }
 #dark-app .code-editor{
   background: #454647;
+}
+#dark-app .func-edit-tab .code-editor{
+  background: #2c2c32;
 }
 
 .code-editor > div {

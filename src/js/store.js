@@ -60,8 +60,6 @@ const $normal = {
     },
     // beta测试
     beta:{
-        // beta: utools输入中的tags部分，用于标签辅助选择
-        tempTags: [],
         // beta:子代码片段选择的索引位
         subSnippetNum: null,
     },
@@ -73,10 +71,8 @@ const $normal = {
         index: null,
     },
     keyboard:{
-        // 上次按下的键
-        lastPressedKey: null,
-        // 是否长按键
-        isLongPressed: false,
+        // 长按Tab用来快速预览
+        longTabAsQuickView: false,
     }
 }
 

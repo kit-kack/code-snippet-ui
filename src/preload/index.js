@@ -46,6 +46,36 @@ export const dynamicLoadJS = (p) =>{
         return null
     }
 }
+const vm = require('vm')
+
+// vm.createContext(context)
+// vm.runInContext(`
+//     const os = require('os');
+//     fetch = undefined;
+//     let res = await fetch('https://www.baidu.com')
+//     res = await res.text()
+//     console.log(res);
+// `, context)
+// console.log(context)
+function notify(...args){
+    utools.showNotification(args.join(' '))
+}
+const CONTEXT = Object.freeze({
+    require,
+    fetch,
+    console:{
+        log:notify
+    },
+    alert:notify,
+    atob,
+    btoa,
+})
+vm.createContext(CONTEXT)
+export const dynamicRunCode = (code,command,param,globalVar)=>{
+    return vm.compileFunction(code,[ 'command', 'param', '$'],{
+        parsingContext: CONTEXT
+    })(command,param,globalVar)
+}
 
 /*
  * 暂未使用到

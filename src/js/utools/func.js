@@ -47,8 +47,10 @@ switch (command) {
         desc: `获取剪切板内容;
 可选参数：<i>小写</i>/<i>lowercase</i>/<i>大写</i>/<i>uppercase</i>/<i>去空格</i>/<i>trim</i>`,
         commands: ["clipboard","剪切板"],
+        runInNode: true,
         expression: `\
-const data = $._clipboard.readText();
+const {clipboard} = require('electron');
+const data = clipboard.readText();
 switch (param){
     case '小写':
     case 'lowercase':
@@ -386,14 +388,14 @@ export const formatManager = {
     async _expression_invoker(key,command,param,isFuncKey){
         try{
             if(isFuncKey){
-                return await new Function('$',param)(this.globalVar);
+                return await window.preload.dynamicRunCode(param,undefined,undefined,this.globalVar);
             }else{
                 // get expression of command
                 if(param in this.globalVar){
                     param = this.globalVar[param]?.toString();
                 }
                 if(key){
-                    return await new Function('command','param','$',this.funcMap[key].expression)(command,param,this.globalVar);
+                    return await window.preload.dynamicRunCode(this.funcMap[key].expression,command,param,this.globalVar);
                 }else{
                     return await GLOBAL_HIERARCHY.currentConfig.funcs[command](param);
                 }

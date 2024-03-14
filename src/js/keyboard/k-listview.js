@@ -11,7 +11,7 @@ import {configManager} from "../utools/config";
 import {Direction, doScrollForListView, doScrollForMultiLineCode} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import { throttle as _throttle } from "lodash-es"
-import {K_COMMON} from "./k-common";
+import {K_COMMON_DOWN, K_COMMON_UP} from "./k-common";
 
 
 const debMoveDown = _throttle(function(){
@@ -49,13 +49,84 @@ const debItemMoveRight = _throttle(function(){
     }
 },120)
 /**
- * @type {KeyHandler}
+ * @type KeyUpHandler
  */
-export const K_LISTVIEW = (ext)=>{
+export const K_LISTVIEW_UP = (ext)=>{
     const {code,double,long,shift,ctrl,repeat,alt} = ext;
     // active
     if($reactive.main.settingActive){
-        if($reactive.setting.funcEditActive){
+        return
+    }
+    //
+    // // vim操作下隐藏鼠标
+    // $reactive.main.isCursorShow = false;
+    switch (code){
+        case 'Space':
+            if ($reactive.utools.subItemSelectedIndex !== -1) {
+                // 处理 Vim 操作
+                $normal.spaceInvoker[$reactive.utools.subItemSelectedIndex]?.()
+            }
+            break;
+        case "KeyS":
+            utools.setSubInputValue('')
+            utools.subInputFocus();
+            $reactive.utools.focused = true;
+            break;
+        case 'KeyT':
+            if($reactive.currentSnippet.help){
+                $message.warning('内置文档无法置顶');
+            }else{
+                GLOBAL_HIERARCHY.update(null,"top");
+                $normal.keepSelectedStatus = true;
+                refreshSearchResult();
+            }
+            break;
+        case 'KeyD':
+        case 'KeyX':
+            if(GLOBAL_HIERARCHY.currentConfig.remove){
+                $reactive.utools.subItemSelectedIndex = 1;
+                $reactive.main.isDel = true;
+            }else{
+                $message.warning("当前目录层级不支持[删除]操作")
+            }
+            break;
+        case 'KeyV':
+            if($reactive.currentSnippet.dir){
+                GLOBAL_HIERARCHY.changeHierarchy("next")
+            }else if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
+                utools.shellOpenExternal($reactive.currentSnippet.path)
+            }else{
+                GLOBAL_HIERARCHY.changeView(CODE_VIEW)
+            }
+            break
+        case 'KeyR':
+            if(ctrl){
+                refreshListView()
+            }else{
+                GLOBAL_HIERARCHY.changeHierarchy("root")
+            }
+            break
+        case 'KeyQ':
+            if($reactive.utools.subItemSelectedIndex !== -1 || $reactive.main.isDel){
+                $reactive.utools.subItemSelectedIndex = -1;
+                $reactive.main.isDel = false;
+            }else{
+                GLOBAL_HIERARCHY.changeHierarchy("prev")
+            }
+            break;
+        default:
+            return K_COMMON_UP(ext);
+    }
+    return true;
+}
+/**
+ * @type KeyDownHandler
+ */
+export const K_LISTVIEW_DOWN = (ext)=>{
+    const {code,double,long,shift,repeat,alt} = ext;
+    // active
+    if($reactive.main.settingActive){
+        if($reactive.setting.funcEditActive || $reactive.setting.specialTagConfigActive){
             return;
         }
         // prevent any possible event
@@ -105,22 +176,18 @@ export const K_LISTVIEW = (ext)=>{
     // vim操作下隐藏鼠标
     $reactive.main.isCursorShow = false;
     switch (code){
-        case "Slash": // / ?
-            switchToFullUIMode();
-            $reactive.main.settingActive = true;
-            break;
         case "Space":
             // 空格额外处理
             if(long && $reactive.utools.subItemSelectedIndex === -1){
                 if(!$reactive.currentSnippet.dir && !$reactive.currentSnippet.link){
+                    $normal.keyboard.longTabAsQuickView = true;
                     GLOBAL_HIERARCHY.changeView(CODE_VIEW)
                 }
             }
             break;
-        case "KeyS":
-            utools.setSubInputValue('')
-            utools.subInputFocus();
-            $reactive.utools.focused = true;
+        case "Slash": // / ?
+            switchToFullUIMode();
+            $reactive.main.settingActive = true;
             break;
         case "KeyH":
         case "ArrowLeft":
@@ -193,50 +260,8 @@ export const K_LISTVIEW = (ext)=>{
                 doScrollForMultiLineCode(Direction.RESET);
             }
             break;
-        case 'KeyT':
-            if($reactive.currentSnippet.help){
-                $message.warning('内置文档无法置顶');
-            }else{
-                GLOBAL_HIERARCHY.update(null,"top");
-                $normal.keepSelectedStatus = true;
-                refreshSearchResult();
-            }
-            break;
-        case 'KeyD':
-        case 'KeyX':
-            if(GLOBAL_HIERARCHY.currentConfig.remove){
-                $reactive.utools.subItemSelectedIndex = 1;
-                $reactive.main.isDel = true;
-            }else{
-                $message.warning("当前目录层级不支持[删除]操作")
-            }
-            break;
-        case 'KeyV':
-            if($reactive.currentSnippet.dir){
-                GLOBAL_HIERARCHY.changeHierarchy("next")
-            }else if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
-                utools.shellOpenExternal($reactive.currentSnippet.path)
-            }else{
-                GLOBAL_HIERARCHY.changeView(CODE_VIEW)
-            }
-            break
-        case 'KeyR':
-            if(ctrl){
-                refreshListView()
-            }else{
-                GLOBAL_HIERARCHY.changeHierarchy("root")
-            }
-            break
-        case 'KeyQ':
-            if($reactive.utools.subItemSelectedIndex !== -1 || $reactive.main.isDel){
-                $reactive.utools.subItemSelectedIndex = -1;
-                $reactive.main.isDel = false;
-            }else{
-                GLOBAL_HIERARCHY.changeHierarchy("prev")
-            }
-            break;
         default:
-            return K_COMMON(ext);
+            return K_COMMON_DOWN(ext);
     }
     return true;
 }

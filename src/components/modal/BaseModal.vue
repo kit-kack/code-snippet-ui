@@ -8,7 +8,7 @@
            :auto-focus="!vim"
            @close="$emit('cancel')"
            :style="{
-             width: wide? '80%':'60%'
+             width: wide ? '80%':'60%'
            }">
     <slot></slot>
     <template #footer>
@@ -46,8 +46,8 @@ import { throttle } from "lodash-es"
 import {$normal} from "../../js/store";
 
 const props = defineProps({
-  'wide': Boolean,
-  'title': String,
+  wide: Boolean,
+  title: String,
   vim: Boolean
 })
 const emit = defineEmits(['update:show','cancel','confirm'])

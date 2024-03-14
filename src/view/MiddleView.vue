@@ -28,7 +28,7 @@
           <template #trigger>
             <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()" @click="GLOBAL_HIERARCHY.changeView(CREATE_VIEW)">
               <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 13h-5v5c0 .55-.45 1-1 1s-1-.45-1-1v-5H6c-.55 0-1-.45-1-1s.45-1 1-1h5V6c0-.55.45-1 1-1s1 .45 1 1v5h5c.55 0 1 .45 1 1s-.45 1-1 1z" fill="currentColor"></path></svg>
+                <svg-add/>
               </template>
             </n-button>
           </template>
@@ -39,7 +39,7 @@
           <template #trigger>
             <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()" @click="$reactive.main.settingActive = true">
               <template #icon>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 7h9v2h-9zm0 8h9v2h-9zm3-4h6v2h-6zm-3 1L8 7v4H2v2h6v4z" fill="currentColor"></path></svg>
+                <svg-expand/>
               </template>
             </n-button>
           </template>
@@ -50,10 +50,10 @@
             <n-button strong circle secondary type="primary"  :color="configManager.getGlobalColor()"  @contextmenu="$reactive.main.isButtonFixed = !$reactive.main.isButtonFixed" @click="refreshListView(true)">
               <template #icon>
                 <template v-if="$reactive.main.isButtonFixed">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="M21.25 7.5a.75.75 0 0 1 .743.648L22 8.25v8.5a3.25 3.25 0 0 1-3.066 3.245L18.75 20H6.061l.72.72a.75.75 0 0 1 .072.976l-.073.084a.75.75 0 0 1-.976.073l-.084-.073l-2-2l-.064-.072a1.213 1.213 0 0 1-.007-.01l.07.082a.753.753 0 0 1-.127-.89a.775.775 0 0 1 .128-.17l2-2a.75.75 0 0 1 1.133.976l-.073.084l-.72.72h12.69a1.75 1.75 0 0 0 1.744-1.607l.006-.143v-8.5a.75.75 0 0 1 .75-.75zm-3.054-5.353l.084.073l2 2a.75.75 0 0 1 .071.081l-.07-.081a.752.752 0 0 1 .004 1.056l-.005.004l-2 2a.75.75 0 0 1-1.133-.976l.073-.084l.718-.72H5.25a1.75 1.75 0 0 0-1.744 1.606L3.5 7.25v8.5a.75.75 0 0 1-1.493.102L2 15.75v-8.5a3.25 3.25 0 0 1 3.066-3.245L5.25 4h12.689l-.72-.72a.75.75 0 0 1-.072-.976l.073-.084a.75.75 0 0 1 .976-.073zM12 8a4 4 0 1 1 0 8a4 4 0 0 1 0-8z" fill="currentColor"></path></g></svg>
+                  <svg-refresh-fixed/>
                 </template>
                 <template v-else>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g fill="none"><path d="M14.854 2.146a.5.5 0 0 0-.708.708L15.293 4H4a2 2 0 0 0-2 2v6.5a.5.5 0 0 0 1 0V6a1 1 0 0 1 1-1h11.293l-1.147 1.146a.5.5 0 0 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2zM16 15a1 1 0 0 0 1-1V7.5a.5.5 0 0 1 1 0V14a2 2 0 0 1-2 2H4.707l1.147 1.146a.5.5 0 0 1-.708.708l-2-2a.5.5 0 0 1 0-.708l2-2a.5.5 0 0 1 .708.708L4.707 15H16zm-3-5a3 3 0 1 1-6 0a3 3 0 0 1 6 0zm-1 0a2 2 0 1 0-4 0a2 2 0 0 0 4 0z" fill="currentColor"></path></g></svg>
+                  <svg-refresh/>
                 </template>
               </template>
             </n-button>
@@ -67,7 +67,7 @@
         <template #trigger>
           <n-button strong circle type="primary" quaternary :color="configManager.getGlobalColor()" @click="expanded = true" >
             <template #icon>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6z" fill="currentColor"></path></svg>
+              <svg-arrow-up/>
             </template>
           </n-button>
         </template>
@@ -93,6 +93,11 @@ import {configManager} from "../js/utools/config";
 import TopNav from "../components/item/TopNav.vue";
 import {doScrollForListView} from "../js/utils/scroller";
 import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";
+import SvgAdd from "../asserts/add.svg";
+import SvgExpand from "../asserts/expand.svg";
+import SvgRefresh from "../asserts/refresh.svg";
+import SvgRefreshFixed from "../asserts/refresh-fixed.svg";
+import SvgArrowUp from "../asserts/arrow-up.svg";
 
 const expanded = ref(false)
 window.$message = useMessage();

@@ -2,9 +2,8 @@
 
 新版本速览✨
 
-1. <span style="color:#209a6e">新增</span> 代码编辑支持高亮显示 
-2. <span style="color:#209a6e">新增</span> Beta功能：扩充搜索范围 
-3. <span style="color:#5eacee">优化</span> 标签选择，请在主界面点击上面的ALL切换
+1. <span style="color:#209a6e">新增</span> 本地图片类型`image`（简写为`img`）特殊处理 (功能测试中~)
+2. <span style="color:#209a6e">改进</span> 占位符运行环境以及识别处理
 4. <span style="color:#5eacee">完善</span> 一些界面处理逻辑
 ---
 
@@ -183,7 +182,7 @@ hello, {{clipboard}}  // 返回剪切板复制内容
 
 > 该功能同样适用于**聚合模式**下的uTools搜索框直接搜索功能
 
-### 3.2 扩充搜索范围✨
+### 3.2 扩充搜索范围
 开启后，输入`name`不仅会匹配代码片段名，还会尝试匹配描述说明，以及代码片段内容（仅支持普通片段内容）
 > 后两者匹配为普通忽略大小写匹配，而非全模糊匹配
 

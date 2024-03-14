@@ -220,26 +220,10 @@ function handleMdHorizonMove(left,fast){
 }
 
 /**
- * @type KeyHandler
+ * @type KeyDownHandler
  */
-const K_CODEVIEW_MARKDOWN = ({code,shift,ctrl,repeat})=>{
+const K_CODEVIEW_MARKDOWN_DOWN = ({code,shift,ctrl,repeat})=>{
   switch (code){
-    case 'KeyQ':
-      if($reactive.code.tocActive){
-        $reactive.code.tocActive = false
-        return true;
-      }
-      return;
-    case 'KeyS':
-      if($reactive.code.tocActive){
-        $reactive.code.infoActive = true;
-        $reactive.code.tocActive = false;
-        return true;
-      }
-      return;
-    case 'Tab':
-      adjustCenterPre(true)
-      break
     case "KeyH":
     case "ArrowLeft":
       handleMdHorizonMove(true,shift)
@@ -338,6 +322,9 @@ const K_CODEVIEW_MARKDOWN = ({code,shift,ctrl,repeat})=>{
       handleMdHorizonMove(false,shift)
       break;
     case 'KeyT':
+      if(repeat){
+        return;
+      }
       if($reactive.common.shortcutActive){
         $reactive.common.shortcutActive = false
         $reactive.code.tocActive = true
@@ -350,6 +337,32 @@ const K_CODEVIEW_MARKDOWN = ({code,shift,ctrl,repeat})=>{
       }
       $reactive.code.tocActive = ! $reactive.code.tocActive;
       break;
+    default:
+      return $reactive.code.tocActive;
+  }
+  return true;
+}
+/**
+ * @type KeyUpHandler
+ */
+const K_CODEVIEW_MARKDOWN_UP = ({code})=>{
+  switch (code){
+    case 'KeyQ':
+      if($reactive.code.tocActive){
+        $reactive.code.tocActive = false
+        return true;
+      }
+      return;
+    case 'KeyS':
+      if($reactive.code.tocActive){
+        $reactive.code.infoActive = true;
+        $reactive.code.tocActive = false;
+        return true;
+      }
+      return;
+    case 'Tab':
+      adjustCenterPre(true)
+      break
     case 'Space':
       if($reactive.code.tocActive){
         $reactive.code.tocActive = false
@@ -362,9 +375,6 @@ const K_CODEVIEW_MARKDOWN = ({code,shift,ctrl,repeat})=>{
       if($reactive.common.shortcutActive){
         $reactive.common.shortcutActive = false
         return true
-      }
-      if(repeat){
-        return true;
       }
       if($normal.md.pre){
         utools.copyText($normal.md.pre.querySelector('code').innerText)
@@ -460,13 +470,13 @@ onMounted(()=>{
     }))
   }
   document.addEventListener('click',handleClickUrl)
-  // document.addEventListener('keydown',handleKeyDown)
-  RENDER_KEYHANDLER.handle = K_CODEVIEW_MARKDOWN
+  RENDER_KEYHANDLER.onKeyUp = K_CODEVIEW_MARKDOWN_UP
+  RENDER_KEYHANDLER.onKeyDown = K_CODEVIEW_MARKDOWN_DOWN
 })
 onUnmounted(()=>{
   document.removeEventListener('click',handleClickUrl)
-  // document.removeEventListener('keydown',handleKeyDown)
-  RENDER_KEYHANDLER.handle = null
+  RENDER_KEYHANDLER.onKeyUp = null
+  RENDER_KEYHANDLER.onKeyDown = null
   $reactive.code.tocActive = false;
 })
 </script>

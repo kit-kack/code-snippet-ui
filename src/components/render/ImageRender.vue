@@ -1,6 +1,6 @@
 <template>
   <div class="image-render">
-    <template v-if="isSvg(url)">
+    <template v-if="type === 'svg-code'">
       <div class="image-render-svg"
            :style="{
       transform: `translate(${x}px,${y}px)  scale( calc(${rate}/100))  rotate(${deg}deg) `
@@ -9,19 +9,23 @@
     </template>
     <template v-else>
       <img :src="url" alt="图片加载失败了哦" :style="{
-      transform: `translate(${x}px,${y}px)  scale( calc(${rate}/100))  rotate(${deg}deg) `
-    }">
+      transform: `translate(${x}px,${y}px)  scale( calc(${rate}/100))  rotate(${deg}deg) `,
+
+    }" :class="{
+        'svg-as-image': type === 'svg-url'
+    }"
+      >
     </template>
   </div>
 </template>
 <script setup>
 import {onMounted, onUnmounted, ref} from "vue";
-import {isSvg} from "../../js/utils/common";
 import {RENDER_KEYHANDLER} from "../../js/keyboard/k-codeview";
 import {Direction} from "../../js/utils/scroller";
 
 const props = defineProps({
-  url: String
+  url: String,
+  type: String, // image / svg-code / svg-url
 });
 const rate = ref(100)
 const deg = ref(0)
@@ -54,9 +58,9 @@ function doRotate(up){
   deg.value += (up ? 90 : -90)
 }
 /**
- * @type KeyHandler
+ * @type KeyDownHandler
  */
-const K_CODEVIEW_IMAGE= ({code,shift})=>{
+const K_CODEVIEW_IMAGE_DOWN= ({code,shift})=>{
   switch (code){
     case 'KeyL':
     case 'ArrowRight':
@@ -89,9 +93,8 @@ const K_CODEVIEW_IMAGE= ({code,shift})=>{
       }else{
         doMove(Direction.UP)
       }
-
       break;
-    case 'KeyR':
+    case 'Digit0':
       rate.value = 100;
       deg.value = 0;
       x.value = 0;
@@ -127,12 +130,12 @@ function handleDrag(e){
 onMounted(()=>{
   document.querySelector('#code-view')?.classList?.toggle('dot-bg')
   window.onwheel = handleWheel;
-  RENDER_KEYHANDLER.handle = K_CODEVIEW_IMAGE
+  RENDER_KEYHANDLER.onKeyDown = K_CODEVIEW_IMAGE_DOWN
 })
 onUnmounted(()=>{
   document.querySelector('#code-view')?.classList?.toggle('dot-bg')
   window.onwheel = null;
-  RENDER_KEYHANDLER.handle = null
+  RENDER_KEYHANDLER.onKeyDown = null
 })
 </script>
 <style>
@@ -161,9 +164,10 @@ onUnmounted(()=>{
 .image-render > img:hover{
   box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
 }
-.image-render-svg svg{
+.image-render-svg svg, .image-render > img.svg-as-image{
   width: 200px;
   height: 200px;
+  color: #000;
 }
 .image-render-svg svg:hover, .image-render-file:hover{
   box-shadow: #eaeef2 0 4px 32px;

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {createPreloadPlugin, createUpxPlugin} from "vite-plugin-utools-helper";
+import svgLoader from "vite-svg-loader";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,6 +14,7 @@ export default defineConfig({
     },
     plugins: [
       vue(),
+      svgLoader(),
       createPreloadPlugin({
         name:'window.preload',
         path:'src/preload/index.js'

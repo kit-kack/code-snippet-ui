@@ -36,7 +36,7 @@
         style="height: 15px" size="small"  v-else-if="$reactive.currentMode > CODE_VIEW && $reactive.form.fullScreen">
       退出全屏
       <template #icon>
-        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" fill="currentColor"></path></svg>
+        <svg-exit-fullscreen/>
       </template>
     </n-button>
     <n-dropdown v-else size="small" placement="bottom-start" trigger="hover" :options="tagOptions" :render-icon="renderIcon" style="max-height: min(240px, calc(100vh * 0.7) )" :disabled="$reactive.currentMode !== LIST_VIEW" scrollable>
@@ -57,6 +57,7 @@ import {GLOBAL_HIERARCHY} from "../../js/hierarchy/core";
 import {computed, h, ref, watch} from "vue";
 import dayjs from "dayjs";
 import NormalTag from "../base/NormalTag.vue";
+import SvgExitFullscreen from "../../asserts/exit-fullscreen.svg";
 import {replaceOrAddTag} from "../../js/utils/resolve";
 import {tagColorManager} from "../../js/utools/tag";
 const word = ref(0);

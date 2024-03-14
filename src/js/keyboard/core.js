@@ -1,23 +1,30 @@
-import {$index, $normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../store";
-import {GLOBAL_HIERARCHY} from "../hierarchy/core";
-import {K_SHORTCUT} from "./k-shortcut";
-import {K_CODEVIEW} from "./k-codeview";
-import {K_LISTVIEW} from "./k-listview";
+import {$index, $reactive, EDIT_VIEW, LIST_VIEW} from "../store";
+import {K_SHORTCUT_DOWN} from "./k-shortcut";
+import {K_CODEVIEW_DOWN, K_CODEVIEW_UP} from "./k-codeview";
+import {K_LISTVIEW_DOWN, K_LISTVIEW_UP} from "./k-listview";
 import {CountType, statisticsManager} from "../utools/statistics";
 
 export const GLOBAL_KEYBOARD_HANDLER = {
     isInited: false,
     prevCode: null,
     prevRepeatCode: null,
-    prevMode: null,
     isNewKeyLongPressed: null,
     lastPressedTime: 0,
-    getExt(e){
+    getExt(e, up){
         // 提供参数
         const code = e.code;
         const shift = e.shiftKey;
         const ctrl = e.ctrlKey || e.metaKey;
         const alt = e.altKey;
+        if(up){
+            return {
+                code,
+                shift,
+                ctrl,
+                alt
+            }
+        }
+
         // double
         const gap = e.timeStamp - this.lastPressedTime;
         const double = gap > 50 && gap < 300 &&  this.prevCode === code;
@@ -33,7 +40,6 @@ export const GLOBAL_KEYBOARD_HANDLER = {
                 // new key is long pressed
                 this.isNewKeyLongPressed = true
                 this.prevRepeatCode = code
-                this.prevMode = $reactive.currentMode
             }
         }else{
             this.prevRepeatCode = null
@@ -76,16 +82,16 @@ export const GLOBAL_KEYBOARD_HANDLER = {
             const ext = this.getExt(e)
             // 快捷键界面场景
             if($reactive.common.shortcutActive){
-                K_SHORTCUT(ext) && e.preventDefault();
+                K_SHORTCUT_DOWN(ext) && e.preventDefault();
                 return;
             }
 
             if ($reactive.currentMode === LIST_VIEW) {
                 // LIST_VIEW场景
-                K_LISTVIEW(ext) && e.preventDefault();
+                K_LISTVIEW_DOWN(ext) && e.preventDefault();
             } else {
                 // CODE_VIEW场景
-                K_CODEVIEW(ext) && e.preventDefault();
+                K_CODEVIEW_DOWN(ext) && e.preventDefault();
             }
         }
 
@@ -93,20 +99,20 @@ export const GLOBAL_KEYBOARD_HANDLER = {
             if ($reactive.utools.vimDisabled || $reactive.main.settingActive || $reactive.utools.focused || $index.value < 0 || $reactive.currentMode >= EDIT_VIEW) {
                 return;
             }
+            // 需要输入的场景被禁用
+            if($reactive.common.variableActive || $reactive.main.tagColorActive){
+                return;
+            }
+            const ext = this.getExt(e,true);
             statisticsManager.count(CountType.VIM)
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (this.isNewKeyLongPressed !== null && this.prevMode === LIST_VIEW) {
-                    GLOBAL_HIERARCHY.changeView(LIST_VIEW)
-                    this.isNewKeyLongPressed = null
-                    return;
-                }
-                if ($reactive.currentMode === LIST_VIEW) {
-                    if ($reactive.utools.subItemSelectedIndex !== -1) {
-                        // 处理 Vim 操作
-                        $normal.spaceInvoker[$reactive.utools.subItemSelectedIndex]?.()
-                    }
-                }
+            // 快捷键界面场景
+            if($reactive.common.shortcutActive){
+                return;
+            }
+            if($reactive.currentMode === LIST_VIEW){
+                K_LISTVIEW_UP(ext) && e.preventDefault();
+            }else{
+                K_CODEVIEW_UP(ext) && e.preventDefault();
             }
         }
         this.isInited = true

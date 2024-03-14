@@ -1,4 +1,5 @@
 import {utools_db_store} from "./base";
+import { debounce as _debounce } from 'lodash-es'
 
 const GLOBAL_STATISTICS = 'statistics'
 export const CountType= {
@@ -6,6 +7,9 @@ export const CountType= {
     COPYED: "copyed",
     VIM: "vim"
 }
+const writeToDB = _debounce(()=>{
+    utools_db_store(GLOBAL_STATISTICS,statisticsManager.data)
+},150)
 export const statisticsManager = {
     isInited: false,
     data:{},
@@ -36,9 +40,6 @@ export const statisticsManager = {
         const date = new Date();
         return new Date(date.getFullYear(),date.getMonth(),date.getDate()).getTime();
     },
-    writeToDB(){
-        utools_db_store(GLOBAL_STATISTICS,this.data)
-    },
     count(type){
         this.data[type].total++;
         const now = this._now();
@@ -47,7 +48,7 @@ export const statisticsManager = {
         }else{
             this.data[type].week[now] = 1
         }
-        this.writeToDB();
+        writeToDB();
     },
     countUsed(){
         const now = this._now();
@@ -66,7 +67,7 @@ export const statisticsManager = {
             change = true;
         }
         if(change){
-            this.writeToDB();
+            writeToDB();
         }
     },
 

@@ -93,3 +93,16 @@ export function isSvg(content){
     const c = content.trim();
     return c.startsWith('<svg') && c.endsWith('</svg>')
 }
+
+/**
+ * @return "image" | "svg-code" | "svg-url"
+ */
+export function getImageType(type,path){
+    if(type === 'image'){
+        return 'image';
+    }else if(path){
+        return 'svg-url';
+    }else{
+        return 'svg-code';
+    }
+}
