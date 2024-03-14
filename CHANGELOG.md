@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.2](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.1...v2.7.2) (2024-03-14)
+
+
+### Features
+
+* 图像和vim按键优化 ([deb8957](https://github.com/kit-kack/code-snippet-ui/commit/deb89579e3d59a07c0a65c6d4c75c595102469dc))
+
+
+### Bug Fixes
+
+* 一些细节优化 ([f31e914](https://github.com/kit-kack/code-snippet-ui/commit/f31e914dc74bbc96600605fcd203fe109429e8dd))
+* 优化一些界面 ([7991979](https://github.com/kit-kack/code-snippet-ui/commit/7991979b24f24950661045bc03071652dc8deca9))
+* 优化一些小问题 ([949db77](https://github.com/kit-kack/code-snippet-ui/commit/949db77811175a0d3abf4871b73fbb62dd2bab67))
+* 优化占位符渲染配色 ([128a380](https://github.com/kit-kack/code-snippet-ui/commit/128a380f7467d7a009ca43d1e2fb833d03bfa018))
+* 子代码片段修改保存流程改进 ([dd17b29](https://github.com/kit-kack/code-snippet-ui/commit/dd17b29f936f448ed4bebd9e379be73a83e76e3f))
+* some changes ([d58d4fd](https://github.com/kit-kack/code-snippet-ui/commit/d58d4fded5199134d7cf896b69f033308b7307fc))
+
 ### [2.7.1](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.0...v2.7.1) (2024-01-23)
 
 
