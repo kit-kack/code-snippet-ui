@@ -108,7 +108,7 @@ export const statisticsManager = {
         return [
             this.data.used.total,
             'N/A',
-            Math.floor((now - this.data.used.start) / (24 * 60 * 60 * 1000))
+            Math.floor((now - this.data.used.start) / (24 * 60 * 60 * 1000)) + 1
         ]
     },
     getStatistics(){

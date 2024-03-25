@@ -10,7 +10,7 @@
     <form-view/>
   </template>
   <vim-status-bar/>
-  <n-drawer v-model:show="$reactive.main.settingActive" :width="380" placement="right">
+  <n-drawer v-model:show="$reactive.main.settingActive" width="50vw" placement="right">
     <side-view/>
   </n-drawer>
   <n-drawer  v-model:show="$reactive.common.shortcutActive" display-directive="show" placement="left" :width="380">
@@ -137,7 +137,7 @@ watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.ut
   position: fixed;
   right:20px;
   bottom: 6px;
-  z-index: 20;
+  z-index: 2000;
   text-align: center;
 }
 </style>

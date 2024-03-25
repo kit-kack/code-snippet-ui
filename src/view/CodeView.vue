@@ -165,7 +165,7 @@
 
 <script setup>
 import {configManager} from "../js/utools/config";
-import {computed, onMounted, onUnmounted, ref, watch, watchPostEffect} from "vue";
+import {computed, onMounted, onUnmounted, onUpdated, ref, watch, watchPostEffect} from "vue";
 import {
   section_add,
   section_clone,

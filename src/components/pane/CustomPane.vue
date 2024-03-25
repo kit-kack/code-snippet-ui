@@ -1,5 +1,5 @@
 <template>
-  <n-space vertical align="center">
+  <n-space vertical>
     <n-space>
       配色方案
       <n-select
@@ -14,14 +14,17 @@
       元素代码块
       <n-select  v-model:value="codeBlockRef" :options="codeBlockOptions" size="tiny" @update-value="handleCodeBlockChange"/>
     </n-space>
+    <config-switch title="关闭显示入门手册" config="readme_close" @refresh="refreshSearchResult()"/>
   </n-space>
+
 </template>
 
 <script setup>
 import {h, ref} from "vue";
 import {configManager} from "../../js/utools/config";
 import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../../js/theme";
-import {refreshListView} from "../../js/store";
+import {refreshListView, refreshSearchResult} from "../../js/store";
+import ConfigSwitch from "../base/ConfigSwitch.vue";
 
 const colorSchemaRef = ref(configManager.get('strategy_theme')??0)
 const codeBlockRef = ref(getBlockRefInitValue())
@@ -108,10 +111,8 @@ function handleColorSchema(v){
 </script>
 
 <style scoped>
-.n-select{
-  font-size: 12px;
-  width: 150px;
-}
+
+
 .n-divider{
   margin-top: 20px;
   height: 10px;

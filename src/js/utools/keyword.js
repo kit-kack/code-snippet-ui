@@ -12,11 +12,21 @@ export function register_utools_keyword(snippet,prefix,nonNotify){
         keyword += prefix+"#";
     }
     keyword += snippet.id;
-    let info = snippet.desc ?? '暂无描述';
+    let info = snippet.desc ?? '暂无描述~';
+    let ico
     if(snippet.dir){
-        info = "[快速访问目录]："+info
+        info = "🚀快速访问目录：     "+info
     }else{
-        info = "[快速粘贴内容]："+info
+        let prefix = "快速粘贴片段"
+        if(snippet.link){
+            prefix = "📎快速跳转链接"
+        }else if(snippet.type === 'image'){
+            prefix = "🖼️快速粘贴图片"
+        }else if(snippet.type?.startsWith('x-')){
+            prefix = "♾️"+ "快速粘贴片段"
+        }
+        info = prefix+"：      "+info
+        ico = "/quick.png"
     }
     // 获取
     const features = utools.getFeatures([keyword])
@@ -24,7 +34,8 @@ export function register_utools_keyword(snippet,prefix,nonNotify){
     utools.setFeature({
         code: keyword,
         explain: info,
-        cmds: [snippet.name]
+        cmds: [snippet.name],
+        icon: ico
     })
     if(!nonNotify && features.length === 0){
         $message.success("新增uTools关键字："+snippet.name)

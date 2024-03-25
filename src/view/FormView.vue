@@ -165,7 +165,6 @@
                                line-nums
                                @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/></div>
               </n-tab-pane>
-
               <n-tab-pane name="link" tab="关联" :disabled="formProperties.codeSource === 'code'">
                 <template v-if="codeTemplate.path || codeTemplate.dir">
                   <n-list hoverable clickable :show-divider="false" style="background: transparent;margin-top:10px;">
@@ -200,7 +199,9 @@
                         </n-button>
                       </div>
                       <n-ellipsis style="max-width: 600px;margin-left: 8px;margin-top: 10px">
-                        {{(codeTemplate.dir&&!codeTemplate.ref)? '📢无预设内容，其内容受父目录控制':codeTemplate.path}}
+                        {{(codeTemplate.dir&&!codeTemplate.ref)?
+                          (GLOBAL_HIERARCHY.currentHierarchy.core ? '📢 使用目录来分类管理你的代码片段；建议设置uTools关键字，从而能够快速访问该目录': '📢其内容受父目录逻辑控制')
+                          :codeTemplate.path}}
                       </n-ellipsis>
                     </n-list-item>
                   </n-list>
@@ -276,16 +277,7 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  h,
-  onMounted,
-  onUnmounted,
-  reactive,
-  ref,
-  toRaw,
-  watch,
-} from "vue";
+import {computed, h, onMounted, onUnmounted, reactive, ref, toRaw, watch,} from "vue";
 import {tagColorManager} from "../js/utools/tag";
 import {configManager} from "../js/utools/config";
 import {fullAlias, getFileName, getRealTypeAndValidStatus, languages} from "../js/utils/language";
@@ -306,7 +298,7 @@ import SvgConf from "../asserts/conf.svg";
 import SvgDelete from "../asserts/delete.svg";
 
 import {GLOBAL_HIERARCHY, loadValidHierarchyJS} from "../js/hierarchy/core";
-import {isNetWorkUri} from "../js/utils/common";
+import {isXmlOrEscapeCharsExisting, isNetWorkUri} from "../js/utils/common";
 import {utools_browser_open} from "../js/utools/base";
 import {isArray as _isArray} from "lodash-es"
 import {replaceRenderBlock} from "../js/utools/func";
@@ -411,7 +403,7 @@ const tabOptions = [
 const rules = {
   "name":[
     {
-      message: "代码片段名必须非空且不重复",
+      message: "代码片段名 必须非空且不重复",
       required: true,
       validator(rule, value) {
         if(value!= null){
@@ -428,11 +420,18 @@ const rules = {
       trigger: ["input","blur"]
     },
     {
-      message: "代码片段名不能包含/",
+      message: "代码片段名 不能包含/",
       validator(rule, value) {
         if(value!= null){
           return !value.includes('/')
         }
+      },
+      trigger: ["input","blur"]
+    },
+    {
+      message: "代码片段名 不能包含xml标签以及转义符号",
+      validator(rule, value) {
+        return !isXmlOrEscapeCharsExisting(value);
       },
       trigger: ["input","blur"]
     }
@@ -446,13 +445,20 @@ const rules = {
       return true;
     },
     message:"代码片段不能为空"
+  },
+  "desc":{
+    message: "描述 不能包含xml标签以及转义符号",
+    validator(rule, value) {
+      return !value || !isXmlOrEscapeCharsExisting(value);
+    },
+    trigger: ["input","blur"]
   }
 }
 function renderCodeTypeTag({option}){
   if(option.value.length > 2 && option.value.startsWith('x-')){
-    return option.label + ' （解析⚡）'
+    return option.label + ' （解析♾️）'
   }else if(option.value === 'image' || option.value === 'svg'){
-    return option.label + ' （🖼️渲染）'
+    return option.label + ' （渲染🖼️）'
   }else{
     return option.label;
   }

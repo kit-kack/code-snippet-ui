@@ -23,6 +23,12 @@
   --item-code-text-color: #a4a4a4;
   --item-code-scroller-border-color: #666666;
 }
+.global-color{
+  color: var(--global-color)
+}
+.kitx-italic{
+  font-style: italic;
+}
 @import "style/naiveui";
 *{
   padding: 0;
@@ -44,7 +50,7 @@
 body#light-app{
   background-color: var(--plugin-background-color);
 }
-.snippet-item__title b{
+.snippet-item  b{
   color: var(--global-color);
 }
 
@@ -59,7 +65,7 @@ body#light-app{
 }
 
 
-p.func-desc i{
+p.func-desc i,.kitx-mark{
   color: #ffa400;
   font-size: 13px;
   font-style: normal;
@@ -85,7 +91,7 @@ p.tooltip b{
 
 .kitx-snippet{
   border-radius: 3px;
-  background-color: #f5f5f5 !important;
+  background-color: var(--selected-color) !important;
   transition: background-color .3s;
   color: #c6c6c9;
   .kitx-var{

@@ -1,16 +1,10 @@
 <template>
   <n-ellipsis style="width: 100%" :tooltip="false" class="item-code-scroller" >
-    <template v-if="configManager.get('strategy_item_code_raw')">
-      <span class="item-code" >{{handleCode(code)}}</span>
-    </template>
-    <template v-else>
-      <n-code :code="handleCode(code)" :language="pair.type"   inline  class="item-code"/>
-    </template>
+    <n-code :code="handleCode(code)" :language="pair.type"   inline  class="item-code"/>
   </n-ellipsis>
 </template>
 
 <script setup>
-import {configManager} from "../../js/utools/config";
 import {getRealTypeAndValidStatus} from "../../js/utils/language";
 import {onUpdated, ref} from "vue";
 
@@ -22,7 +16,11 @@ const pair = ref(getRealTypeAndValidStatus(props.type))
  * @return {*}
  */
 function handleCode(code){
-  return code.slice(0,200).replaceAll("\n",'↩\n')
+  if(code){
+    return code.slice(0,200).replaceAll("\n",'↩\n')
+  }
+  return ''
+
 }
 onUpdated(()=>{
   pair.value = getRealTypeAndValidStatus(props.type)

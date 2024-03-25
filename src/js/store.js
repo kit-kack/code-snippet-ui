@@ -1,4 +1,6 @@
-import {nextTick, reactive, ref} from "vue";
+import {nextTick, queuePostFlushCb, reactive, ref} from "vue";
+import {configManager} from "./utools/config";
+import {doScrollForListView} from "./utils/scroller";
 // 主界面
 const LIST_VIEW = 0;
 // 代码预览界面
@@ -23,6 +25,8 @@ const $normal = {
         // 控制CodeView滚动
         codeHorizontalInvoker: null, //
         codeVerticalInvoker: null, //
+        sideCodeHorizontalInvoker: null,  // 控制侧边滚动
+        sideCodeVerticalInvoker: null, //
         itemCodeInvoker: null,   // 控制多行代码块滚动
         hierarchyInvoker: null,  // 控制topNav
         virtualInvoker: null , // 控制 virtual scroll
@@ -135,6 +139,8 @@ const $reactive = reactive({
         isFullScreenShow: true,
         // 用来进行重度刷新
         deepRefresh: true,
+        // 是否显示【侧边CodeView】
+        isSideCodeViewShow: false,
     },
     form:{
         fullScreen: false,
@@ -178,12 +184,17 @@ const handleRecoverLiteShow = ()=>{
 }
 /**
  * 临时需要切换成 完整UI模式
+ * @param {boolean} persist 持久化
  */
-const switchToFullUIMode = ()=>{
+const switchToFullUIMode = (persist)=>{
     if(!$reactive.main.isFullScreenShow){
         $reactive.main.isFullScreenShow = true;
-        $normal.recoverLiteShow= true;
         utools.setExpendHeight(545)
+        if(persist){
+            configManager.set('lite',false)
+        }else{
+            $normal.recoverLiteShow= true;
+        }
     }
 }
 
@@ -203,7 +214,11 @@ export function utools_focus_or_blur(focus){
 const refreshListView = ()=>{
     $reactive.main.deepRefresh = false;
     nextTick(()=>{
-        $reactive.main.deepRefresh = true
+        $reactive.main.deepRefresh = true;
+    }).then(()=>{
+        queuePostFlushCb(()=>{
+            doScrollForListView();
+        })
     })
 }
 export const refreshSearchResult =()=>{

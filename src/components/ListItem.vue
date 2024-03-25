@@ -9,7 +9,7 @@
     <n-card
             embedded
             size="small"
-            content-style="padding: 0 10px"
+            content-style="padding: 0 12px"
             header-style="height:28px;"
             :style="getSelectedStyle(props.selected,isHover&&$reactive.main.isCursorShow)"
     >
@@ -26,9 +26,12 @@
           <div class="snippet-item-head__left">
             <n-ellipsis>
               <!-- 标题 -->
-              <span class="snippet-item__title"   v-html="snippet.temp??snippet.name"></span>
+              <span class="snippet-item__title"   v-html="escapeHtmlExceptB((snippet.temp && !snippet.matchType)? snippet.temp:snippet.name)"></span>
               <!-- 描述（标题右侧）  子代码片段 -->
-              <span class="snippet-item__desc">{{ configManager.get('strategy_item_code_show') > 0 ? snippet.desc: pair.sideInfo}}</span>
+              <span class="snippet-item__desc">
+                <span v-if="configManager.get('strategy_item_code_show') > 0" v-html="(snippet.matchType === 1 && snippet.temp)? snippet.temp : snippet.desc"></span>
+                <span v-else>{{pair.sideInfo}}</span>
+              </span>
             </n-ellipsis>
           </div>
         </n-scrollbar>
@@ -65,7 +68,7 @@
       <template v-else>
         <!-- 描述（标题下方） -->
         <n-ellipsis :tooltip="false">
-          <span class="snippet-item__desc" style="margin-left: 0px;">{{snippet.desc}}</span>
+          <span class="snippet-item__desc" style="margin-left: 0px;" v-html="(snippet.matchType === 1 && snippet.temp)? snippet.temp : snippet.desc" ></span>
         </n-ellipsis>
       </template>
 
@@ -73,10 +76,23 @@
       <!-- 右侧下方 （语言类型|使用次数|上次使用时间） -->
       <span  class="snippet-item-info" style="  transform-origin: 100% 0;right:0;margin-right:3px;"
              :style="{
-               color: snippet.dir ? $normal.theme.globalColor: '#888'
+               color: '#888'
              }"
       >
-              {{pair.showType}}
+        <template v-if="snippet.dir">
+          <n-icon size="16" class="global-color"><svg-directory/></n-icon>
+        </template>
+        <template v-else-if="snippet.type === 'image' || snippet.type === 'svg'">
+        <n-icon size="16" class="global-color">
+          <svg-image/>
+        </n-icon>
+      </template>
+        <template v-else-if="snippet.link">
+          <n-icon size="16" class="global-color"><svg-link/></n-icon>
+        </template>
+        <template v-else>
+          {{pair.showType}}
+        </template>
       </span>
     </n-card>
 
@@ -138,8 +154,12 @@ import SvgCopy from "../asserts/copy.svg"
 import SvgDelete from "../asserts/delete.svg"
 import SvgTopUp from "../asserts/top-up.svg"
 import SvgTopDown from "../asserts/top-down.svg"
+import SvgImage from "../asserts/image.svg"
+import SvgDirectory from "../asserts/directory.svg"
+import SvgLink from "../asserts/link.svg"
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {snippetCopyOrPaste} from "../js/keyboard/k-common";
+import {escapeHtmlExceptB} from "../js/utils/common";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -159,20 +179,20 @@ const pair = computed(()=>{
   // sideInfo
   let sideInfo = '';
   if(props.snippet.matchType === 1){
-    sideInfo = '📗描述匹配';
+    sideInfo = ' 📗描述匹配';
   }else if(props.snippet.matchType === 2){
-    sideInfo = '📘内容匹配';
+    sideInfo = ' 📘内容匹配';
   }
   if(props.snippet.sections){
     if(props.snippet.sections.length > 0){
       if(props.snippet.keyword){
-        sideInfo = '✬×'+props.snippet.sections.length + ' ' + sideInfo;
+        sideInfo = '✬×'+props.snippet.sections.length +  sideInfo;
       }else{
-        sideInfo = '⚑×'+props.snippet.sections.length + ' ' + sideInfo;
+        sideInfo = '⚑×'+props.snippet.sections.length +  sideInfo;
       }
     }
   }else if(props.snippet.keyword){
-    sideInfo = '✬' + ' ' + sideInfo;
+    sideInfo = '✬' +  sideInfo;
   }
   if(props.snippet.dir){
     // if(props.snippet.ref === "local"){
@@ -204,9 +224,17 @@ const pair = computed(()=>{
           code = '[关联链接]: ' + props.snippet.path;
           renderType = 'plaintext';
         }else{
-          if(mode === 2 && (renderType === 'image' || renderType === 'svg')){
-            code = props.snippet.path;
-            showType = '';
+          if(renderType === 'image' || renderType === 'svg'){
+            if(mode === 1){
+              code = '[关联图片]: '+props.snippet.path;
+              renderType = 'plaintext';
+            }else if(mode === 2){
+              code = props.snippet.path;
+              showType = '';
+            }else{
+              code = '[关联片段]: '+props.snippet.path;
+              renderType = 'plaintext';
+            }
           }else{
             code = '[关联片段]: '+props.snippet.path;
             renderType = 'plaintext';
@@ -340,10 +368,14 @@ function doItemRefresh(){
     margin: 3px 1vw 3px 1vw;
     position:relative;
     overflow: hidden;
+    transition: width 0.4s ease-out;
   }
   .n-card-header{
     padding-left: 12px;
   }
+}
+#list-view .kitx-half-container .snippet-item .n-card{
+  width: 50vw;
 }
 
 .snippet-item__tags{
@@ -355,7 +387,7 @@ function doItemRefresh(){
   left:0;
   z-index: 10;
   height: calc(100% - 4px);
-  width: 98vw;
+  width: 98%;
   overflow: auto;
   margin-left: 1vw;
   display: flex;
@@ -387,7 +419,7 @@ function doItemRefresh(){
 }
 .snippet-item__top {
   position: absolute;
-  top:11px;
+  top:10px;
   left: 1px;
   width: 6px;
   height: 6px;

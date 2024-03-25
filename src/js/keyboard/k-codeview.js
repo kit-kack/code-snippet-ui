@@ -12,8 +12,7 @@ export const RENDER_KEYHANDLER = {
     /**
      * @type KeyDownHandler | null
      */
-    onKeyDown: null,
-    handle: null
+    onKeyDown: null
 }
 /**
  * @type KeyDownHandler

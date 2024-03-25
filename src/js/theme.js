@@ -40,7 +40,7 @@ const colorSchemaStyleOptions = [
         highColor: '#fdd8eaaa'
     }
     ,{
-        globalColor: '#fdb83aff',
+        globalColor: '#fdc253ff',
         selectedColor: '#fffbe6ff',
         highColor: '#f6e6c8aa'
     }
@@ -105,7 +105,9 @@ function getThemeOverrides(){
             fontSize: '12px'
         },
         Switch:{
-            railColorActive: gc
+            railColorActive: gc,
+            boxShadowFocus: 'none',
+            loadingColor: gc
         },
         Tooltip:{
             color: utools.isDarkColors()? '#2a2a2c':'#fafafc',
@@ -129,11 +131,11 @@ function getThemeOverrides(){
                 InternalSelection:{
                     textColor: textOrCaretColorVar,
                     border: inputBorderVar,
-                    borderHover: borderHover,
-                    borderFocus: borderHover,
+                    borderHover: inputBorderVar,
+                    borderFocus: inputBorderVar,
                     borderActive: borderHover,
-                    boxShadowFocus: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
-                    boxShadowActive: utools.isDarkColors()? 'none': lightBoxShadowFoucsAndActive,
+                    boxShadowFocus: 'none',
+                    boxShadowActive: 'none',
                     clearColorHover: 'none',
                     caretColor: textOrCaretColorVar,
                     colorFocus: 'white',

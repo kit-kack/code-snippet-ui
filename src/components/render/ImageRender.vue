@@ -22,10 +22,12 @@
 import {onMounted, onUnmounted, ref} from "vue";
 import {RENDER_KEYHANDLER} from "../../js/keyboard/k-codeview";
 import {Direction} from "../../js/utils/scroller";
+import {SIDE_RENDER_KEYHANDLER} from "../../js/keyboard/k-listview";
 
 const props = defineProps({
   url: String,
   type: String, // image / svg-code / svg-url
+  isSideView: Boolean
 });
 const rate = ref(100)
 const deg = ref(0)
@@ -106,6 +108,35 @@ const K_CODEVIEW_IMAGE_DOWN= ({code,shift})=>{
   }
   return true;
 }
+const K_SIDE_CODEVIEW_IMAGE_HANDLER = (code)=>{
+  switch (code){
+    case 'KeyL':
+    case 'ArrowRight':
+      doMove(Direction.RIGHT);
+      break;
+    case 'KeyH':
+    case 'ArrowLeft':
+      doMove(Direction.LEFT)
+      break;
+    case 'KeyJ':
+    case 'ArrowDown':
+      doMove(Direction.DOWN)
+      break;
+    case 'KeyK':
+    case 'ArrowUp':
+      doMove(Direction.UP)
+      break;
+    case 'KeyG':
+      rate.value = 100;
+      deg.value = 0;
+      x.value = 0;
+      y.value = 0;
+      break;
+    default:
+      return true;
+  }
+  return true;
+}
 function handleWheel(e){
   const up = e.wheelDelta > 0
   if(e.ctrlKey || e.metaKey){  // scale
@@ -130,12 +161,20 @@ function handleDrag(e){
 onMounted(()=>{
   document.querySelector('#code-view')?.classList?.toggle('dot-bg')
   window.onwheel = handleWheel;
-  RENDER_KEYHANDLER.onKeyDown = K_CODEVIEW_IMAGE_DOWN
+  if(props.isSideView){
+    SIDE_RENDER_KEYHANDLER.IMAGE_HANDLER = K_SIDE_CODEVIEW_IMAGE_HANDLER
+  }else{
+    RENDER_KEYHANDLER.onKeyDown = K_CODEVIEW_IMAGE_DOWN
+  }
 })
 onUnmounted(()=>{
   document.querySelector('#code-view')?.classList?.toggle('dot-bg')
   window.onwheel = null;
-  RENDER_KEYHANDLER.onKeyDown = null
+  if(props.isSideView){
+    SIDE_RENDER_KEYHANDLER.IMAGE_HANDLER = null
+  }else{
+    RENDER_KEYHANDLER.onKeyDown = null
+  }
 })
 </script>
 <style>

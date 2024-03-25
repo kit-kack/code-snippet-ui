@@ -1,11 +1,13 @@
 <template>
-  <v-md-preview
-      :beforeChange="storeLocalImageUrlBeforeMdChange"
-      @change="assignLocalImageUrlWhenMdRender"
-      :text="$reactive.currentCode"
-      @copy-code-success="copyCodeSuccess"
-      ref="preview"
-  ></v-md-preview>
+  <div :class="isSideView ? 'side-markdown-view': 'full-markdown-view'">
+    <v-md-preview
+        :beforeChange="storeLocalImageUrlBeforeMdChange"
+        @change="assignLocalImageUrlWhenMdRender"
+        :text="code ?? $reactive.currentCode"
+        @copy-code-success="copyCodeSuccess"
+        ref="preview"
+    ></v-md-preview>
+  </div>
   <n-drawer
       v-model:show="$reactive.code.tocActive"
       @after-enter="adjustCurrentHeading(true)"
@@ -37,6 +39,7 @@ import {nextTick, onMounted, onUnmounted, ref} from "vue";
 import {isNetWorkUri} from "../../js/utils/common";
 import {utools_browser_open} from "../../js/utools/base";
 import {RENDER_KEYHANDLER} from "../../js/keyboard/k-codeview";
+import {SIDE_RENDER_KEYHANDLER} from "../../js/keyboard/k-listview";
 
 const preview = ref()
 const tocScrollRef = ref()
@@ -45,7 +48,10 @@ const currentHeadingIndex = ref(0)
 function copyCodeSuccess(){
   $message.info("已复制该代码块内容")
 }
-
+const props = defineProps({
+  code: String,
+  isSideView: Boolean
+})
 let cachedImageUrls = null;
 let count = -1;
 /**
@@ -342,6 +348,23 @@ const K_CODEVIEW_MARKDOWN_DOWN = ({code,shift,ctrl,repeat})=>{
   }
   return true;
 }
+const K_SIDE_CODEVIEW_MARKDOWN_HANDLER = (code) =>{
+  switch (code){
+    case "KeyH":
+    case "ArrowLeft":
+      adjustCenterPre()
+      handleMdHorizonMove(true,true);
+      break;
+    case "KeyL":
+    case "ArrowRight":
+      adjustCenterPre()
+      handleMdHorizonMove(false,true)
+      break;
+    default:
+      return false;
+  }
+  return true;
+}
 /**
  * @type KeyUpHandler
  */
@@ -470,13 +493,21 @@ onMounted(()=>{
     }))
   }
   document.addEventListener('click',handleClickUrl)
-  RENDER_KEYHANDLER.onKeyUp = K_CODEVIEW_MARKDOWN_UP
-  RENDER_KEYHANDLER.onKeyDown = K_CODEVIEW_MARKDOWN_DOWN
+  if(props.isSideView){
+    SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER = K_SIDE_CODEVIEW_MARKDOWN_HANDLER;
+  }else{
+    RENDER_KEYHANDLER.onKeyUp = K_CODEVIEW_MARKDOWN_UP
+    RENDER_KEYHANDLER.onKeyDown = K_CODEVIEW_MARKDOWN_DOWN
+  }
 })
 onUnmounted(()=>{
   document.removeEventListener('click',handleClickUrl)
-  RENDER_KEYHANDLER.onKeyUp = null
-  RENDER_KEYHANDLER.onKeyDown = null
+  if(props.isSideView){
+    SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER = null
+  }else{
+    RENDER_KEYHANDLER.onKeyUp = null
+    RENDER_KEYHANDLER.onKeyDown = null
+  }
   $reactive.code.tocActive = false;
 })
 </script>
@@ -485,7 +516,6 @@ onUnmounted(()=>{
 
 <style lang="scss">
 .github-markdown-body{
-  background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
   background-size: 20px 20px;
   background-position: 50%;
 
@@ -536,10 +566,15 @@ onUnmounted(()=>{
     font-weight: bold
   }
 }
+.full-markdown-view .github-markdown-body{
+  background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
+}
+.side-markdown-view .github-markdown-body{
+  background-color: #f5f5f5;
+}
 
 // 适配 暗黑模式
 #dark-app .github-markdown-body{
-  background-image: linear-gradient(90deg, rgba(145, 142, 142, 0.04) 3%, transparent 0), linear-gradient(1turn, rgba(201, 194, 197, 0.04) 3%, transparent 0);
   color: #ccc !important;
 
   div[class*=v-md-pre-wrapper-]{
@@ -564,7 +599,6 @@ onUnmounted(()=>{
       border-color: #444 !important;
     }
   }
-
   blockquote{
     border-left-color: #515154;
   }
@@ -605,6 +639,12 @@ onUnmounted(()=>{
   a {
     color: #1c84f9;
   }
+}
+#dark-app .full-markdown-view .github-markdown-body{
+  background-image: linear-gradient(90deg, rgba(145, 142, 142, 0.04) 3%, transparent 0), linear-gradient(1turn, rgba(201, 194, 197, 0.04) 3%, transparent 0);
+}
+#dark-app .side-markdown-view .github-markdown-body{
+  background-color: #303133 !important;
 }
 
 .v-md-pre-wrapper.copy-code-mode .v-md-copy-code-btn:active{

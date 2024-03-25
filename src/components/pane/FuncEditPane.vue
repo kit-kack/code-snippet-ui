@@ -1,8 +1,5 @@
 <template>
   <div v-if="refreshFlag">
-    <n-divider title-placement="center">
-      自定义占位符
-    </n-divider>
     <n-list hoverable clickable :show-divider="false" @mouseleave="activeKey = null">
       <n-list-item v-for="(value,key) in formatManager.funcMap"
         @mouseenter="activeKey = key"
@@ -77,11 +74,10 @@
                       </n-icon>
                     </template>
                     tips:<br/>
-                    1. 运行环境为Node.js<br/>
-                    2. 支持异步，可返回Promise结果
+                    1. 运行环境为<span class="global-color">Node.js</span>，可<span class="global-color">require</span>内置模块使用<br/>
+                    2. 支持异步，可返回<span class="global-color">Promise</span>结果
                   </n-tooltip>
                 </p>
-
               </div>
             </n-tab-pane>
           </n-tabs>
@@ -148,7 +144,7 @@ const COMMAND_RULE = {
 function enterAddView(){
   pair.value = {
     desc: '暂无描述~',
-    expression: 'return "Hello World";',
+    expression: 'return "hello code-snippet!";',
   };
   nowKey = null;
   $reactive.setting.funcEditActive = true;

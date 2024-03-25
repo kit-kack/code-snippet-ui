@@ -61,7 +61,7 @@ export function handleArrayForHierarchy(result,name,tag,type){
     const override_support = snippetHub && !GLOBAL_HIERARCHY.currentHierarchy.core
     const betaDescSearch = !configManager.get('beta_wide_desc_close');
     const betaContentSearchClose = configManager.get('beta_wide_content_close');
-    const betaSearch = configManager.get('beta_wide_snippet_search') && (betaDescSearch || !betaContentSearchClose);
+    const betaSearch = (betaDescSearch || !betaContentSearchClose);
     for (const snippet of result.snippets) {
         const item = {...snippet}
         const id = snippet.id ??snippet.name;

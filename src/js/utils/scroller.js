@@ -80,6 +80,30 @@ export function doScrollForMultiLineCode(direction){
 }
 
 /**
+ * 控制侧边代码预览界面滚动
+ * @param {number} direction
+ */
+export function doScrollForSideCodeView(direction){
+    switch (direction){
+        case Direction.LEFT:
+        case Direction.RIGHT:
+            _controlScrollBar($normal.scroll.sideCodeHorizontalInvoker,direction,false)
+            break
+        case Direction.UP:
+        case Direction.DOWN:
+            _controlScrollBar($normal.scroll.sideCodeVerticalInvoker,direction,false)
+            break
+        case Direction.END:
+            _controlScrollBar($normal.scroll.sideCodeVerticalInvoker,direction,false)
+            break
+        default:
+            _controlScrollBar($normal.scroll.sideCodeHorizontalInvoker,direction,false)
+            _controlScrollBar($normal.scroll.sideCodeVerticalInvoker,direction,false)
+            break
+    }
+}
+
+/**
  * 控制代码预览界面滚动
  * @param {number} direction
  * @param {boolean} fast

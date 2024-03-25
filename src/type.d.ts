@@ -259,7 +259,7 @@ declare type ConfigItem =
     | "default_language"                         // 默认语言
     | "default_keyword_enable"                       // 默认是否启用uTools关键字
 // @deprecated    | "beta_tag_aid_choose"                      // 标签辅助选择
-    | "beta_wide_snippet_search"                 // 允许扩充搜索范围
+// @default    | "beta_wide_snippet_search"                 // 允许扩充搜索范围
     | "beta_wide_desc_close"                     // 关闭描述匹配
     | "beta_wide_content_close"                  // 关闭内容匹配
     | "beta_sub_snippet_search"                  // 允许搜索子代码片段

@@ -8,7 +8,7 @@ import {
     utools_focus_or_blur
 } from "../store";
 import {configManager} from "../utools/config";
-import {Direction, doScrollForListView, doScrollForMultiLineCode} from "../utils/scroller";
+import {Direction, doScrollForListView, doScrollForMultiLineCode, doScrollForSideCodeView} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import { throttle as _throttle } from "lodash-es"
 import {K_COMMON_DOWN, K_COMMON_UP} from "./k-common";
@@ -48,6 +48,34 @@ const debItemMoveRight = _throttle(function(){
         }
     }
 },120)
+
+export const SIDE_RENDER_KEYHANDLER = {
+    IMAGE_HANDLER: null,
+    MARKDOWON_HANDLER: null,
+
+}
+
+function controlSideViewOrMultiLineCode(direction,code) {
+    if($reactive.main.isSideCodeViewShow){
+        // 判断类型
+        let result;
+        if($reactive.currentSnippet.type === "markdown"){
+            if(SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER){
+                result = SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER(code)
+            }
+        }else if($reactive.currentSnippet.type === "image" || $reactive.currentSnippet.type === "svg"){
+            if(SIDE_RENDER_KEYHANDLER.IMAGE_HANDLER){
+                result = SIDE_RENDER_KEYHANDLER.IMAGE_HANDLER(code)
+            }
+        }
+        if(!result){
+            doScrollForSideCodeView(direction);
+        }
+    }else if(configManager.get('strategy_item_code_show') === 2){
+        doScrollForMultiLineCode(direction);
+    }
+
+}
 /**
  * @type KeyUpHandler
  */
@@ -150,6 +178,9 @@ export const K_LISTVIEW_DOWN = (ext)=>{
                 $message.warning(' [多行元素代码块] 场景不支持切换UI模式')
                 return;
             }
+            if($reactive.main.isFullScreenShow){
+                $reactive.main.isSideCodeViewShow = false;
+            }
             $reactive.main.isFullScreenShow = !$reactive.main.isFullScreenShow;
             configManager.set('lite',!$reactive.main.isFullScreenShow)
             refreshListView()
@@ -194,8 +225,8 @@ export const K_LISTVIEW_DOWN = (ext)=>{
             // 校验是否有效
             if($index.value=== -1){
                 $message.error("没有可选择的元素")
-            }else if(shift && configManager.get('strategy_item_code_show') === 2){
-                doScrollForMultiLineCode(Direction.LEFT);
+            }else if(shift){
+                controlSideViewOrMultiLineCode(Direction.LEFT,code)
             }else{
                 debItemMoveLeft()
             }
@@ -205,11 +236,11 @@ export const K_LISTVIEW_DOWN = (ext)=>{
             if($reactive.main.isDel){
                 $reactive.main.isDel = false;
             }
-            if(shift && configManager.get('strategy_item_code_show') === 2){
-                if ($index.value === -1) { // -1 >= 0-1
+            if(shift){
+                if($index.value === -1){
                     $message.error("没有可选择的元素")
-                }else {
-                    doScrollForMultiLineCode(Direction.DOWN);
+                }else{
+                    controlSideViewOrMultiLineCode(Direction.DOWN,code)
                 }
             }else{
                 if ($index.value >= $list.value.length -1) { // -1 >= 0-1
@@ -224,11 +255,11 @@ export const K_LISTVIEW_DOWN = (ext)=>{
             if($reactive.main.isDel){
                 $reactive.main.isDel = false;
             }
-            if(shift && configManager.get('strategy_item_code_show') === 2){
-                if ($index.value === -1) {
+            if(shift){
+                if($index.value === -1){
                     $message.error("没有可选择的元素")
-                }else {
-                    doScrollForMultiLineCode(Direction.UP);
+                }else{
+                    controlSideViewOrMultiLineCode(Direction.UP,code)
                 }
             }else{
                 if ($index.value <= 0) {
@@ -243,21 +274,23 @@ export const K_LISTVIEW_DOWN = (ext)=>{
             // 校验是否有效
             if($index.value=== -1 ){
                 $message.error("没有可选择的元素")
-            }else if(shift && configManager.get('strategy_item_code_show') === 2){
-                doScrollForMultiLineCode(Direction.RIGHT);
+            }else if(shift){
+                controlSideViewOrMultiLineCode(Direction.RIGHT,code)
             }else{
                 debItemMoveRight();
             }
+            break;
+        case 'Period':
+            // check
+            switchToFullUIMode(true);
+            $reactive.main.isSideCodeViewShow = !$reactive.main.isSideCodeViewShow;
             break;
         case "KeyG":
             if(double){
                 $index.value = 0;
                 doScrollForListView();
             }else if(shift){
-                $index.value = $list.value.length -1;
-                doScrollForListView();
-            }else if(alt){
-                doScrollForMultiLineCode(Direction.RESET);
+                controlSideViewOrMultiLineCode(Direction.RESET,code)
             }
             break;
         default:

@@ -106,3 +106,27 @@ export function getImageType(type,path){
         return 'svg-code';
     }
 }
+
+export function escapeHtmlExceptB(html) {
+    return html.replace(/<(?!\/?b\s*\/?)[^>]+>/g, function(match) {
+        return match.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    });
+}
+const  xmlRegex = /<\/?[^>]+>/
+// 定义检测HTML转义字符的正则表达式
+const regexHTMLEscape = /&[a-zA-Z]{2,6};|&#\d{2,4};/;
+
+export function isXmlOrEscapeCharsExisting(str) {
+    return xmlRegex.test(str) || regexHTMLEscape.test(str);
+}
+
+export function getDirType(ref){
+    switch (ref){
+        case "local":
+            return "本地目录";
+        case "custom":
+            return "自定义目录";
+        default:
+            return "普通目录";
+    }
+}

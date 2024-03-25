@@ -200,7 +200,7 @@ export const codeSnippetManager = {
         let list = [];
         const betaDescSearch = !configManager.get('beta_wide_desc_close');
         const betaContentSearchClose = configManager.get('beta_wide_content_close');
-        const betaSearch = configManager.get('beta_wide_snippet_search') && (betaDescSearch || !betaContentSearchClose);
+        const betaSearch = (betaDescSearch || !betaContentSearchClose);
         if(name){
             for (const codeSnippet of map.values()) {
                 const result = match(name,codeSnippet.name)
@@ -211,10 +211,11 @@ export const codeSnippetManager = {
                 } else if(betaSearch){
                     // desc
                     if(betaDescSearch && codeSnippet.desc){
-                        if(codeSnippet.desc.toLowerCase().includes(name)){
+                        const index = codeSnippet.desc.toLowerCase().indexOf(name);
+                        if(index !== -1){
                             codeSnippet.matchType = 1;
-                            list.push(codeSnippet)
-                            continue
+                            codeSnippet.temp = codeSnippet.desc.slice(0,index) + '<b>' + codeSnippet.desc.slice(index,index+name.length) + '</b>' + codeSnippet.desc.slice(index+name.length);
+                            list.push(codeSnippet);
                         }
                     }
                     // pass
@@ -243,7 +244,7 @@ export const codeSnippetManager = {
         const list = [];
         const betaDescSearch = !configManager.get('beta_wide_desc_close');
         const betaContentSearchClose = configManager.get('beta_wide_content_close');
-        const betaSearch = configManager.get('beta_wide_snippet_search') && (betaDescSearch || !betaContentSearchClose);
+        const betaSearch = (betaDescSearch || !betaContentSearchClose);
         for (const codeSnippet of this.rootSnippetMap.values()) {
             if(!codeSnippet.dir && match(name,codeSnippet.name) !== null){
                 codeSnippet.matchType = undefined;
