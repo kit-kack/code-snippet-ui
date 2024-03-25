@@ -283,7 +283,7 @@ import {configManager} from "../js/utools/config";
 import {fullAlias, getFileName, getRealTypeAndValidStatus, languages} from "../js/utils/language";
 import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {CtrlStr} from "../js/some";
-import CodeEditor from '../components/lib/MyCodeEditor.vue';
+import CodeEditor from '../components/code-editor/MyCodeEditor.vue';
 import ConfigSwitch from "../components/base/ConfigSwitch.vue";
 import FuncSelectPane from "../components/modal/FuncChooseModal.vue";
 import NormalTag from "../components/base/NormalTag.vue";

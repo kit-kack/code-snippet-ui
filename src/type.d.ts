@@ -269,3 +269,16 @@ declare type ConfigItem =
     | "lite"                                     // 列表UI模式
     | "readme_close"                             // 说明文档显示
     | "pure_mode"                                // 纯净模式
+
+
+interface CodeEditorSource {
+    readonly content: string,
+    readonly cursorStart: number,
+    readonly cursorEnd: number
+}
+interface CodeEditorChange {
+    readonly newCursorPosition?: number,
+    readonly newContent?: string,
+    readonly changeType: "none" | "cursor" | "content" | "all"
+}
+type CodeEditorKeyDownHandler = (e: KeyboardEvent, source: CodeEditorSource) => CodeEditorChange | null | undefined

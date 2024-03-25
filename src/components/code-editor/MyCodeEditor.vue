@@ -46,7 +46,7 @@
             ref="textarea"
             :autofocus="autofocus"
             spellcheck="false"
-            @keydown="handleKeyDown"
+            @keydown="handleNewKeyDown"
             @scroll="calcScrollDistance"
             :value="modelValue == undefined ? content : modelValue"
             @input="updateValue"
@@ -78,8 +78,7 @@
 
 <script>
 import hljs from "../../js/dep/highlight-dep";
-import {configManager} from "../../js/utools/config";
-import {INVERSE_MATCHED_WORDS, isMatchedWord, MATCHED_WORDS} from "../../js/utils/language";
+import {handleCodeEditorKeyDown} from "./key-handler";
 
 export default {
   name: "CodeEditor",
@@ -212,16 +211,6 @@ export default {
     },
   },
   methods: {
-    tabWidth() {
-        switch (configManager.get('default_tab')){
-          case 2:
-            return '  ';
-          case 4:
-            return '    ';
-          default:
-            return '\t';
-        }
-      },
     updateValue(e) {
       if (this.modelValue == undefined) {
         this.content = e.target.value;
@@ -233,44 +222,6 @@ export default {
       this.languageTitle = lang[1] ? lang[1] : lang[0];
       this.languageClass = "language-" + lang[0];
       this.$emit("lang", lang[0]);
-    },
-    tab() {
-      // TODO: shift+tab 减去缩进
-      document.execCommand("insertText", false, this.tabWidth());
-    },
-    enter(shift){
-      const cursorPosition = this.$refs.textarea.selectionStart;
-      let lineChar = '\n';
-      const currentLineStart = this.modelValue.lastIndexOf('\n',cursorPosition-1) + 1;
-      let end = currentLineStart;
-      while (end < cursorPosition){
-        const char = this.modelValue.charAt(end);
-        if(char === '\r' || char=== '\t' || char === ' '){
-          end++
-        }else{
-          break;
-        }
-      }
-      if(end > currentLineStart){
-        lineChar += this.modelValue.slice(currentLineStart,end);
-      }
-      if(shift){
-        // 向后寻找下一个\n
-        const currentLineEnd =  this.modelValue.indexOf('\n',cursorPosition + 1)
-        if(currentLineEnd === -1){
-          const temp = this.modelValue+lineChar;
-          this.cursorPosition = temp.length;
-          this.insertTab = true;
-          this.$emit("update:modelValue",temp)
-        }else{
-          const temp = this.modelValue.slice(0,currentLineEnd) + lineChar + this.modelValue.slice(currentLineEnd);
-          this.cursorPosition = currentLineEnd + lineChar.length;
-          this.insertTab = true;
-          this.$emit("update:modelValue",temp)
-        }
-      }else {
-        document.execCommand("insertText", false, lineChar);
-      }
     },
     calcScrollDistance(e) {
       this.$refs.code.scrolling = true;
@@ -315,44 +266,23 @@ export default {
       // displayed lineNum
       this.lineNum = lineNum;
     },
-    handleKeyDown(e){
-      if(e.key === 'Tab'){
+    handleNewKeyDown(e){
+      const change = handleCodeEditorKeyDown(e,{
+        content: this.modelValue,
+        cursorStart: this.$refs.textarea.selectionStart,
+        cursorEnd: this.$refs.textarea.selectionEnd
+      })
+      if(change){
         e.preventDefault();
-        this.tab();
-      }else if(e.key === 'Enter') {
-        e.preventDefault();
-        this.enter(e.shiftKey);
-      }else if(e.key === 'Backspace'){
-        let start = this.$refs.textarea.selectionStart;
-        if(start === this.$refs.textarea.selectionEnd && start < this.modelValue.length){
-          if(isMatchedWord(this.modelValue[start-1],this.modelValue[start])){
-            e.preventDefault()
-            this.cursorPosition = start -1;
-            this.insertTab = true;
-            this.$emit("update:modelValue",this.modelValue.slice(0,start-1)+this.modelValue.slice(start+1))
-          }else if(this.modelValue[start] === '\n' && this.modelValue[start-1] === '\n'){
-            if(isMatchedWord(this.modelValue[start-2],this.modelValue[start+1])){
-              e.preventDefault()
-              this.cursorPosition = start -1;
-              this.insertTab = true;
-              this.$emit("update:modelValue",this.modelValue.slice(0,start-1)+this.modelValue.slice(start+1))
-            }
-          }
-        }
-      }else if(e.key in MATCHED_WORDS){
-        e.preventDefault()
-        let start = this.$refs.textarea.selectionStart;
-        this.cursorPosition = start+1;
-        this.insertTab = true;
-        this.$emit("update:modelValue", this.modelValue.slice(0,start)
-            +e.key+ MATCHED_WORDS[e.key]
-            +this.modelValue.slice(start));
-      }else if(e.key in INVERSE_MATCHED_WORDS){
-        let start = this.$refs.textarea.selectionStart;
-        if(e.key === this.modelValue[start] && INVERSE_MATCHED_WORDS[e.key] === this.modelValue[start-1]){
-          this.cursorPosition = start+1;
+        const isContentUpdate = change.changeType === 'all' || change.changeType === 'content';
+        const isCursorUpdate = change.changeType === 'all' || change.changeType === 'cursor';
+        if(isContentUpdate){
+          this.cursorPosition = change.newCursorPosition;
+          this.insertTab = true;
+          this.$emit("update:modelValue",change.newContent)
+        }else if(isCursorUpdate){
+          this.cursorPosition = change.newCursorPosition;
           this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
-          e.preventDefault()
         }
       }
     }
