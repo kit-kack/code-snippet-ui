@@ -99,6 +99,7 @@ let lastTime = 0  // 时间
 function handleVimStatusBarClick(){
   if($reactive.currentMode === LIST_VIEW){
     if(showCount === 3){
+      configManager.set('easter_egg_log',true);
       statisticsShow.value = !statisticsShow.value
       showCount = 0;
     }else{

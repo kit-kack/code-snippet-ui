@@ -7,9 +7,6 @@
       <div v-if="isSvg(code)" class="image-render-svg" v-html="code"></div>
       <img v-else class="image-multi-render svg-as-image" :src="code" alt="图片加载失败了哦"/>
     </template>
-    <template v-else-if="configManager.get('strategy_item_code_raw')">
-      <pre class="item-code">{{code}}</pre>
-    </template>
     <template v-else-if="pair.valid">
       <highlightjs :language="pair.type" :autodetect="false" :code="code" width="100%" class="item-code"/>
     </template>
@@ -21,7 +18,6 @@
 
 <script setup>
 
-import {configManager} from "../../js/utools/config";
 import {$normal} from "../../js/store";
 import {onMounted, onUpdated, ref} from "vue";
 import {getRealTypeAndValidStatus} from "../../js/utils/language";

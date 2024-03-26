@@ -254,7 +254,7 @@ declare type ConfigItem =
       "strategy_theme"                           // 主题
     | "strategy_sort"                            // 排序策略： 0-创建时间  1-最近使用时间 2-累计使用次数 3-自然排序
     | "strategy_item_code_show"                  // 元素代码块显示策略 0-无 1-单行 2-多行
-    | "strategy_item_code_raw"                   // 元素代码块不高亮显示
+// @deprecated    | "strategy_item_code_raw"                   // 元素代码块不高亮显示
     | "default_tab"                              // 编辑界面Tab键行为： 0-原生 1-\t 2-2个空格 4-4个空格
     | "default_language"                         // 默认语言
     | "default_keyword_enable"                       // 默认是否启用uTools关键字
@@ -269,6 +269,8 @@ declare type ConfigItem =
     | "lite"                                     // 列表UI模式
     | "readme_close"                             // 说明文档显示
     | "pure_mode"                                // 纯净模式
+    | "easter_egg_log"                           // 彩蛋：日志
+
 
 
 interface CodeEditorSource {

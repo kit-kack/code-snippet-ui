@@ -78,8 +78,8 @@
     </div>
 
 
-    <div class="aspect">
-      <h4>本地数据统计（今日/七日/总计）</h4>
+    <div class="aspect" v-if="configManager.get('easter_egg_log')">
+      <h4 @click="handleLogClick">本地数据统计（今日/七日/总计）</h4>
       <p class="tooltip">由于插件在v2.7.2版本才开始统计，数据仅供参考</p>
       <div class="stat-container">
         <div class="stat-item" v-for="stat in statisticsManager.getStatistics()">
@@ -108,9 +108,6 @@
       </div>
 
     </div>
-
-
-    <div class="footer">code-snippet v{{defaultHelpSnippet.version}}</div>
   </div>
 </template>
 
@@ -125,12 +122,13 @@ import FuncPane from "../components/pane/FuncEditPane.vue";
 import {$reactive, refreshListView} from "../js/store";
 import CustomView from "../components/pane/CustomPane.vue";
 import {generate_backup, load_backup} from "../js/utools/backup";
-import {backupFilePath, defaultHelpSnippet} from "../js/some";
+import {backupFilePath} from "../js/some";
 import SpecialTagConfigModal from "../components/modal/SpecialTagConfigModal.vue";
 import SvgBackupImport from "../asserts/backup-import.svg";
 import SvgBackupExport from "../asserts/backup-export.svg";
 import {statisticsManager} from "../js/utools/statistics";
 import SearchPane from "../components/pane/side/SearchPane.vue";
+import {configManager} from "../js/utools/config";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
@@ -162,6 +160,18 @@ function handleImport(){
       load_backup(realPathList[0])
   }
 }
+let count = 0;
+function handleLogClick() {
+  if(count > 3){
+    return;
+  }
+  count++;
+  if(count > 3){
+    configManager.set('easter_egg_log',false);
+    $message.info("本地统计组件已隐藏~")
+    doRefresh();
+  }
+}
 
 
 </script>
@@ -186,6 +196,7 @@ function handleImport(){
 
     h4{
       margin-bottom: 10px;
+      user-select: none;
     }
 
     p.tooltip{
@@ -211,14 +222,6 @@ function handleImport(){
       }
     }
   }
-  .footer{
-    float: right;
-    font-size: 12px;
-    transform-origin: right;
-    transform: scale(0.8);
-
-  }
-
 }
 #light-app #side-view{
   .aspect{

@@ -27,7 +27,7 @@ import {refreshListView, refreshSearchResult} from "../../js/store";
 import ConfigSwitch from "../base/ConfigSwitch.vue";
 
 const colorSchemaRef = ref(configManager.get('strategy_theme')??0)
-const codeBlockRef = ref(getBlockRefInitValue())
+const codeBlockRef = ref(configManager.get('strategy_item_code_show')??0)
 const codeBlockOptions = [
   {
     label: '不展示',
@@ -36,32 +36,11 @@ const codeBlockOptions = [
     label: '单行显示',
     value: 1
   },{
-    label: '单行显示-无高亮',
-    value: 3
-  },{
     label: '多行显示',
     value: 2
-  },{
-    label: '多行显示-无高亮',
-    value: 4
   }
 ]
-function getBlockRefInitValue(){
-  let value = configManager.get('strategy_item_code_show')??0;
-  if(value > 0){
-    if(configManager.get('strategy_item_code_raw')){
-      value += 2;
-    }
-  }
-  return value
-}
 function handleCodeBlockChange(v){
-  if(v >= 3){
-    configManager.set('strategy_item_code_raw',true);
-    v -= 2;
-  }else{
-    configManager.set('strategy_item_code_raw',false);
-  }
   configManager.set('strategy_item_code_show',v)
   refreshListView(true)
 }
