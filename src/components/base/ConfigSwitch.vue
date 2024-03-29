@@ -1,23 +1,14 @@
 <template>
-  <n-space >
+  <span>
+    <n-switch @update:value="updateConfigValue" :default-value="configManager.get(config)"/>&nbsp;
     {{ title }}
-    <template v-if="props.icon">
-      <n-switch @update:value="updateConfigValue" :default-value="configManager.get(config)">
-        <template #icon>
-          {{icon}}
-        </template>
-      </n-switch>
-    </template>
-    <template v-else>
-      <n-switch @update:value="updateConfigValue" :default-value="configManager.get(config)"/>
-    </template>
-  </n-space>
+  </span>
 </template>
 
 <script setup>
 import {configManager} from "../../js/utools/config";
 
-const props = defineProps(['config','title','icon'])
+const props = defineProps(['config','title'])
 const emit = defineEmits(['refresh'])
 
 /**

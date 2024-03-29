@@ -12,12 +12,9 @@
       <n-checkbox :focusable="false" :checked="betaSearchAspects.desc" @update:checked="handleChangeBetaSearchAspects('desc',$event)">描述</n-checkbox>
       <n-checkbox :focusable="false" :checked="betaSearchAspects.content" @update:checked="handleChangeBetaSearchAspects('content',$event)">普通片段代码</n-checkbox>
     </n-space>
-    <n-tooltip width="trigger">
-      <template #trigger>
-        <config-switch title="💡搜索子代码片段" config="beta_sub_snippet_search"/>
-      </template>
+    <config-tooltip-switch title="搜索子代码片段" config="beta_sub_snippet_search">
       开启后，可以通过 <span class="kitx-italic">name$num</span> 搜索复制粘贴 <span class="kitx-italic">name</span> 对应的<span class="kitx-italic">num</span> 号子代码片段
-    </n-tooltip>
+    </config-tooltip-switch>
   </n-space>
 </template>
 
@@ -25,8 +22,8 @@
 
 import {configManager} from "../../../js/utools/config";
 import {refreshSearchResult} from "../../../js/store";
-import ConfigSwitch from "../../base/ConfigSwitch.vue";
 import {ref} from "vue";
+import ConfigTooltipSwitch from "../../base/ConfigTooltipSwitch.vue";
 
 const betaSearchAspects = ref({
   desc: !configManager.get('beta_wide_desc_close'),

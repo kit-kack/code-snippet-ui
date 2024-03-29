@@ -69,7 +69,7 @@
                 <p class="func-impl-preset-content">}
                   <n-tooltip>
                     <template #trigger>
-                      <n-icon>
+                      <n-icon class="global-color">
                         <svg-tip/>
                       </n-icon>
                     </template>
@@ -87,14 +87,14 @@
 </template>
 <script setup>
 import {h, ref, toRaw} from "vue";
-import {formatManager} from "../../js/utools/func";
-import {getRefreshFunc} from "../../js/utils/common";
-import {$reactive} from "../../js/store";
-import BaseModal from "../modal/BaseModal.vue";
-import CodeEditor from "../code-editor/MyCodeEditor.vue";
-import SvgEdit from "../../asserts/edit.svg"
-import SvgDelete from "../../asserts/delete.svg"
-import SvgTip from "../../asserts/tip.svg"
+import {formatManager} from "../../../js/utools/func";
+import {getRefreshFunc} from "../../../js/utils/common";
+import {$reactive} from "../../../js/store";
+import BaseModal from "../../modal/BaseModal.vue";
+import CodeEditor from "../../code-editor/MyCodeEditor.vue";
+import SvgEdit from "../../../asserts/edit.svg"
+import SvgDelete from "../../../asserts/delete.svg"
+import SvgTip from "../../../asserts/tip.svg"
 
 const activeKey = ref(null)
 const pair = ref({})

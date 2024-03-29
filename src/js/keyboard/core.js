@@ -80,6 +80,13 @@ export const GLOBAL_KEYBOARD_HANDLER = {
             }
             // 提供参数
             const ext = this.getExt(e)
+            // 禁用ctrl shift alt
+            if(ext.code === 'ControlLeft' || ext.code === 'ShiftLeft' || ext.code === 'AltLeft'
+                || ext.code === 'ControlRight' || ext.code === 'ShiftRight' || ext.code === 'AltRight') {
+                e.returnValue = false;
+                e.keycode = 0;
+                return false;
+            }
             // 快捷键界面场景
             if($reactive.common.shortcutActive){
                 K_SHORTCUT_DOWN(ext) && e.preventDefault();

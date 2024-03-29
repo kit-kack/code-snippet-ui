@@ -79,7 +79,8 @@
 <script>
 import hljs from "../../js/dep/highlight-dep";
 import {handleCodeEditorKeyDown} from "./key-handler";
-
+import {useHistory} from "./history";
+// import {useHistory} from "./history";
 export default {
   name: "CodeEditor",
   props: {
@@ -185,6 +186,23 @@ export default {
     },
   },
   data() {
+    const {undo,redo,record} = useHistory((change)=>{
+      if(change){
+        const isContentUpdate = change.changeType === 'all' || change.changeType === 'content';
+        const isCursorUpdate = change.changeType === 'all' || change.changeType === 'cursor';
+        if(isContentUpdate){
+          this.cursorPosition = change.newCursorPosition;
+          this.insertTab = true;
+          this.$emit("update:modelValue",change.newContent)
+        }else if(isCursorUpdate){
+          this.cursorPosition = change.newCursorPosition;
+          this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
+        }
+      }
+    });
+    this.undo = undo
+    this.redo = redo
+    this.record = record
     return {
       scrollBarWidth: 0,
       scrollBarHeight: 0,
@@ -211,10 +229,27 @@ export default {
     },
   },
   methods: {
+    insertCommand(command){
+      const cursorPosition = this.$refs.textarea.selectionStart;
+      const newContent = this.modelValue.slice(0,cursorPosition) + command + this.modelValue.slice(cursorPosition);
+      this.cursorPosition = cursorPosition +  command.length;
+      this.insertTab = true;
+      this.$emit("update:modelValue",newContent)
+      this.record({
+        changeType: "all",
+        newContent: newContent,
+        newCursorPosition: this.cursorPosition
+      })
+    },
     updateValue(e) {
       if (this.modelValue == undefined) {
         this.content = e.target.value;
       } else {
+        this.record({
+          changeType: "all",
+          newContent: e.target.value,
+          newCursorPosition: this.$refs.textarea.selectionStart
+        })
         this.$emit("update:modelValue", e.target.value);
       }
     },
@@ -267,6 +302,16 @@ export default {
       this.lineNum = lineNum;
     },
     handleNewKeyDown(e){
+      // 优先处理 ctrl+z ctrl+y
+      if(e.ctrlKey || e.metaKey){
+        if(e.key === 'z'){
+          e.preventDefault();
+          this.undo();
+        }else if(e.key === 'y'){
+          e.preventDefault();
+          this.redo();
+        }
+      }
       const change = handleCodeEditorKeyDown(e,{
         content: this.modelValue,
         cursorStart: this.$refs.textarea.selectionStart,
@@ -280,9 +325,11 @@ export default {
           this.cursorPosition = change.newCursorPosition;
           this.insertTab = true;
           this.$emit("update:modelValue",change.newContent)
+          this.record(change)
         }else if(isCursorUpdate){
           this.cursorPosition = change.newCursorPosition;
           this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
+          this.record(change)
         }
       }
     }
@@ -305,7 +352,7 @@ export default {
         this.getLineNum();
       }
     }
-  },
+  }
 };
 </script>
 

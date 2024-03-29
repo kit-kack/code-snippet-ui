@@ -164,7 +164,10 @@ function _getVisiableBlocks(selectors){
   return result
 }
 function adjustCenterPre(tab){
-  const pres = _getVisiableBlocks(".v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre");
+  const pres = _getVisiableBlocks(
+      props.isSideView? "#lite-code-view .v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre"
+          :"#code-view .v-md-editor-preview > .github-markdown-body .v-md-pre-wrapper > pre"
+  );
   if(pres.length === 0){
     $normal.md.pre = null;
     $normal.md.index = null;
@@ -578,7 +581,7 @@ onUnmounted(()=>{
   color: #ccc !important;
 
   div[class*=v-md-pre-wrapper-]{
-    background-color: #242425;
+    background-color: #303133;
   }
 
   table{

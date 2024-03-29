@@ -35,30 +35,33 @@
 
     <div class="aspect">
       <h4 id="beta">Beta功能</h4>
-      <p class="tooltip">下列拓展功能，目前处于测试中，不保证最终可用性</p>
+      <p class="tooltip">下列拓展功能为<span style="color:#d03050">非正式功能</span>，不保证最终可用性</p>
       <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>
-      <n-popover :show-arrow="false">
-        <template #trigger>
+      <config-tooltip-switch title="特殊标签" config="beta_special_tag">
+        开启后，为代码片段添加<span class="kitx-italic">VSCode</span> 标签即可写入<span class="kitx-italic">VSCode</span> 代码片段中，<span class="kitx-italic">IDEA</span>、<span class="kitx-italic">Sublime Text</span> 等同理
+        <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
+      </config-tooltip-switch>
+<!--      <n-popover :show-arrow="false" width="trigger">-->
+<!--        <template #trigger>-->
 <!--          <n-space>-->
             <!--              <config-check-tag title="💡搜索子代码片段" config="beta_sub_snippet_search" @mouseover="configIndex = 0"/>-->
-            <config-check-tag title="💡特殊标签" config="beta_special_tag" @mouseover="configIndex = 1"/>
+<!--          <config-switch title="💡特殊标签" config="beta_special_tag"/>-->
             <!--              <config-check-tag title="💡扩充搜索范围" config="beta_wide_snippet_search" @mouseover="configIndex = 2"/>-->
 
 <!--          </n-space>-->
-        </template>
+<!--        </template>-->
         <!--          <template v-if="configIndex === 0">-->
         <!--            开启后，可以通过 <span class="global-color">name$num</span> 搜索复制粘贴 <span class="global-color">name</span>对应的<span class="global-color">num</span>号子代码片段-->
         <!--          </template>-->
         <!--          <template v-else-if="configIndex === 1">-->
-        开启后，为代码片段添加<span class="kitx-italic">VSCode</span> 标签即可写入<span class="kitx-italic">VSCode</span> 代码片段中，<span class="kitx-italic">IDEA</span>、<span class="kitx-italic">Sublime Text</span> 等同理
-        <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
+
         <!--          </template>-->
         <!--          <template v-else>-->
         <!--            开启后，<span class="global-color">name</span>在原有匹配基础上，还将匹配-->
         <!--            <n-checkbox :focusable="false" :checked="betaSearchAspects.desc" @update:checked="handleChangeBetaSearchAspects('desc',$event)">描述</n-checkbox>-->
         <!--            <n-checkbox :focusable="false" :checked="betaSearchAspects.content" @update:checked="handleChangeBetaSearchAspects('content',$event)">代码（仅支持普通代码片段）</n-checkbox>-->
         <!--          </template>-->
-      </n-popover>
+<!--      </n-popover>-->
     </div>
 
     <div class="aspect">
@@ -74,7 +77,7 @@
     <div class="aspect">
       <h4 id="func">占位符管理</h4>
       <p class="tooltip">若内置占位符不满足需求，可以创建你的自定义占位符</p>
-      <func-pane/>
+      <func-edit-pane/>
     </div>
 
 
@@ -115,12 +118,11 @@
 import {tagColorManager} from "../js/utools/tag";
 import {ref} from "vue";
 import NormalTag from "../components/base/NormalTag.vue";
-import ConfigCheckTag from "../components/base/ConfigCheckTag.vue";
 import {NButton} from "naive-ui";
 import {getRefreshFunc} from "../js/utils/common";
-import FuncPane from "../components/pane/FuncEditPane.vue";
+import FuncEditPane from "../components/pane/side/FuncEditPane.vue";
 import {$reactive, refreshListView} from "../js/store";
-import CustomView from "../components/pane/CustomPane.vue";
+import CustomView from "../components/pane/side/CustomPane.vue";
 import {generate_backup, load_backup} from "../js/utools/backup";
 import {backupFilePath} from "../js/some";
 import SpecialTagConfigModal from "../components/modal/SpecialTagConfigModal.vue";
@@ -129,6 +131,7 @@ import SvgBackupExport from "../asserts/backup-export.svg";
 import {statisticsManager} from "../js/utools/statistics";
 import SearchPane from "../components/pane/side/SearchPane.vue";
 import {configManager} from "../js/utools/config";
+import ConfigTooltipSwitch from "../components/base/ConfigTooltipSwitch.vue";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
@@ -225,9 +228,12 @@ function handleLogClick() {
 }
 #light-app #side-view{
   .aspect{
-    border: 1px solid #efeff2;
+    //border: 1px solid #efeff2;
+    box-shadow: rgba(50, 50, 105, 0.15) 0 2px 5px 0, rgba(0, 0, 0, 0.05) 0 1px 1px 0;
+
+
     &:hover{
-      box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px;
+      box-shadow: rgba(9, 30, 66, 0.25) 0 4px 8px -2px, rgba(9, 30, 66, 0.08) 0 0 0 1px;
     }
 
 

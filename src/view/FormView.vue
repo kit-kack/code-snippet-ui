@@ -310,7 +310,9 @@ const formProperties = GLOBAL_HIERARCHY.currentConfig.form;
 const properties = formProperties.allowUpdatedProperties;
 const placeholders = formProperties.placeholders;
 const edit = $reactive.currentMode === EDIT_VIEW;
-const codeTemplate = reactive(edit?{...toRaw($reactive.currentSnippet)} :{
+const codeTemplate = reactive(edit?{
+  code: "",
+  ...toRaw($reactive.currentSnippet)} :{
   code: $normal.quickCode ?? "",
   keyword: configManager.get('default_keyword_enable')
 })
@@ -551,7 +553,6 @@ function handleUpdate(){
 }
 function requestFullScreen(isFullScreen) {
   if(isFullScreen){
-    // codeEditorRef.value.$el.requestFullscreen()
     $reactive.form.fullScreen = true;
   }else {
     // document.exitFullscreen();
@@ -666,15 +667,16 @@ function keyDownHandler(e){
 }
 function handleChooseCommand(command){
   showFuncModal.value = false;
-  if(codeTemplate.code){
-    const start =codeEditorRef.value.$refs.textarea.selectionStart;
-    codeTemplate.code =
-        codeTemplate.code.slice(0,start)
-        + "{{"+command+"}}"
-        +codeTemplate.code.slice(start)
-  }else{
-    codeTemplate.code = "{{"+command+"}}"
-  }
+  codeEditorRef.value.insertCommand("{{"+command+"}}");
+  // if(codeTemplate.code){
+  //   const start =codeEditorRef.value.$refs.textarea.selectionStart;
+  //   codeTemplate.code =
+  //       codeTemplate.code.slice(0,start)
+  //       + "{{"+command+"}}"
+  //       +codeTemplate.code.slice(start)
+  // }else{
+  //   codeTemplate.code = "{{"+command+"}}"
+  // }
 }
 function handleTypeChange(){
   if(GLOBAL_HIERARCHY.currentHierarchy.inline){
@@ -735,6 +737,7 @@ function importLocalFile(){
   if (realPathList != null) {
     const path = realPathList[0];
     codeTemplate.path = path;
+    codeTemplate.local = true;
     setSnippetNameWhenUrl(path);
     // 解析类型
     const index = path.lastIndexOf('.');
@@ -847,10 +850,12 @@ function importHierarchyJS(){
 function setAsNormalDir() {
   codeTemplate.dir = true;
   codeTemplate.ref = undefined;
+  codeTemplate.local = undefined;
 }
 function handleSetUrlAsPath(){
   if(url.value && isNetWorkUri(url.value)){
     codeTemplate.path = url.value;
+    codeTemplate.local = undefined;
     setSnippetNameWhenUrl(url.value);
     showInternetLinkModal.value = false;
   }else{
@@ -861,6 +866,7 @@ function handleClearPath(){
   codeTemplate.path = undefined;
   codeTemplate.dir = undefined;
   codeTemplate.ref = undefined;
+  codeTemplate.local = undefined;
 }
 </script>
 

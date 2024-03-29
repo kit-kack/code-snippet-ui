@@ -4,14 +4,19 @@
       {{data.title}}
     </n-divider>
     <n-list hoverable clickable :show-divider="false">
-      <template v-for="item in data.items">
+      <template v-for="(item,index) in data.items">
         <template v-if="item.tooltip">
-          <n-popover width="trigger">
+          <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
             <template #trigger>
               <n-list-item>
                 <div>
                   <div style="float: left;">
-                    💡{{item.feature}}
+                    {{item.feature}}
+                    <n-icon :class="{
+                      'global-color': popoverShow[index]
+                    }">
+                      <SvgTip/>
+                    </n-icon>
                   </div>
                   <div style="float: right;">
                     <template v-if="Array.isArray(item.shortcut)">
@@ -52,7 +57,9 @@
 
 <script setup>
 import {CtrlStr} from "../../js/some";
-
+import SvgTip from "../../asserts/tip.svg"
+import {reactive} from "vue";
+const popoverShow = reactive({})
 const shortcuts = [{
   title: "通用",
   items: [{

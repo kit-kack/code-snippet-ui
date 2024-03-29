@@ -91,7 +91,6 @@ import FormView from "./FormView.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {configManager} from "../js/utools/config";
 import TopNav from "../components/item/TopNav.vue";
-import {doScrollForListView} from "../js/utils/scroller";
 import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";
 import SvgAdd from "../asserts/add.svg";
 import SvgExpand from "../asserts/expand.svg";
@@ -103,28 +102,27 @@ const expanded = ref(false)
 window.$message = useMessage();
 window.$dialog = useDialog();
 const topNavShow = ref(true)
-watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.utools.searchRefreshValue],([search,prefix,value])=>{
-  GLOBAL_HIERARCHY.search(search).then(list => {
-    const isSameLength = $list.value.length === list.length;
-    if(isSameLength){
-      if(list.length === 0 && $reactive.utools.search){
-        // 不做任何改变
-        if(!$reactive.main.isFullScreenShow){
-          topNavShow.value = false;
-          utools.setExpendHeight(0)
-        }
-        return
+watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.utools.searchRefreshValue],async ([search,prefix,value])=>{
+  const list = await GLOBAL_HIERARCHY.search(search);
+  const isSameLength = $list.value.length === list.length;
+  if(isSameLength){
+    if(list.length === 0 && $reactive.utools.search){
+      // 不做任何改变
+      if(!$reactive.main.isFullScreenShow){
+        topNavShow.value = false;
+        utools.setExpendHeight(0)
       }
+      return
     }
-    topNavShow.value = true;
-    $list.value = list;
-    if($normal.keepSelectedStatus){
-      setTimeout(()=>{
-        doScrollForListView()
-      },100)
-    }
-    refreshListView()
-  })
+  }
+  topNavShow.value = true;
+  $list.value = list;
+  // if($normal.keepSelectedStatus){
+  //   queuePostFlushCb(()=>{
+  //     doScrollForListView();
+  //   })
+  // }
+  refreshListView()
 },{
   deep:true,
   immediate:true,

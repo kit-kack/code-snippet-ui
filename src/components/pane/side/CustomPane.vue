@@ -21,10 +21,10 @@
 
 <script setup>
 import {h, ref} from "vue";
-import {configManager} from "../../js/utools/config";
-import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../../js/theme";
-import {refreshListView, refreshSearchResult} from "../../js/store";
-import ConfigSwitch from "../base/ConfigSwitch.vue";
+import {configManager} from "../../../js/utools/config";
+import {adjustTheme, colorSchemaStyleOptions, darkColorSchemaStyleOptions, globalThemeRefresh} from "../../../js/theme";
+import {refreshListView, refreshSearchResult} from "../../../js/store";
+import ConfigSwitch from "../../base/ConfigSwitch.vue";
 
 const colorSchemaRef = ref(configManager.get('strategy_theme')??0)
 const codeBlockRef = ref(configManager.get('strategy_item_code_show')??0)
