@@ -39,14 +39,23 @@
         <svg-exit-fullscreen/>
       </template>
     </n-button>
-    <n-dropdown v-else size="small" placement="bottom-start" trigger="hover" :options="tagOptions" :render-icon="renderIcon" style="max-height: min(240px, calc(100vh * 0.7) )" :disabled="$reactive.currentMode !== LIST_VIEW" scrollable>
+    <n-dropdown v-else size="small"
+                placement="bottom"   scrollable :show="show"
+                :options="tagOptions" :render-icon="renderIcon"
+                width="22vw" trigger="manual" x="792" y="14"
+                @mouseenter="handleTagShow(true)" @mouseleave="handleTagShow(false,true)"
+                @select="show = false;"
+                style="max-height: min(240px, calc(100vh * 0.7) );"
+                :disabled="$reactive.currentMode !== LIST_VIEW">
+    </n-dropdown>
+    <span class="top-tag-info" @mouseenter="show = true" @mouseleave="handleTagShow(false)">
       <template v-if="$reactive.main.selectedTag === null">
         <n-button size="small" text style="font-weight: bold;font-size: 12px;height: 15px">ALL</n-button>
       </template>
       <template v-else>
         <normal-tag :content="$reactive.main.selectedTag" type="raw"/>
       </template>
-    </n-dropdown>
+    </span>
     <span> • {{word}} {{$reactive.main.isFullScreenShow? '◈': '◇'}}</span>
   </div>
 </template>
@@ -62,6 +71,7 @@ import {replaceOrAddTag} from "../../js/utils/resolve";
 import {tagColorManager} from "../../js/utools/tag";
 const word = ref(0);
 const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
+const show = ref(false);
 let timer = null;
 watch([()=>$list.value,()=>$reactive.currentMode],(newValue)=>{
   if($reactive.currentMode === LIST_VIEW){
@@ -91,6 +101,21 @@ function clearCurrentPrefix(){
 function sliceCurrentPrefix(ind){
   if($reactive.currentMode === LIST_VIEW){
     GLOBAL_HIERARCHY.changeHierarchy("custom",ind);
+  }
+}
+let showTimer = null;
+function handleTagShow(showFlag){
+  if(showFlag){
+    if(showTimer){
+      clearTimeout(showTimer)
+      showTimer = null
+    }
+    show.value = true
+  }else{
+    showTimer = setTimeout(()=>{
+      show.value = false;
+      showTimer = null
+    },200)
   }
 }
 const renderIcon = (option) => {
@@ -164,6 +189,9 @@ const tagOptions = computed(()=>{
   font-size: 12px;
   line-height: 1.0;
 }
+#top-nav :deep(.n-dropdown){
+  --n-padding: 0 !important;
+}
 .snippet-count-info{
   position: fixed;
   right: 10px;
@@ -195,6 +223,16 @@ const tagOptions = computed(()=>{
 #dark-app{
   .snippet-count-info{
     color: #d9d9da;
+  }
+}
+.top-tag-info{
+  position: relative;
+  .top-tag-btn{
+    position: absolute;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    z-index: 10000;
   }
 }
 

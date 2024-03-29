@@ -2,7 +2,7 @@
 
 新版本速览✨
 
-1. <span style="color:#209a6e">改进</span> 占位符运行环境以及识别处理
+1. <span style="color:#209a6e">改进</span> 占位符运行环境为Node.js场景
 2. <span style="color:#5eacee">完善</span> 一些界面处理逻辑
 ---
 

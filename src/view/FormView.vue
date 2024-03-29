@@ -267,7 +267,11 @@
   <n-modal v-model:show="showCustomHiearchyModal" preset="card" title="自定义目录" style="width: 66%" :auto-focus="false">
     <n-popover>
       <template #trigger>
-        <n-button @click="importHierarchyJS" quaternary type="primary" >💡本地代码实现</n-button>
+        <n-button @click="importHierarchyJS" quaternary type="primary" >本地代码实现
+          <template #icon>
+            <svg-tip/>
+          </template>
+        </n-button>
       </template>
       <n-button type="info" @click="utools_browser_open('https://flowus.cn/share/87c95fcc-e9f2-420d-a6d3-6578cd424e58')" text>查看教程</n-button>
     </n-popover>
@@ -296,6 +300,7 @@ import SvgCommand from "../asserts/command.svg";
 import SvgPath from "../asserts/path.svg";
 import SvgConf from "../asserts/conf.svg";
 import SvgDelete from "../asserts/delete.svg";
+import SvgTip from "../asserts/tip.svg";
 
 import {GLOBAL_HIERARCHY, loadValidHierarchyJS} from "../js/hierarchy/core";
 import {isXmlOrEscapeCharsExisting, isNetWorkUri} from "../js/utils/common";

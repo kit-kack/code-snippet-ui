@@ -69,9 +69,11 @@
                 <p class="func-impl-preset-content">}
                   <n-tooltip>
                     <template #trigger>
-                      <n-icon class="global-color">
-                        <svg-tip/>
-                      </n-icon>
+                      <n-button text size="tiny" :focusable="false">
+                        <template #icon>
+                          <svg-tip/>
+                        </template>
+                      </n-button>
                     </template>
                     tips:<br/>
                     1. 运行环境为<span class="global-color">Node.js</span>，可<span class="global-color">require</span>内置模块使用<br/>
