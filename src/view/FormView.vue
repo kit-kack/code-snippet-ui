@@ -220,7 +220,7 @@
                     </n-divider>
                     <n-button @click="importLocalDir" quaternary type="primary" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">本地目录</n-button>
                     <n-button @click="setAsNormalDir" quaternary type="info" >普通目录</n-button>
-                    <n-button @click="showCustomHiearchyModal = true" quaternary type="error" >自定义目录</n-button>
+                    <n-button @click="showCustomHiearchyModal = true" quaternary type="error" v-if="!GLOBAL_HIERARCHY.currentPrefixIdStr">自定义目录</n-button>
                   </template>
                 </template>
               </n-tab-pane>

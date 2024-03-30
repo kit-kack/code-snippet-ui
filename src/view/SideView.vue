@@ -7,13 +7,13 @@
       <p class="tooltip">uTools会员能够自动同步插件数据，无需手动备份同步</p>
       <n-space>
         <n-button strong secondary  type="primary"  @click="handleImport">
-          备份导入
+          导入备份
           <template #icon>
             <svg-backup-import/>
           </template>
         </n-button>
         <n-button  strong secondary  type="info"  @click="handleExport" >
-          生成备份
+          导出备份
           <template #icon>
             <svg-backup-export/>
           </template>
@@ -41,27 +41,6 @@
         开启后，为代码片段添加<span class="kitx-italic">VSCode</span> 标签即可写入<span class="kitx-italic">VSCode</span> 代码片段中，<span class="kitx-italic">IDEA</span>、<span class="kitx-italic">Sublime Text</span> 等同理
         <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
       </config-tooltip-switch>
-<!--      <n-popover :show-arrow="false" width="trigger">-->
-<!--        <template #trigger>-->
-<!--          <n-space>-->
-            <!--              <config-check-tag title="💡搜索子代码片段" config="beta_sub_snippet_search" @mouseover="configIndex = 0"/>-->
-<!--          <config-switch title="💡特殊标签" config="beta_special_tag"/>-->
-            <!--              <config-check-tag title="💡扩充搜索范围" config="beta_wide_snippet_search" @mouseover="configIndex = 2"/>-->
-
-<!--          </n-space>-->
-<!--        </template>-->
-        <!--          <template v-if="configIndex === 0">-->
-        <!--            开启后，可以通过 <span class="global-color">name$num</span> 搜索复制粘贴 <span class="global-color">name</span>对应的<span class="global-color">num</span>号子代码片段-->
-        <!--          </template>-->
-        <!--          <template v-else-if="configIndex === 1">-->
-
-        <!--          </template>-->
-        <!--          <template v-else>-->
-        <!--            开启后，<span class="global-color">name</span>在原有匹配基础上，还将匹配-->
-        <!--            <n-checkbox :focusable="false" :checked="betaSearchAspects.desc" @update:checked="handleChangeBetaSearchAspects('desc',$event)">描述</n-checkbox>-->
-        <!--            <n-checkbox :focusable="false" :checked="betaSearchAspects.content" @update:checked="handleChangeBetaSearchAspects('content',$event)">代码（仅支持普通代码片段）</n-checkbox>-->
-        <!--          </template>-->
-<!--      </n-popover>-->
     </div>
 
     <div class="aspect">

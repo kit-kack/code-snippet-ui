@@ -5,7 +5,7 @@
     <n-scrollbar x-scrollable style="max-width: 60vw"  :ref="(el)=> $normal.scroll.hierarchyInvoker = el">
       <n-breadcrumb style="padding-left: 10px" class="top-nav-item" >
         <n-breadcrumb-item  clickable @click="clearCurrentPrefix">
-          {{$reactive.main.isFullScreenShow ? '◈': '◇'}}
+          {{$reactive.main.isRecycleBinActive ? '🗑️': '◈'}}
         </n-breadcrumb-item>
         <n-breadcrumb-item v-for="(p,index) in $reactive.currentPrefix" clickable @click="sliceCurrentPrefix(index)">
           {{p}}
@@ -39,7 +39,17 @@
         <svg-exit-fullscreen/>
       </template>
     </n-button>
-    <n-dropdown v-else size="small"
+    <span v-else @mouseenter="show = true" @mouseleave="handleTagShow(false)">
+      <template v-if="$reactive.main.selectedTag === null">
+        <n-button size="small" text style="font-weight: bold;font-size: 12px;height: 15px" :focusable="false">
+          {{$reactive.main.isRecycleBinActive ? '回收站': 'ALL'}}
+        </n-button>
+      </template>
+      <template v-else>
+        <normal-tag :content="$reactive.main.selectedTag" type="raw"/>
+      </template>
+    </span>
+    <n-dropdown  size="small"
                 placement="bottom"   scrollable :show="show"
                 :options="tagOptions" :render-icon="renderIcon"
                 width="22vw" trigger="manual" x="792" y="14"
@@ -48,15 +58,7 @@
                 style="max-height: min(240px, calc(100vh * 0.7) );"
                 :disabled="$reactive.currentMode !== LIST_VIEW">
     </n-dropdown>
-    <span class="top-tag-info" @mouseenter="show = true" @mouseleave="handleTagShow(false)">
-      <template v-if="$reactive.main.selectedTag === null">
-        <n-button size="small" text style="font-weight: bold;font-size: 12px;height: 15px">ALL</n-button>
-      </template>
-      <template v-else>
-        <normal-tag :content="$reactive.main.selectedTag" type="raw"/>
-      </template>
-    </span>
-    <span> • {{word}} {{$reactive.main.isFullScreenShow? '◈': '◇'}}</span>
+    <span> • {{word}} {{$reactive.main.isRecycleBinActive ? '🗑️': '◈'}}</span>
   </div>
 </template>
 <script setup>
@@ -119,8 +121,10 @@ function handleTagShow(showFlag){
   }
 }
 const renderIcon = (option) => {
-  if(option.default){
+  if(option.default) {
     return '🌟'
+  }else if(option.recycle){
+    return '🗑️'
   }else{
     return h(
         'div',
@@ -143,16 +147,30 @@ const ALL_TAG = {
   props:{
     onClick:()=>{
       $reactive.main.selectedTag = null;
+      $reactive.main.isRecycleBinActive = false;
+      replaceOrAddTag($reactive.utools.search,null)
+    }
+  }
+}
+const RECYCLE_TAG = {
+  label: '回收站',
+  value: 'RECYCLE',
+  recycle: true,
+  props:{
+    onClick:()=>{
+      $reactive.main.isRecycleBinActive = true;
+      $reactive.main.selectedTag = null;
       replaceOrAddTag($reactive.utools.search,null)
     }
   }
 }
 const tagOptions = computed(()=>{
   if($reactive.main.tagSet.size=== 0){
-    return [ ALL_TAG];
+    return [ ALL_TAG, RECYCLE_TAG];
   }
   const tags = [
     ALL_TAG,
+      RECYCLE_TAG,
     {
       type: 'divider',
       key: 'divider'

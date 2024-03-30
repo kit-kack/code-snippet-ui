@@ -101,8 +101,8 @@ export const K_LISTVIEW_UP = (ext)=>{
             $reactive.utools.focused = true;
             break;
         case 'KeyT':
-            if($reactive.currentSnippet.help){
-                $message.warning('内置文档无法置顶');
+            if($reactive.currentSnippet.help || $reactive.main.isRecycleBinActive){
+                $message.warning('当前元素不支持 置顶');
             }else{
                 GLOBAL_HIERARCHY.update(null,"top");
                 $normal.keepSelectedStatus = true;

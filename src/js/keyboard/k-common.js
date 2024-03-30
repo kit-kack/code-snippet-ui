@@ -62,8 +62,8 @@ export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
             break;
         case 'KeyE':
         case 'KeyI':
-            if($reactive.currentSnippet.help){
-                $message.warning("内置文档，无法修改");
+            if($reactive.currentSnippet.help || $reactive.main.isRecycleBinActive){
+                $message.warning("当前元素不支持 编辑");
                 return;
             }
             if($reactive.common.shortcutActive){

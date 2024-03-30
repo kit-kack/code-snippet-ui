@@ -79,14 +79,17 @@
                color: '#888'
              }"
       >
+        <template v-if="$reactive.main.isRecycleBinActive">
+          剩余{{calculateExpiredDesc(snippet.expired)}} ~
+        </template>
         <template v-if="snippet.dir">
           <n-icon size="16" class="global-color"><svg-directory/></n-icon>
         </template>
         <template v-else-if="snippet.type === 'image' || snippet.type === 'svg'">
-        <n-icon size="16" class="global-color">
-          <svg-image/>
-        </n-icon>
-      </template>
+          <n-icon size="16" class="global-color">
+            <svg-image/>
+          </n-icon>
+        </template>
         <template v-else-if="snippet.link">
           <n-icon size="16" class="global-color"><svg-link/></n-icon>
         </template>
@@ -111,7 +114,10 @@
       <template v-else-if="isShowBtn">
         <div class="snippet-item-btn" >
           <n-space>
-            <selectable-button  :disabled="snippet.help || !GLOBAL_HIERARCHY.currentConfig?.edit"  :mid="305"  type="warning" tip="编辑" :index="0" @invoke="doEdit" >
+            <selectable-button v-if="$reactive.main.isRecycleBinActive"  :disabled="snippet.help"  :mid="305"  type="warning" tip="恢复" :index="0" @invoke="doResume" >
+              <svg-resume/>
+            </selectable-button>
+            <selectable-button v-else  :disabled="snippet.help || !GLOBAL_HIERARCHY.currentConfig?.edit"  :mid="305"  type="warning" tip="编辑" :index="0" @invoke="doEdit" >
               <svg-edit/>
             </selectable-button>
             <selectable-button  :mid="350" type="primary" tip="预览" :index="1" @invoke="doViewCode" >
@@ -124,12 +130,12 @@
               <svg-delete/>
             </selectable-button>
             <template v-if="props.snippet.index !== undefined">
-              <selectable-button :disabled="snippet.help" :mid="485"  type="primary"  color="#9b59b6" :index="4" tip="取消置顶" @invoke="handleCancelTop">
+              <selectable-button :disabled="snippet.help || $reactive.main.isRecycleBinActive" :mid="485"  type="primary"  color="#9b59b6" :index="4" tip="取消置顶" @invoke="handleCancelTop">
                 <svg-top-down/>
               </selectable-button>
             </template>
             <template v-else>
-              <selectable-button :disabled="snippet.help" :mid="485"  type="primary"  color="#9b59b6" :index="4" tip="置顶" @invoke="handleSetTop">
+              <selectable-button :disabled="snippet.help || $reactive.main.isRecycleBinActive" :mid="485"  type="primary"  color="#9b59b6" :index="4" tip="置顶" @invoke="handleSetTop">
                 <svg-top-up/>
               </selectable-button>
             </template>
@@ -157,9 +163,11 @@ import SvgTopDown from "../asserts/top-down.svg"
 import SvgImage from "../asserts/image.svg"
 import SvgDirectory from "../asserts/directory.svg"
 import SvgLink from "../asserts/link.svg"
+import SvgResume from "../asserts/resume.svg"
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {snippetCopyOrPaste} from "../js/keyboard/k-common";
-import {escapeHtmlExceptB} from "../js/utils/common";
+import {calculateExpiredDesc, calculateTime, escapeHtmlExceptB} from "../js/utils/common";
+import {hierachyHubManager} from "../js/utools/hub";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -272,7 +280,7 @@ const getSelectedStyle =(selected,isHoverRef)=>{
 
 
 function handleDelete(){
-  GLOBAL_HIERARCHY.remove(props.snippet)
+  GLOBAL_HIERARCHY.remove(props.snippet,$reactive.main.isRecycleBinActive);
   $index.value--;
   $normal.keepSelectedStatus = true;
   $reactive.main.isDel = false;
@@ -348,6 +356,10 @@ function doEdit(){
   // $reactive.currentName = props.snippet.name;
   // $va r.currentMode = UPDATE_VIEW;
   GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
+}
+function doResume(){
+  hierachyHubManager.resumeElement(props.snippet.id);
+  doItemRefresh();
 }
 function doItemRefresh(){
   $normal.keepSelectedStatus = true;

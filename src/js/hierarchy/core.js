@@ -238,8 +238,9 @@ export const GLOBAL_HIERARCHY = {
     /**
      *
      * @param {string} searchWord uTools子搜索框搜索内容
+     * @param {boolean} isRecycleBinModeActive
      */
-    async search(searchWord){
+    async search(searchWord,isRecycleBinModeActive) {
         let result;
         $normal.beta.subSnippetNum = undefined;
         let name = null;
@@ -312,7 +313,7 @@ export const GLOBAL_HIERARCHY = {
         let array;
         // sort
         if(result){
-            array = handleArrayForHierarchy(result,name,tags,type)
+            array = handleArrayForHierarchy(result,name,tags,type,isRecycleBinModeActive)
         }else{
             array = [];
         }
@@ -434,8 +435,17 @@ export const GLOBAL_HIERARCHY = {
     /**
      * 移除代码片段
      * @param {CodeSnippet} snippet
+     * @param {boolean} isRecycleBinModeActive
      */
-    remove(snippet){
+    remove(snippet,isRecycleBinModeActive){
+        // 内置普通目录才支持回收操作
+        // 其他目录会直接删除
+        if(!isRecycleBinModeActive && GLOBAL_HIERARCHY.currentHierarchy.core) {
+            // 内置目录 - 不处于回收站模式下
+            // 此时删除操作就是回收
+            hierachyHubManager.recycleElement(snippet.id);
+            return;
+        }
         try{
             this.currentHierarchy.remove?.(this.currentPrefixSnippetArrayTemp,snippet);
         }catch (e){
@@ -443,6 +453,7 @@ export const GLOBAL_HIERARCHY = {
         }
 
         // 移除 hub数据
+        hierachyHubManager.removeElement(snippet.id??snippet.name)
         if(snippet.dir){
             // 移除 整个hub
             if(this.currentPrefixIdStr){
@@ -450,9 +461,6 @@ export const GLOBAL_HIERARCHY = {
             }else{
                 deleteHub(snippet.id)
             }
-
-        }else{
-            hierachyHubManager.removeElement(snippet.id??snippet.name)
         }
     }
 }

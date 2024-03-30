@@ -7,17 +7,21 @@ import { clone as _clone } from "lodash-es"
  * - 处理 Top
  * - 处理 Count&Time
  * - 处理 Sections
+ * - 处理 Delete -- Recycle bin
  * - 处理 ...
  */
 const HIERARCHY_PREFIX = "hub/";
 const ROOT_HIERARCHY_PREFIX = "hub";
 
+// 7天时间戳
+const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
 
 
 
 /**
  * @typedef {Object} HierarchyHub
  * @property {string[]} topList - 记录置顶的代码片段列表
+ * @property {Object<string,number>} recycleBin - 记录删除的代码片段列表 - 剩余保存时间
  * @property {Object<string,{ count?: number,time?: number,sections?: Array<[number,number]> }>} snippets - 额外配置的数据
  */
 
@@ -210,7 +214,23 @@ export const hierachyHubManager = {
         if(this.currentHub.snippets){
             delete this.currentHub.snippets[name]
         }
+        // recycle bin
+        if(this.currentHub.recycleBin){
+            delete this.currentHub.recycleBin[name]
+        }
         // store
+        this.store()
+    },
+    recycleElement(name){
+        const recycleBin = this.currentHub.recycleBin ?? {};
+        recycleBin[name] = Date.now() + SEVEN_DAYS;
+        this.currentHub.recycleBin = recycleBin;
+        this.store()
+    },
+    resumeElement(name){
+        const recycleBin = this.currentHub.recycleBin ?? {};
+        delete recycleBin[name];
+        this.currentHub.recycleBin = recycleBin;
         this.store()
     },
     renameElment(oldName,newName){

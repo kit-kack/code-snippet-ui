@@ -65,7 +65,7 @@
     <template v-else>
       <n-tooltip trigger="hover" placement="left">
         <template #trigger>
-          <n-button strong circle type="primary" quaternary :color="configManager.getGlobalColor()" @click="expanded = true" >
+          <n-button :focusable="false" strong circle type="primary" quaternary :color="configManager.getGlobalColor()" @click="expanded = true" >
             <template #icon>
               <svg-arrow-up/>
             </template>
@@ -102,8 +102,12 @@ const expanded = ref(false)
 window.$message = useMessage();
 window.$dialog = useDialog();
 const topNavShow = ref(true)
-watch([()=>$reactive.utools.search,()=>$reactive.currentPrefix,()=> $reactive.utools.searchRefreshValue],async ([search,prefix,value])=>{
-  const list = await GLOBAL_HIERARCHY.search(search);
+watch([()=>$reactive.utools.search,
+  ()=>$reactive.currentPrefix,
+  ()=> $reactive.utools.searchRefreshValue,
+  ()=> $reactive.main.isRecycleBinActive
+],async ([search,prefix,value,isRecycleBinActive])=>{
+  const list = await GLOBAL_HIERARCHY.search(search,isRecycleBinActive);
   const isSameLength = $list.value.length === list.length;
   if(isSameLength){
     if(list.length === 0 && $reactive.utools.search){

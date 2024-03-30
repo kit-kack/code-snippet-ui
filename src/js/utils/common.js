@@ -79,6 +79,29 @@ export function calculateTime(time){
     return '现在';
 }
 
+export function calculateExpiredDesc(stamp){
+    if(stamp == null){
+        return '时间未知';
+    }
+    const timestamp = stamp/1000;
+    // 计算天数
+    let days = Math.trunc(timestamp/86400) + 1;
+    if(days > 1){
+        return days+'天';
+    }
+    // 计算小时
+    let hours = Math.trunc(timestamp/3600) + 1;
+    if(hours > 1){
+        return hours+'小时';
+    }
+    // 计算分钟
+    let minutes = Math.trunc(timestamp/60) + 1;
+    if(minutes > 1){
+        return minutes+'分钟';
+    }
+    return Math.trunc(timestamp%60)+'秒';
+}
+
 const networkRegex = /^\w+:\/\/.*/
 /**
  * 判断URI是否为网络URI
