@@ -120,7 +120,11 @@ export const K_LISTVIEW_UP = (ext)=>{
             break;
         case 'KeyV':
             if($reactive.currentSnippet.dir){
-                GLOBAL_HIERARCHY.changeHierarchy("next")
+                if($reactive.main.isRecycleBinActive){
+                    $message.warning("当前元素不支持 预览子元素");
+                }else{
+                    GLOBAL_HIERARCHY.changeHierarchy("next")
+                }
             }else if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
                 utools.shellOpenExternal($reactive.currentSnippet.path)
             }else{

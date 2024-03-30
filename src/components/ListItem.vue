@@ -120,7 +120,7 @@
             <selectable-button v-else  :disabled="snippet.help || !GLOBAL_HIERARCHY.currentConfig?.edit"  :mid="305"  type="warning" tip="编辑" :index="0" @invoke="doEdit" >
               <svg-edit/>
             </selectable-button>
-            <selectable-button  :mid="350" type="primary" tip="预览" :index="1" @invoke="doViewCode" >
+            <selectable-button :disabled="$reactive.main.isRecycleBinActive && snippet.dir"  :mid="350" type="primary" tip="预览" :index="1" @invoke="doViewCode" >
               <svg-view/>
             </selectable-button>
             <selectable-button :disabled="snippet.dir || snippet.link"  :mid="395"  type="info" tip="复制" :index="2" @invoke="snippetCopyOrPaste(false,false)" >
