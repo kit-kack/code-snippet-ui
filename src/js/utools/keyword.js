@@ -20,7 +20,7 @@ export function register_utools_keyword(snippet,prefix,nonNotify){
         let prefix = "快速粘贴片段"
         if(snippet.link){
             prefix = "📎快速跳转链接"
-        }else if(snippet.type === 'image'){
+        }else if(snippet.image || snippet.type === 'image'){
             prefix = "🖼️快速粘贴图片"
         }else if(snippet.type?.startsWith('x-')){
             prefix = "♾️"+ "快速粘贴片段"

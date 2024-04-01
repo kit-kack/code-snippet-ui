@@ -186,7 +186,7 @@ const handleRecoverLiteShow = ()=>{
 }
 /**
  * 临时需要切换成 完整UI模式
- * @param {boolean} persist 持久化
+ * @param {boolean} [persist] 持久化
  */
 const switchToFullUIMode = (persist)=>{
     if(!$reactive.main.isFullScreenShow){

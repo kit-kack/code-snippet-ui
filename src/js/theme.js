@@ -7,8 +7,9 @@ const theme = ref(utools.isDarkColors()? darkTheme:null);
 
 export function adjustLightDarkTheme(){
     const id = document.body.id;
+    const lightId = utools.getAppVersion().startsWith('4.') ? 'light-app':'light-app-v5';
     if(id){
-        const newId = utools.isDarkColors()? "dark-app":"light-app";
+        const newId = utools.isDarkColors()? "dark-app":lightId;
         if(id !== newId){
             document.body.id = newId;
             theme.value = utools.isDarkColors()? darkTheme:null;
@@ -16,7 +17,7 @@ export function adjustLightDarkTheme(){
             globalThemeRefresh()
         }
     }else{
-        document.body.id = utools.isDarkColors()? "dark-app":"light-app";
+        document.body.id = utools.isDarkColors()? "dark-app":lightId;
     }
 }
 

@@ -71,7 +71,7 @@ export function handleArrayForHierarchy(result,name,tag,type,isRecycleBinModeAct
         // determine recycle
         if(isRecycleBinModeActive){
             if(id in recycleBin){
-                item.expired = recycleBin[id] - timeStamp;
+                item.expired = recycleBin[id].expired - timeStamp;
                 if(item.expired < 0){
                     // TODO: 过期处理
                     GLOBAL_HIERARCHY.remove(snippet,true);

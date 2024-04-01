@@ -95,6 +95,7 @@ module.exports = {
     init(conf){
         this._conf = conf;
         this.requestInfo = getRequestInfo(conf);
+        this.subModuleLoaded = undefined;
     },
     /**
      *

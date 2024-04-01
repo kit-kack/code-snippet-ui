@@ -1,7 +1,10 @@
 <template>
   <n-scrollbar style="max-height: 180px" x-scrollable trigger="hover" class="item-code-scroller" ref="itemCodeScrollBar">
-    <template v-if="pair.type === 'image'">
-      <img loading="lazy" class="image-multi-render" :src="code" alt="图片加载失败了哦"/>
+    <template v-if="props.imgId">
+      <utools-image :id="props.imgId" class="image-multi-render"/>
+    </template>
+    <template v-else-if="pair.type === 'image'">
+      <img loading="lazy" class="image-multi-render"  :src="code" alt="图片加载失败了哦"/>
     </template>
     <template v-else-if="pair.type === 'svg'">
       <div v-if="isSvg(code)" class="image-render-svg" v-html="code"></div>
@@ -22,9 +25,10 @@ import {$normal} from "../../js/store";
 import {onMounted, onUpdated, ref} from "vue";
 import {getRealTypeAndValidStatus} from "../../js/utils/language";
 import {isSvg} from "../../js/utils/common";
+import UtoolsImage from "./UtoolsImage.vue";
 
 
-const props = defineProps(['code','type','active']);
+const props = defineProps(['code','type','active','imgId']);
 const pair = ref(getRealTypeAndValidStatus(props.type))
 const itemCodeScrollBar = ref();
 onUpdated(()=>{

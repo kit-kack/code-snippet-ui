@@ -44,7 +44,7 @@ export const rootHierachy = {
     checkNameRepeat(prefix,name){
         return codeSnippetManager.contain(name,GLOBAL_HIERARCHY.currentPrefixIdStr)
     },
-    createOrEdit(prefix,snippet,oldName){
+    async createOrEdit(prefix,snippet,oldName){
         // editor
         if(configManager.get('beta_special_tag')){
             SPECIAL_TAG_HANDLER.accept(snippet,true)
@@ -61,10 +61,10 @@ export const rootHierachy = {
         }
         if(oldName){
             // update
-            codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)
+            await codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)
         }else{
             // add
-            codeSnippetManager.add(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)
+            await codeSnippetManager.add(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr)
         }
     },
     remove(prefix,snippet){

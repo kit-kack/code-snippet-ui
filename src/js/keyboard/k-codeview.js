@@ -127,7 +127,7 @@ export const K_CODEVIEW_UP = (ext)=>{
             }
             break;
         case 'KeyR':
-            if($reactive.currentSnippet.type === 'image'){
+            if($reactive.currentSnippet.image || $reactive.currentSnippet.type === 'image'){
                 return;
             }
             $reactive.code.isRendering = !$reactive.code.isRendering;

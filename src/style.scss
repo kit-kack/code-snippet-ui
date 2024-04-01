@@ -11,8 +11,16 @@
   --scrollbar-thumb-background-color: #ccc;
 
   --item-code-text-color: #a9a8a8;
-  --item-code-scroller-border-color: #ccc;
+  --item-code-scroller-border-color: #e0e0e0;
 
+}
+#light-app-v5{
+  --utools-background-color: #f4f4f4;
+  --plugin-background-color: #f5f5f5;
+  --plugin-text-selected-background-color: rgba(0,0,0,.15);
+  --scrollbar-thumb-background-color: #ccc;
+  --item-code-text-color: #a9a8a8;
+  --item-code-scroller-border-color: #e0e0e0;
 }
 #dark-app{
   --utools-background-color: #303133;
@@ -49,6 +57,9 @@
 }
 body#light-app{
   background-color: var(--plugin-background-color);
+}
+body#light-app-v5{
+  background-color: var(--utools-background-color);
 }
 .snippet-item  b{
   color: var(--global-color);
@@ -146,4 +157,7 @@ span.shortcut{
   margin-left: 5px;
   border-radius: 5px;
   background: rgba(191, 208, 229, 0.2) !important;
+}
+#light-app-v5 span.shortcut{
+  background: #eaeef2 !important;
 }

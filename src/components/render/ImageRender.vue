@@ -1,6 +1,12 @@
 <template>
   <div class="image-render">
-    <template v-if="type === 'svg-code'">
+    <template v-if="imgId">
+       <utools-image :id="imgId" :style="{
+        maxHeight: '80vh',
+        maxWidth: '90vw',
+      transform: `translate(${x}px,${y}px)  scale( calc(${rate}/100))  rotate(${deg}deg) `}"/>
+    </template>
+    <template v-else-if="type === 'svg-code'">
       <div class="image-render-svg"
            :style="{
       transform: `translate(${x}px,${y}px)  scale( calc(${rate}/100))  rotate(${deg}deg) `
@@ -23,11 +29,13 @@ import {onMounted, onUnmounted, ref} from "vue";
 import {RENDER_KEYHANDLER} from "../../js/keyboard/k-codeview";
 import {Direction} from "../../js/utils/scroller";
 import {SIDE_RENDER_KEYHANDLER} from "../../js/keyboard/k-listview";
+import UtoolsImage from "../item/UtoolsImage.vue";
 
 const props = defineProps({
   url: String,
   type: String, // image / svg-code / svg-url
-  isSideView: Boolean
+  isSideView: Boolean,
+  imgId: String
 });
 const rate = ref(100)
 const deg = ref(0)
@@ -183,6 +191,9 @@ onUnmounted(()=>{
   background-size: 20px 20px;
   /* 第二背景的偏移定位值必须是贴片宽高的一半 30/2 */
   background-position: 0 0, 10px 10px;
+}
+#light-app-v5 #code-view.dot-bg{
+  background-image: radial-gradient(#ccc 20%, transparent 0), radial-gradient(#e0e0e0 20%, transparent 0);
 }
 #dark-app #code-view.dot-bg{
   background-image: radial-gradient(#444 20%, transparent 0), radial-gradient(#444 20%, transparent 0);

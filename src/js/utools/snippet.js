@@ -68,7 +68,7 @@ export const codeSnippetManager = {
      * @param {CodeSnippet} codeSnippet
      * @param {string | null} [prefix]
      */
-    add(codeSnippet,prefix){
+    async add(codeSnippet,prefix){
         if(codeSnippet.help){
             $message.error("用户无法主动创建内置说明片段")
             return false;
@@ -77,6 +77,7 @@ export const codeSnippetManager = {
         codeSnippet.count = codeSnippet.count??0;
         codeSnippet.createTime = Date.now()
         codeSnippet.time = codeSnippet.time??codeSnippet.createTime;
+        await this.uploadImage(codeSnippet);
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix);
             this.snippetMap.set(codeSnippet.id,codeSnippet);
@@ -104,6 +105,7 @@ export const codeSnippetManager = {
             this.prepareForPrefixSnippetMap(prefix);
             snippet = this.snippetMap.get(id);
             if(snippet){
+                this.removeImage(snippet);
                 utools.db.remove(SUB_CODE_PREFIX+prefix+"#"+id)
                 this.snippetMap.delete(id)
             }
@@ -111,6 +113,7 @@ export const codeSnippetManager = {
             // 先查询是否存在
             snippet= this.rootSnippetMap.get(id);
             if(snippet){
+                this.removeImage(snippet);
                 utools.db.remove(CODE_PREFIX+id)
                 this.rootSnippetMap.delete(id)
             }
@@ -152,14 +155,54 @@ export const codeSnippetManager = {
         return false
     },
     /**
+     * @param {CodeSnippet} snippet
+     */
+    async uploadImage(snippet){
+        if(snippet.imgUrl){
+            // upload
+            const type = snippet.format ?? 'image/png';
+            const id = 'attachment/'+Date.now() ;
+            let result;
+            if(snippet.nativeImage){
+                result = utools.db.postAttachment(id,snippet.nativeImage.toPNG(),type)
+            }else if(snippet.imageItem){
+                console.log(snippet.imageItem)
+                let data = await snippet.imageItem.arrayBuffer();
+                result = utools.db.postAttachment(id, data,type)
+                data = null;
+            }else {
+                throw "图片资源获取失败"
+            }
+            if(result.ok){
+                this.removeImage(snippet);
+                snippet.nativeImage = undefined;
+                snippet.imgUrl  = undefined;
+                snippet.imgId = id;
+                snippet.format = undefined;
+                snippet.imageItem = undefined;
+            }else{
+                // throw "图片体积过大，超过1M限制，保存失败！";
+                throw  result.message;
+            }
+        }
+    },
+    removeImage(snippet){
+      if(snippet.image && snippet.imgId){
+        utools.db.remove(snippet.imgId);
+        snippet.imgId = undefined;
+        snippet.image = undefined;
+      }
+    },
+    /**
      *
      * @param { CodeSnippet } codeSnippet
      * @param {string | null} prefix
      */
-    update(codeSnippet,prefix){
+    async update(codeSnippet,prefix){
         if(prefix){
             this.prepareForPrefixSnippetMap(prefix)
             if(this.snippetMap.has(codeSnippet.id)) {
+                await this.uploadImage(codeSnippet)
                 utools_db_store(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id, codeSnippet)
                 this.snippetMap.set(codeSnippet.id, codeSnippet)
                 this.addTagInfo(codeSnippet, true)
@@ -168,9 +211,11 @@ export const codeSnippetManager = {
                 }else{
                     delete_utools_keyword(codeSnippet,prefix)
                 }
+                return;
             }
         }else{
             if(this.rootSnippetMap.has(codeSnippet.id)) {
+                await this.uploadImage(codeSnippet)
                 utools_db_store(CODE_PREFIX + codeSnippet.id, codeSnippet)
                 this.rootSnippetMap.set(codeSnippet.id, codeSnippet)
                 this.addTagInfo(codeSnippet, true)
@@ -179,8 +224,10 @@ export const codeSnippetManager = {
                 }else{
                     delete_utools_keyword(codeSnippet,prefix)
                 }
+                return;
             }
         }
+        throw "找不到对应的代码片段"
     },
     /**
      * 指定目录层级搜索
@@ -308,6 +355,11 @@ export const codeSnippetManager = {
                         zip.file(`${dirname}/custom/${count}.custom.js`,window.preload.readFile(doc.data.path).toString())
                     }catch (_){}
                 }
+            }else if(doc.data.image){
+                try{
+
+                    zip.file(`${dirname}/image/${count}.image.png`,utools.db.getAttachment(doc.data.imgId))
+                }catch (_){}
             }
             zip.file(`${dirname}/${count}.json`,JSON.stringify({
                 data: doc.data,
@@ -317,10 +369,18 @@ export const codeSnippetManager = {
             count++;
         }
         for (const doc of utools.db.allDocs(SUB_CODE_PREFIX)) {
-            zip.file(`${dirname}/${count++}.json`,JSON.stringify({
+            if(doc.data.image){
+                try{
+
+                    zip.file(`${dirname}/image/${count}.image.png`,utools.db.getAttachment(doc.data.imgId))
+                }catch (_){}
+            }
+            zip.file(`${dirname}/${count}.json`,JSON.stringify({
                 data: doc.data,
-                _id: doc._id
+                _id: doc._id,
+                count: count
             }))
+            count++;
         }
     },
     async load(zip,dirname){
@@ -345,11 +405,22 @@ export const codeSnippetManager = {
                             }
                         }
                     }
+                    if(obj.data.image){
+                        const imageZip = zip.file(`${dirname}/image/${obj.count}.image.png`)
+                        if(imageZip){
+                            try{
+                                const attachment = utools.db.getAttachment(obj.data.imgId);
+                                if(attachment){
+                                    utools.db.remove(obj.data.imgId);
+                                }
+                                utools.db.postAttachment(obj.data.imgId, await imageZip.async("uint8array"),"image/png");
+                            }catch (_){}
+                        }
+                    }
                     // 注册关键字
                     if(obj.data.keyword){
                         if(obj._id.startsWith(CODE_PREFIX)){
-                            const id = obj._id.slice(CODE_PREFIX.length)
-                            register_utools_keyword(obj.data,obj._id.slice(CODE_PREFIX.length))
+                            register_utools_keyword(obj.data,null)
                         }else if(obj._id.startsWith(SUB_CODE_PREFIX)){
                             register_utools_keyword(obj.data,obj._id.slice(SUB_CODE_PREFIX.length))
                         }else{

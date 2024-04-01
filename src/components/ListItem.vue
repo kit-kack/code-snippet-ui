@@ -52,7 +52,7 @@
 
       <template v-if="configManager.get('strategy_item_code_show')  === 2">
         <!-- 代码 -->
-        <multi-line-code :type="pair.renderType" :code="pair.code" :active="$index === index"/>
+        <multi-line-code :type="pair.renderType" :img-id="snippet.imgId" :code="pair.code" :active="$index === index"/>
         <!-- no-code-desc -->
         <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
               {{pair.sideInfo}}
@@ -85,7 +85,7 @@
         <template v-if="snippet.dir">
           <n-icon size="16" class="global-color"><svg-directory/></n-icon>
         </template>
-        <template v-else-if="snippet.type === 'image' || snippet.type === 'svg'">
+        <template v-else-if="snippet.image || snippet.type === 'image' || snippet.type === 'svg'">
           <n-icon size="16" class="global-color">
             <svg-image/>
           </n-icon>
@@ -147,10 +147,10 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import {computed, nextTick, queuePostFlushCb, ref} from "vue";
 import {configManager} from "../js/utools/config";
 import SelectableButton from "./base/SelectableButton.vue";
-import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshSearchResult} from "../js/store";
+import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshListView, refreshSearchResult} from "../js/store";
 import NormalTag from "./base/NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";
 import MultiLineCode from "./item/MultiLineCode.vue";
@@ -168,6 +168,7 @@ import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {snippetCopyOrPaste} from "../js/keyboard/k-common";
 import {calculateExpiredDesc, calculateTime, escapeHtmlExceptB} from "../js/utils/common";
 import {hierachyHubManager} from "../js/utools/hub";
+import {doScrollForListView} from "../js/utils/scroller";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -216,7 +217,11 @@ const pair = computed(()=>{
   }
   const mode = configManager.get('strategy_item_code_show');
   if(mode > 0){
-    if(props.snippet.dir){
+    if(props.snippet.image){
+      code = "[图片]: 存储在utools中，支持同步";
+      renderType = 'plaintext';
+    }
+    else if(props.snippet.dir){
       if(props.snippet.ref === "local"){
         code = "[本地目录]: "+props.snippet.path;
       }else if(props.snippet.ref === "custom"){
@@ -284,7 +289,10 @@ function handleDelete(){
   $index.value--;
   $normal.keepSelectedStatus = true;
   $reactive.main.isDel = false;
-  doItemRefresh()
+  doItemRefresh();
+  setTimeout(()=>{
+    doScrollForListView();
+  })
 }
 
 function handleClick(e){

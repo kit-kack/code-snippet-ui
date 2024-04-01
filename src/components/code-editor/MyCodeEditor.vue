@@ -49,6 +49,11 @@
             @keydown="handleNewKeyDown"
             @scroll="calcScrollDistance"
             :value="modelValue == undefined ? content : modelValue"
+            placeholder="记录你的每一次奇思妙想✨"
+            @dragenter="handleDragStart"
+            @dragleave="handleDragLeave"
+            @dragover="handleDragOver"
+            @drop="handleDrop"
             @input="updateValue"
         ></textarea>
         <pre
@@ -81,6 +86,7 @@ import hljs from "../../js/dep/highlight-dep";
 import {handleCodeEditorKeyDown} from "./key-handler";
 import {useHistory} from "./history";
 // import {useHistory} from "./history";
+
 export default {
   name: "CodeEditor",
   props: {
@@ -218,6 +224,7 @@ export default {
       scrolling: false,
       textareaHeight: 0,
       showLineNums: this.wrap ? false : this.lineNums,
+      dragTrigger: false
     };
   },
   computed: {
@@ -229,6 +236,56 @@ export default {
     },
   },
   methods: {
+    /**
+     * @param {DragEvent} e
+     */
+    handleDragStart(e) {
+      const items = e.dataTransfer.items;
+      if(items && items.length > 0){
+        for (let item of items) {
+          if(item.kind === "file" && item.type.startsWith('image/')){
+            e.preventDefault();
+            this.dragTrigger = true
+            this.$emit('img-drag-trigger',true)
+            return;
+          }
+        }
+      }
+    },
+    handleDragLeave(e){
+      if(this.dragTrigger){
+        this.dragTrigger = false
+        this.$emit('img-drag-trigger',false)
+      }
+    },
+    /**
+     *
+     * @param {DragEvent} e
+     */
+    handleDragOver(e) {
+      if(this.dragTrigger){
+        e.preventDefault();
+      }
+    },
+    /**
+     *
+     * @param {DragEvent} e
+     */
+    handleDrop(e) {
+      if(this.dragTrigger){
+        this.dragTrigger = false
+        this.$emit('img-drag-trigger',false)
+        const items = e.dataTransfer.items;
+        if(items && items.length > 0){
+          for (let item of items) {
+            if(item.kind === "file" && item.type.startsWith('image/')){
+              this.$emit('img-drop',item);
+              return;
+            }
+          }
+        }
+      }
+    },
     insertCommand(command){
       const cursorPosition = this.$refs.textarea.selectionStart;
       const newContent = this.modelValue.slice(0,cursorPosition) + command + this.modelValue.slice(cursorPosition);
@@ -301,6 +358,7 @@ export default {
       // displayed lineNum
       this.lineNum = lineNum;
     },
+
     handleNewKeyDown(e){
       // 优先处理 ctrl+z ctrl+y
       if(e.ctrlKey || e.metaKey){
@@ -310,6 +368,23 @@ export default {
         }else if(e.key === 'y'){
           e.preventDefault();
           this.redo();
+        }else if(e.key === 'v'){
+          // 判断是否存在图片数据
+          // const img = window.preload._clipboard.readImage();
+          /**
+           * @type string[]
+           */
+          const availableFormats =  window.preload._clipboard.availableFormats();
+          if(availableFormats && availableFormats.length > 0){
+            for (let format of availableFormats) {
+              if(format.startsWith("image/")){
+                e.preventDefault();
+                const img = window.preload._clipboard.readImage();
+                this.$emit("insertImage",img,format)
+                return;
+              }
+            }
+          }
         }
       }
       const change = handleCodeEditorKeyDown(e,{
@@ -361,6 +436,9 @@ export default {
   position: relative;
   background: white;
 }
+#light-app-v5 .code-editor{
+  background: transparent;
+}
 #dark-app #form-view .code-editor{
   background: #303133;
 }
@@ -398,6 +476,13 @@ export default {
 .code-editor .line-nums > div {
   font-family: Consolas, Monaco, monospace;
   line-height: 1.5;
+}
+.code-editor .code-area > textarea::placeholder{
+  font-family: 'Consolas' !important;
+  color: #c9c9c9;
+}
+#dark-app .code-editor .code-area > textarea::placeholder{
+  color: #8b8c8d;
 }
 .code-editor .code-area > textarea:hover,
 .code-editor .code-area > textarea:focus-visible {

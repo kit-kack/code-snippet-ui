@@ -218,6 +218,21 @@ function handleLogClick() {
 
   }
 }
+#light-app-v5 #side-view{
+  .aspect{
+    background-color: white;
+
+
+
+    &:hover{
+      box-shadow: rgba(50, 50, 105, 0.15) 0 2px 5px 0, rgba(0, 0, 0, 0.05) 0 1px 1px 0;
+      //box-shadow: rgba(9, 30, 66, 0.25) 0 4px 8px -2px, rgba(9, 30, 66, 0.08) 0 0 0 1px;
+    }
+    .n-list{
+      background-color: white;
+    }
+  }
+}
 #dark-app #side-view{
 
   .aspect{

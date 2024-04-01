@@ -367,7 +367,7 @@ export const GLOBAL_HIERARCHY = {
          * @param {CodeSnippet} snippet
          * @param {string | null} [oldName]
          */
-        createOrEdit(snippet,oldName){
+        async createOrEdit(snippet,oldName){
             // 处理 keyword，只允许h-root
             if(!GLOBAL_HIERARCHY.currentHierarchy.core){
                 snippet.keyword = undefined;
@@ -381,9 +381,10 @@ export const GLOBAL_HIERARCHY = {
                 snippet.desc = undefined;
             }
             try{
-                GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixSnippetArrayTemp,snippet,oldName,EXT);
+                await GLOBAL_HIERARCHY.currentHierarchy.createOrEdit?.(GLOBAL_HIERARCHY.currentPrefixSnippetArrayTemp,snippet,oldName,EXT);
             }catch (e){
-                $message.error(e.message)
+                $message.error(e.toString())
+                return false;
             }
             if(oldName){
                 if(oldName !== snippet.name){
@@ -394,6 +395,7 @@ export const GLOBAL_HIERARCHY = {
                     }
                 }
             }
+            return true;
         }
     },
     /**
@@ -441,6 +443,10 @@ export const GLOBAL_HIERARCHY = {
         // 内置普通目录才支持回收操作
         // 其他目录会直接删除
         if(!isRecycleBinModeActive && GLOBAL_HIERARCHY.currentHierarchy.core) {
+            if($reactive.currentSnippet.help){
+                configManager.set('readme_close',true);
+                return;
+            }
             // 内置目录 - 不处于回收站模式下
             // 此时删除操作就是回收
             hierachyHubManager.recycleElement(snippet.id);

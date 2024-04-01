@@ -12,6 +12,10 @@ declare interface CodeSnippetCore{
     // 路径 (本地 或者 网络)，设置该属性后该代码片段将成为 关联文件
     path?: string,
     link?: boolean,  // 对应设置path项而言，是否为单纯的链接导向，而无法查看内容
+    // 是否为图片
+    image?: boolean,
+    // 图片url
+    imgId?: string,
     // 是否为(普通)目录
     dir?: boolean,
     // ================================================
@@ -207,7 +211,7 @@ declare interface HierarchyCore{
      * @param {CodeSnippet} snippet 代码片段
      * @param {string} oldName 如果不为空则为修改操作，否则为新增操作
      */
-    createOrEdit?: (prefix: CodeSnippet[], snippet: CodeSnippet, oldName?: string,ext: any) => void;
+    createOrEdit?: (prefix: CodeSnippet[], snippet: CodeSnippet, oldName?: string,ext: any) => Promise<void> | void;
     /**
      * 删除代码片段
      * @param {string} name

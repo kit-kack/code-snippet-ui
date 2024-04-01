@@ -3,7 +3,6 @@ import './style.scss'
 import App from './App.vue'
 import initNU from "./js/dep/naiveui-dep";
 import initVH from "./js/dep/vmd-dep";
-import {copyCode} from "./js/utils/copy";
 import {backupFilePath} from "./js/some";
 import {$index, $normal, $reactive, CREATE_VIEW, LIST_VIEW, utools_focus_or_blur} from "./js/store";
 import {tagColorManager} from "./js/utools/tag";
@@ -16,6 +15,7 @@ import {generate_backup} from "./js/utools/backup";
 import {adjustLightDarkTheme} from "./js/theme";
 import {GLOBAL_KEYBOARD_HANDLER} from "./js/keyboard/core";
 import {CountType, statisticsManager} from "./js/utools/statistics";
+import {snippetCopyOrPaste} from "./js/keyboard/k-common";
 // init
 configManager.init()
 statisticsManager.init()
@@ -92,7 +92,7 @@ utools.onPluginEnter((data)=>{
             $normal.entry = true;
             enterApp(data)
         }else{
-            copyCode(true,undefined,true)
+            snippetCopyOrPaste(true,undefined,true)
                 .then(input =>{
                     if(input){
                         $normal.funcs.snippetName = $reactive.currentSnippet.name;
@@ -102,6 +102,7 @@ utools.onPluginEnter((data)=>{
                         utools.outPlugin();
                     }
                 })
+
         }
     }else{
         enterApp(data)
@@ -132,9 +133,12 @@ utools.onMainPush(({code,type,payload})=>{
     $reactive.currentSnippet = result[option.index];
     // $reactive.core.selectedIndex = 0;
     $index.value = 0;
-    copyCode(true,num,true).then(v =>{
-        utools.outPlugin();
-    })
+    snippetCopyOrPaste(true,num,true)
+        .then(v =>{
+            if(!v){
+                utools.outPlugin();
+            }
+        })
     $normal.entry = $reactive.currentSnippet.type?.startsWith('x-');
     return $normal.entry
 })

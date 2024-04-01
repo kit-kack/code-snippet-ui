@@ -2,11 +2,22 @@ import {$normal, $reactive, CREATE_VIEW, EDIT_VIEW, switchToFullUIMode} from "..
 import {isNetWorkUri, isSvg} from "../utils/common";
 import {copyCode} from "../utils/copy";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
+const notify = (msg,noView,warning) =>{
+    if(noView){
+        utools.showNotification(msg);
+    }else{
+        if(warning){
+            $message.warning(msg);
+        }else{
+            $message.success(msg);
+        }
+    }
+}
 
-export const snippetCopyOrPaste = (isPaste, supportSub) =>{
+export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
     // dir
     if($reactive.currentSnippet.dir){
-        $message.warning("无法对目录进行此操作");
+        notify("无法对目录进行此操作",noView,true);
         return;
     }
     // link
@@ -14,11 +25,21 @@ export const snippetCopyOrPaste = (isPaste, supportSub) =>{
         if(isPaste){
             utools.shellOpenExternal($reactive.currentSnippet.path);
         }else{
-            $message.warning("无法对链接进行此操作");
+            notify("无法对链接进行此操作",noView,true);
             return;
         }
     }
     // image
+    if($reactive.currentSnippet.image){
+        let attachment = utools.db.getAttachment($reactive.currentSnippet.imgId);
+        if(!(isPaste? utools.hideMainWindowPasteImage(attachment) : utools.copyImage(attachment))){
+            notify("操作失败，请确定图片是否合法",noView,true)
+        }else{
+            notify("已复制图片",noView)
+        }
+        attachment = null;
+        return;
+    }
     if($reactive.currentSnippet.type === "image"){
         const url = $reactive.currentSnippet.path ?? $reactive.currentSnippet.code;
         if(isSvg(url)){
@@ -26,18 +47,18 @@ export const snippetCopyOrPaste = (isPaste, supportSub) =>{
                 utools.hideMainWindowPasteText(url);
             }else{
                 utools.copyText(url)
-                $message.success("已复制图片")
+                notify("已复制图片",noView)
             }
         }else{
             if(!(isPaste? utools.hideMainWindowPasteImage(url) : utools.copyImage(url))){
-                $message.error("无效图片类型，请确保为本地图片")
+                notify("无效图片类型，请确保为本地图片",noView,true)
             }else{
-                $message.success("已复制图片")
+                notify("已复制图片",noView)
             }
         }
     }else{
         // code
-        copyCode(isPaste,supportSub ? $normal.beta.subSnippetNum: undefined);
+        return await copyCode(isPaste,sub,noView);
     }
 }
 /**
@@ -49,16 +70,13 @@ export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
             if(ctrl){
                 return;
             }
-            snippetCopyOrPaste(false,true)
+            snippetCopyOrPaste(false,$normal.beta.subSnippetNum)
             break;
         case 'KeyY':
-            snippetCopyOrPaste(false,false);
+            snippetCopyOrPaste(false);
             break;
         case 'KeyP':
-            snippetCopyOrPaste(true,false);
-            break;
-        case 'Enter':
-            snippetCopyOrPaste(true,true);
+            snippetCopyOrPaste(true);
             break;
         case 'KeyE':
         case 'KeyI':
@@ -122,6 +140,9 @@ export const K_COMMON_DOWN = ({code}) => {
         case 'KeyZ':
             switchToFullUIMode()
             $reactive.common.shortcutActive = !$reactive.common.shortcutActive;
+            break
+        case 'Enter':
+            snippetCopyOrPaste(true,$normal.beta.subSnippetNum);
             break
     }
     return true

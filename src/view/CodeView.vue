@@ -6,8 +6,8 @@
         trigger="none" ref="verticalScroller">
       <template v-if="refreshFlag">
         <template v-if="pair.renderable && $reactive.code.isRendering">
-          <template v-if="pair.type === 'image' || pair.type === 'svg'">
-            <image-render :url="snippet.path?? snippet.code"  :type="getImageType(pair.type,snippet.path)"/>
+          <template v-if="snippet.image ||  pair.type === 'image' || pair.type === 'svg'">
+            <image-render :url="snippet.path?? snippet.code" :img-id="snippet.imgId"  :type="getImageType(pair.type,snippet.path)"/>
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
             <markdown-render/>
@@ -70,7 +70,7 @@
         <template v-if="pair.renderable">
           <n-button quaternary
                     @click=" $reactive.code.isRendering = !$reactive.code.isRendering"
-                    :disabled="pair.type === 'image'"
+                    :disabled="$reactive.currentSnippet.image ||  pair.type === 'image'"
           >
             {{ $reactive.code.isRendering? '已渲染 [R]': '未渲染 [R]' }}
           </n-button>
@@ -286,7 +286,7 @@ const pair = computed(()=>{
   if(result.type === 'image' || result.type === 'svg'){
     $reactive.code.isRendering = true;
   }
-  result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'svg');
+  result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'svg' || snippet.image);
   if($reactive.currentCode){
     result.count = $reactive.currentCode.length;
     if($reactive.currentCode.length > 100000){
@@ -550,6 +550,17 @@ onUnmounted(()=>{
     padding:0 5px;
     border-radius: 2px;
     background-color: #f0f0f0;
+  }
+}
+#light-app-v5{
+  .code-view-side-info{
+    h4{
+      border-bottom-color: #e0e0e0;
+    }
+  }
+  .n-drawer{
+    --n-header-border-bottom: 1px solid #e0e0e0;
+    --n-footer-border-top: 1px solid #e0e0e0;
   }
 }
 #dark-app {

@@ -2,9 +2,12 @@
 
 新版本速览✨
 
-1. <span style="color:#209a6e">新增</span> 回收站功能(数据删除后移入回收站，7天后过期)，主界面ALL选项点击切换
-2. <span style="color:#5eacee">改进</span> 占位符运行环境为Node.js场景
-3. <span style="color:#5eacee">完善</span> 一些界面设计和处理逻辑
+
+1. <span style="color:#209a6e">支持</span> 图片保存以及复制粘贴使用
+2. <span style="color:#209a6e">新增</span> 回收站功能(数据删除后移入回收站，3天后过期彻底移除)，主界面ALL选项点击切换
+3. <span style="color:#5eacee">改进</span> 占位符运行环境为Node.js场景
+4. <span style="color:#5eacee">完善</span> 一些界面设计以及相应处理逻辑
+5. <span style="color:#5eacee">适配</span> uTools5.0
 ---
 
 [[TOC]]

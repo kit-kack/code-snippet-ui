@@ -12,6 +12,7 @@ import {Direction, doScrollForListView, doScrollForMultiLineCode, doScrollForSid
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import { throttle as _throttle } from "lodash-es"
 import {K_COMMON_DOWN, K_COMMON_UP} from "./k-common";
+import {h} from "vue";
 
 
 const debMoveDown = _throttle(function(){
@@ -59,13 +60,13 @@ function controlSideViewOrMultiLineCode(direction,code) {
     if($reactive.main.isSideCodeViewShow){
         // 判断类型
         let result;
-        if($reactive.currentSnippet.type === "markdown"){
-            if(SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER){
-                result = SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER(code)
-            }
-        }else if($reactive.currentSnippet.type === "image" || $reactive.currentSnippet.type === "svg"){
+        if($reactive.currentSnippet.image ||  $reactive.currentSnippet.type === "image" || $reactive.currentSnippet.type === "svg" ){
             if(SIDE_RENDER_KEYHANDLER.IMAGE_HANDLER){
                 result = SIDE_RENDER_KEYHANDLER.IMAGE_HANDLER(code)
+            }
+        }else if($reactive.currentSnippet.type === "markdown"){
+            if(SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER){
+                result = SIDE_RENDER_KEYHANDLER.MARKDOWON_HANDLER(code)
             }
         }
         if(!result){
@@ -169,7 +170,6 @@ export const K_LISTVIEW_DOWN = (ext)=>{
         }
         return;
     }
-
     // super key
     if(code === 'Tab'){
         if(repeat){

@@ -52,7 +52,7 @@
     <n-dropdown  size="small"
                 placement="bottom"   scrollable :show="show"
                 :options="tagOptions" :render-icon="renderIcon"
-                width="22vw" trigger="manual" x="792" y="14"
+                width="22vw" trigger="manual" :x="792" :y="14"
                 @mouseenter="handleTagShow(true)" @mouseleave="handleTagShow(false,true)"
                 @select="show = false;"
                 style="max-height: min(240px, calc(100vh * 0.7) );"

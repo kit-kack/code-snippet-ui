@@ -1,58 +1,60 @@
 <template>
-  <template v-for="data in shortcuts">
-    <n-divider dashed>
-      {{data.title}}
-    </n-divider>
-    <n-list hoverable clickable :show-divider="false">
-      <template v-for="(item,index) in data.items">
-        <template v-if="item.tooltip">
-          <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
-            <template #trigger>
-              <n-list-item>
-                <div>
-                  <div style="float: left;">
-                    {{item.feature}}
-                    <n-icon :class="{
+  <div id="shortcut-pane">
+    <template v-for="data in shortcuts">
+      <n-divider dashed>
+        {{data.title}}
+      </n-divider>
+      <n-list hoverable clickable :show-divider="false">
+        <template v-for="(item,index) in data.items">
+          <template v-if="item.tooltip">
+            <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
+              <template #trigger>
+                <n-list-item>
+                  <div>
+                    <div style="float: left;">
+                      {{item.feature}}
+                      <n-icon :class="{
                       'global-color': popoverShow[index]
                     }">
-                      <SvgTip/>
-                    </n-icon>
+                        <SvgTip/>
+                      </n-icon>
+                    </div>
+                    <div style="float: right;">
+                      <template v-if="Array.isArray(item.shortcut)">
+                        <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                      </template>
+                      <template v-else>
+                        <span class="shortcut">{{item.shortcut}}</span>
+                      </template>
+                    </div>
                   </div>
-                  <div style="float: right;">
-                    <template v-if="Array.isArray(item.shortcut)">
-                      <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
-                    </template>
-                    <template v-else>
-                      <span class="shortcut">{{item.shortcut}}</span>
-                    </template>
-                  </div>
+                </n-list-item>
+              </template>
+              <p class="tooltip" v-html="item.tooltip"></p>
+            </n-popover>
+          </template>
+          <template v-else>
+            <n-list-item>
+              <div>
+                <div style="float: left;">
+                  {{item.feature}}
                 </div>
-              </n-list-item>
-            </template>
-            <p class="tooltip" v-html="item.tooltip"></p>
-          </n-popover>
-        </template>
-        <template v-else>
-          <n-list-item>
-            <div>
-              <div style="float: left;">
-                {{item.feature}}
+                <div style="float: right;">
+                  <template v-if="Array.isArray(item.shortcut)">
+                    <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                  </template>
+                  <template v-else>
+                    <span class="shortcut">{{item.shortcut}}</span>
+                  </template>
+                </div>
               </div>
-              <div style="float: right;">
-                <template v-if="Array.isArray(item.shortcut)">
-                  <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
-                </template>
-                <template v-else>
-                  <span class="shortcut">{{item.shortcut}}</span>
-                </template>
-              </div>
-            </div>
-          </n-list-item>
+            </n-list-item>
+          </template>
         </template>
-      </template>
 
-    </n-list>
-  </template>
+      </n-list>
+    </template>
+  </div>
 </template>
 
 <script setup>
@@ -161,24 +163,6 @@ const shortcuts = [{
 },{
   title: "编辑界面",
   items: [{
-    feature: "退出/保存",
-    shortcut: [CtrlStr+" + Q",CtrlStr+" + S"],
-  },{
-    feature: "本地文件",
-    shortcut: 'Alt + Q'
-  },{
-    feature: "网络文件",
-    shortcut: 'Alt + W'
-  },{
-    feature: "本地目录",
-    shortcut: 'Alt + A'
-  },{
-    feature: "普通目录",
-    shortcut: 'Alt + S'
-  },{
-    feature: "自定义目录",
-    shortcut: 'Alt + D'
-  },{
     feature: "查看『快捷方式』",
     shortcut: 'Alt + Z'
   },{
@@ -200,10 +184,15 @@ const shortcuts = [{
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .n-list-item{
   height: 40px;
   padding: 0 5px
 }
-
+#light-app-v5 #shortcut-pane .n-list{
+  --n-merged-color: #f4f4f4 !important;
+  &.n-list--hoverable .n-list-item{
+    --n-merged-color-hover: #e0e0e0 !important;
+  }
+}
 </style>

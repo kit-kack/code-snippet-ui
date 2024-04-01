@@ -70,61 +70,100 @@
                      :on-before-leave="()=> properties.code"
                      size="small">
               <n-tab-pane name="code" tab="代码" :disabled="formProperties.codeSource === 'link'">
-                <div id="form-code">
+                <div id="form-image" v-if="codeTemplate.image">
+                  <n-scrollbar style="padding-right: 10px">
+                    <utools-image class="core-image" :url="codeTemplate.imgUrl" :id="codeTemplate.imgId" style="width: 100%;"/>
+                  </n-scrollbar>
+                  <div class="clear-image">
+                    <n-button  circle type="error" quaternary @click="handleClearImage">
+                      <template #icon>
+                        <svg-close/>
+                      </template>
+                    </n-button>
+                  </div>
+
+                </div>
+                <div id="form-code"
+                     :style="{
+                        borderColor: dragTrigger ? configManager.getGlobalColor() : ''
+                     }"
+                     v-else>
                   <div id="form-code-top-nav">
-                    <n-popover>
-                      <template #trigger>
-                        <n-button :focusable="false" quaternary style="position: absolute;">
-                          <template #icon>
-                            <svg-setting/>
-                          </template>
-                        </n-button>
-                      </template>
-                      <n-space align="center">
-                        Tab 行为：
-                        <n-select
-                            :options="tabOptions"
-                            :default-value="configManager.get('default_tab')??0"
-                            :theme-overrides="selectThemeOverrides"
-                            @update-value="v=> configManager.set('default_tab',v)"
-                            style="width: 194px"
-                        />
-                      </n-space>
-                      <n-space align="center">
-                        默认语言：
-                        <n-select
-                            filterable
-                            placeholder="选择默认语言"
-                            :options="languages"
-                            :default-value="configManager.get('default_language')??'plaintext'"
-                            tag
-                            @update-value="v=> configManager.set('default_language',v)"
-                            :theme-overrides="selectThemeOverrides"
-                            :render-tag="renderCodeTypeTag"
-                        />
-                      </n-space>
-                      <config-switch title="默认是否注册uTools关键字" config="default_keyword_enable"/>
-                    </n-popover>
-                    <n-tooltip>
-                      <template #trigger>
-                        <n-button :focusable="false" quaternary style="position: absolute; left: 50px" @click="requestFullScreen(true)" >
-                          <template #icon>
-                            <svg-enter-fullscreen/>
-                          </template>
-                        </n-button>
-                      </template>
-                      进入全屏
-                    </n-tooltip>
-                    <n-tooltip v-if="finalType.startsWith('x-')">
-                      <template #trigger>
-                        <n-button :focusable="false" quaternary style="position: absolute; left: 100px" @click="showFuncModal = true" >
-                          <template #icon>
-                            <svg-command/>
-                          </template>
-                        </n-button>
-                      </template>
-                      使用占位符
-                    </n-tooltip>
+                    <n-space style="position: absolute;" :size="[0,0]">
+                      <n-popover>
+                        <template #trigger>
+                          <n-button :focusable="false" quaternary>
+                            <template #icon>
+                              <svg-setting/>
+                            </template>
+                          </n-button>
+                        </template>
+                        <n-space align="center">
+                          Tab 行为：
+                          <n-select
+                              :options="tabOptions"
+                              :default-value="configManager.get('default_tab')??1"
+                              :theme-overrides="selectThemeOverrides"
+                              @update-value="v=> configManager.set('default_tab',v)"
+                              style="width: 194px"
+                          />
+                        </n-space>
+                        <n-space align="center">
+                          默认语言：
+                          <n-select
+                              filterable
+                              placeholder="选择默认语言"
+                              :options="languages"
+                              :default-value="configManager.get('default_language')??'plaintext'"
+                              tag
+                              @update-value="v=> configManager.set('default_language',v)"
+                              :theme-overrides="selectThemeOverrides"
+                              :render-tag="renderCodeTypeTag"
+                          />
+                        </n-space>
+                        <config-switch title="默认是否注册uTools关键字" config="default_keyword_enable"/>
+                      </n-popover>
+                      <n-tooltip>
+                        <template #trigger>
+                          <n-button :focusable="false" quaternary @click="handleChooseLocalImage">
+                            <template #icon>
+                              <svg-image2/>
+                            </template>
+                          </n-button>
+                        </template>
+                        选取图片
+                      </n-tooltip>
+                      <n-tooltip>
+                        <template #trigger>
+                          <n-button :focusable="false" quaternary @click="handleScreencut">
+                            <template #icon>
+                              <svg-screencut/>
+                            </template>
+                          </n-button>
+                        </template>
+                        屏幕截图
+                      </n-tooltip>
+                      <n-tooltip>
+                        <template #trigger>
+                          <n-button :focusable="false" quaternary @click="requestFullScreen(true)" >
+                            <template #icon>
+                              <svg-enter-fullscreen/>
+                            </template>
+                          </n-button>
+                        </template>
+                        进入全屏
+                      </n-tooltip>
+                      <n-tooltip v-if="finalType.startsWith('x-')">
+                        <template #trigger>
+                          <n-button :focusable="false" quaternary  @click="showFuncModal = true" >
+                            <template #icon>
+                              <svg-command/>
+                            </template>
+                          </n-button>
+                        </template>
+                        使用占位符
+                      </n-tooltip>
+                    </n-space>
                     <div id="form-code-language-select">
                       <n-select
                           :focusable="false"
@@ -142,28 +181,17 @@
                       />
                     </div>
                   </div>
-                <!--                  <n-input-->
-                <!--                      v-model:value="codeTemplate.code"-->
-                <!--                      :placeholder="placeholders?.code ?? '请输入代码片段'"-->
-                <!--                      type="textarea"-->
-                <!--                      size="small"-->
-                <!--                      style="padding-top: 40px;padding-bottom: 10px;"-->
-                <!--                      wrap="off"-->
-                <!--                      rows="9"-->
-                <!--                      :disabled="!properties.code"-->
-                <!--                      @keydown="handleKeyDown"-->
-                <!--                      ref="codeTextArea"-->
-                <!--                      show-count-->
-                <!--                      :autosize="{minRows: 9,maxRows: 9}"-->
-                <!--                  />-->
-                  <code-editor v-model="codeTemplate.code"
-                               ref="codeEditorRef"
-                               font-size="14px"
-                               height="220px"
-                               :header="false"
-                               padding="5px"
-                               line-nums
-                               @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/></div>
+                  <code-editor  v-model="codeTemplate.code"
+                                ref="codeEditorRef"
+                                font-size="14px"
+                                height="220px"
+                                :header="false"
+                                padding="5px"
+                                line-nums
+                                @insert-image="handleInsertImage"
+                                @img-drag-trigger = "e => dragTrigger = e"
+                                @img-drop="handleImageDrop"
+                                @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/></div>
               </n-tab-pane>
               <n-tab-pane name="link" tab="关联" :disabled="formProperties.codeSource === 'code'">
                 <template v-if="codeTemplate.path || codeTemplate.dir">
@@ -301,6 +329,9 @@ import SvgPath from "../asserts/path.svg";
 import SvgConf from "../asserts/conf.svg";
 import SvgDelete from "../asserts/delete.svg";
 import SvgTip from "../asserts/tip.svg";
+import SvgClose from "../asserts/close.svg";
+import SvgImage2 from "../asserts/image2.svg";
+import SvgScreencut from "../asserts/screencut.svg";
 
 import {GLOBAL_HIERARCHY, loadValidHierarchyJS} from "../js/hierarchy/core";
 import {isXmlOrEscapeCharsExisting, isNetWorkUri} from "../js/utils/common";
@@ -308,8 +339,10 @@ import {utools_browser_open} from "../js/utools/base";
 import {isArray as _isArray} from "lodash-es"
 import {replaceRenderBlock} from "../js/utools/func";
 import hljs from "../js/dep/highlight-dep";
+import UtoolsImage from "../components/item/UtoolsImage.vue";
 
 const codeEditorRef = ref()
+const dragTrigger = ref(false)
 const form = ref()
 const formProperties = GLOBAL_HIERARCHY.currentConfig.form;
 const properties = formProperties.allowUpdatedProperties;
@@ -446,7 +479,7 @@ const rules = {
   ],
   "code":{
     validator(rule,value){
-      if(currentTab.value === 'code'){
+      if(currentTab.value === 'code' && !codeTemplate.imgUrl){
         return value && value.length > 0;
       }
       return true;
@@ -488,20 +521,108 @@ function renderTag({ option, handleClose }) {
   )
 }
 
+/**
+ *
+ * @param { NativeImage } image
+ */
+function handleInsertImage(image,format) {
+  $message.info("插入图片")
+  codeTemplate.imgUrl = image.toDataURL();
+  codeTemplate.image = true;
+  codeTemplate.nativeImage = image
+  codeTemplate.imageItem = undefined;
+  codeTemplate.format = format
+}
+
+function handleClearImage(){
+  codeTemplate.image = undefined;
+  codeTemplate.imgUrl = undefined;
+  codeTemplate.format = undefined
+  codeTemplate.nativeImage = undefined
+  codeTemplate.imageItem = undefined
+}
+
+function handleChooseLocalImage(){
+  const realPathList = utools.showOpenDialog({
+    title: '选取图片' ,
+    defaultPath: utools.getPath('desktop'),
+    buttonLabel: '确定',
+    properties: [
+      'openFile'
+    ],
+    filters:[
+      {name: '图片', extensions: ['jpg', 'png', 'webp', 'jpeg']}
+    ]
+  })
+  if (realPathList != null) {
+    const path = realPathList[0];
+    // io操作
+    let buffer = preload.readFile(path);
+    let blob = new Blob([buffer], { type: 'image/png' });
+    codeTemplate.imgUrl = URL.createObjectURL(blob);
+    codeTemplate.image = true;
+    codeTemplate.format = 'image/png'
+    codeTemplate.nativeImage = {
+      toPNG(){
+        return buffer
+      }
+    }
+    codeTemplate.imageItem = undefined
+    blob = null
+  }
+}
+function handleImageDrop(item){
+  codeTemplate.image = true;
+  let reader = new FileReader();
+  let file = item.getAsFile()
+  reader.onload = () => {
+    codeTemplate.imgUrl = reader.result;
+    codeTemplate.image = true;
+    codeTemplate.format = item.type
+    codeTemplate.imageItem = item
+    codeTemplate.nativeImage = undefined
+  }
+  reader.readAsDataURL(file);
+}
+
+function handleScreencut(){
+  utools.screenCapture(async (imgBase64)=>{
+    const response = await fetch(imgBase64)
+    const blob = await response.blob();
+    let reader = new FileReader();
+    reader.onload = () => {
+      codeTemplate.imgUrl = reader.result;
+      codeTemplate.image = true;
+      codeTemplate.format = 'image/png'
+      codeTemplate.imageItem = {
+        async arrayBuffer(){
+          return new Uint8Array(await blob.arrayBuffer())
+        }
+      };
+      codeTemplate.nativeImage = undefined
+    }
+    reader.readAsDataURL(blob);
+  })
+}
+
 function handleCancel(){
   $normal.keepSelectedStatus = true;
   GLOBAL_HIERARCHY.changeView(LIST_VIEW)
 }
 function handleUpdate(){
-  form.value.validate().then(error=>{
+  form.value.validate().then(async (error)=>{
       if(error!=null && error.length >= 0){
         window.$message.warning("请按要求填写")
       }else{
         codeTemplate.name = codeTemplate.name.trim()
         if(currentTab.value === 'code'){  // code
-          if(!codeTemplate.code){
-            $message.warning("代码不能为空")
-            return;
+          if(codeTemplate.image){
+            codeTemplate.code = undefined;
+          }else{
+            if(!codeTemplate.code){
+              $message.warning("代码不能为空")
+              return;
+            }
           }
           codeTemplate.dir = undefined;
           codeTemplate.ref = undefined;
@@ -542,12 +663,16 @@ function handleUpdate(){
             $normal.lastQueryCodeSnippetId = null;
           }
           // 更新
-          GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),$reactive.currentSnippet.name)
+          if(!await GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),$reactive.currentSnippet.name)){
+            return;
+          }
           // 是否维持选中
           $normal.keepSelectedStatus = (codeTemplate.name === $reactive.currentSnippet.name);
         }else{
           $normal.keepSelectedStatus = false;
-          GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),null)
+          if(! await GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),null)){
+            return;
+          }
         }
         window.$message.success("操作成功")
         GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
@@ -576,7 +701,7 @@ function keyDownHandler(e){
     return;
   }
   if(e.code === 'F11'){
-    if(currentTab.value !== 'code'){
+    if(currentTab.value !== 'code' || codeTemplate.image){
       return;
     }
     e.preventDefault();
@@ -599,7 +724,7 @@ function keyDownHandler(e){
     }
   }else if(e.altKey){
     if(e.code === 'KeyX'){
-      if(!codeTemplate.dir && !showFuncModal.value){
+      if(!codeTemplate.dir && !codeTemplate.image && !showFuncModal.value){
         if(codeTemplate.type){
           if(codeTemplate.type.startsWith('x-')){
             codeTemplate.type = codeTemplate.type.slice(2)
@@ -611,7 +736,7 @@ function keyDownHandler(e){
         }
       }
     }else if(e.code === 'KeyC'){
-      if(currentTab.value === 'code'){
+      if(currentTab.value === 'code' && !codeTemplate.image){
         if(codeTemplate.type){
           if(!codeTemplate.type.startsWith('x-')){
             codeTemplate.type = 'x-'+codeTemplate.type
@@ -623,47 +748,10 @@ function keyDownHandler(e){
       }
     }else if(e.code === 'KeyZ'){
       $reactive.common.shortcutActive = ! $reactive.common.shortcutActive
-    }else if(e.code === 'KeyQ'){
-      if(formProperties.codeSource !== "code" && formProperties.linkType !== "dir"){
-        if(currentTab.value === 'code'){
-          currentTab.value = 'link'
-        }
-        importLocalFile()
-      }
-    }else if(e.code === 'KeyW'){
-      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "dir"){
-
-        if(currentTab.value === 'code'){
-          currentTab.value = 'link'
-        }
-        showInternetLinkModal.value = true
-      }
-    }else if(e.code === 'KeyA'){
-      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
-
-        if(currentTab.value === 'code'){
-          currentTab.value = 'link'
-        }
-        importLocalDir()
-      }
-    }else if(e.code === 'KeyS'){
-      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
-        if(currentTab.value === 'code'){
-          currentTab.value = 'link'
-        }
-        setAsNormalDir();
-      }
-    }else if(e.code === 'KeyD'){
-      if(formProperties.codeSource !== "code"  && formProperties.linkType !== "file"){
-        if(currentTab.value === 'code'){
-          currentTab.value = 'link'
-        }
-        importHierarchyJS()
-      }
     }else if(e.code === 'KeyK'){
       codeTemplate.keyword = ! codeTemplate.keyword;
-    }else if(e.code === 'KeyF'){
-      if(currentTab.value !== 'code'){
+    }else if(e.code === 'KeyF' ){
+      if(currentTab.value !== 'code' || codeTemplate.image){
         return;
       }
       $reactive.form.fullScreen = !$reactive.form.fullScreen;
@@ -884,13 +972,47 @@ function handleClearPath(){
   border: 2px solid transparent;
   transition: all .3s;
   z-index: 1000;
+  background-color: white;
+}
+#dark-app #form-code{
+  background-color: transparent;
+}
+#form-image{
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 48vh;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  transition: all .3s;
+  z-index: 1000;
+  background-color: white;
+  .core-image{
+    border-radius: 6px;
+  }
+
+  .clear-image{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+}
+#dark-app #form-image{
+  background-color: #454647;
+}
+#form-image:hover{
+  border-color: #ccc;
 }
 #form-code:hover{
   border-color: #ccc;
 }
 #dark-app #form-code:hover{
   border-color: #555758;
-}
+}#dark-app #form-image:hover{
+   border-color: #555758;
+ }
 #form-code-top-nav{
   position: relative;
   //top: 0;

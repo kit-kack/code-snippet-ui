@@ -12,6 +12,7 @@ import {hierachyHubManager} from "./hub";
  * - code-snippet-func.json
  * - code
  * - code/custom
+ * - code/resource
  * - hub
  * - func
  */

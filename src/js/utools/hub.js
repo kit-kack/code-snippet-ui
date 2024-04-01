@@ -1,6 +1,8 @@
 import {utools_db_store} from "./base";
 import {$index} from "../store";
 import { clone as _clone } from "lodash-es"
+import {codeSnippetManager} from "./snippet";
+import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 /**
  *
  * Snippet Hierarchy Hub 职责
@@ -13,8 +15,8 @@ import { clone as _clone } from "lodash-es"
 const HIERARCHY_PREFIX = "hub/";
 const ROOT_HIERARCHY_PREFIX = "hub";
 
-// 7天时间戳
-const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000
+// 3天时间戳
+const THREE_DAYS = 3 * 24 * 60 * 60 * 1000
 
 
 
@@ -163,44 +165,6 @@ export const hierachyHubManager = {
         }
         this.store();
     },
-    // /**
-    //  *
-    //  * @param {string} name
-    //  * @param {string} desc
-    //  * @param {string[]} tags
-    //  * @param {string} type
-    //  */
-    // handle_local_dir_storage(name,desc,tags,type){
-    //     if (!this.currentHub.snippets) {
-    //         this.currentHub.snippets = {};
-    //     }
-    //     const snippetHub = this.currentHub.snippets;
-    //
-    //     const temp = snippetHub[name] ?? {};
-    //     if(desc){
-    //         temp.desc = desc;
-    //     }else{
-    //         delete temp.desc
-    //     }
-    //     if(tags && tags.length > 0){
-    //         temp.tags = tags;
-    //     }else{
-    //         delete temp.tags
-    //     }
-    //     if(type){
-    //         temp.type = type;
-    //     }else{
-    //         delete temp.type
-    //     }
-    //     // 后置处理
-    //     if(Object.keys(temp).length === 0){
-    //         delete snippetHub[name]
-    //     }else{
-    //         // 保存数据
-    //         snippetHub[name] = temp;
-    //     }
-    //     this.store();
-    // },
     removeElement(name){
         // top
         const topList = this.currentHub.topList ?? [];
@@ -223,12 +187,27 @@ export const hierachyHubManager = {
     },
     recycleElement(name){
         const recycleBin = this.currentHub.recycleBin ?? {};
-        recycleBin[name] = Date.now() + SEVEN_DAYS;
+        const obj = {
+            expired: Date.now() + THREE_DAYS,
+        };
+        const snippet = codeSnippetManager.get(name,GLOBAL_HIERARCHY.currentPrefixIdStr);
+        if(snippet && snippet.keyword){
+            delete snippet.keyword;
+            obj.keyword = true;
+            codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr);
+        }
+        recycleBin[name] = obj;
         this.currentHub.recycleBin = recycleBin;
         this.store()
     },
     resumeElement(name){
         const recycleBin = this.currentHub.recycleBin ?? {};
+        const obj = recycleBin[name];
+        if(obj && obj.keyword){
+            const snippet = codeSnippetManager.get(name,GLOBAL_HIERARCHY.currentPrefixIdStr);
+            snippet.keyword = true;
+            codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr);
+        }
         delete recycleBin[name];
         this.currentHub.recycleBin = recycleBin;
         this.store()

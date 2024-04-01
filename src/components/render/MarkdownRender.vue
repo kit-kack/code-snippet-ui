@@ -575,6 +575,14 @@ onUnmounted(()=>{
 .side-markdown-view .github-markdown-body{
   background-color: #f5f5f5;
 }
+#light-app-v5{
+  .github-markdown-body{
+    .hljs{
+      background-color: #f5f5f5 !important;
+    }
+
+  }
+}
 
 // 适配 暗黑模式
 #dark-app .github-markdown-body{

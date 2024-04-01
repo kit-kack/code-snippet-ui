@@ -6,8 +6,8 @@
         trigger="hover" ref="verticalScroller">
       <template v-if="refreshFlag">
         <template v-if="pair.renderable">
-          <template v-if="pair.type === 'image' || pair.type === 'svg'">
-            <image-render is-side-view :url="snippet.path?? snippet.code"  :type="getImageType(pair.type,snippet.path)"/>
+          <template v-if="snippet.image || pair.type === 'image' || pair.type === 'svg'">
+            <image-render is-side-view :url="snippet.path?? snippet.code" :img-id="snippet.imgId"  :type="getImageType(pair.type,snippet.path)"/>
           </template>
           <template v-else-if="pair.type === 'markdown' || pair.type === 'md'">
             <markdown-render is-side-view :code="pair.code"/>
@@ -63,7 +63,8 @@ const props = defineProps(['snippet'])
 const pair = ref({
   code: '正在加载中',
   type: 'markdown',
-  valid: true
+  valid: true,
+  imgId: props.snippet.imgId,
 })
 
 const refreshFlag = ref(true)
@@ -97,8 +98,9 @@ const vCodeLine = function (el){
 function calculatePair(snippet){
   // 分析类型
   const result = getRealTypeAndValidStatus(snippet.type);
-  let isImage = result.type === 'image' || result.type === 'svg';
+  let isImage = result.type === 'image' || result.type === 'svg' || snippet.image;
   result.renderable = (result.type === 'markdown' || isImage );
+  result.imgId = snippet.imgId
   // 获取code
   let code = isImage ? '': getCode(snippet);
   if(code){
