@@ -42,7 +42,7 @@ const codeBlockOptions = [
 ]
 function handleCodeBlockChange(v){
   configManager.set('strategy_item_code_show',v)
-  refreshListView(true)
+  refreshListView(false)
 }
 const colorSchemaOptions = [
   {
@@ -84,7 +84,7 @@ function handleColorSchema(v){
   configManager.set('strategy_theme',v);
   adjustTheme(v)
   globalThemeRefresh()
-  refreshListView(true)
+  refreshListView(false)
 }
 
 </script>

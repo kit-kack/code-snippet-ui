@@ -1,6 +1,5 @@
-import {nextTick, queuePostFlushCb, reactive, ref} from "vue";
+import {nextTick, reactive, ref} from "vue";
 import {configManager} from "./utools/config";
-import {doScrollForListView} from "./utils/scroller";
 // 主界面
 const LIST_VIEW = 0;
 // 代码预览界面
@@ -43,8 +42,21 @@ const $normal = {
      * }[]}
      */
     hierarchyPath: [],
-    // 控制 选中元素 保持记忆功能
+    // ------- 控制 选中元素 保持记忆功能 --------
+    /**
+     * 下面两者都是控制 选中元素 保持记忆功能
+     * keepSelectedStatus
+     * 控制 $index是否维持原值,同时滚动至原地点；
+     * 当utools搜索变更、创建新元素、以及某元素已改名时为false，即不保持记忆，此时$index = 0,滚动至开头
+     *
+     * rollbackToOriginWhenRefresh
+     * 解决上面滚动至原地点时遇到列表后四个元素时，滚动错位问题，为了解决直接滚动到底部；
+     * 滚动到底部是在doScrollForListView中实现，为了避免正常vim上下操作滚动，rollbackToOriginWhenRefresh只有在主动刷新场景下为true
+     */
     keepSelectedStatus: false,
+    rollbackToOriginWhenRefresh: false,
+    // ----------------------------------------
+
     // utools快速记录的代码
     quickCode: null,
     // 非核心Command进入插件
@@ -213,14 +225,16 @@ export function utools_focus_or_blur(focus){
     }
 }
 
-const refreshListView = ()=>{
+const refreshListView = (keep)=>{
+    if(keep){
+        $normal.keepSelectedStatus = true;
+        $normal.rollbackToOriginWhenRefresh = true;
+    }else if(keep === false){
+        $normal.keepSelectedStatus = false;
+    }
     $reactive.main.deepRefresh = false;
     nextTick(()=>{
         $reactive.main.deepRefresh = true;
-    }).then(()=>{
-        queuePostFlushCb(()=>{
-            doScrollForListView();
-        })
     })
 }
 export const refreshSearchResult =()=>{

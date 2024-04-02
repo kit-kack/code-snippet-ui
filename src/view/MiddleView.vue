@@ -9,7 +9,7 @@
   <template v-else-if="$reactive.currentMode >= EDIT_VIEW">
     <form-view/>
   </template>
-  <vim-status-bar/>
+<!--  <vim-status-bar/>-->
   <n-drawer v-model:show="$reactive.main.settingActive" width="50vw" placement="right">
     <side-view/>
   </n-drawer>
@@ -79,7 +79,6 @@
 
 <script setup>
 import SideView from "./SideView.vue";
-import VimStatusBar from "../components/VimStatusBar.vue";
 import ShortcutPane from "../components/pane/ShortcutPane.vue";
 import {ref, watch} from "vue";
 import {NButton, useDialog, useMessage} from 'naive-ui'
@@ -121,11 +120,6 @@ watch([()=>$reactive.utools.search,
   }
   topNavShow.value = true;
   $list.value = list;
-  // if($normal.keepSelectedStatus){
-  //   queuePostFlushCb(()=>{
-  //     doScrollForListView();
-  //   })
-  // }
   refreshListView()
 },{
   deep:true,

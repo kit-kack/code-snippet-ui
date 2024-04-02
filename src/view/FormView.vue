@@ -526,7 +526,6 @@ function renderTag({ option, handleClose }) {
  * @param { NativeImage } image
  */
 function handleInsertImage(image,format) {
-  $message.info("插入图片")
   codeTemplate.imgUrl = image.toDataURL();
   codeTemplate.image = true;
   codeTemplate.nativeImage = image

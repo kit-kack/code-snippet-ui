@@ -114,7 +114,6 @@ import ConfigTooltipSwitch from "../components/base/ConfigTooltipSwitch.vue";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
-const configIndex = ref(0);
 
 
 const dealWithTagRefresh = ()=>{

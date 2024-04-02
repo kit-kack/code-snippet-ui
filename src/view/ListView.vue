@@ -8,6 +8,7 @@
               key-field="now"
               :min-item-size="60"
               class="scroller"
+              @resize="handleResize"
               :ref="(el)=> $normal.scroll.virtualInvoker = el">
             <template v-slot="{item,index, active}">
               <DynamicScrollerItem
@@ -74,6 +75,7 @@ import {defineAsyncComponent, onMounted, watch} from "vue";
 import SvgDirectory from "../asserts/directory.svg";
 import SvgLink from "../asserts/link.svg"
 import {getDirType} from "../js/utils/common";
+import {doScrollForListView} from "../js/utils/scroller";
 
 const AsyncCodeView =defineAsyncComponent(()=> import('./LiteCodeView.vue'))
 const handleSelect = (index,selectedIndex)=>{
@@ -90,6 +92,14 @@ watch($index,(newValue)=>{
   immediate: true,
   flush: 'pre'
 })
+function handleResize(){
+  if($normal.keepSelectedStatus){
+    doScrollForListView($normal.rollbackToOriginWhenRefresh)
+    if($normal.rollbackToOriginWhenRefresh){
+      $normal.rollbackToOriginWhenRefresh = false;
+    }
+  }
+}
 
 onMounted(()=>{
   if($reactive.main.isFullScreenShow){

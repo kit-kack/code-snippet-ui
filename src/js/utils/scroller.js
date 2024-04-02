@@ -1,4 +1,4 @@
-import {$index, $normal} from "../store";
+import {$index, $list, $normal} from "../store";
 import {configManager} from "../utools/config";
 
 
@@ -144,11 +144,15 @@ export function doScrollForTopNav(){
     $normal.scroll.hierarchyInvoker?.scrollBy?.({left: 100})
 }
 
-export function doScrollForListView(){
+export function doScrollForListView(flag){
     try{
-        $normal.scroll.virtualInvoker?.scrollToItem(
-            $index.value - ((configManager.get('strategy_item_code_show') === 2)?1: 3)
-        )
+        if(flag &&$list.value.length - $index.value <=4){
+            $normal.scroll.virtualInvoker?.scrollToBottom();
+        }else{
+            $normal.scroll.virtualInvoker?.scrollToItem(
+                $index.value - ((configManager.get('strategy_item_code_show') === 2)?1: 3)
+            )
+        }
     }catch (e) {
         console.error(e)
     }

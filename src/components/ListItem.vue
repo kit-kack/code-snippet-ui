@@ -289,10 +289,7 @@ function handleDelete(){
   $index.value--;
   $normal.keepSelectedStatus = true;
   $reactive.main.isDel = false;
-  doItemRefresh();
-  setTimeout(()=>{
-    doScrollForListView();
-  })
+  doItemRefresh(true);
 }
 
 function handleClick(e){
@@ -367,12 +364,15 @@ function doEdit(){
 }
 function doResume(){
   hierachyHubManager.resumeElement(props.snippet.id);
-  doItemRefresh();
+  doItemRefresh(true);
 }
-function doItemRefresh(){
+function doItemRefresh(isDel){
   $normal.keepSelectedStatus = true;
   // refreshListView(true)
-  refreshSearchResult();
+  if(isDel){
+    refreshSearchResult()
+  }
+  refreshListView(true)
 }
 
 </script>

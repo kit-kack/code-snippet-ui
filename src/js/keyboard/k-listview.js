@@ -1,18 +1,19 @@
 import {
-    $index, $list,
+    $index,
+    $list,
     $normal,
     $reactive,
     CODE_VIEW,
-    refreshListView, refreshSearchResult,
+    refreshListView,
+    refreshSearchResult,
     switchToFullUIMode,
     utools_focus_or_blur
 } from "../store";
 import {configManager} from "../utools/config";
 import {Direction, doScrollForListView, doScrollForMultiLineCode, doScrollForSideCodeView} from "../utils/scroller";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
-import { throttle as _throttle } from "lodash-es"
+import {throttle as _throttle} from "lodash-es"
 import {K_COMMON_DOWN, K_COMMON_UP} from "./k-common";
-import {h} from "vue";
 
 
 const debMoveDown = _throttle(function(){
@@ -134,7 +135,8 @@ export const K_LISTVIEW_UP = (ext)=>{
             break
         case 'KeyR':
             if(ctrl){
-                refreshListView()
+                refreshListView(true)
+                console.dir($normal.scroll.virtualInvoker.scrollTop)
             }else{
                 GLOBAL_HIERARCHY.changeHierarchy("root")
             }
@@ -187,7 +189,7 @@ export const K_LISTVIEW_DOWN = (ext)=>{
             }
             $reactive.main.isFullScreenShow = !$reactive.main.isFullScreenShow;
             configManager.set('lite',!$reactive.main.isFullScreenShow)
-            refreshListView()
+            refreshListView(false)
             utools_focus_or_blur(true)
         }else{
             // vim模式切换
