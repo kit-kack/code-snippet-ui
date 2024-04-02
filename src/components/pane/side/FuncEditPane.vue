@@ -50,6 +50,7 @@
                                  font-size="14px"
                                  padding="5px"
                                  line-nums
+                                 placeholder="有些故事没讲完，那就算了吧"
                                  :header="false" width="99%" :languages="[['html']]"/>
                   </div>
                 </n-form-item>
@@ -64,6 +65,7 @@
                                padding="5px"
                                height="250px"
                                line-nums
+                               placeholder="我曾经试着忘掉你，但每次都是加深了记忆"
                                :header="false" width="100%"/>
                 </div>
                 <p class="func-impl-preset-content">}

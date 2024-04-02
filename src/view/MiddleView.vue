@@ -9,7 +9,7 @@
   <template v-else-if="$reactive.currentMode >= EDIT_VIEW">
     <form-view/>
   </template>
-<!--  <vim-status-bar/>-->
+  <vim-status-bar/>
   <n-drawer v-model:show="$reactive.main.settingActive" width="50vw" placement="right">
     <side-view/>
   </n-drawer>
@@ -96,6 +96,7 @@ import SvgExpand from "../asserts/expand.svg";
 import SvgRefresh from "../asserts/refresh.svg";
 import SvgRefreshFixed from "../asserts/refresh-fixed.svg";
 import SvgArrowUp from "../asserts/arrow-up.svg";
+import VimStatusBar from "../components/VimStatusBar.vue";
 
 const expanded = ref(false)
 window.$message = useMessage();

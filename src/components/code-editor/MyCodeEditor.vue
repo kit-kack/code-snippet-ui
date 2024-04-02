@@ -49,7 +49,7 @@
             @keydown="handleNewKeyDown"
             @scroll="calcScrollDistance"
             :value="modelValue == undefined ? content : modelValue"
-            placeholder="记录你的每一次奇思妙想✨"
+            :placeholder="placeholder"
             @dragenter="handleDragStart"
             @dragleave="handleDragLeave"
             @dragover="handleDragOver"
@@ -139,6 +139,10 @@ export default {
     borderRadius: {
       type: String,
       default: "12px",
+    },
+    placeholder: {
+      type: String,
+      default: "记录你的每一次奇思妙想✨"
     },
     languages: {
       type: Array,

@@ -61,7 +61,7 @@
 
 <script setup>
 import {configManager} from "../js/utools/config";
-import {$index, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
+import {$index, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {computed, ref} from "vue";
 import {statisticsManager} from "../js/utools/statistics";
 
@@ -93,20 +93,31 @@ const getBtnStyle = ()=>{
   }
 }
 
-let showCount = 0 // 必须要到达 7
-let clearCount = 0
+let showCount = 0 // 必须要到达 3
 let lastTime = 0  // 时间
 function handleVimStatusBarClick(){
-  if($reactive.currentMode === LIST_VIEW){
-    if(showCount === 3){
+  const now = Date.now();
+  if(now - lastTime > 500){
+    lastTime = now;
+    showCount = 0;
+    return;
+  }
+  lastTime = now;
+  showCount++;
+  if(showCount === 3){
+    if($reactive.currentMode === LIST_VIEW){
       configManager.set('easter_egg_log',true);
       statisticsShow.value = !statisticsShow.value
-      showCount = 0;
-    }else{
-      showCount++;
+    }else if($reactive.currentMode === CODE_VIEW){
+      $message.success("怕无归期，怕空欢喜，怕来者不是你。");
+    }else if($reactive.currentMode === EDIT_VIEW){
+      $message.error("我试过销声匿迹，最终也无人问及。");
+    }else if($reactive.currentMode === CREATE_VIEW){
+      $message.error("孤单年少岁月长，暮色沉沉晚风凉。");
     }
-  }else if($reactive.currentMode === CODE_VIEW){
+    showCount = 0;
   }
+
 }
 
 </script>
