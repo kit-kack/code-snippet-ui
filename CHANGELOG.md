@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.3](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.2...v2.7.3) (2024-04-02)
+
+
+### Features
+
+* 侧边预览 ([a456360](https://github.com/kit-kack/code-snippet-ui/commit/a4563609111c324807873baf24650484fbed1015))
+* 伤感buffer ([453b55f](https://github.com/kit-kack/code-snippet-ui/commit/453b55f5ec025c6a05e05117699aa0dcbb02c745))
+* 图片渲染 ([cb3090a](https://github.com/kit-kack/code-snippet-ui/commit/cb3090a055dabe9f252f0ee0b73a44547185e921))
+* 新增回收站功能 ([05fb3ad](https://github.com/kit-kack/code-snippet-ui/commit/05fb3adff00c51626beb65db0bffa797f40e6bfc))
+
+
+### Bug Fixes
+
+* 缓解回滚bug，目前仍无法解决多行代码块场景问题 ([e0e6d69](https://github.com/kit-kack/code-snippet-ui/commit/e0e6d691d39ef86d64dc514cb809053fa34f8bc5))
+* 回收站目录不支持预览 ([89c86db](https://github.com/kit-kack/code-snippet-ui/commit/89c86db8c9522ea64171151e74240f697e1b2abb))
+* 适配uTools5.0 ([c5a6eda](https://github.com/kit-kack/code-snippet-ui/commit/c5a6eda705d004b682143ff0beca232862cf4195))
+* 适配uTools5.0 ([a898103](https://github.com/kit-kack/code-snippet-ui/commit/a8981038d3ea4f29dc7884c6056d7d42684eb1ec))
+* 修复code-editor初始内容未记录到history ([2677139](https://github.com/kit-kack/code-snippet-ui/commit/26771398a458b5a30e3536f21f2fa233867c30bd))
+* 移除代码无高亮显示 ([4ebc7b8](https://github.com/kit-kack/code-snippet-ui/commit/4ebc7b813e1049e26369dec0683e23deb4d481fe))
+* 优化界面小设计 ([8f8b6c8](https://github.com/kit-kack/code-snippet-ui/commit/8f8b6c84b883a9cca6b9c861862fa6ad69c25269))
+* code-editor 对 tab以及 shift+tab键正确处理 ([4e676d6](https://github.com/kit-kack/code-snippet-ui/commit/4e676d6f75242171369c8227aa4236f38b658ba2))
+
 ### [2.7.2](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.1...v2.7.2) (2024-03-14)
 
 
