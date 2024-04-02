@@ -205,7 +205,7 @@ export default {
           this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
         }
       }
-    });
+    },(this.modelValue ?? this.content) + "");
     this.undo = undo
     this.redo = redo
     this.record = record
