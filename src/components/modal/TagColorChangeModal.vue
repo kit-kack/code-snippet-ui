@@ -1,5 +1,5 @@
 <template>
-  <base-modal title="修改标签配色" @cancel="operate(false)" @confirm="operate(true)">
+  <base-modal vim title="修改标签配色" @cancel="operate(false)" @confirm="operate(true)">
     <n-tag class="tag" :style="{
       background: instance.background,
       color: instance.color

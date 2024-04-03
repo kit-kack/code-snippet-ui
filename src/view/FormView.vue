@@ -8,6 +8,7 @@
                    height="calc( 100vh - 18px )"
                    history-key="code"
                    :header="false"
+                   :placeholder="placeholders?.code"
                    line-nums
                    @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/>
     </template>
@@ -190,6 +191,7 @@
                                 history-key="code"
                                 padding="5px"
                                 line-nums
+                                :placeholder="placeholders?.code"
                                 @insert-image="handleInsertImage"
                                 @img-drag-trigger = "e => dragTrigger = e"
                                 @img-drop="handleImageDrop"
@@ -765,15 +767,6 @@ function keyDownHandler(e){
 function handleChooseCommand(command){
   showFuncModal.value = false;
   codeEditorRef.value.insertCommand("{{"+command+"}}");
-  // if(codeTemplate.code){
-  //   const start =codeEditorRef.value.$refs.textarea.selectionStart;
-  //   codeTemplate.code =
-  //       codeTemplate.code.slice(0,start)
-  //       + "{{"+command+"}}"
-  //       +codeTemplate.code.slice(start)
-  // }else{
-  //   codeTemplate.code = "{{"+command+"}}"
-  // }
 }
 function handleTypeChange(){
   if(GLOBAL_HIERARCHY.currentHierarchy.inline){

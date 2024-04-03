@@ -149,6 +149,9 @@ export const K_LISTVIEW_UP = (ext)=>{
                 GLOBAL_HIERARCHY.changeHierarchy("prev")
             }
             break;
+        case 'F9':
+            $reactive.main.isRecycleBinActive = !$reactive.main.isRecycleBinActive;
+            break;
         default:
             return K_COMMON_UP(ext);
     }

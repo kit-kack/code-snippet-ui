@@ -125,7 +125,6 @@ export function clearHistory(key){
             delete GLOBAL_REDOS[key];
             delete GLOBAL_UNDOS[key];
             delete GLOBAL_DEP_COUNT[key];
-            $message.info(`已清空[ ${key} ]历史记录`);
         }
     }
 }

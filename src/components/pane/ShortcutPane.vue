@@ -132,6 +132,9 @@ const shortcuts = [{
   },{
     feature: '查看『设置』',
     shortcut: '/'
+  },{
+    feature: '切换至『回收站』',
+    shortcut: 'F9'
   }]
 },{
   title: "代码预览界面",
