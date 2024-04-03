@@ -84,7 +84,7 @@
 <script>
 import hljs from "../../js/dep/highlight-dep";
 import {handleCodeEditorKeyDown} from "./key-handler";
-import {useHistory} from "./history";
+import {clearHistory, useHistory} from "./history";
 // import {useHistory} from "./history";
 
 export default {
@@ -178,6 +178,9 @@ export default {
       type: String,
       default: "20px",
     },
+    historyKey: {
+      type: String
+    }
   },
   directives: {
     highlight: {
@@ -209,7 +212,7 @@ export default {
           this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
         }
       }
-    },(this.modelValue ?? this.content) + "");
+    },(this.modelValue ?? this.content) + "",this.historyKey);
     this.undo = undo
     this.redo = redo
     this.record = record
@@ -431,6 +434,9 @@ export default {
         this.getLineNum();
       }
     }
+  },
+  unmounted() {
+    clearHistory(this.historyKey);
   }
 };
 </script>

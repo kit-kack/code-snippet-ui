@@ -6,6 +6,7 @@
                    font-size="14px"
                    padding="5px"
                    height="calc( 100vh - 18px )"
+                   history-key="code"
                    :header="false"
                    line-nums
                    @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/>
@@ -186,6 +187,7 @@
                                 font-size="14px"
                                 height="220px"
                                 :header="false"
+                                history-key="code"
                                 padding="5px"
                                 line-nums
                                 @insert-image="handleInsertImage"
@@ -340,6 +342,7 @@ import {isArray as _isArray} from "lodash-es"
 import {replaceRenderBlock} from "../js/utools/func";
 import hljs from "../js/dep/highlight-dep";
 import UtoolsImage from "../components/base/UtoolsImage.vue";
+import {clearHistory, keepHistory} from "../components/code-editor/history";
 
 const codeEditorRef = ref()
 const dragTrigger = ref(false)
@@ -682,9 +685,11 @@ function handleUpdate(){
 }
 function requestFullScreen(isFullScreen) {
   if(isFullScreen){
+    keepHistory("code")
     $reactive.form.fullScreen = true;
   }else {
     // document.exitFullscreen();
+    clearHistory("code");
     $reactive.form.fullScreen = false;
   }
 }
