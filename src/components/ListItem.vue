@@ -149,7 +149,7 @@
 <script setup>
 import {computed, nextTick, queuePostFlushCb, ref} from "vue";
 import {configManager} from "../js/utools/config";
-import SelectableButton from "./base/SelectableButton.vue";
+import SelectableButton from "./item/SelectableButton.vue";
 import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshListView, refreshSearchResult} from "../js/store";
 import NormalTag from "./base/NormalTag.vue";
 import SingleLineCode from "./item/SingleLineCode.vue";

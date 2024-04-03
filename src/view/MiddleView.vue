@@ -89,7 +89,7 @@ import CodeView from "./CodeView.vue";
 import FormView from "./FormView.vue";
 import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {configManager} from "../js/utools/config";
-import TopNav from "../components/item/TopNav.vue";
+import TopNav from "../components/TopNav.vue";
 import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";
 import SvgAdd from "../asserts/add.svg";
 import SvgExpand from "../asserts/expand.svg";

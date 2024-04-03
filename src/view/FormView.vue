@@ -42,7 +42,7 @@
         </n-form-item>
 
         <n-form-item label="描述" path="desc">
-          <n-input v-model:value="codeTemplate.desc" :placeholder="placeholders?.desc ?? '可选：请输入描述'" clearable :disabled="!properties.desc" />
+          <n-input v-model:value="codeTemplate.desc" :placeholder="placeholders?.desc ?? '请输入描述（可选）'" clearable :disabled="!properties.desc" />
         </n-form-item>
 
         <n-form-item label="标签" path="tags" >
@@ -52,7 +52,7 @@
               multiple
               tag
               show-on-focus
-              :placeholder="placeholders?.tags ?? '可选：请选择或输入标签'"
+              :placeholder="placeholders?.tags ?? '请选择或输入标签（可选）'"
               :show-arrow="false"
               :options="tags"
               :disabled="!properties.tags"
@@ -334,12 +334,12 @@ import SvgImage2 from "../asserts/image2.svg";
 import SvgScreencut from "../asserts/screencut.svg";
 
 import {GLOBAL_HIERARCHY, loadValidHierarchyJS} from "../js/hierarchy/core";
-import {isXmlOrEscapeCharsExisting, isNetWorkUri} from "../js/utils/common";
+import {isNetWorkUri, isXmlOrEscapeCharsExisting} from "../js/utils/common";
 import {utools_browser_open} from "../js/utools/base";
 import {isArray as _isArray} from "lodash-es"
 import {replaceRenderBlock} from "../js/utools/func";
 import hljs from "../js/dep/highlight-dep";
-import UtoolsImage from "../components/item/UtoolsImage.vue";
+import UtoolsImage from "../components/base/UtoolsImage.vue";
 
 const codeEditorRef = ref()
 const dragTrigger = ref(false)

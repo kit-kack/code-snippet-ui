@@ -63,14 +63,14 @@
 </template>
 <script setup>
 
-import {$list, $normal, $reactive, CODE_VIEW, LIST_VIEW} from "../../js/store";
-import {GLOBAL_HIERARCHY} from "../../js/hierarchy/core";
+import {$list, $normal, $reactive, CODE_VIEW, LIST_VIEW} from "../js/store";
+import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
 import {computed, h, ref, watch} from "vue";
 import dayjs from "dayjs";
-import NormalTag from "../base/NormalTag.vue";
-import SvgExitFullscreen from "../../asserts/exit-fullscreen.svg";
-import {replaceOrAddTag} from "../../js/utils/resolve";
-import {tagColorManager} from "../../js/utools/tag";
+import NormalTag from "./base/NormalTag.vue";
+import SvgExitFullscreen from "../asserts/exit-fullscreen.svg";
+import {replaceOrAddTag} from "../js/utils/resolve";
+import {tagColorManager} from "../js/utools/tag";
 const word = ref(0);
 const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
 const show = ref(false);

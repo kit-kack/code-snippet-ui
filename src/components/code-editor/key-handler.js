@@ -164,7 +164,7 @@ function whenEnter(e,source){
     }
     if(e.shiftKey){
         // 向后寻找下一个\n
-        const currentLineEnd =  content.indexOf('\n',cursorPosition + 1)
+        const currentLineEnd =  content.indexOf('\n',cursorPosition)
         if(currentLineEnd === -1){
             const temp = content+lineChar;
             return {

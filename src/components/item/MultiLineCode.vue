@@ -25,7 +25,7 @@ import {$normal} from "../../js/store";
 import {onMounted, onUpdated, ref} from "vue";
 import {getRealTypeAndValidStatus} from "../../js/utils/language";
 import {isSvg} from "../../js/utils/common";
-import UtoolsImage from "./UtoolsImage.vue";
+import UtoolsImage from "../base/UtoolsImage.vue";
 
 
 const props = defineProps(['code','type','active','imgId']);

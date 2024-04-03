@@ -29,7 +29,7 @@ import {onMounted, onUnmounted, ref} from "vue";
 import {RENDER_KEYHANDLER} from "../../js/keyboard/k-codeview";
 import {Direction} from "../../js/utils/scroller";
 import {SIDE_RENDER_KEYHANDLER} from "../../js/keyboard/k-listview";
-import UtoolsImage from "../item/UtoolsImage.vue";
+import UtoolsImage from "../base/UtoolsImage.vue";
 
 const props = defineProps({
   url: String,
