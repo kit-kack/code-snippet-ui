@@ -81,25 +81,39 @@ export function calculateTime(time){
 
 export function calculateExpiredDesc(stamp){
     if(stamp == null){
-        return '时间未知';
+        return '剩余时间未知';
     }
-    const timestamp = stamp/1000;
+    let timestamp = stamp/1000;
+    let result = '';
+    let flag = false;
     // 计算天数
-    let days = Math.trunc(timestamp/86400) + 1;
-    if(days > 1){
-        return days+'天';
+    let days = Math.trunc(timestamp/86400);
+    if(days > 0){
+        timestamp -= days*86400;
+        result = days+'天';
+        flag = true;
     }
     // 计算小时
-    let hours = Math.trunc(timestamp/3600) + 1;
-    if(hours > 1){
-        return hours+'小时';
+    let hours = Math.trunc(timestamp/3600);
+    if(hours > 0){
+        timestamp -= hours*3600;
+        result += hours+'小时';
+        if(flag){
+            return  result;
+        }
+        flag = true;
     }
     // 计算分钟
-    let minutes = Math.trunc(timestamp/60) + 1;
-    if(minutes > 1){
-        return minutes+'分钟';
+    let minutes = Math.trunc(timestamp/60);
+    if(minutes > 0){
+        timestamp -= minutes*60;
+        result += minutes+'分';
+        if(flag){
+            return  result;
+        }
+        flag = true;
     }
-    return Math.trunc(timestamp%60)+'秒';
+    return result +  Math.trunc(timestamp%60)+'秒';
 }
 
 const networkRegex = /^\w+:\/\/.*/

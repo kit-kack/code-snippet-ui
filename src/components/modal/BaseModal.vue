@@ -5,7 +5,7 @@
            :title="title"
            :closable="false"
            :mask-closable="false"
-           :auto-focus="!vim"
+           :auto-focus="!(vim || nonFocus)"
            @close="$emit('cancel')"
            :style="{
              width: wide ? '80%':'60%'
@@ -48,7 +48,8 @@ import {$normal} from "../../js/store";
 const props = defineProps({
   wide: Boolean,
   title: String,
-  vim: Boolean
+  vim: Boolean,
+  nonFocus: Boolean
 })
 const emit = defineEmits(['update:show','cancel','confirm'])
 const down = throttle(()=>{

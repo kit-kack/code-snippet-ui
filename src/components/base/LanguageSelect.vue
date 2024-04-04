@@ -6,7 +6,6 @@
       show-on-focus
       placeholder="选择代码类型"
       :options="languageOptions"
-      :default-value="configManager.get('default_language')??'plaintext'"
       tag
       :disabled="disabled"
       :size="size"
@@ -38,6 +37,9 @@ const props = defineProps({
   }
 })
 const language = defineModel('language');
+if(!language.value){
+  language.value = configManager.get('default_language')
+}
 
 function handleLanguageChange(v){
   if(GLOBAL_HIERARCHY.currentHierarchy.inline){

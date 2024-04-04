@@ -79,9 +79,6 @@
                color: '#888'
              }"
       >
-        <template v-if="$reactive.main.isRecycleBinActive">
-          剩余{{calculateExpiredDesc(snippet.expired)}} ~
-        </template>
         <template v-if="snippet.dir">
           <n-icon size="16" class="global-color"><svg-directory/></n-icon>
         </template>
@@ -191,6 +188,9 @@ const pair = computed(()=>{
     sideInfo = ' 📗描述匹配';
   }else if(props.snippet.matchType === 2){
     sideInfo = ' 📘内容匹配';
+  }
+  if($reactive.main.isRecycleBinActive){
+    sideInfo = ' ◷ ' + calculateExpiredDesc(props.snippet.expired) + sideInfo;
   }
   if(props.snippet.sections){
     if(props.snippet.sections.length > 0){
@@ -317,7 +317,7 @@ function handleDoubleClick(){
   if(props.snippet.dir){
     GLOBAL_HIERARCHY.changeHierarchy("next")
   }else{
-    snippetCopyOrPaste(true,false)
+    snippetCopyOrPaste(true)
   }
 }
 function handleCancelTop(){
