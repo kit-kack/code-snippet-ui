@@ -103,6 +103,7 @@
                         <n-space align="center">
                           Tab 行为：
                           <n-select
+                              size="small"
                               :options="tabOptions"
                               :default-value="configManager.get('default_tab')??1"
                               :theme-overrides="selectThemeOverrides"
@@ -112,16 +113,7 @@
                         </n-space>
                         <n-space align="center">
                           默认语言：
-                          <n-select
-                              filterable
-                              placeholder="选择默认语言"
-                              :options="languages"
-                              :default-value="configManager.get('default_language')??'plaintext'"
-                              tag
-                              @update-value="v=> configManager.set('default_language',v)"
-                              :theme-overrides="selectThemeOverrides"
-                              :render-tag="renderCodeTypeTag"
-                          />
+                          <language-select is-on-default-setting-mode size="small"/>
                         </n-space>
                         <config-switch title="默认是否注册uTools关键字" config="default_keyword_enable"/>
                       </n-popover>
@@ -167,20 +159,7 @@
                       </n-tooltip>
                     </n-space>
                     <div id="form-code-language-select">
-                      <n-select
-                          :focusable="false"
-                          v-model:value="codeTemplate.type"
-                          filterable
-                          show-on-focus
-                          placeholder="选择代码类型"
-                          :options="languages"
-                          :default-value="configManager.get('default_language')??'plaintext'"
-                          tag
-                          :disabled="!properties.type"
-                          @update:value="handleTypeChange()"
-                          :render-tag="renderCodeTypeTag"
-                          :theme-overrides="selectThemeOverrides"
-                      />
+                      <language-select v-model:language="codeTemplate.type" :disabled="!properties.type"/>
                     </div>
                   </div>
                   <code-editor  v-model="codeTemplate.code"
@@ -204,21 +183,9 @@
                       <div class="file" style="position: relative;background-color: transparent;padding-top: 5px">
                         <div style="width: 24px" ><svg-path/></div>
                         <div style="position: absolute; left: 32px; bottom: 7px">[ {{linkDesc}} ]</div>
-                        <n-select
-                            v-if="!codeTemplate.dir"
-                            style="position: absolute; right:36px; bottom: 7px;width: 230px;height: 24px"
-                            v-model:value="codeTemplate.type"
-                            filterable
-                            size="small"
-                            placeholder="选择代码类型"
-                            :options="languages"
-                            default-value="plaintext"
-                            tag
-                            :disabled="!properties.type"
-                            @update:value="handleTypeChange()"
-                            :render-tag="renderCodeTypeTag"
-                            :theme-overrides="selectThemeOverrides"
-                        />
+                        <div v-if="!codeTemplate.dir" style="position: absolute; right:36px; bottom: 7px;width: 230px;height: 24px">
+                          <language-select v-model:language="codeTemplate.type" :disabled="!properties.type" size="small"/>
+                        </div>
                         <n-button v-if="codeTemplate.conf && codeTemplate.ref === 'custom'" @click="openConfModal(null)" style="position: absolute; right:50px; bottom: 0px;" :color="$normal.theme.globalColor" quaternary circle :disabled="!properties.code">
                           <template #icon>
                             <svg-conf/>
@@ -345,6 +312,8 @@ import {replaceRenderBlock} from "../js/utools/func";
 import hljs from "../js/dep/highlight-dep";
 import UtoolsImage from "../components/base/UtoolsImage.vue";
 import {clearHistory, keepHistory} from "../components/code-editor/history";
+import LanguageSelect from "../components/base/LanguageSelect.vue";
+import {selectThemeOverrides} from "../js/theme";
 
 const codeEditorRef = ref()
 const dragTrigger = ref(false)
@@ -497,15 +466,6 @@ const rules = {
       return !value || !isXmlOrEscapeCharsExisting(value);
     },
     trigger: ["input","blur"]
-  }
-}
-function renderCodeTypeTag({option}){
-  if(option.value.length > 2 && option.value.startsWith('x-')){
-    return option.label + ' （解析♾️）'
-  }else if(option.value === 'image' || option.value === 'svg'){
-    return option.label + ' （渲染🖼️）'
-  }else{
-    return option.label;
   }
 }
 function renderTag({ option, handleClose }) {
@@ -768,11 +728,6 @@ function handleChooseCommand(command){
   showFuncModal.value = false;
   codeEditorRef.value.insertCommand("{{"+command+"}}");
 }
-function handleTypeChange(){
-  if(GLOBAL_HIERARCHY.currentHierarchy.inline){
-    codeTemplate.type = fullAlias(codeTemplate.type)
-  }
-}
 
 onMounted(()=>{
   watch(()=> codeTemplate.type,(newValue) =>{
@@ -792,24 +747,6 @@ onUnmounted(()=>{
   document.removeEventListener('keydown',keyDownHandler)
   $reactive.form.fullScreen = false;
 })
-const selectThemeOverrides = {
-  peers:{
-    InternalSelection:{
-      border: `1px solid transparent`,
-      borderActive: `1px solid transparent`,
-      borderHover: `1px solid transparent`,
-      borderFocus: `1px solid transparent`,
-      boxShadowHover: 'none',
-      boxShadowActive: 'none',
-      boxShadowFocus: 'none',
-      textColor: utools.isDarkColors()? 'white':'black',
-      borderRadius: 0,
-      color:'transparent',
-      colorFocus: 'white',
-      colorActive: utools.isDarkColors()? '#575859': '#fff'
-    }
-  }
-}
 function setSnippetNameWhenUrl(url) {
   if(!codeTemplate.name){
     codeTemplate.name = getFileName(url);

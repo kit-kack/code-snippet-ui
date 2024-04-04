@@ -194,6 +194,24 @@ const themeOverrides = ref(getThemeOverrides())
 const globalThemeRefresh = ()=>{
     themeOverrides.value = getThemeOverrides()
 }
+const selectThemeOverrides = {
+    peers:{
+        InternalSelection:{
+            border: `1px solid transparent`,
+            borderActive: `1px solid transparent`,
+            borderHover: `1px solid transparent`,
+            borderFocus: `1px solid transparent`,
+            boxShadowHover: 'none',
+            boxShadowActive: 'none',
+            boxShadowFocus: 'none',
+            textColor: utools.isDarkColors()? 'white':'black',
+            borderRadius: 0,
+            color:'transparent',
+            colorFocus: 'white',
+            colorActive: utools.isDarkColors()? '#575859': '#fff'
+        }
+    }
+}
 
 export {
     theme,
@@ -201,5 +219,6 @@ export {
     globalThemeRefresh,
     adjustTheme,
     colorSchemaStyleOptions,
-    darkColorSchemaStyleOptions
+    darkColorSchemaStyleOptions,
+    selectThemeOverrides
 }
