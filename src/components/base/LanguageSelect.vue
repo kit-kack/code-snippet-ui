@@ -51,6 +51,9 @@ function handleLanguageChange(v){
   }
 }
 function renderCodeTypeTag({option}){
+  if(props.isOnDefaultSettingMode){
+    return option.label;
+  }
   if(option.value.length > 2 && option.value.startsWith('x-')){
     return option.label + ' （解析♾️）'
   }else if(option.value === 'image' || option.value === 'svg'){

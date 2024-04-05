@@ -67,6 +67,22 @@ p.func-desc i,.kitx-mark{
   font-size: 13px;
   font-style: normal;
 }
+p.func-desc b{
+  padding: 0 2px;
+  font-weight: bolder;
+  font-family: Consolas, Monaco, Andale Mono, Ubuntu Mono, monospace;
+  &::before{
+    content: "{{";
+    font-weight: normal;
+  }
+  &::after{
+    content: "}}";
+    font-weight: normal;
+  }
+  &:hover{
+    color: var(--global-color);
+  }
+}
 p.tooltip b{
   padding-left: 3px;
   padding-right: 3px;

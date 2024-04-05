@@ -6,7 +6,7 @@
         <n-collapse-item :title="func.name">
           <p class="func-desc" v-html="func.desc?.replaceAll('\n','<br/>')??'暂无描述'"></p>
         </n-collapse-item>
-      <n-button tertiary size="tiny" v-for="command in func.commands"
+      <n-button secondary type="tertiary" size="tiny" v-for="command in func.commands"
                 @click="$emit('choose',command)" >
         {{command}}
       </n-button>

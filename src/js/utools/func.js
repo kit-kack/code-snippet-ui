@@ -15,8 +15,8 @@ const DEFAULT_FUNCS = {
     '主动输入':{
         name: "主动输入",
         desc: `弹出输入框，用户主动输入值;
-[input/输入]可选参数：任意值（作为输入框默认值）
-[select/选择]必需参数：字符串数组,例如<i>['a','b','c']</i>
+<b>input/输入</b>可选参数：任意值（作为输入框默认值）
+<b>select/选择</b>必需参数：字符串数组,例如<i>['a','b','c']</i>
 额外说明：如果没有使用变量接收，默认输入的值会被保存到名为<i>位置X</i>的变量，故请勿将自定义的变量设置为<i>位置X</i>的形式`,
         commands: ["input","输入","select","选择"],
         expression: '内置提供，无函数实现',
@@ -25,7 +25,7 @@ const DEFAULT_FUNCS = {
     '日期与时间':{
         name: "日期与时间",
         desc: `获取日期与时间;
-[pattern/自定义格式]需要携带格式化参数，例如<i>HH:mm:ss</i>`,
+<b>pattern/自定义格式</b>需要携带格式化参数，例如<i>HH:mm:ss</i>`,
         commands: ["now", "时间戳", "date", "日期", "time", "时间","pattern", "自定义格式"],
         expression: `\
 switch (command) {
@@ -68,9 +68,9 @@ switch (param){
     "随机":{
         name: "随机",
         desc: `获取随机数/nanoid/uuid;
-random可选参数：<i>min..max</i>（来指定范围） 
-nanoid可选参数：<i>size</i>(来指定id字符数量)
-uuid可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）`,
+<b>random</b>可选参数：<i>min..max</i>（来指定范围） 
+<b>nanoid</b>可选参数：<i>size</i>(来指定id字符数量)
+<b>uuid</b>可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）`,
         commands: ["random", "nanoid","uuid"],
         expression: `\
 switch (command){

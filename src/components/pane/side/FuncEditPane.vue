@@ -39,7 +39,7 @@
             <n-tab-pane name="command" tab="占位符" style="padding-right: 10px">
               <n-scrollbar style="max-height: 300px;padding-right: 10px">
                 <n-form-item label="分组" path="name" :rule="NAME_RULE" label-placement="left">
-                  <n-input v-model:value="pair.name" placeholder="分组名需要非空且唯一"   clearable/>
+                  <n-input v-model:value="pair.name" placeholder="起个好名字呗~"   clearable/>
                 </n-form-item>
                 <n-form-item label="占位符" path="commands" :rule="COMMAND_RULE" label-placement="left">
                   <n-dynamic-tags v-model:value="pair.commands"/>
@@ -47,7 +47,7 @@
                 <n-form-item label="描述" path="desc" label-placement="left">
                   <div style="width: 99%;padding-left: 11px">
                     <code-editor v-model="pair.desc"
-                                 placeholder="有些故事没讲完，那就算了吧"
+                                 placeholder="↪ 有些故事没讲完，那就算了吧"
                                  :languages="[['html']]"/>
                   </div>
                 </n-form-item>
@@ -58,8 +58,8 @@
                 <p class="func-impl-preset-content" style="margin-bottom: 5px">function func(command,param){</p>
                 <div style="padding-left: 10px">
                   <code-editor v-model="pair.expression"
-                               height="250px"
-                               placeholder="我曾经试着忘掉你，但每次都是加深了记忆"/>
+                               height="250px "
+                               placeholder="↪ 我曾经试着忘掉你，但每次都是加深了记忆"/>
                 </div>
                 <p class="func-impl-preset-content">}
                   <n-tooltip>
