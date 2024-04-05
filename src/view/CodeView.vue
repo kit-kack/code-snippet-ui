@@ -565,8 +565,8 @@ onUnmounted(()=>{
 }
 #dark-app {
   .hljs-code-number{
-    color: #666;
-    border-right-color:  #3a3c41;
+    color: #abb2bf;
+    border-right-color:  #424447;
   }
   .code-view-side-info{
     p{

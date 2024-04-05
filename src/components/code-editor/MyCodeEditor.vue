@@ -1,8 +1,7 @@
 <template>
   <div
-      class="code-editor"
+      class="code-editor hide-header"
       :class="{
-      'hide-header': !header,
       scroll: scroll,
       'read-only': readOnly,
       wrap: wrap,
@@ -44,7 +43,6 @@
             width: showLineNums ? 'calc(100% - ' + lineNumsWidth + 'px)' : '100%',
           }"
             ref="textarea"
-            :autofocus="autofocus"
             spellcheck="false"
             @keydown="handleNewKeyDown"
             @scroll="calcScrollDistance"
@@ -91,7 +89,7 @@ export default {
   props: {
     lineNums: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     modelValue: {
       type: String,
@@ -107,17 +105,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    autofocus: {
-      type: Boolean,
-      default: false,
-    },
-    header: {
-      type: Boolean,
-      default: true,
-    },
     width: {
       type: String,
-      default: "540px",
+      default: "100%",
     },
     height: {
       type: String,
@@ -149,33 +139,17 @@ export default {
         return [["javascript", "JS"]];
       },
     },
-    langListWidth: {
-      type: String,
-      default: "110px",
-    },
-    langListHeight: {
-      type: String,
-      default: "auto",
-    },
-    langListDisplay: {
-      type: Boolean,
-      default: false,
-    },
-    displayLanguage: {
-      type: Boolean,
-      default: true,
-    },
     zIndex: {
       type: String,
       default: "0",
     },
     fontSize: {
       type: String,
-      default: "17px",
+      default: "14px",
     },
     padding: {
       type: String,
-      default: "20px",
+      default: "5px",
     },
     historyKey: {
       type: String
@@ -452,7 +426,7 @@ export default {
   background: #303133;
 }
 #dark-app .code-editor{
-  background: #454647;
+  background: #303133;
 }
 #dark-app .func-edit-tab .code-editor{
   background: #2c2c32;
@@ -462,15 +436,7 @@ export default {
   width: 100%;
   height: 100%;
 }
-/* header */
-.code-editor .header {
-  box-sizing: border-box;
-  position:fixed;
-  right: 10px;
-  z-index: 1;
-  height: 34px;
 
-}
 
 /* code-area */
 .code-editor .code-area {
@@ -559,35 +525,6 @@ export default {
   user-select: none;
   height: 100%;
   font-family: sans-serif;
-}
-.code-editor .list > .lang-list {
-  border-radius: 5px;
-  box-sizing: border-box;
-  overflow: auto;
-  font-size: 13px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  text-align: left;
-}
-.code-editor .list > .lang-list > li {
-  font-size: 13px;
-  transition: background 0.16s ease, color 0.16s ease;
-  box-sizing: border-box;
-  padding: 0 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 30px;
-}
-.code-editor .list > .lang-list > li:first-child {
-  padding-top: 5px;
-}
-.code-editor .list > .lang-list > li:last-child {
-  padding-bottom: 5px;
-}
-.code-editor .list > .lang-list > li:hover {
-  background: rgba(160, 160, 160, 0.4);
 }
 /* line-nums */
 .code-editor .line-nums {

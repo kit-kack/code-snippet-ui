@@ -3,14 +3,11 @@
     <template v-if="$reactive.form.fullScreen">
       <code-editor v-model="codeTemplate.code"
                    ref="codeEditorRef"
-                   font-size="14px"
-                   padding="5px"
                    height="calc( 100vh - 18px )"
                    history-key="code"
-                   :header="false"
                    :placeholder="placeholders?.code"
-                   line-nums
-                   @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/>
+                   @exit-full-screen="requestFullScreen(false)"
+                   :languages="language"/>
     </template>
     <template v-else>
       <n-form
@@ -164,17 +161,15 @@
                   </div>
                   <code-editor  v-model="codeTemplate.code"
                                 ref="codeEditorRef"
-                                font-size="14px"
                                 height="220px"
-                                :header="false"
                                 history-key="code"
-                                padding="5px"
-                                line-nums
                                 :placeholder="placeholders?.code"
                                 @insert-image="handleInsertImage"
                                 @img-drag-trigger = "e => dragTrigger = e"
                                 @img-drop="handleImageDrop"
-                                @exit-full-screen="requestFullScreen(false)" width="100%" :languages="language"/></div>
+                                @exit-full-screen="requestFullScreen(false)"
+                                :languages="language"/>
+                </div>
               </n-tab-pane>
               <n-tab-pane name="link" tab="关联" :disabled="formProperties.codeSource === 'code'">
                 <template v-if="codeTemplate.path || codeTemplate.dir">
@@ -914,6 +909,9 @@ function handleClearPath(){
     --plugin-background-color: #454647;
     --scrollbar-thumb-background-color: #5a5a5a;
   }
+}
+#light-app-v5 #form-code .code-editor{
+  --plugin-background-color: #ffffff;
 }
 #form-image{
   box-sizing: border-box;

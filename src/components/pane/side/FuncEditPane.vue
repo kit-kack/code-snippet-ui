@@ -47,11 +47,8 @@
                 <n-form-item label="描述" path="desc" label-placement="left">
                   <div style="width: 99%;padding-left: 11px">
                     <code-editor v-model="pair.desc"
-                                 font-size="14px"
-                                 padding="5px"
-                                 line-nums
                                  placeholder="有些故事没讲完，那就算了吧"
-                                 :header="false" width="99%" :languages="[['html']]"/>
+                                 :languages="[['html']]"/>
                   </div>
                 </n-form-item>
               </n-scrollbar>
@@ -61,12 +58,8 @@
                 <p class="func-impl-preset-content" style="margin-bottom: 5px">function func(command,param){</p>
                 <div style="padding-left: 10px">
                   <code-editor v-model="pair.expression"
-                               font-size="14px"
-                               padding="5px"
                                height="250px"
-                               line-nums
-                               placeholder="我曾经试着忘掉你，但每次都是加深了记忆"
-                               :header="false" width="100%"/>
+                               placeholder="我曾经试着忘掉你，但每次都是加深了记忆"/>
                 </div>
                 <p class="func-impl-preset-content">}
                   <n-tooltip>
@@ -266,5 +259,8 @@ function doFinal(){
 #dark-app .code-editor{
   --plugin-background-color: #2c2c32;
   --scrollbar-thumb-background-color: #5a5a5a;
+}
+#light-app-v5 .code-editor{
+  --plugin-background-color: #ffffff;
 }
 </style>
