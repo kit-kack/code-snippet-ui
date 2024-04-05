@@ -278,7 +278,7 @@
 import {computed, h, onMounted, onUnmounted, reactive, ref, toRaw, watch,} from "vue";
 import {tagColorManager} from "../js/utools/tag";
 import {configManager} from "../js/utools/config";
-import {fullAlias, getFileName, getRealTypeAndValidStatus, languages} from "../js/utils/language";
+import {fullAlias, getFileName, getRealTypeAndValidStatus} from "../js/utils/language";
 import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../js/store";
 import {CtrlStr} from "../js/some";
 import CodeEditor from '../components/code-editor/MyCodeEditor.vue';
@@ -306,9 +306,9 @@ import {isArray as _isArray} from "lodash-es"
 import {replaceRenderBlock} from "../js/utools/func";
 import hljs from "../js/dep/highlight-dep";
 import UtoolsImage from "../components/base/UtoolsImage.vue";
-import {clearHistory, keepHistory} from "../components/code-editor/history";
 import LanguageSelect from "../components/base/LanguageSelect.vue";
 import {selectThemeOverrides} from "../js/theme";
+import {removeHistory} from "../components/code-editor/history";
 
 const codeEditorRef = ref()
 const dragTrigger = ref(false)
@@ -642,11 +642,9 @@ function handleUpdate(){
 }
 function requestFullScreen(isFullScreen) {
   if(isFullScreen){
-    keepHistory("code")
     $reactive.form.fullScreen = true;
   }else {
     // document.exitFullscreen();
-    clearHistory("code");
     $reactive.form.fullScreen = false;
   }
 }
@@ -741,6 +739,7 @@ onUnmounted(()=>{
   hljs.removePlugin(X_PLUGIN)
   document.removeEventListener('keydown',keyDownHandler)
   $reactive.form.fullScreen = false;
+  removeHistory("code")
 })
 function setSnippetNameWhenUrl(url) {
   if(!codeTemplate.name){

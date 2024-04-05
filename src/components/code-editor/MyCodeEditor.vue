@@ -82,7 +82,7 @@
 <script>
 import hljs from "../../js/dep/highlight-dep";
 import {handleCodeEditorKeyDown} from "./key-handler";
-import {clearHistory, useHistory} from "./history";
+import {useHistory} from "./history";
 
 export default {
   name: "CodeEditor",
@@ -407,9 +407,6 @@ export default {
         this.getLineNum();
       }
     }
-  },
-  unmounted() {
-    clearHistory(this.historyKey);
   }
 };
 </script>

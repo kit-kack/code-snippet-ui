@@ -7,18 +7,11 @@ const GLOBAL_REDOS = {};
  * @type {Record<String,CodeEditorChange[]>}
  */
 const GLOBAL_UNDOS = {};
-/**
- * @type {Record<String,number>}
- */
-const GLOBAL_DEP_COUNT = {};
 
 function _initRedoAndUndo(key){
-    if(key in GLOBAL_DEP_COUNT){
-        GLOBAL_DEP_COUNT[key]++;
-    }else{
+    if(!(key in GLOBAL_REDOS)){
         GLOBAL_REDOS[key] = [];
         GLOBAL_UNDOS[key] = [];
-        GLOBAL_DEP_COUNT[key] = 0;
     }
     return {
         redos: GLOBAL_UNDOS[key],
@@ -118,19 +111,14 @@ export function useHistory(fn,initValue,shareKey) {
     }
 }
 
-export function clearHistory(key){
-    if(key){
-        GLOBAL_DEP_COUNT[key]--;
-        if(GLOBAL_DEP_COUNT[key] === 0){
-            delete GLOBAL_REDOS[key];
-            delete GLOBAL_UNDOS[key];
-            delete GLOBAL_DEP_COUNT[key];
-        }
-    }
-}
-
-export function keepHistory(key){
-    if(key){
-        GLOBAL_DEP_COUNT[key]++;
+/**
+ * 在包含code-editor且指定history共享的界面中，<br/>
+ * 需要在所有关联的code-editor被销毁后调用本方法来销毁对应的history
+ * @param key
+ */
+export function removeHistory(key){
+    if(key && key in GLOBAL_REDOS){
+        delete GLOBAL_REDOS[key];
+        delete GLOBAL_UNDOS[key];
     }
 }
