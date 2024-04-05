@@ -5,7 +5,6 @@
   --high-color: white;
 }
 #light-app{
-  --utools-background-color: white;
   --plugin-background-color: #f5f5f5;
   --plugin-text-selected-background-color: rgba(0,0,0,.1);
   --scrollbar-thumb-background-color: #ccc;
@@ -15,15 +14,14 @@
 
 }
 #light-app-v5{
-  --utools-background-color: #f4f4f4;
-  --plugin-background-color: #f5f5f5;
+  --plugin-background-color: #f4f4f4;
+  --scrollbar-thumb-border-color: white;
   --plugin-text-selected-background-color: rgba(0,0,0,.15);
   --scrollbar-thumb-background-color: #ccc;
   --item-code-text-color: #a9a8a8;
   --item-code-scroller-border-color: #e0e0e0;
 }
 #dark-app{
-  --utools-background-color: #303133;
   --plugin-background-color: #303133;
   --plugin-text-selected-background-color: rgba(255,255,255,.1);
   --scrollbar-thumb-background-color: #262626;
@@ -45,37 +43,25 @@
     background-color: var(--plugin-text-selected-background-color) !important;
   }
   &::-webkit-scrollbar-track-piece{
-    background-color: transparent;
+    background-color: transparent; // 轨道透明
   }
-  &::-webkit-scrollbar-thumb{
+  &::-webkit-scrollbar-thumb{  // 滑块
     border-color: var(--plugin-background-color);
     background-color: var(--scrollbar-thumb-background-color);
   }
   &::-webkit-scrollbar-corner{
-    background-color: transparent;
+    background-color: transparent;  // 交叉角透明
   }
 }
 body#light-app{
   background-color: var(--plugin-background-color);
 }
 body#light-app-v5{
-  background-color: var(--utools-background-color);
+  background-color: var(--plugin-background-color);
 }
 .snippet-item  b{
   color: var(--global-color);
 }
-
-.vue-recycle-scroller{
-  &::-webkit-scrollbar-track-piece{
-    background-color: transparent;
-  }
-  &::-webkit-scrollbar-thumb{
-    border-color: var(--plugin-background-color);
-    background-color: var(--scrollbar-thumb-background-color);
-  }
-}
-
-
 p.func-desc i,.kitx-mark{
   color: #ffa400;
   font-size: 13px;

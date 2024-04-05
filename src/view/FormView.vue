@@ -910,6 +910,10 @@ function handleClearPath(){
 }
 #dark-app #form-code{
   background-color: transparent;
+  .code-editor{
+    --plugin-background-color: #454647;
+    --scrollbar-thumb-background-color: #5a5a5a;
+  }
 }
 #form-image{
   box-sizing: border-box;

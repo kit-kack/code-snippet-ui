@@ -263,4 +263,8 @@ function doFinal(){
   font-size: 12px;
   font-weight: bold;
 }
+#dark-app .code-editor{
+  --plugin-background-color: #2c2c32;
+  --scrollbar-thumb-background-color: #5a5a5a;
+}
 </style>
