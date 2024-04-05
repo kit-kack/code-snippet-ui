@@ -224,11 +224,18 @@ function whenBackspace(e,source){
  */
 function whenMatchedWord(e,source){
     const start = source.cursorStart;
+    const end = source.cursorEnd;
     const content = source.content;
+    let newContent;
+    if(start === end){
+        newContent = content.slice(0,start)+e.key+MATCHED_WORDS[e.key]+content.slice(start);
+    }else{
+        newContent = content.slice(0,start) + e.key + content.slice(start,end) + MATCHED_WORDS[e.key] + content.slice(end);
+    }
     return {
         changeType: "all",
-        newCursorPosition: start+1,
-        newContent: content.slice(0,start)+e.key+MATCHED_WORDS[e.key]+content.slice(start)
+        newCursorPosition: end+1,
+        newContent: newContent
     }
 }
 
