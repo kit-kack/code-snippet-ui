@@ -152,9 +152,9 @@ hello, {{clipboard}}  // 返回剪切板复制内容
 > 在`无command有param`的情况下，此时param将作为JavaScript表达式执行
 ```js
 // command无，param为JavaScript语句（需要return结果）
-{{:return "Hello World"}}
+{{:return "Hello World"}} // Hello World
 // 使用变量接收
-{{one:::return "One"}}
+{{one:::return "One"}}   // One
 {{#two:::
     return "Two"
 }}

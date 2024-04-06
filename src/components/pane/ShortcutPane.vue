@@ -1,58 +1,116 @@
 <template>
   <div id="shortcut-pane">
     <template v-for="data in shortcuts">
-      <n-divider dashed>
-        {{data.title}}
-      </n-divider>
-      <n-list hoverable clickable :show-divider="false">
-        <template v-for="(item,index) in data.items">
-          <template v-if="item.tooltip">
-            <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
-              <template #trigger>
-                <n-list-item>
-                  <div>
-                    <div style="float: left;">
-                      {{item.feature}}
-                      <n-icon :class="{
+      <template v-if="data.tab">
+        <n-divider dashed>
+          {{data.title}}
+        </n-divider>
+        <n-tabs type="bar" animated size="small" justify-content="space-around" :value="data.items[$reactive.common.shortcutTabIndexForCodeView].title">
+          <n-tab-pane v-for="(d,i) in data.items" :key="d.title" :name="d.title">
+            <n-list hoverable clickable :show-divider="false">
+              <template v-for="(item,index) in d.items">
+                <template v-if="item.tooltip">
+                  <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
+                    <template #trigger>
+                      <n-list-item>
+                        <div>
+                          <div style="float: left;">
+                            {{item.feature}}
+                            <n-icon :class="{
                       'global-color': popoverShow[index]
                     }">
-                        <SvgTip/>
-                      </n-icon>
+                              <SvgTip/>
+                            </n-icon>
+                          </div>
+                          <div style="float: right;">
+                            <template v-if="Array.isArray(item.shortcut)">
+                              <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                            </template>
+                            <template v-else>
+                              <span class="shortcut">{{item.shortcut}}</span>
+                            </template>
+                          </div>
+                        </div>
+                      </n-list-item>
+                    </template>
+                    <p class="tooltip" v-html="item.tooltip"></p>
+                  </n-popover>
+                </template>
+                <template v-else>
+                  <n-list-item>
+                    <div>
+                      <div style="float: left;">
+                        {{item.feature}}
+                      </div>
+                      <div style="float: right;">
+                        <template v-if="Array.isArray(item.shortcut)">
+                          <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                        </template>
+                        <template v-else>
+                          <span class="shortcut">{{item.shortcut}}</span>
+                        </template>
+                      </div>
                     </div>
-                    <div style="float: right;">
-                      <template v-if="Array.isArray(item.shortcut)">
-                        <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
-                      </template>
-                      <template v-else>
-                        <span class="shortcut">{{item.shortcut}}</span>
-                      </template>
-                    </div>
-                  </div>
-                </n-list-item>
+                  </n-list-item>
+                </template>
               </template>
-              <p class="tooltip" v-html="item.tooltip"></p>
-            </n-popover>
-          </template>
-          <template v-else>
-            <n-list-item>
-              <div>
-                <div style="float: left;">
-                  {{item.feature}}
+            </n-list>
+          </n-tab-pane>
+        </n-tabs>
+      </template>
+      <template v-else>
+        <n-divider dashed>
+          {{data.title}}
+        </n-divider>
+        <n-list hoverable clickable :show-divider="false">
+          <template v-for="(item,index) in data.items">
+            <template v-if="item.tooltip">
+              <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
+                <template #trigger>
+                  <n-list-item>
+                    <div>
+                      <div style="float: left;">
+                        {{item.feature}}
+                        <n-icon :class="{
+                      'global-color': popoverShow[index]
+                    }">
+                          <SvgTip/>
+                        </n-icon>
+                      </div>
+                      <div style="float: right;">
+                        <template v-if="Array.isArray(item.shortcut)">
+                          <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                        </template>
+                        <template v-else>
+                          <span class="shortcut">{{item.shortcut}}</span>
+                        </template>
+                      </div>
+                    </div>
+                  </n-list-item>
+                </template>
+                <p class="tooltip" v-html="item.tooltip"></p>
+              </n-popover>
+            </template>
+            <template v-else>
+              <n-list-item>
+                <div>
+                  <div style="float: left;">
+                    {{item.feature}}
+                  </div>
+                  <div style="float: right;">
+                    <template v-if="Array.isArray(item.shortcut)">
+                      <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                    </template>
+                    <template v-else>
+                      <span class="shortcut">{{item.shortcut}}</span>
+                    </template>
+                  </div>
                 </div>
-                <div style="float: right;">
-                  <template v-if="Array.isArray(item.shortcut)">
-                    <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
-                  </template>
-                  <template v-else>
-                    <span class="shortcut">{{item.shortcut}}</span>
-                  </template>
-                </div>
-              </div>
-            </n-list-item>
+              </n-list-item>
+            </template>
           </template>
-        </template>
-
-      </n-list>
+        </n-list>
+      </template>
     </template>
   </div>
 </template>
@@ -61,6 +119,7 @@
 import {CtrlStr} from "../../js/some";
 import SvgTip from "../../asserts/tip.svg"
 import {reactive} from "vue";
+import {$reactive} from "../../js/store";
 const popoverShow = reactive({})
 const shortcuts = [{
   title: "通用",
@@ -137,31 +196,47 @@ const shortcuts = [{
     shortcut: 'F9'
   }]
 },{
+  tab: true,
   title: "代码预览界面",
-  items: [{
-    feature: "纯净模式Pure",
-    shortcut: CtrlStr+" + P"
-  },{
-    feature: "切换渲染Render",
-    shortcut: "R"
-  },{
-    feature: "查看说明Show",
-    shortcut: 'S'
-  }]
-},{
-  title: "代码预览界面 —— Markdown渲染",
-  items: [{
-    feature: "目录TOC",
-    shortcut: "T"
-  },{
-    feature: '选中其他代码块',
-    shortcut: "Tab"
-  },{
-    feature: "复制代码块内容",
-    shortcut: "Space"
-  },{
-    feature: "跳转前后小节",
-    shortcut: [CtrlStr+ " + J", CtrlStr+" + K"]
+  items:[{
+      title: "基本",
+      items: [{
+        feature: "纯净模式Pure",
+        shortcut: CtrlStr+" + P"
+      },{
+        feature: "切换渲染Render",
+        shortcut: "R"
+      },{
+        feature: "查看说明Show",
+        shortcut: 'S'
+      }]
+    },{
+      title: "Markdown✨",
+      items: [{
+        feature: "目录TOC",
+        shortcut: "T"
+      },{
+        feature: '选中其他代码块',
+        shortcut: "Tab"
+      },{
+        feature: "复制代码块内容",
+        shortcut: "Space"
+      },{
+        feature: "跳转前后小节",
+        shortcut: [CtrlStr+ " + J", CtrlStr+" + K"]
+      }]
+    },{
+      title: "Image🖼️",
+      items: [{
+        feature: "缩放",
+        shortcut: ["Shift + J", "Shift + K"]
+      },{
+        feature: "旋转",
+        shortcut: ["Shift + H", "Shift + L"]
+      },{
+        feature: "恢复",
+        shortcut: "G"
+      }]
   }]
 },{
   title: "编辑界面",

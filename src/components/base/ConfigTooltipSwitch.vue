@@ -13,7 +13,7 @@
         </n-icon>
       </span>
     </template>
-    <slot ></slot>
+    <slot></slot>
   </n-popover>
 </template>
 

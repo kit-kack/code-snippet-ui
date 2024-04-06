@@ -110,6 +110,7 @@ const $reactive = reactive({
     common:{
         // 【快捷方式】界面
         shortcutActive: false,
+        shortcutTabIndexForCodeView: 0,
         // 【变量输入】界面
         variableActive: false,
     },

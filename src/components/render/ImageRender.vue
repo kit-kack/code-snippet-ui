@@ -104,7 +104,7 @@ const K_CODEVIEW_IMAGE_DOWN= ({code,shift})=>{
         doMove(Direction.UP)
       }
       break;
-    case 'Digit0':
+    case 'KeyG':
       rate.value = 100;
       deg.value = 0;
       x.value = 0;
