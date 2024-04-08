@@ -5,7 +5,7 @@
         <n-divider dashed>
           {{data.title}}
         </n-divider>
-        <n-tabs type="bar" animated size="small" justify-content="space-around" :value="data.items[$reactive.common.shortcutTabIndexForCodeView].title">
+        <n-tabs type="bar" @click="handleClick" animated size="small" justify-content="space-around" :value="data.items[$reactive.common.shortcutTabIndexForCodeView].title">
           <n-tab-pane v-for="(d,i) in data.items" :key="d.title" :name="d.title">
             <n-list hoverable clickable :show-divider="false">
               <template v-for="(item,index) in d.items">
@@ -211,7 +211,7 @@ const shortcuts = [{
         shortcut: 'S'
       }]
     },{
-      title: "Markdown✨",
+      title: "Markdown渲染",
       items: [{
         feature: "目录TOC",
         shortcut: "T"
@@ -226,7 +226,7 @@ const shortcuts = [{
         shortcut: [CtrlStr+ " + J", CtrlStr+" + K"]
       }]
     },{
-      title: "Image🖼️",
+      title: "Image渲染",
       items: [{
         feature: "缩放",
         shortcut: ["Shift + J", "Shift + K"]
@@ -255,6 +255,22 @@ const shortcuts = [{
   }]
 }]
 
+/**
+ *
+ * @param {MouseEvent} e
+ */
+function handleClick(e){
+  const text = e.target?.innerText;
+  if(!text){
+    return;
+  }
+  const codeViewShortcut = shortcuts.find(item => {
+    return item.title === '代码预览界面' && item.tab;
+  })
+  if(codeViewShortcut){
+    $reactive.common.shortcutTabIndexForCodeView = codeViewShortcut.items.findIndex(item => item.title === text);
+  }
+}
 
 
 
