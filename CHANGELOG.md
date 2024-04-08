@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.4](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.3...v2.7.4) (2024-04-08)
+
+
+### Features
+
+* 增加F9键-回收站 ([4bff211](https://github.com/kit-kack/code-snippet-ui/commit/4bff211cd0812ac54da27c00da4c15d8b1042402))
+* **code-editor:** 优化暗黑场景下其滚动条样式 ([66def80](https://github.com/kit-kack/code-snippet-ui/commit/66def8072e50e82814ea153aa7bc88abd033afa0))
+* **code-editor:** 优化utools5.0亮色场景下其滚动条样式 ([3914a1b](https://github.com/kit-kack/code-snippet-ui/commit/3914a1b231852839e8f2e036b7585c63777da341))
+* **code-editor:** 支持输入[、{等字符时包裹选中文本 ([ec52c21](https://github.com/kit-kack/code-snippet-ui/commit/ec52c213ac1b92d94eeba6785132a000f55313ea))
+
+
+### Bug Fixes
+
+* code-editor history共享 ([1797876](https://github.com/kit-kack/code-snippet-ui/commit/1797876c1bb3195b8501a79b399b4bf608db91b1))
+* code-editor shift+enterbug ([bbd79f4](https://github.com/kit-kack/code-snippet-ui/commit/bbd79f44e6788a4dfd06222964369a87202a3e84))
+* **code-editor:** 修复组件销毁后history残留问题 ([20d89a2](https://github.com/kit-kack/code-snippet-ui/commit/20d89a20a25d96552245a7964804ed81b1413aae))
+* **command-func:** 优化界面 ([da725a5](https://github.com/kit-kack/code-snippet-ui/commit/da725a5f3f1d42f273f8ef66708d0d61143780e6))
+* **ListItem:** 优化剩余存活时间显示 ([4ec6828](https://github.com/kit-kack/code-snippet-ui/commit/4ec682877bbcc71414d3aaf70bd41ff433f4ca3e))
+* **shortcut-tab:** 优化显示 ([4cc6d82](https://github.com/kit-kack/code-snippet-ui/commit/4cc6d82c5a2971409300d4d23f6aa86dcd469bb5))
+
 ### [2.7.3](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.2...v2.7.3) (2024-04-02)
 
 
