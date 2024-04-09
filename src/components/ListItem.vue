@@ -323,11 +323,14 @@ function handleDoubleClick(){
 function handleCancelTop(){
   GLOBAL_HIERARCHY.update(props.snippet,"top");
   $index.value = props.index;
-  doItemRefresh()
+  $normal.keepSelectedStatus = true;
+  refreshSearchResult()
+
 }
 function handleSetTop(){
   GLOBAL_HIERARCHY.update(props.snippet,"top");
-  doItemRefresh()
+  $normal.keepSelectedStatus = true;
+  refreshSearchResult()
 }
 
 function handleMouseLeave(e){

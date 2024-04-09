@@ -1,8 +1,9 @@
 import {utools_db_store} from "./base";
-import {$index} from "../store";
+import {$index, $reactive} from "../store";
 import { clone as _clone } from "lodash-es"
 import {codeSnippetManager} from "./snippet";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
+import {configManager} from "./config";
 /**
  *
  * Snippet Hierarchy Hub 职责
@@ -84,7 +85,9 @@ export const hierachyHubManager = {
                 // 添加进去
                 topList.push(eleName)
                 // 更新index
-                $index.value = topList.length -1;
+                // isReadmeShow
+                const isReadmeShow = !configManager.get('readme_close') || $reactive.utools.search;
+                $index.value = topList.length - (isReadmeShow? 0 : 1);
             }
         }else{
             if(mode !== "set"){
