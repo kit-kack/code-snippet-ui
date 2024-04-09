@@ -1,6 +1,4 @@
 import {configManager} from "../../js/utools/config";
-import {INVERSE_MATCHED_WORDS, isMatchedWord, MATCHED_WORDS} from "../../js/utils/language";
-
 
 
 /**
@@ -86,25 +84,45 @@ function whenTab(e,source){
     // 获取tabWidth
     const tabChars = _getTabChars();
     if(e.shiftKey){
+        // 解析行
         const lines = getSelectLines(source);
         const count = tabChars.length === 1 ? 4 : tabChars.length;
+        // 第一行之前的数据不需要缩进处理
         let newContent = source.content.slice(0,lines[0].start);
+        // 记录第一行的缩进量
         let firstCur = -1;
+        let totalSubstractLength = 0;
         for (const line of lines) {
+            // 获取一行内容
             const lineContent = source.content.slice(line.start,line.end + 1);
+            // 找到缩进处理后的位置
             const cur = _substractTabChars(source.content.slice(line.start,line.end + 1),count);
             if(firstCur === -1){
                 firstCur = cur;
             }
             newContent += lineContent.slice(cur) ;
+            totalSubstractLength += cur;
         }
         const lastLength = lines.at(-1).end + 1;
+        // 加上后面的文本数据
         if(lastLength < source.content.length){
             newContent += source.content.slice(lastLength);
         }
+        // 当cursor不是第一行开头时，需要将cursor位置进行移动
         let cursorStart = source.cursorStart;
-        if(cursorStart !== lines[0].start){
+        const offset = cursorStart - lines[0].start;
+        if(offset < firstCur){
+            cursorStart = lines[0].start
+        }else{
             cursorStart -= firstCur;
+        }
+        if(source.cursorStart !== source.cursorEnd){
+            return {
+                changeType: 'all',
+                newContent: newContent,
+                newCursorPosition: cursorStart,
+                newCursorPositionEnd: source.cursorEnd - totalSubstractLength
+            }
         }
         return {
             changeType: 'all',
@@ -186,6 +204,28 @@ function whenEnter(e,source){
             changeType: "none"
         }
     }
+}
+const MATCHED_WORDS = {
+    '(':')',
+    '{':'}',
+    '[':']',
+    "'":"'",
+    '"':'"',
+    '`':'`'
+}
+const INVERSE_MATCHED_WORDS =  (()=> {
+    const result = {};
+    Object.keys(MATCHED_WORDS).forEach(v => {
+        result[MATCHED_WORDS[v]] = v
+    })
+    return result
+
+})()
+function isMatchedWord(a,b){
+    if(a in MATCHED_WORDS){
+        return MATCHED_WORDS[a] === b;
+    }
+    return false
 }
 
 /**

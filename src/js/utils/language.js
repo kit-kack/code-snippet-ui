@@ -164,27 +164,6 @@ export function recongizeFileType(type){
     }
     return type.trim().toLowerCase();
 }
-export const MATCHED_WORDS = {
-  '(':')',
-  '{':'}',
-  '[':']',
-  "'":"'",
-  '"':'"',
-  '`':'`'
-}
-export const INVERSE_MATCHED_WORDS =  (()=>{
-    const result = {};
-    Object.keys(MATCHED_WORDS).forEach(v=>{
-      result[MATCHED_WORDS[v]] = v
-    })
-    return result
-})()
-export function isMatchedWord(a,b){
-    if(a in MATCHED_WORDS){
-        return MATCHED_WORDS[a] === b;
-    }
-    return false
-}
 
 export function getFileName(url){
     let index = url.lastIndexOf('/');

@@ -177,12 +177,10 @@ export default {
         const isContentUpdate = change.changeType === 'all' || change.changeType === 'content';
         const isCursorUpdate = change.changeType === 'all' || change.changeType === 'cursor';
         if(isContentUpdate){
-          this.cursorPosition = change.newCursorPosition;
-          this.insertTab = true;
+          this.triggerCursor(change,false);
           this.$emit("update:modelValue",change.newContent)
         }else if(isCursorUpdate){
-          this.cursorPosition = change.newCursorPosition;
-          this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
+          this.triggerCursor(change,true);
         }
       }
     },(this.modelValue ?? this.content) + "",this.historyKey);
@@ -198,7 +196,8 @@ export default {
       languageTitle: this.languages[0][1] ? this.languages[0][1] : this.languages[0][0],
       content: this.value,
       cursorPosition: 0,
-      insertTab: false,
+      cursorPositionEnd: 0,
+      cursorMode: null,
       lineNum: 0,
       lineNumsWidth: 0,
       scrolling: false,
@@ -269,14 +268,17 @@ export default {
     insertCommand(command){
       const cursorPosition = this.$refs.textarea.selectionStart;
       const newContent = this.modelValue.slice(0,cursorPosition) + command + this.modelValue.slice(cursorPosition);
-      this.cursorPosition = cursorPosition +  command.length;
-      this.insertTab = true;
-      this.$emit("update:modelValue",newContent)
-      this.record({
+      /**
+      * @type CodeEditorChange
+      */
+      const change = {
         changeType: "all",
         newContent: newContent,
-        newCursorPosition: this.cursorPosition
-      })
+        newCursorPosition: cursorPosition + command.length
+      }
+      this.triggerCursor(change,false);
+      this.$emit("update:modelValue",newContent)
+      this.record(change)
     },
     updateValue(e) {
       if (this.modelValue == undefined) {
@@ -285,7 +287,8 @@ export default {
         this.record({
           changeType: "all",
           newContent: e.target.value,
-          newCursorPosition: this.$refs.textarea.selectionStart
+          newCursorPosition: this.$refs.textarea.selectionStart,
+          newCursorPositionEnd: this.$refs.textarea.selectionStart === this.$refs.textarea.selectionEnd ? undefined: this.$refs.textarea.selectionEnd
         })
         this.$emit("update:modelValue", e.target.value);
       }
@@ -338,6 +341,34 @@ export default {
       // displayed lineNum
       this.lineNum = lineNum;
     },
+    /**
+     * 变动光标位置
+     * @param {CodeEditorChange} change
+     * @param {boolean} manual - 手动触发
+     */
+    triggerCursor(change,manual){
+      this.cursorPosition = change.newCursorPosition;
+      if(change.newCursorPositionEnd){
+        this.cursorPositionEnd = change.newCursorPositionEnd;
+        if(manual){
+          this.$refs.textarea.setSelectionRange(change.newCursorPosition, change.newCursorPositionEnd);
+        }else{
+          this.cursorMode = "selection";
+        }
+      }else{
+        if(manual){
+          this.$refs.textarea.setSelectionRange(change.newCursorPosition, change.newCursorPosition);
+        }else{
+          this.cursorMode = "move";
+        }
+      }
+    },
+    getNowCursorChange(){
+      return {
+          newCursorPosition: this.$refs.textarea.selectionStart,
+          newCursorPositionEnd: this.$refs.textarea.selectionStart === this.$refs.textarea.selectionEnd ? undefined: this.$refs.textarea.selectionEnd
+      }
+    },
 
     handleNewKeyDown(e){
       // 优先处理 ctrl+z ctrl+y
@@ -377,14 +408,14 @@ export default {
         const isContentUpdate = change.changeType === 'all' || change.changeType === 'content';
         const isCursorUpdate = change.changeType === 'all' || change.changeType === 'cursor';
         if(isContentUpdate){
-          this.cursorPosition = change.newCursorPosition;
-          this.insertTab = true;
+          // 这里需要先记录，因为光标变更操作往往不会被记录,这里需要覆盖nowChange
+          this.record(change,this.getNowCursorChange())
+          this.triggerCursor(change,false);
           this.$emit("update:modelValue",change.newContent)
-          this.record(change)
         }else if(isCursorUpdate){
-          this.cursorPosition = change.newCursorPosition;
-          this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
-          this.record(change)
+          // 这里需要先记录，因为光标变更操作往往不会被记录,这里需要覆盖nowChange
+          this.record(change,this.getNowCursorChange())
+          this.triggerCursor(change,true);
         }
       }
     }
@@ -396,9 +427,13 @@ export default {
     this.resizer();
   },
   updated() {
-    if (this.insertTab) {
-      this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
-      this.insertTab = false;
+    if(this.cursorMode){
+      if(this.cursorMode === "move"){
+        this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPosition);
+      }else{
+        this.$refs.textarea.setSelectionRange(this.cursorPosition, this.cursorPositionEnd);
+      }
+      this.cursorMode = null;
     }
     if (this.lineNums) {
       if (this.scrolling) {

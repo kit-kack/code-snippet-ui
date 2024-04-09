@@ -284,6 +284,7 @@ interface CodeEditorSource {
 }
 interface CodeEditorChange {
     readonly newCursorPosition?: number,
+    readonly newCursorPositionEnd?: number,
     readonly newContent?: string,
     readonly changeType: "none" | "cursor" | "content" | "all"
 }

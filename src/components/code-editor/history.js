@@ -44,6 +44,9 @@ export function useHistory(fn,initValue,shareKey) {
         undos = [];
     }
     let timer = null;
+    /**
+     * @type {CodeEditorChange}
+     */
     let nowChange = {
         changeType: "all",
         newContent: initValue,
@@ -68,8 +71,9 @@ export function useHistory(fn,initValue,shareKey) {
     /**
      *
      * @param {CodeEditorChange} change
+     * @param {CodeEditorChange} nowChangeBackup
      */
-    function record(change){
+    function record(change,nowChangeBackup){
         if(timer){
             clearTimeout(timer);
         }
@@ -78,6 +82,11 @@ export function useHistory(fn,initValue,shareKey) {
                 undos.shift();
             }
             if(nowChange){
+                // update nowChange
+                if(nowChangeBackup){
+                    nowChange.newCursorPosition = nowChangeBackup.newCursorPosition
+                    nowChange.newCursorPositionEnd = nowChangeBackup.newCursorPositionEnd
+                }
                 undos.push(nowChange);
                 if(undos.length === LIMITED_MAX_RECORD_COUNT){
                     undos.shift();
