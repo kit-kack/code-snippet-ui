@@ -148,16 +148,20 @@ hello, {{clipboard}}  // 返回剪切板复制内容
 // 另外，遇到上面的{{#...}}就会直接解析，而{{...}}会统一到【主动输入】完成之后解析
 ```
 
-- 使用JavaScript表达式
-> 在`无command有param`的情况下，此时param将作为JavaScript表达式执行
+- 使用JavaScript语句
+> 在`无command有param`的情况下，此时param将作为JavaScript语句执行
 ```js
-// command无，param为JavaScript语句（需要return结果）
+// command为空，param为JavaScript语句（需要return结果）
 {{:return "Hello World"}} // Hello World
 // 使用变量接收
-{{one:::return "One"}}   // One
-{{#two:::
-    return "Two"
-}}
+{{#one:::return "1"}}   
+{{two:::
+    // 进阶：在 占位符实现代码 和 param为JavaScript语句 中
+    // 1.覆写console.log和alert方法为utools.showNotifiaction系统弹窗提示API
+    console.log("1+1=2")
+    // 2.可以通过内置对象$来获取前面配置的变量值 $['@variable']
+    return $['@one'] + "+1 = 2"
+}}  // 1+1 = 2
 // {{#variable=value}} 用来快速为变量赋值
 {{#two=Two}}
 ```

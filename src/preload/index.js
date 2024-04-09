@@ -60,12 +60,19 @@ const vm = require('vm')
 function notify(...args){
     utools.showNotification(args.join(' '))
 }
+const emptyFunc = function (){}
 const CONTEXT = Object.freeze({
     require,
     fetch,
-    console:{
-        log:notify
-    },
+    console: new Proxy({},{
+        get(target,key) {
+            if(key === "log" ){
+                return notify
+            }else{
+                return emptyFunc
+            }
+        }
+    }),
     alert:notify,
     atob,
     btoa,
