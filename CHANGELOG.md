@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.5](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.4...v2.7.5) (2024-04-09)
+
+
+### Bug Fixes
+
+* 优化文档与快捷键说明 ([796ed03](https://github.com/kit-kack/code-snippet-ui/commit/796ed030f1151f92cead14b6c35cefad30158164))
+* **占位符:** 优化文档 ([fd32d22](https://github.com/kit-kack/code-snippet-ui/commit/fd32d225c4aea1b1d5dc84b492ea1ffa47518c0a))
+* **code-editor:** 改进对光标选中的redo和undo支持 ([655780c](https://github.com/kit-kack/code-snippet-ui/commit/655780c807ff0863117851e74eac6cce971eccbe))
+* **ListView:** 修复 置顶操作后页面未刷新bug ([67313d2](https://github.com/kit-kack/code-snippet-ui/commit/67313d24b6f6d0edf45670eddd40be9d15599706))
+
 ### [2.7.4](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.3...v2.7.4) (2024-04-08)
 
 
