@@ -19,8 +19,8 @@ export default defineConfig({
         name:'window.preload',
         path:'src/preload/index.js'
       }),
-        createUpxPlugin(({
-            outFileName:'code-snippet-[version].upx'
-        }))
+        // createUpxPlugin(({
+        //     outFileName:'code-snippet-[version].upx'
+        // }))
     ],
 })

@@ -142,6 +142,7 @@ function whenTab(e,source){
         for (const line of lines) {
             newContent += tabChars + source.content.slice(line.start,line.end + 1) ;
         }
+        const totalAddLength = tabChars.length * lines.length;
         const lastLength = lines.at(-1).end + 1;
         if(lastLength < source.content.length){
             newContent += source.content.slice(lastLength);
@@ -153,7 +154,8 @@ function whenTab(e,source){
         return {
             changeType: 'all',
             newContent: newContent,
-            newCursorPosition: cursorStart
+            newCursorPosition: cursorStart,
+            newCursorPositionEnd: source.cursorEnd + totalAddLength
         }
     }
 }
