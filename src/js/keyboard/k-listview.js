@@ -3,7 +3,7 @@ import {
     $list,
     $normal,
     $reactive,
-    CODE_VIEW,
+    CODE_VIEW, CREATE_VIEW,
     refreshListView,
     refreshSearchResult,
     switchToFullUIMode,
@@ -78,6 +78,33 @@ function controlSideViewOrMultiLineCode(direction,code) {
     }
 
 }
+function _up_without_index(code,ctrl){
+    switch (code){
+        case 'KeyR':
+            if(ctrl){
+                refreshListView(true)
+            }else{
+                GLOBAL_HIERARCHY.changeHierarchy("root")
+            }
+            break
+        case 'KeyQ':
+            if($reactive.utools.subItemSelectedIndex !== -1 || $reactive.main.isDel){
+                $reactive.utools.subItemSelectedIndex = -1;
+                $reactive.main.isDel = false;
+            }else{
+                GLOBAL_HIERARCHY.changeHierarchy("prev")
+            }
+            break;
+        case 'F9':
+            $reactive.main.isRecycleBinActive = !$reactive.main.isRecycleBinActive;
+            break;
+        case 'KeyN':
+            if(ctrl){
+                GLOBAL_HIERARCHY.changeView(CREATE_VIEW)
+            }
+            break
+    }
+}
 /**
  * @type KeyUpHandler
  */
@@ -90,6 +117,11 @@ export const K_LISTVIEW_UP = (ext)=>{
     //
     // // vim操作下隐藏鼠标
     // $reactive.main.isCursorShow = false;
+    if($index.value < 0){
+        _up_without_index(code,ctrl)
+        return
+    }
+    // need $index >= 0
     switch (code){
         case 'Space':
             if ($reactive.utools.subItemSelectedIndex !== -1) {
@@ -157,6 +189,20 @@ export const K_LISTVIEW_UP = (ext)=>{
     }
     return true;
 }
+
+function _down_without_index(code){
+    switch (code){
+        case "Slash": // / ?
+            switchToFullUIMode();
+            $reactive.main.settingActive = true;
+            break;
+        case 'KeyZ':
+            switchToFullUIMode()
+            $reactive.common.shortcutActive = !$reactive.common.shortcutActive;
+            break
+    }
+}
+
 /**
  * @type KeyDownHandler
  */
@@ -212,7 +258,11 @@ export const K_LISTVIEW_DOWN = (ext)=>{
     // if ($reactive.utools.focused) {
     //     return;
     // }
-
+    if($index.value < 0){
+        _down_without_index(code)
+        return
+    }
+    // need $index >= 0
     // vim操作下隐藏鼠标
     $reactive.main.isCursorShow = false;
     switch (code){
@@ -232,7 +282,7 @@ export const K_LISTVIEW_DOWN = (ext)=>{
         case "KeyH":
         case "ArrowLeft":
             // 校验是否有效
-            if($index.value=== -1){
+            if($index.value < 0){
                 $message.error("没有可选择的元素")
             }else if(shift){
                 controlSideViewOrMultiLineCode(Direction.LEFT,code)

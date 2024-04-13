@@ -25,6 +25,7 @@ codeSnippetManager.init()
 function bindApp(){
     tagColorManager.init()
     GLOBAL_KEYBOARD_HANDLER.init();
+    statisticsManager.countUsed();
     const app = createApp(App)
 
     initNU(app)

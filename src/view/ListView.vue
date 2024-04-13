@@ -15,11 +15,12 @@
                   :active="active"
                   :item="item"
                   :data-index="index">
-                <list-item
+                <component
+                    :is="SNIPPET_ITEM_COMPS[configManager.get('strategy_item_code_show')]"
                     :index="index"
                     :snippet="item"
                     :last="index === $list.length - 1"
-                    :selected="handleSelect(index,$index)"/>
+                    :selected="index === $index"/>
                 <div v-if="(index === $list.length -1) && $reactive.main.isFullScreenShow" style="height: 215px"></div>
               </DynamicScrollerItem>
             </template>
@@ -67,7 +68,6 @@
 
 <script setup>
 import {$index, $list, $normal, $reactive} from "../js/store";
-import ListItem from "../components/ListItem.vue";
 import {DynamicScroller, DynamicScrollerItem} from "vue-virtual-scroller";
 import SvgNotFound from "../asserts/not-found.svg";
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
@@ -76,16 +76,17 @@ import SvgDirectory from "../asserts/directory.svg";
 import SvgLink from "../asserts/link.svg"
 import {getDirType} from "../js/utils/common";
 import {doScrollForListView} from "../js/utils/scroller";
+import MultiCodeSnippetItem from "../components/item/MultiCodeSnippetItem.vue";
+import SingleCodeSnippetItem from "../components/item/SingleCodeSnippetItem.vue";
+import NoCodeSnippetItem from "../components/item/NoCodeSnippetItem.vue";
+import {configManager} from "../js/utools/config";
 
 const AsyncCodeView =defineAsyncComponent(()=> import('./LiteCodeView.vue'))
-const handleSelect = (index,selectedIndex)=>{
-  if(index === selectedIndex){
-    // $reactive.currentSnippet = $list.value[index]
-    return true;
-  }else{
-    return false;
-  }
-}
+const SNIPPET_ITEM_COMPS = [
+    NoCodeSnippetItem,
+    SingleCodeSnippetItem,
+    MultiCodeSnippetItem
+]
 watch($index,(newValue)=>{
   $reactive.currentSnippet = $list.value[newValue]
 },{

@@ -1,10 +1,12 @@
 <template>
   <div class="image-render">
     <template v-if="imgId">
-       <utools-image :id="imgId" :style="{
+      <div class="image-render-utools" :style="{
         maxHeight: '80vh',
         maxWidth: '90vw',
-      transform: `translate(${x}px,${y}px)  scale( calc(${rate}/100))  rotate(${deg}deg) `}"/>
+      transform: `translate(${x}px,${y}px)  scale( calc(${rate}/100))  rotate(${deg}deg) `}">
+        <utools-image :id="imgId" />
+      </div>
     </template>
     <template v-else-if="type === 'svg-code'">
       <div class="image-render-svg"
@@ -206,12 +208,12 @@ onUnmounted(()=>{
   align-items: center;
   justify-content: center;
 }
-.image-render > img{
+.image-render  img{
   border-radius: 5px;
   width: 95%;
   transition: box-shadow .2s;
 }
-.image-render > img:hover{
+.image-render  img:hover{
   box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
 }
 .image-render-svg svg, .image-render > img.svg-as-image{
@@ -221,5 +223,8 @@ onUnmounted(()=>{
 }
 .image-render-svg svg:hover, .image-render-file:hover{
   box-shadow: #eaeef2 0 4px 32px;
+}
+.image-render-utools img{
+  width: 100%;
 }
 </style>

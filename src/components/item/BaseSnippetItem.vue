@@ -5,13 +5,13 @@
        @dblclick="handleDoubleClick"
        @mouseleave="handleMouseLeave"
        @mouseenter="isHover = true"
-       >
+  >
     <n-card
-            embedded
-            size="small"
-            content-style="padding: 0 12px"
-            header-style="height:28px;"
-            :style="getSelectedStyle(props.selected,isHover&&$reactive.main.isCursorShow)"
+        embedded
+        size="small"
+        content-style="padding: 0 12px"
+        header-style="height:28px;"
+        :style="getSelectedStyle(props.selected,isHover&&$reactive.main.isCursorShow)"
     >
       <!-- 置顶 圆心 -->
       <div class="snippet-item__top"
@@ -29,8 +29,7 @@
               <span class="snippet-item__title"   v-html="escapeHtmlExceptB((snippet.temp && !snippet.matchType)? snippet.temp:snippet.name)"></span>
               <!-- 描述（标题右侧）  子代码片段 -->
               <span class="snippet-item__desc">
-                <span v-if="configManager.get('strategy_item_code_show') > 0" v-html="(snippet.matchType === 1 && snippet.temp)? snippet.temp : snippet.desc"></span>
-                <span v-else>{{pair.sideInfo}}</span>
+                <slot name="header-desc" :snippet="snippet" :pair="pair"></slot>
               </span>
             </n-ellipsis>
           </div>
@@ -50,29 +49,12 @@
         </n-scrollbar>
       </template>
 
-      <template v-if="configManager.get('strategy_item_code_show')  === 2">
-        <!-- 代码 -->
-        <multi-line-code :type="pair.renderType" :img-id="snippet.imgId" :code="pair.code" :active="$index === index"/>
-        <!-- no-code-desc -->
-        <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
-              {{pair.sideInfo}}
-        </span>
-      </template>
-      <template v-else-if="configManager.get('strategy_item_code_show') === 1">
-        <single-line-code :type="pair.renderType" :code="pair.code"/>
-        <!-- no-code-desc -->
-        <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
-              {{pair.sideInfo}}
-        </span>
-      </template>
-      <template v-else>
-        <!-- 描述（标题下方） -->
-        <n-ellipsis :tooltip="false">
-          <span class="snippet-item__desc" style="margin-left: 0px;" v-html="(snippet.matchType === 1 && snippet.temp)? snippet.temp : snippet.desc" ></span>
-        </n-ellipsis>
-      </template>
-
-
+      <!-- 主体内容 -->
+      <slot name="content" :snippet="snippet" :pair="pair" :index="index"></slot>
+      <!-- 左侧下方：功能性标志 -->
+      <span  class="snippet-item-info no-item-code" style="left: 0;z-index: 20;" >
+            <slot name="footer-desc" :pair="pair"></slot>
+      </span>
       <!-- 右侧下方 （语言类型|使用次数|上次使用时间） -->
       <span  class="snippet-item-info" style="  transform-origin: 100% 0;right:0;margin-right:3px;"
              :style="{
@@ -144,28 +126,25 @@
 </template>
 
 <script setup>
-import {computed, nextTick, queuePostFlushCb, ref} from "vue";
-import {configManager} from "../js/utools/config";
-import SelectableButton from "./item/SelectableButton.vue";
-import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshListView, refreshSearchResult} from "../js/store";
-import NormalTag from "./base/NormalTag.vue";
-import SingleLineCode from "./item/SingleLineCode.vue";
-import MultiLineCode from "./item/MultiLineCode.vue";
-import SvgEdit from "../asserts/edit.svg"
-import SvgView from "../asserts/view.svg"
-import SvgCopy from "../asserts/copy.svg"
-import SvgDelete from "../asserts/delete.svg"
-import SvgTopUp from "../asserts/top-up.svg"
-import SvgTopDown from "../asserts/top-down.svg"
-import SvgImage from "../asserts/image.svg"
-import SvgDirectory from "../asserts/directory.svg"
-import SvgLink from "../asserts/link.svg"
-import SvgResume from "../asserts/resume.svg"
-import {GLOBAL_HIERARCHY} from "../js/hierarchy/core";
-import {snippetCopyOrPaste} from "../js/keyboard/k-common";
-import {calculateExpiredDesc, calculateTime, escapeHtmlExceptB} from "../js/utils/common";
-import {hierachyHubManager} from "../js/utools/hub";
-import {doScrollForListView} from "../js/utils/scroller";
+import {computed, ref} from "vue";
+import {configManager} from "../../js/utools/config";
+import SelectableButton from "../item/SelectableButton.vue";
+import {$index, $normal, $reactive, CODE_VIEW, EDIT_VIEW, refreshListView, refreshSearchResult} from "../../js/store";
+import NormalTag from "../base/NormalTag.vue";
+import SvgEdit from "../../asserts/edit.svg"
+import SvgView from "../../asserts/view.svg"
+import SvgCopy from "../../asserts/copy.svg"
+import SvgDelete from "../../asserts/delete.svg"
+import SvgTopUp from "../../asserts/top-up.svg"
+import SvgTopDown from "../../asserts/top-down.svg"
+import SvgImage from "../../asserts/image.svg"
+import SvgDirectory from "../../asserts/directory.svg"
+import SvgLink from "../../asserts/link.svg"
+import SvgResume from "../../asserts/resume.svg"
+import {GLOBAL_HIERARCHY} from "../../js/hierarchy/core";
+import {snippetCopyOrPaste} from "../../js/keyboard/k-common";
+import {calculateExpiredDesc, escapeHtmlExceptB} from "../../js/utils/common";
+import {hierachyHubManager} from "../../js/utools/hub";
 
 const showBtnModal = ref(false)
 const props = defineProps(['snippet','selected','index','last'])
@@ -180,8 +159,6 @@ const pair = computed(()=>{
 
   // type
   let showType = props.snippet.type?? 'plaintext';
-  let renderType = showType;
-  let code;
   // sideInfo
   let sideInfo = '';
   if(props.snippet.matchType === 1){
@@ -215,54 +192,8 @@ const pair = computed(()=>{
   }else if(props.snippet.path && props.snippet.link) {
     showType = '🔗'
   }
-  const mode = configManager.get('strategy_item_code_show');
-  if(mode > 0){
-    if(props.snippet.image){
-      code = "[图片]: 存储在utools中，支持同步";
-      renderType = 'plaintext';
-    }
-    else if(props.snippet.dir){
-      if(props.snippet.ref === "local"){
-        code = "[本地目录]: "+props.snippet.path;
-      }else if(props.snippet.ref === "custom"){
-        code = "[自定义目录]: "+props.snippet.path;
-      }else{
-        code = "[普通目录] ";
-      }
-      renderType = 'plaintext';
-    }else{
-      // file
-      if(props.snippet.path){
-        if(props.snippet.link) {
-          code = '[关联链接]: ' + props.snippet.path;
-          renderType = 'plaintext';
-        }else{
-          if(renderType === 'image' || renderType === 'svg'){
-            if(mode === 1){
-              code = '[关联图片]: '+props.snippet.path;
-              renderType = 'plaintext';
-            }else if(mode === 2){
-              code = props.snippet.path;
-              showType = '';
-            }else{
-              code = '[关联片段]: '+props.snippet.path;
-              renderType = 'plaintext';
-            }
-          }else{
-            code = '[关联片段]: '+props.snippet.path;
-            renderType = 'plaintext';
-          }
-        }
-      }else{ // normal code
-        code = props.snippet.code;
-        if(mode === 2 && renderType === 'svg'){
-          showType = '';
-        }
-      }
-    }
-  }
   return {
-    showType,renderType,code,sideInfo
+    showType,sideInfo
   }
 })
 

@@ -103,7 +103,7 @@ export const GLOBAL_KEYBOARD_HANDLER = {
         }
 
         document.onkeyup = e => {
-            if ($reactive.utools.vimDisabled || $reactive.main.settingActive || $reactive.utools.focused || $index.value < 0 || $reactive.currentMode >= EDIT_VIEW) {
+            if ($reactive.utools.vimDisabled || $reactive.main.settingActive || $reactive.utools.focused || $reactive.currentMode >= EDIT_VIEW) {
                 return;
             }
             // 需要输入的场景被禁用
