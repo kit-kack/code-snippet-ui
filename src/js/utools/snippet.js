@@ -5,7 +5,7 @@ import {tagColorManager} from "./tag";
 import {batch_delete_utools_keyword, delete_utools_keyword, register_utools_keyword} from "./keyword";
 import {configManager} from "./config";
 
-const CODE_PREFIX = "code/";
+export const CODE_PREFIX = "code/";
 const SUB_CODE_PREFIX = "#code/"
 const GLOBAL_FUNC = "func";
 export const codeSnippetManager = {

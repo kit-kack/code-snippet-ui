@@ -45,10 +45,10 @@ export async function load_backup(path){
     await tagColorManager.load(zip, "code-snippet-tag.json")
     // func
     await formatManager.load(zip, "code-snippet-func.json","func")
-    // hub
-    await hierachyHubManager.load(zip, "hub")
     // snippet
     await codeSnippetManager.load(zip, "code")
+    // hub
+    await hierachyHubManager.load(zip, "hub")
 
     // exit,refresh
     $dialog.info({

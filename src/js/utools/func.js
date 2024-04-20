@@ -5,6 +5,7 @@ import {nanoid} from "nanoid";
 import dayjs from "dayjs";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {toString as _toString} from "lodash-es";
+import {desktopPath} from "../some";
 
 const GLOBAL_FUNC = "func";
 const GLOBAL_FUNC_PREFIX = "func/";
@@ -34,7 +35,8 @@ const DEFAULT_FUNCS = {
           "select": "选择"
         },
         expression: '内置提供，无函数实现',
-        default: true
+        default: true,
+        sort: 0
     },
     '日期与时间':{
         name: "日期与时间",
@@ -46,6 +48,7 @@ const DEFAULT_FUNCS = {
           "time": "时间",
           "pattern": "自定义格式"
         },
+        sort: 1,
         expression: `\
 switch (command) {
     case "now": // 时间戳
@@ -65,6 +68,7 @@ switch (command) {
           "clipboard": "剪切板",
           "ip": "ip地址",
         },
+        sort: 2,
         expression: `\
 switch (command){
     case "clipboard": // 剪切板
@@ -97,6 +101,7 @@ switch (command){
             "nanoid": null,
             "uuid": null
         },
+        sort: 3,
         expression: `\
 switch (command){
     case "nanoid":
@@ -147,6 +152,7 @@ switch (command){
             "snakecase": "转下划线",
             "kebabcase": "转短横线",
         },
+        sort: 4,
         expression: `\
 if(!param){
     return param;
@@ -439,13 +445,102 @@ export const formatManager = {
         if(this.isInited){
             return;
         }
-        this.funcMap = utools.db.get(GLOBAL_FUNC)?.data ?? {...DEFAULT_FUNCS};
+        let data = utools.db.get(GLOBAL_FUNC)?.data;
+        if(data){
+            this._old_version_data_mirgate(data);
+            utools.db.remove(GLOBAL_FUNC);
+        }else{
+            const docs = utools.db.allDocs(GLOBAL_FUNC_PREFIX);
+            if(docs && docs.length > 0){
+                docs.sort((a,b) => a.data.sort - b.data.sort);
+                data = {
+                    "主动输入": DEFAULT_FUNCS['主动输入']
+                }
+                for (const doc of docs) {
+                    const func = doc.data;
+                    if(!func.default){
+                        data[func.name] = func;
+                    }
+                }
+                this.funcMap = data;
+            }else{
+                this._mirgate(structuredClone(DEFAULT_FUNCS));
+            }
+        }
         this.isInited = true;
         console.log('formatManager init');
     },
+    _mirgate(newFuncMap){
+        this.funcMap ={
+            "主动输入": DEFAULT_FUNCS['主动输入']
+        }
+        for (const funcKey  in newFuncMap) {
+            const func = newFuncMap[funcKey];
+            if(!func.default){
+                this._storeFunc(func);
+            }
+        }
+    },
+    _old_version_data_mirgate(oldVersionFuncMap){
+        // 必须先执行 this.mirgate
+        this._mirgate(structuredClone(DEFAULT_FUNCS));
+        const backupForMirgate = {};
+        for (const funcKey  in oldVersionFuncMap) {
+            const func = oldVersionFuncMap[funcKey];
+            // check name repeat
+            let mirgateFlag = false;
+            if(this.checkNameRepeat(func.name)){
+                mirgateFlag = true;
+                func.mirgateErrorMessage = '分组名与 新内置分组名 重复，无法判断实现代码一致'
+            }
+            if(!mirgateFlag){
+                // check command repeat
+                // 旧版本 func.commands 为 [ one ,two ]
+                for (const command of func.commands) {
+                    if(this.checkCommandRepeat(command,func.name)){
+                        mirgateFlag = true;
+                        func.mirgateErrorMessage = '占位符与 新内置占位符 重复，无法判断实现代码一致'
+                        break;
+                    }
+                }
+            }
+            if(mirgateFlag){
+                const commands = {};
+                for (const command of func.commands) {
+                    commands[command] = null
+                }
+                func.commands = commands;
+                backupForMirgate[funcKey] = func;
+            }else{
+                // store
+                this._storeFunc(func)
+            }
+        }
+
+        // generate file
+        if(Object.keys(backupForMirgate).length > 0){
+            window.preload.writeFile(desktopPath + 'code-snippet-func.json',
+                JSON.stringify(backupForMirgate,null,2)
+            )
+            utools.showNotification('占位符存储发生变化，旧数据生成于桌面/code-snippet-func.json，请自行迁移')
+        }
+    },
+    /**
+     * @param {Func} func
+     * @private
+     */
+    _storeFunc(func){
+        if(func.sort === undefined){
+            func.sort = Date.now();
+        }
+        this.funcMap[func.name] = func;
+        utools_db_store(GLOBAL_FUNC_PREFIX + func.name,func)
+    },
     reset() {
-        this.funcMap = {...DEFAULT_FUNCS};
-        utools.db.remove(GLOBAL_FUNC)
+        // remove
+        utools.db.allDocs(GLOBAL_FUNC_PREFIX).forEach(doc => utools.db.remove(doc._id));
+        // use default
+        this._mirgate(structuredClone(DEFAULT_FUNCS))
     },
     /**
      * 检查 Func中的Command是否重复
@@ -516,8 +611,7 @@ export const formatManager = {
             return false;
         }
         // 保存
-        this.funcMap[func.name] = func;
-        utools_db_store(GLOBAL_FUNC,this.funcMap)
+        this._storeFunc(func);
         return true
     },
     /**
@@ -534,8 +628,11 @@ export const formatManager = {
             return false;
         }
         // 保存
-        this.funcMap[func.name] = func;
-        utools_db_store(GLOBAL_FUNC,this.funcMap)
+        if(func.name !== oldName){
+            delete this.funcMap[oldName];
+            utools.db.remove(GLOBAL_FUNC_PREFIX + oldName)
+        }
+        this._storeFunc(func);
         return true
     },
     /**
@@ -549,7 +646,7 @@ export const formatManager = {
             }else{
                 // 移除
                 delete this.funcMap[name]
-                utools_db_store(GLOBAL_FUNC,this.funcMap)
+                utools.db.remove(GLOBAL_FUNC_PREFIX + name)
             }
         }
     },
@@ -1032,7 +1129,8 @@ export const formatManager = {
             funcs[key] = {
                 name: func.name,
                 desc: func.desc,
-                commands: func.commands
+                commands: func.commands,
+                sort: func.sort
             }
             // store
             zip.file(`${dirname}/${func.name}.func.js`,func.expression)
@@ -1049,9 +1147,15 @@ export const formatManager = {
                 for (const key in obj.funcs) {
                     const func = obj.funcs[key];
                     func.expression = await zip.file(`${dirname}/${func.name}.func.js`).async("string");
-                    formatManager.funcMap[key] = func
+                    if(func.default || func.name=== '主动输入'){
+                       continue;
+                    }
+                    const commands = func.commands;
+                    if('input' in commands || 'select' in commands){
+                        continue;
+                    }
+                    this._storeFunc(func);
                 }
-                utools_db_store(GLOBAL_FUNC,formatManager.funcMap)
             }
         }catch (e){
             utools.showNotification(`解析${filename}时发生异常，原因为${e.message}`)

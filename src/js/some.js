@@ -1,5 +1,6 @@
 // 备份文件地址
 export const backupFilePath = utools.getPath('desktop')+(utools.isWindows()? "\\":'/') +'code-snippet-backup.zip';
+export const desktopPath = utools.getPath('desktop') +(utools.isWindows()? "\\":'/');
 // 本地配置目录
 export const localConfigDirPath = window.preload.getFinalPath(utools.getPath('appData'),'./code-snippet-utools')
 // CTRL键

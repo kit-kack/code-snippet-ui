@@ -1,7 +1,7 @@
 import {utools_db_store} from "./base";
 import {$index, $reactive} from "../store";
 import { clone as _clone } from "lodash-es"
-import {codeSnippetManager} from "./snippet";
+import {CODE_PREFIX, codeSnippetManager} from "./snippet";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {configManager} from "./config";
 /**
@@ -262,6 +262,17 @@ export const hierachyHubManager = {
                 }
                 const obj = JSON.parse(await item.async("string"))
                 if(obj._id && obj.data){
+                    // only handle root : topList去除无效元素
+                    const newTopList = [];
+                    if(obj._id === ROOT_HIERARCHY_PREFIX){
+                        const topList = obj.data.topList ?? [];
+                        for (const topId of topList) {
+                            if(utools.db.get(CODE_PREFIX + topId)){
+                                newTopList.push(topId)
+                            }
+                        }
+                        obj.data.topList = newTopList
+                    }
                     utools_db_store(obj._id,obj.data)
                 }
             }
