@@ -8,7 +8,7 @@
         <template v-for="(template,index) in templates">
           <p style="font-size: 13px;margin: 5px">{{template.desc ?? template.name}}</p>
           <template v-if="template.type === 'input'">
-            <n-input @keydown.enter="handleEnter(index)" v-model:value="template.value" clearable placeholder="输入值"/>
+            <n-input @keydown.enter.passive.stop="handleEnter(index)" v-model:value="template.value" clearable placeholder="输入值"/>
           </template>
           <template v-else>
             <n-select v-model:value="template.value"
@@ -105,10 +105,11 @@ function doYes(){
       formatManager.globalVar['@'+template.name] = template.value;
     }
     // 继续进行解析
-    formatManager.continueFormat();
-    // 关闭
-    $reactive.common.variableActive = false;
-    handleRecoverLiteShow();
+    formatManager.continueFormat().then(()=>{
+      // 关闭
+      $reactive.common.variableActive = false;
+      handleRecoverLiteShow();
+    })
   }else{
     $normal.funcs.syncDataFunc(templates.value)
     $reactive.common.variableActive = false;

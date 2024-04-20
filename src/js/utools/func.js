@@ -1110,13 +1110,11 @@ export const formatManager = {
     },
 
 
-    continueFormat(){
+    async continueFormat(){
         if(this.codeBuffer){
-            let that = this;
-            this._expression(this.codeBuffer).then(code =>{
-                that.codeBuffer = null
-                copyOrPaste(code)
-            })
+            const code = await this._expression(this.codeBuffer)
+            this.codeBuffer = null
+            copyOrPaste(code)
         }
     },
     backup(zip, filename,dirname) {
