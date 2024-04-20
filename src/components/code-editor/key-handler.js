@@ -201,9 +201,11 @@ function whenEnter(e,source){
             }
         }
     }else {
-        document.execCommand("insertText", false, lineChar);
+        const temp = content.slice(0, cursorPosition) + lineChar + content.slice(cursorPosition);
         return {
-            changeType: "none"
+            changeType: "all",
+            newContent: temp,
+            newCursorPosition: cursorPosition + lineChar.length
         }
     }
 }

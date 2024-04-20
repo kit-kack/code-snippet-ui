@@ -320,15 +320,6 @@ export default {
         lineNumsResizer.observe(this.$refs.lineNums);
       }
     },
-    copy() {
-      if (document.execCommand("copy")) {
-        this.$refs.textarea.select();
-        document.execCommand("copy");
-        window.getSelection().removeAllRanges();
-      } else {
-        navigator.clipboard.writeText(this.$refs.textarea.value);
-      }
-    },
     getLineNum() {
       // lineNum
       const str = this.$refs.textarea.value;

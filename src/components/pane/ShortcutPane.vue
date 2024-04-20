@@ -7,7 +7,7 @@
         </n-divider>
         <n-tabs type="bar" @click="handleClick" animated size="small" justify-content="space-around" :value="data.items[$reactive.common.shortcutTabIndexForCodeView].title">
           <n-tab-pane v-for="(d,i) in data.items" :key="d.title" :name="d.title">
-            <n-list hoverable clickable :show-divider="false">
+            <n-list hoverable :show-divider="false">
               <template v-for="(item,index) in d.items">
                 <template v-if="item.tooltip">
                   <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
@@ -62,7 +62,7 @@
         <n-divider dashed>
           {{data.title}}
         </n-divider>
-        <n-list hoverable clickable :show-divider="false">
+        <n-list hoverable :show-divider="false">
           <template v-for="(item,index) in data.items">
             <template v-if="item.tooltip">
               <n-popover width="trigger" @update:show="v => popoverShow[index] = v">
@@ -260,7 +260,11 @@ const shortcuts = [{
  * @param {MouseEvent} e
  */
 function handleClick(e){
-  const text = e.target?.innerText;
+  const target = e.target;
+  if(!target || target.className!=='n-tabs-tab__label'){
+    return;
+  }
+  const text = target.innerText;
   if(!text){
     return;
   }
