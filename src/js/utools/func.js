@@ -7,6 +7,15 @@ import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 import {toString as _toString} from "lodash-es";
 
 const GLOBAL_FUNC = "func";
+const GLOBAL_FUNC_PREFIX = "func/";
+const COMMAND_FLAG = {
+    UNKNOWN: -1,
+    ACTIVE_INPUT: 0,
+    ACTIVE_SELECT: 1,
+    NORMAL_COMMAND: 10,
+    PARAM_AS_FUNC: 11,
+    CHAIN: 100
+}
 /**
  *
  *
@@ -15,63 +24,79 @@ const DEFAULT_FUNCS = {
     '主动输入':{
         name: "主动输入",
         desc: `弹出输入框，用户主动输入值;
-<b>input/输入</b>可选参数：任意值（作为输入框默认值）
-<b>select/选择</b>必需参数：字符串数组,例如<i>['a','b','c']</i>
-额外说明：如果没有使用变量接收，默认输入的值会被保存到名为<i>位置X</i>的变量，故请勿将自定义的变量设置为<i>位置X</i>的形式`,
-        commands: ["input","输入","select","选择"],
+{{input}}可选参数：任意值（作为输入框默认值）
+{{select}}必需参数：字符串数组,例如<i>['a','b','c']</i>
+额外说明：
+1.如果没有使用变量接收，默认输入的值会被保存到名为<i>位置X</i>的变量，故请勿将自定义的变量设置为<i>位置X</i>的形式
+2.【主动输入】占位符不能放置于管道操作后面，只能放置于首位`,
+        commands:{
+          "input": "输入",
+          "select": "选择"
+        },
         expression: '内置提供，无函数实现',
         default: true
     },
     '日期与时间':{
         name: "日期与时间",
         desc: `获取日期与时间;
-<b>pattern/自定义格式</b>需要携带格式化参数，例如<i>HH:mm:ss</i>`,
-        commands: ["now", "时间戳", "date", "日期", "time", "时间","pattern", "自定义格式"],
+{{pattern}}需要携带格式化参数，例如<i>HH:mm:ss</i>`,
+        commands: {
+          "now": "时间戳",
+          "date": "日期",
+          "time": "时间",
+          "pattern": "自定义格式"
+        },
         expression: `\
 switch (command) {
-    case "now":
-    case "时间戳":
+    case "now": // 时间戳
         return Date.now();
-    case "date":
-    case "日期":
+    case "date": // 日期
         return new Date().toLocaleDateString();
-    case "time":
-    case "时间":
+    case "time": // 时间
         return new Date().toLocaleTimeString();
-    default:
+    default: // 自定义
         return $._dayjs().format(param)
 }`,
     },
-    '剪切板': {
-        name: "剪切板",
-        desc: `获取剪切板内容;
-可选参数：<i>小写</i>/<i>lowercase</i>/<i>大写</i>/<i>uppercase</i>/<i>去空格</i>/<i>trim</i>`,
-        commands: ["clipboard","剪切板"],
-        runInNode: true,
+    '系统信息': {
+        name: "系统信息",
+        desc: `获取系统信息`,
+        commands: {
+          "clipboard": "剪切板",
+          "ip": "ip地址",
+        },
         expression: `\
-const {clipboard} = require('electron');
-const data = clipboard.readText();
-switch (param){
-    case '小写':
-    case 'lowercase':
-        return data.toLowerCase();
-    case '大写':
-    case 'uppercase':
-        return data.toUpperCase();
-    case '去空格':
-    case 'trim':
-        return data.trim();
+switch (command){
+    case "clipboard": // 剪切板
+        return require('electron').clipboard.readText();
+    case "ip": // ip地址
+        const os = require('os');
+        const ifaces = os.networkInterfaces();
+        for (const dev in ifaces) {
+            const iface = ifaces[dev]
+            for (let i = 0; i < iface.length; i++) {
+                const {family, address, internal} = iface[i]
+                if (family === 'IPv4' && address !== '127.0.0.1' && !internal) {
+                    return address
+                }
+            }
+        }
+        return "127.0.0.1";
     default:
-        return data;
+        return null;
 }`
     },
     "随机":{
         name: "随机",
         desc: `获取随机数/nanoid/uuid;
-<b>random</b>可选参数：<i>min..max</i>（来指定范围） 
-<b>nanoid</b>可选参数：<i>size</i>(来指定id字符数量)
-<b>uuid</b>可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）`,
-        commands: ["random", "nanoid","uuid"],
+{{random}}可选参数：<i>min..max</i>（来指定范围） 
+{{nanoid}}可选参数：<i>size</i>(来指定id字符数量)
+{{uuid}}可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）`,
+        commands: {
+            "random": null,
+            "nanoid": null,
+            "uuid": null
+        },
         expression: `\
 switch (command){
     case "nanoid":
@@ -92,7 +117,7 @@ switch (command){
             }
         }
         return $._uuid();
-    default:
+    default: // random
         const num = Math.random();
         if(param){
             const aspects = param.split("..",2);
@@ -109,6 +134,132 @@ switch (command){
         }else{
             return num;
         }
+}`
+    },
+    "文本处理":{
+        name: "文本处理",
+        desc: `对传入的参数进行文本处理`,
+        commands: {
+            "lowercase": "转小写",
+            "uppercase": "转大写",
+            "trim": "去空格",
+            "camelcase": "转驼峰",
+            "snakecase": "转下划线",
+            "kebabcase": "转短横线",
+        },
+        expression: `\
+if(!param){
+    return param;
+}
+/**
+ * @param {string} text
+ */
+function resolveAspects(text){
+    let aspects = [];
+    /**
+     * mode:
+     * -1 未知
+     * 1 小写
+     * 2 大写
+     * 3 首字母大写
+     * 4 特殊符号
+     * @type {number}
+     */
+    let mode = -1;
+    let start = 0;
+    const specicalChars = ['_','-'];
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if(mode === -1){
+            if(specicalChars.includes(char)){
+                start = i+1;
+                continue;
+            }
+            start = i;
+            const code = char.charCodeAt(0);
+            if(code >= 65 && code <= 90){
+                mode = 3;
+            }else if(code >= 97 && code <= 122){
+                mode = 1;
+            }else{
+                mode = 4;
+            }
+        }else{
+            if(specicalChars.includes(char)){
+                aspects.push(text.slice(start,i));
+                start = i+1;
+                mode = -1;
+                continue;
+            }
+
+            const code = char.charCodeAt(0);
+            let newMode;
+            if(code >= 65 && code <= 90){
+                newMode = 2;
+            }else if(code >= 97 && code <= 122){
+                newMode = 1;
+            }else{
+                continue
+            }
+            if(mode ===3 ||mode === 4){
+                // 沿用后面
+                mode = newMode;
+                continue;
+            }
+            if(mode !== newMode){
+                aspects.push(text.slice(start,i));
+                start = i;
+                mode = newMode;
+                if(mode === 2){
+                    mode = 3
+                }
+            }
+        }
+    }
+    // last char
+    const last = text.at(-1);
+    if(specicalChars.includes(last)){
+        if(mode !== -1){
+            aspects.push(text.slice(start,-1));
+        }
+    }else{
+        const code = last.charCodeAt(0);
+        let newMode;
+        if(code >= 65 && code <= 90){
+            newMode = 2;
+        }else if(code >= 97 && code <= 122){
+            newMode = 1;
+        }else{
+            newMode = 4;
+        }
+        if(mode === -1){
+            aspects.push(last);
+        }else if(mode === 3 || mode === 4 || newMode === 4 || mode === newMode){
+            aspects.push(text.slice(start))
+        }else{
+            aspects.push(text.slice(start,-1));
+            aspects.push(last);
+        }
+    }
+    return aspects;
+}
+switch(command){
+    case 'lowercase': // 转小写
+        return param.toLowerCase();
+    case 'uppercase': // 转大写
+        return param.toUpperCase();
+    case 'trim': // 去空格
+        return param.trim();
+    case 'camelcase': // 转驼峰
+        return resolveAspects(param).map(v =>{
+            return v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()
+        }).join('')
+    case 'snakecase': // 转下划线
+        return resolveAspects(param).map(v => v.toUpperCase()).join('_')
+    case 'kebabcase': // 转短横线
+        return resolveAspects(param).map(v => v.toLowerCase()).join('-');
+    default:
+        return param
 }`
     }
 }
@@ -148,80 +299,105 @@ function _uuid(len, radix) {
     return uuid.join('');
 }
 
-/**
- *
- * @typedef {Object} Result
- * 不解析或者是已经解析好了
- * @property {string} [code] 代码
- * 引用变量
- * @property {string} [variable] 变量
- * 占位符解析
- * @property {string} [command] 占位符
- * @property {string} [param] 可选参数
- * @property {string} [_var] 待赋值的变量名
- * @property {string} [key] 对应占位符实现函数的key
- * @property {boolean} [func] param是否作为占位符函数实现
- * @property {boolean} [assign] 是否为assign
- * @private
- *
- */
-
 
 /**
- * 解析 [variable::]command[:param]
+ * 解析 [variable::]command1[:param] | command2 | command3
+ * #var=value
  * @param {string} text
- * @param assignFlag
- * @return Result
+ * @param {boolean} [isInRenderMode]
+ * @return ParseResult
  * @private
  */
-function _parseVariable_Command_Param(text,assignFlag) {
+function _newParseWithMultiCommands(text,isInRenderMode){
     /**
-     * @type {Result}
+     * @type {ParseResult}
      */
     const result = {};
     let index = text.indexOf(':');
-    if(index === -1){  // only command
-        // #var=value, find =
-        if(assignFlag){
-            index = text.indexOf('=');
-            if(index !== -1) {
-                result._var = text.slice(0, index)
-                result.param = text.slice(index + 1)
-                result.assign = true;
+    let chainOperateIndex = text.indexOf(' | ');
+    if(index === -1 && chainOperateIndex === -1){
+        // only command
+        result.command = text;
+        return result;
+    }
+    if(index === -1){
+        if(chainOperateIndex === -1){
+            // only command
+            result.command = text;
+            return result;
+        }else{
+            // command1 | command2
+            return _parse_command_chain(text,-1,result);
+        }
+    }else if(chainOperateIndex === -1){
+        // [variable::]command1[:param]
+        return _parse_variable_command_param(text,index,result);
+    }else if(chainOperateIndex < index){
+        // command1 | command2
+        return _parse_command_chain(text,-1,result);
+    }
+    return _parse_command_chain(text,index,result);
+}
+
+function _parse_command_chain(text,index,result){
+    const aspects = text.split(' | ');
+    result.chain = aspects.map(c => ({
+        command: c,
+    }))
+    if(index !== -1){
+        result.chain[0] = _parse_variable_command_param(aspects[0],index,result.chain[0]);
+    }
+    return result
+}
+
+function _parse_variable_command_param(text,index,result){
+    if(index === text.length-1){ // last
+        // command :
+        result.command = text.slice(0,index)
+        result.param= "";
+    }else{
+        if(text[index+1] === ':'){
+            // variable :: command [:param]
+            result._var = text.slice(0,index)
+            const newText = text.slice(index+2);
+            index = newText.indexOf(':')
+            if(index !== -1){
+                // command: param
+                result.command = newText.slice(0,index)
+                result.param = newText.slice(index+1)
             }else{
-                result.command = text;
+                // command
+                result.command = newText;
             }
         }else{
-            result.command = text;
-        }
-    }else{
-        if(index === text.length-1){ // last
             // command : param
             result.command = text.slice(0,index)
-            result.param= "";
-        }else{
-            if(text[index+1] === ':'){
-                // variable :: command [:param]
-                result._var = text.slice(0,index)
-                const newText = text.slice(index+2);
-                index = newText.indexOf(':')
-                if(index !== -1){
-                    // command: param
-                    result.command = newText.slice(0,index)
-                    result.param = newText.slice(index+1)
-                }else{
-                    // command
-                    result.command = newText;
-                }
-            }else{
-                // command : param
-                result.command = text.slice(0,index)
-                result.param= text.slice(index+1);
-            }
+            result.param= text.slice(index+1);
         }
     }
     return result;
 }
+
+/**
+ * @param {ParseResult} result
+ */
+function trimResult(result){
+    if(result.chain){
+        result.chain.forEach(trimResult);
+        return;
+    }
+    if(result.command){
+        result.command = result.command.trim();
+    }
+    if(result.param){
+        result.param = result.param.trim();
+    }
+    if(result._var){
+        result._var = result._var.trim();
+    }
+
+}
+
 
 /**
  * 获取command对应的键，如果返回null则代表该占位符不存在
@@ -242,8 +418,7 @@ function _get_command_key(command){
     }
     // 2. normal funcMap
     for (const key in formatManager.funcMap) {
-        const func = formatManager.funcMap[key];
-        if(func.commands.includes(command)){
+        if(command in formatManager.funcMap[key].commands){
             return {
                 command: command,
                 key: key
@@ -258,6 +433,7 @@ export const formatManager = {
     codeBuffer : null,  // 为输入变量设置的暂时缓存
     isInited: false,
     globalVar:{},  // 全局超级变量
+    dynamicFuncRunStack:[],  // $.func 运行栈
 
     init(){
         if(this.isInited){
@@ -277,7 +453,7 @@ export const formatManager = {
     checkCommandRepeat(command,currentFuncName){
         for (let key in this.funcMap) {
             const func = this.funcMap[key];
-            if(func.commands.includes(command) && currentFuncName!==func.name){
+            if(command in func.commands && currentFuncName!==func.name){
                 return true
             }
         }
@@ -312,9 +488,9 @@ export const formatManager = {
             return false
         }
         // check num
-        if(func.commands && func.commands.length >= 1){
+        if(func.commands && Object.keys(func.commands).length >= 1){
             // check command repeat
-            for (let command of func.commands) {
+            for (const command in func.commands) {
                 if(this.checkCommandRepeat(command,func.name)){
                     $message.warning("占位符["+command+"]已被使用")
                     return false;
@@ -378,40 +554,207 @@ export const formatManager = {
         }
     },
     /**
-     * 执行表达式
-     * @param {string} key
-     * @param {string} command
-     * @param {string} param
-     * @param {boolean} isFuncKey
+     *
+     * @param {ParseResult} result
      * @private
+     * @return {Promise<any | string>}
+     * @param  [runtimeParam]
      */
-    async _expression_invoker(key,command,param,isFuncKey){
+    async _expression_invoker_for_command(result,runtimeParam){
         try{
-            if(isFuncKey){
-                return await window.preload.dynamicRunCode(param,undefined,undefined,this.globalVar);
+            if(result.flag === COMMAND_FLAG.PARAM_AS_FUNC){
+                return await window.preload.dynamicRunCode(result.param,undefined,undefined,this.globalVar);
             }else{
-                // get expression of command
-                if(param in this.globalVar){
-                    param = this.globalVar[param]?.toString();
-                }
-                if(key){
-                    return await window.preload.dynamicRunCode(this.funcMap[key].expression,command,param,this.globalVar);
+                // 看param是否为@variable形式
+                if(runtimeParam === undefined){
+                    if(result.param in this.globalVar){
+                        result.param = this.globalVar[result.param]?.toString();
+                    }
                 }else{
-                    return await GLOBAL_HIERARCHY.currentConfig.funcs[command](param);
+                    result.param = runtimeParam
+                }
+                if(result.key){
+                    return await window.preload.dynamicRunCode(this.funcMap[result.key].expression,result.command,result.param,this.globalVar);
+                }else{
+                    return await GLOBAL_HIERARCHY.currentConfig.funcs[result.command](result.param);
                 }
             }
         }catch (e){
             console.error(e)
-            return `{{${e}}}`;
+            return `{{${e.toString()}}}`;
         }
     },
+    /**
+     *
+     * @return {Promise<any | string>}
+     * @param {string} cAspect
+     * @param {string} [pAspect]
+     */
+    async dynamicRunFunc(cAspect,pAspect){
+        const newCommand = cAspect ? cAspect.trim() : '';
+        if(!newCommand){
+            throw "SyntaxError: $.func(...)执行command不能为空";
+        }
+        const result = {
+            command: newCommand,
+            param: _toString(pAspect)
+        }
+        if(this._checkCommand(result,false) === COMMAND_FLAG.NORMAL_COMMAND){
+            // 判断 调用自己判断
+            if(this.dynamicFuncRunStack.includes(newCommand)){
+                throw `RecursiveError: 递归调用[ ${newCommand} ]，请修改相关占位符代码实现`
+            }
+            // 入栈
+            this.dynamicFuncRunStack.unshift(newCommand);
+            const value = await this._expression_invoker_for_command(result);
+            // 出栈
+            this.dynamicFuncRunStack.shift();
+            return value;
+        }
+        throw `CommandNotFoundError: 未找到对应占位符[ ${newCommand} ]`
+    },
+    /**
+     *
+     * @param {ParseResult} result
+     * @private
+     */
+    async _expression_invoker_for_chain(result){
+        let value;
+        for (let i = 0; i < result.chain.length; i++) {
+            if(i === 0){
+                const first = result.chain[i];
+                if(first.flag === COMMAND_FLAG.ACTIVE_INPUT || first.flag === COMMAND_FLAG.ACTIVE_SELECT){
+                    value = this.globalVar['@'+first._var];
+                }else{
+                    value = await this._expression_invoker_for_command(result.chain[i]);
+                }
+            }else{
+                value = await this._expression_invoker_for_command(result.chain[i],value);
+            }
+        }
+        return value
+    },
     _initForEachRegex(){
+        const func = this.dynamicRunFunc.bind(this)
         this.globalVar = {
             _nanoid: nanoid,
             _dayjs: dayjs,
             _clipboard: window.preload._clipboard,
-            _uuid: _uuid
+            _uuid: _uuid,
+            func: func
         }
+        this.activeInputCount = 0;
+        /**
+         * key: 存放【主动输入】的变量名
+         * value: 主动输入类型 input select
+         */
+        this.inputVars = {};
+        /**
+         * 对应【主动输入】中的默认值
+         */
+        this.inputVarsDefaultValue = {};
+        this.dynamicFuncRunStack = [];
+    },
+    /**
+     * @param {ParseResult} result
+     * @private
+     */
+    _resolveCommandWhenInput(result){
+        if(!result._var){
+            result._var = '位置'+ this.activeInputCount;
+        }
+        this.inputVars[result._var]= "input"
+        if(result.param){
+            // 因为在globalVar中变量键是@key形式的
+            // 所以当param设置为@key形式时，会优先从globalVar来解析数据
+            // 后续才会作为普通字符串进行解析
+            if(result.param in this.globalVar ){
+                this.inputVarsDefaultValue[result._var] = this.globalVar[result.param]?.toString();
+            }else{
+                this.inputVarsDefaultValue[result._var] = result.param;
+            }
+        }
+        this.activeInputCount++;
+    },
+
+    /**
+     * @param {ParseResult} result
+     * @private
+     */
+    _resolveCommandWhenSelect(result){
+        if(!result._var){
+            result._var = '位置'+ this.activeInputCount;
+        }
+        this.inputVars[result._var]= "select"
+        if(result.param){
+            // 1. 判断 globalVar是否存在相应元素
+            if(result.param in this.globalVar ){
+                const value = this.globalVar[result.param]
+                // for select,need convert param to array
+                if(value){
+                    if(Array.isArray(value)){
+                        this.inputVarsDefaultValue[result._var] = value;
+                    }else{
+                        this.inputVarsDefaultValue[result._var] = [value];
+                    }
+                }
+            }else{
+                try{
+                    let value = new Function('return '+ result.param)()
+                    if(value){
+                        if(!Array.isArray(value)){
+                            value = [value];  // defaultVarValue[result._var] = value;
+                        }
+                        // for
+                        for (let i = 0; i < value.length; i++) {
+                            value[i] = _toString(value[i])
+                        }
+                        this.inputVarsDefaultValue[result._var] = value
+                    }
+                }catch (e){
+                    $message.error(`{{${name}}}中的select param部分解析错误，原因为${e.message}`)
+                }
+            }
+        }
+        this.activeInputCount++;
+    },
+    /**
+     * @param {ParseResult} result
+     * @private
+     * @param {boolean} syncActiveInput
+     * @return {number}
+     */
+    _checkCommand(result,syncActiveInput){
+        // -1:unknown 0:active input 1:normal command 2:func param
+        let commandFlag = COMMAND_FLAG.UNKNOWN;
+        // 2. deal with active input
+        if(result.command === "input"){
+            commandFlag = COMMAND_FLAG.ACTIVE_INPUT;
+            syncActiveInput && this._resolveCommandWhenInput(result);
+        }else if(result.command === "select"){
+            commandFlag = COMMAND_FLAG.ACTIVE_SELECT;
+            syncActiveInput && this._resolveCommandWhenSelect(result);
+        }
+
+
+        // 3.check command valid
+        if(commandFlag === COMMAND_FLAG.UNKNOWN){
+            if(result.command){
+                const command_key = _get_command_key(result.command);
+                if(command_key){
+                    commandFlag = COMMAND_FLAG.NORMAL_COMMAND;
+                    result.command = command_key.command;
+                    result.key = command_key.key;
+                }
+            }else{
+                // param将作为command实现函数处理
+                if(result.param){
+                    commandFlag = COMMAND_FLAG.PARAM_AS_FUNC;
+                }
+            }
+        }
+        result.flag = commandFlag
+        return commandFlag
     },
 
     /**
@@ -424,22 +767,11 @@ export const formatManager = {
         // 判断是否存在inputVars，并且同时进行切分
         /**
          *
-         * @type {Result[]}
+         * @type {ParseResult[]}
          */
         const target = [];
-        /**
-         * key: 存放【主动输入】的变量名
-         * value: 主动输入类型 input select
-         */
-        const inputVars = {};
-        /**
-         * 对应【主动输入】中的默认值
-         */
-        const defaultVarValue = {};
         // {{...}}x   的x位置
         let last = 0;
-        // 用来记录【位置X】
-        let inputCount = 0;
         for (const formatBlock of formatBlocks) {
             // 判断是否为inputVar
             let name = formatBlock[0]
@@ -449,7 +781,14 @@ export const formatManager = {
             })
             // 变更{{...}}x的x位置
             last = formatBlock.index + name.length;
-            // current
+            // {{...}}\n判断最后一个是否为\n，当占位符为{{#...}}\n形式时移除后面的换行符
+            /**
+             * {{...}}\n判断最后一个是否为\n，
+             * 默认情况下都会移除\n
+             * 所以正常情况下都需要执行
+             * if(line) last--; 来保留\n
+             * 当占位符为{{#...}}\n形式时移除后面的换行符,故不需要执行上述语句
+             */
             const line = name.at(-1) === '\n'
             name = name.slice(2,line? -3: -2).trim()
             if(name.startsWith('@')) {  // var
@@ -465,120 +804,109 @@ export const formatManager = {
                     name = name.slice(1);
                     assignFlag = true;
                 }
-
-                // [variable::]command[:param]
                 // 1.parse
-                const result = _parseVariable_Command_Param(name,assignFlag)
+                const result = _newParseWithMultiCommands(name);
                 // trim
-                result.command = result.command?.trim();
-                result.param = result.param?.trim();
-                result._var = result._var?.trim();
+                trimResult(result);
                 // assign：必须有变量赋值
                 if(assignFlag){
-                    if(!result._var){
+                    const _var = result.chain ? result.chain[0]._var : result._var
+                    if(!_var){
                         target.push({
-                            code: formatBlock[0]  // 不解析
+                            code: `{{ SyntaxError: #开头语句必须有变量接收 => #${name} }}`  // 不解析
                         })
+                        if(line){  // 保留\n
+                            last--;
+                        }
                         continue
-                    }else if(result.assign){
-                        this.globalVar['@'+result._var] = result.param;
-                        continue;
                     }
+                    // 由于移除 #variable=value 语法，故此处不进行直接赋值
+                    // else if(result.assign){
+                    //     this.globalVar['@'+result._var] = result.param;
+                    //     continue;
+                    // }
                 }
-
-                // -1:unknown 0:active input 1:normal command
-                let commandFlag = -1;
-                // 2. deal with active input
-                if(result.command === "input" || result.command === "输入"){
-                    commandFlag = 0;
-                    if(!result._var){
-                        result._var = '位置'+ inputCount;
-                    }
-                    inputVars[result._var]= "input"
-                    if(result.param){
-                        // 因为在globalVar中变量键是@key形式的
-                        // 所以当param设置为@key形式时，会优先从globalVar来解析数据
-                        // 后续才会作为普通字符串进行解析
-                        if(result.param in this.globalVar ){
-                            defaultVarValue[result._var] = this.globalVar[result.param]?.toString();
-                        }else{
-                            defaultVarValue[result._var] = result.param;
-                        }
-                    }
-                    inputCount++;
-                }else if(result.command === "select" || result.command === "选择"){
-                    commandFlag = 0;
-                    if(!result._var){
-                        result._var = '位置'+ inputCount;
-                    }
-                    inputVars[result._var]= "select"
-                    if(result.param){
-                        // 1. 判断 globalVar是否存在相应元素
-                        if(result.param in this.globalVar ){
-                            const value = this.globalVar[result.param]
-                            // for select,need convert param to array
-                            if(value){
-                                if(Array.isArray(value)){
-                                    defaultVarValue[result._var] = value;
-                                }else{
-                                    defaultVarValue[result._var] = [value];
-                                }
+                // check command
+                if(result.chain){
+                    let allRightCommands = true;
+                    let errorMessage;
+                    let existActiveInputFlag = COMMAND_FLAG.UNKNOWN;
+                    for (let i = 0; i < result.chain.length; i++) {
+                        const item = result.chain[i];
+                        const flag = this._checkCommand(item,false);
+                        if(flag === COMMAND_FLAG.UNKNOWN){
+                            allRightCommands = false;
+                            errorMessage = `CommandNotFoundError: 未找到对应占位符[ ${item.command} ]`
+                            break;
+                        }else if(flag === COMMAND_FLAG.ACTIVE_INPUT){
+                            if(i > 0){
+                                allRightCommands = false;
+                                errorMessage = `SyntaxError: 【主动输入】占位符无法放置于管道操作后面，只能放置于首位`
+                                break;
+                            }else{
+                                existActiveInputFlag = COMMAND_FLAG.ACTIVE_INPUT;
                             }
-                        }else{
-                            try{
-                                let value = new Function('return '+ result.param)()
-                                if(value){
-                                    if(!Array.isArray(value)){
-                                        value = [value];  // defaultVarValue[result._var] = value;
-                                    }
-                                    // for
-                                    for (let i = 0; i < value.length; i++) {
-                                        value[i] = _toString(value[i])
-                                    }
-                                    defaultVarValue[result._var] = value
-                                }
-                            }catch (e){
-                                $message.error(`{{${name}}}中的select param部分解析错误，原因为${e.message}`)
+                        }else if(flag === COMMAND_FLAG.ACTIVE_SELECT){
+                            if(i > 0){
+                                allRightCommands = false;
+                                errorMessage = `SyntaxError: 【主动输入】占位符无法放置于管道操作后面，只能放置于首位`
+                                break;
+                            }else{
+                                existActiveInputFlag = COMMAND_FLAG.ACTIVE_SELECT;
                             }
                         }
                     }
-                    inputCount++;
-                }
-
-
-                // 3.check command valid
-                if(commandFlag < 0){
-                    if(result.command){
-                        const command_key = _get_command_key(result.command);
-                        if(command_key){
-                            commandFlag = 1;
-                            result.command = command_key.command;
-                            result.key = command_key.key;
+                    if(allRightCommands){
+                        // 处理唯一的【主动输入】
+                        if(existActiveInputFlag === COMMAND_FLAG.ACTIVE_INPUT){
+                            this._resolveCommandWhenInput(result.chain[0]);
+                        }else if(existActiveInputFlag === COMMAND_FLAG.ACTIVE_SELECT){
+                            this._resolveCommandWhenSelect(result.chain[0]);
+                        }
+                        if(assignFlag){
+                            if(existActiveInputFlag === COMMAND_FLAG.UNKNOWN){
+                                this.globalVar['@'+result.chain[0]._var] = await this._expression_invoker_for_chain(result);
+                                continue;
+                            }
+                            // TODO: xxx
+                            result.assign = true;
+                        }
+                        result.flag = COMMAND_FLAG.CHAIN;
+                        target.push(result)
+                        if(line && !result.assign){ // 非赋值下 保留\n
+                            last--;
                         }
                     }else{
-                        // param将作为command实现函数处理
-                        if(result.param){
-                            result.func = true
-                            commandFlag = 1;
+                        // fail
+                        target.push({
+                            code: `{{ ${errorMessage} => ${name} }}`  // 不解析
+                        })
+                        if(line){  // 保留\n
+                            last--;
                         }
                     }
+                    // TODO
+                    continue;
                 }
-
-                if(commandFlag < 0){
+                const flag = this._checkCommand(result,true);
+                if(flag === COMMAND_FLAG.UNKNOWN){
                     target.push({
-                        code: formatBlock[0]  // 不解析
+                        code: `{{ CommandNotFoundError: 未找到对应占位符${result.command} => ${name} }}`  // 不解析
                     })
+                    if(line) {  // 保留\n
+                        last--;
+                    }
                 }else{
                     if(assignFlag){
-                        // need parse at once
-                        if(commandFlag > 0){
-                            this.globalVar['@'+result._var] = await this._expression_invoker(result.key,result.command,result.param,result.func);
+                        // 立即解析，而不是等到【主动输入】完成后才解析
+                        if(flag >= COMMAND_FLAG.NORMAL_COMMAND){
+                            this.globalVar['@'+result._var] = await this._expression_invoker_for_command(result);
                             continue;
                         }
                         result.assign = true;
                     }
                     target.push(result)
-                    if(line){
+                    if(line && !result.assign){ // 非赋值下 保留\n
                         last--;
                     }
                 }
@@ -594,11 +922,11 @@ export const formatManager = {
                 code: code.slice(last)
             })
         }
-        if(Object.keys(inputVars).length > 0){
+        if(Object.keys(this.inputVars).length > 0){
             return {
                 parse: true,
-                vars: Object.entries(inputVars),
-                defaultValues: defaultVarValue,
+                vars: Object.entries(this.inputVars),
+                defaultValues: this.inputVarsDefaultValue,
                 code: target
             }
         }else{
@@ -611,31 +939,40 @@ export const formatManager = {
 
     /**
      *
-     * @param {Result[]} codes
+     * @param {ParseResult[]} codes
      */
     async _expression(codes){
         // first deal with command
         for (const element of codes) {
-            if(element.command || element.func){
-                switch (element.command){
-                    case "input":
-                    case "输入":
-                    case "select":
-                    case "选择":
-                        if(element.assign){
-                            element.code = ''
-                        }else{
-                            element.code = this.globalVar['@'+element._var];
-                        }
-                        break;
-                    default:
-                        element.code = await  this._expression_invoker(element.key,element.command,element.param,element.func)
-                        // var
-                        if(element._var){
-                            this.globalVar['@'+element._var] = element.code;
-                        }
-                        break
-                }
+            if(element.flag === undefined){
+                continue
+            }
+            switch (element.flag){
+                case COMMAND_FLAG.ACTIVE_INPUT:
+                case COMMAND_FLAG.ACTIVE_SELECT:
+                    if(element.assign){
+                        element.code = ''
+                    }else{
+                        element.code = this.globalVar['@'+element._var];
+                    }
+                    break;
+                case COMMAND_FLAG.CHAIN:
+                    element.code = await this._expression_invoker_for_chain(element);
+                    // var
+                    if(element.chain[0]._var){
+                        this.globalVar['@'+element.chain[0]._var] = element.code;
+                    }
+                    if(element.assign){
+                        element.code = ''
+                    }
+                    break;
+                default:
+                    element.code = await this._expression_invoker_for_command(element);
+                    // var
+                    if(element._var){
+                        this.globalVar['@'+element._var] = element.code;
+                    }
+                    break
             }
         }
         // then deal with variable
@@ -723,58 +1060,67 @@ export const formatManager = {
 }
 
 
-function _getCommandClass(command) {
-    return _get_command_key(command.trim()) ? 'kitx-right-command': 'kitx-error-command';
+/**
+ *
+ * @param {string} command
+ * @param {number} index
+ * @return {string}
+ * @private
+ */
+function _getCommandClass(command,index) {
+    const newCommand = command.trim();
+    if(newCommand === 'input' || newCommand === 'select'){
+        return index === 0 ? 'kitx-right-command': 'kitx-error-command';
+    }
+    return _get_command_key(newCommand) ? 'kitx-right-command': 'kitx-error-command';
 }
 
-function _colorResult(text,assignFlag) {
-    let index = text.indexOf(':');
-    if(index === -1){  // only command
-        // #var=value, find =
-        if(assignFlag){
-            index = text.indexOf('=');
-            if(index !== -1) {
-                return `#<span class="kitx-var">${text.slice(0, index)}</span>=<span class="kitx-param">${text.slice(index + 1)}</span>`
-            }else{
-                return `<span class="kitx-error-command">#${text}</span>`
-            }
+
+/**
+ * [variable::]command[:param]
+ * variable:::param
+ * @param {ParseResult} result
+ * @param {number} index
+ * @return {string}
+ */
+function buildResultElement(result,index){
+    let html = '';
+    if(result.command){
+        html = `<span class="${_getCommandClass(result.command.trim(),index)}">${result.command}</span>`
+    }
+    if(result._var !== undefined){
+        if(result._var){
+            html = `<span class="kitx-var">${result._var}</span>::${html}`
         }else{
-            return `<span class="${_getCommandClass(text)}">${text}</span>`
+            // 空字符串
+            html = `::${html}`
         }
+    }
+    if(result.param !== undefined){
+        if(result.param){
+            html = `${html}:<span class="${result.param.startsWith('@') ? 'kitx-reference' : 'kitx-param' }">${result.param}</span>`
+        }else{
+            // 空字符串
+            html = `${html}:`
+        }
+    }
+
+    return html;
+
+}
+
+/**
+ *
+ * @param {string} text
+ * @private
+ */
+function _colorResult2(text) {
+    const result = _newParseWithMultiCommands(text);
+    if(result.chain){
+        return result.chain.map((r,index) => buildResultElement(r,index))
+            .join(' | ');
     }else{
-        if(index === text.length-1){ // last
-            // command : param
-            let command = text.slice(0,index);
-            if(assignFlag){
-                command = '#'+command
-            }
-            return `<span class="${_getCommandClass(command)}">${command}</span>:`
-        }else{
-            if(text[index+1] === ':'){
-                // variable :: command [:param]
-                const _var = text.slice(0,index)
-                const newText = text.slice(index+2);
-                index = newText.indexOf(':')
-                const prefix = assignFlag ? '#':'' ;
-                if(index !== -1){
-                    // command: param
-                    const command = newText.slice(0,index);
-                    const param = newText.slice(index+1)
-                    return prefix + `<span class="kitx-var">${_var}</span>::<span class="${_getCommandClass(command)}">${command}</span>:<span class="${param.startsWith('@') ? 'kitx-reference' : 'kitx-param' }">${param}</span>`
-                }else{
-                    // command
-                    return prefix + `<span class="kitx-var">${_var}</span>::<span class="${_getCommandClass(newText)}">${newText}</span>`
-                }
-            }else{
-                // command : param
-                let command = text.slice(0,index);
-                if(assignFlag){
-                    command = '#'+command
-                }
-                const param = text.slice(index+1);
-                return `<span class="${_getCommandClass(command)}">${command}</span>:<span class="${param.startsWith('@') ? 'kitx-reference' : 'kitx-param' }">${param}</span>`
-            }
-        }
+        return buildResultElement(result,0)
     }
 }
 /**
@@ -793,11 +1139,11 @@ export function replaceRenderBlock(code){
         const text = substring.slice(2,-2);
         let html = '<span class="kitx-snippet">{{';
         if(text.startsWith('#')) {
-            html+=  _colorResult(text.slice(1),true);
+            html+= '#' +  _colorResult2(text.slice(1));
         }else if(text.startsWith('@')){
             html+= `<span class="kitx-reference">${text}</span>`
         }else{
-            html+= _colorResult(text);
+            html+= _colorResult2(text);
         }
         return html + '}}</span>'
     })

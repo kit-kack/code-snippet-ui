@@ -5,7 +5,7 @@
         @mouseenter="activeKey = key"
       >
         <n-ellipsis :tooltip="false" style="max-width: 280px">
-          {{value.name}} —— {{value.commands.length}}个占位符
+          {{value.name}} —— {{Object.keys(value.commands).length}}个占位符
         </n-ellipsis>
         <template #suffix>
           <n-space v-if="activeKey === key && !value.default" :wrap="false" style="margin-right: -16px;margin-top: 5px">
@@ -29,6 +29,7 @@
                 :title="pair.flag?'修改占位符实现': '新增占位符实现'"
                 @cancel="$reactive.setting.funcEditActive = false"
                 @confirm="doFinal"
+                id="func-command-edit-tab"
                 wide
     >
         <div class="func-edit-tab">
@@ -41,8 +42,32 @@
                 <n-form-item label="分组" path="name" :rule="NAME_RULE" label-placement="left">
                   <n-input v-model:value="pair.name" placeholder="起个好名字呗~"   clearable/>
                 </n-form-item>
-                <n-form-item label="占位符" path="commands" :rule="COMMAND_RULE" label-placement="left">
-                  <n-dynamic-tags v-model:value="pair.commands"/>
+                <n-form-item path="commands" :rule="COMMAND_RULE" label-placement="left">
+                  <template #label>
+                    占位符
+                    <n-tooltip>
+                      <template #trigger>
+                        <n-button text size="tiny" :focusable="false">
+                          <template #icon>
+                            <svg-tip/>
+                          </template>
+                        </n-button>
+                      </template>
+                      双击占位符来设置显示别名
+                    </n-tooltip>
+                  </template>
+                  <n-dynamic-tags v-model:value="commandsArray" :render-tag="renderCommandTag"/>
+                  <base-modal v-if="active.flag" to="#func-command-edit-tab"
+                              preset="card"
+                              :title="active.element"
+                              style="width: 60%"
+                              non-keydown-handler
+                              @cancel="active.flag = false"
+                              @confirm="doAddCommandDesc"
+                              :auto-focus="false">
+                    <h5>填写显示别名，方便后续在代码片段编辑页面选择相应占位符</h5>
+                    <n-input placeholder="填写别名，方便选择" v-model:value="active.desc" maxlength="10" show-count/>
+                  </base-modal>
                 </n-form-item>
                 <n-form-item label="描述" path="desc" label-placement="left">
                   <div style="width: 99%;padding-left: 11px">
@@ -78,6 +103,7 @@
               </div>
             </n-tab-pane>
           </n-tabs>
+
         </div>
     </base-modal>
   </div>
@@ -92,11 +118,19 @@ import CodeEditor from "../../code-editor/MyCodeEditor.vue";
 import SvgEdit from "../../../asserts/edit.svg"
 import SvgDelete from "../../../asserts/delete.svg"
 import SvgTip from "../../../asserts/tip.svg"
+import SvgFlag from "../../../asserts/flag.svg"
+import {NIcon, NTag} from "naive-ui";
 
 const activeKey = ref(null)
 const pair = ref({})
+const commandsArray = ref([])
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag)
+const active = ref({
+  flag:false,
+  element:null,
+  desc: null
+})
 let nowKey = null;
 const NAME_RULE = {
   required: true,
@@ -116,7 +150,7 @@ const NAME_RULE = {
 const COMMAND_RULE = {
   trigger: ['change'],
   validator() {
-    const commands = pair.value.commands;
+    const commands = commandsArray.value;
     // check repeat
     if(commands && commands.length > 0){
       if(new Set(commands).size !== commands.length){
@@ -138,11 +172,49 @@ const COMMAND_RULE = {
     return true;
   }
 }
+function renderCommandTag(command,index){
+  return h(
+      NTag,
+      {
+        closable: true,
+        bordered: false,
+        style:{
+          userSelect: 'none',
+        },
+        onDblclick: () => {
+          active.value.flag = true;
+          active.value.element = command;
+          active.value.desc = pair.value.commands[command]
+        },
+        onClose: () => {
+          commandsArray.value.splice(index,1)
+        }
+      },
+      {
+        default: () => command,
+        icon: pair.value.commands[command]? ()=>{
+          return h(NIcon, {
+            size: 18,
+          }, {default: () => h(SvgFlag)})
+        }: null
+      }
+  )
+}
+function doAddCommandDesc(){
+  if(active.value.desc && active.value.desc.trim()){
+    pair.value.commands[active.value.element] = active.value.desc.trim()
+  }else{
+    pair.value.commands[active.value.element] = null;
+  }
+  active.value.flag = false;
+}
 function enterAddView(){
   pair.value = {
     desc: '暂无描述~',
     expression: 'return "hello code-snippet!";',
+    commands:{}
   };
+  commandsArray.value = []
   nowKey = null;
   $reactive.setting.funcEditActive = true;
 }
@@ -199,9 +271,8 @@ function doReset(){
   })
 }
 function enterEditView(key,value){
-  pair.value = {
-    ...formatManager.funcMap[key]
-  }
+  pair.value = structuredClone(formatManager.funcMap[key])
+  commandsArray.value = Object.keys(formatManager.funcMap[key].commands);
   nowKey = key;
   $reactive.setting.funcEditActive= true;
 }
@@ -226,6 +297,11 @@ function doFinal(){
   }
   // parse commands
   const func = toRaw(pair.value)
+  for (const command of commandsArray.value) {
+    if(!(command in func.commands)){
+      func.commands[command] = null
+    }
+  }
   if(nowKey){ // edit
     if(formatManager.update(func,nowKey)){
       $reactive.setting.funcEditActive = false;

@@ -14,7 +14,11 @@
     <template #footer>
       <div style="width: 100%;position: relative">
         <n-space style="position: absolute; right: 3px">
-          <template v-if="vim">
+          <template v-if="nonKeydownHandler">
+            <n-button :focusable="false" quaternary @click="$emit('cancel')">取消</n-button>
+            <n-button :focusable="false" quaternary :color="$normal.theme.globalColor" @click="$emit('confirm')">确定</n-button>
+          </template>
+          <template v-else-if="vim">
             <n-button :focusable="false" quaternary @click="$emit('cancel')">取消 [Q]</n-button>
             <n-button :focusable="false" quaternary :color="$normal.theme.globalColor" @click="$emit('confirm')">确定 [S]</n-button>
           </template>
@@ -49,6 +53,7 @@ const props = defineProps({
   wide: Boolean,
   title: String,
   vim: Boolean,
+  nonKeydownHandler: Boolean,
   nonFocus: Boolean
 })
 const emit = defineEmits(['update:show','cancel','confirm'])
@@ -80,9 +85,15 @@ const keyDownHandler = (e)=>{
   }
 }
 onMounted(()=>{
+  if(props.nonKeydownHandler){
+    return
+  }
   document.addEventListener('keydown',keyDownHandler)
 })
 onUnmounted(()=>{
+  if(props.nonKeydownHandler){
+    return
+  }
   document.removeEventListener('keydown',keyDownHandler)
 })
 </script>

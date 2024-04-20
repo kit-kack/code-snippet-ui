@@ -717,9 +717,9 @@ function keyDownHandler(e){
     }
   }
 }
-function handleChooseCommand(command){
+function handleChooseCommand(command,lite){
   showFuncModal.value = false;
-  codeEditorRef.value.insertCommand("{{"+command+"}}");
+  codeEditorRef.value.insertCommand(lite ? command : "{{"+command+"}}");
 }
 
 onMounted(()=>{
