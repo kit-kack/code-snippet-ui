@@ -94,14 +94,36 @@ utools.onPluginEnter((data)=>{
             enterApp(data)
         }else{
             snippetCopyOrPaste(true,undefined,true)
-                .then(input =>{
-                    if(input){
-                        $normal.funcs.snippetName = $reactive.currentSnippet.name;
-                        $normal.entry = true;
-                        enterApp(data)
-                    }else{
-                        utools.outPlugin();
-                    }
+                .then(/*** @param {FormatResult | undefined} result*/
+                    (result) =>{
+                        if(result){
+                            if(result.type === 'input'){
+                                $normal.funcs.snippetName = $reactive.currentSnippet.name;
+                                //
+                                let text='';
+                                let defaultText = '';
+                                if(result.defaultValue){
+                                    defaultText = ' | 默认值: ' + result.defaultValue
+                                }
+                                utools.setSubInput(t => text = t,`${result.variable}${defaultText}`);
+                                document.onkeydown = e => {
+                                    if(e.key === 'Enter'){
+                                        formatManager.globalVar['@'+result.variable] = text ? text: result.defaultValue;
+                                        formatManager.continueFormat(true).then(()=>{
+                                            document.onkeydown = null;
+                                            utools.outPlugin();
+                                        });
+                                    }
+                                }
+                            }else{
+                                // 进入UI界面
+                                $normal.funcs.snippetName = $reactive.currentSnippet.name;
+                                $normal.entry = true;
+                                enterApp(data)
+                            }
+                        }else{
+                            utools.outPlugin();
+                        }
                 })
 
         }
@@ -134,9 +156,10 @@ utools.onMainPush(({code,type,payload})=>{
     $reactive.currentSnippet = result[option.index];
     // $reactive.core.selectedIndex = 0;
     $index.value = 0;
+    $normal.mainPush = true;
     snippetCopyOrPaste(true,num,true)
-        .then(v =>{
-            if(!v){
+        .then(result =>{
+            if(!result){
                 utools.outPlugin();
             }
         })

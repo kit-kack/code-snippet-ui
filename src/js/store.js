@@ -61,6 +61,8 @@ const $normal = {
     quickCode: null,
     // 非核心Command进入插件
     entry: false,
+    // mainPush进入
+    mainPush: false,
     // 占位符相关
     funcs:{
         // 【变量输入】界面遇到select直接使用vim键

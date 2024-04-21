@@ -11,7 +11,8 @@
     "preload": "preload.js"
   },
   "pluginSetting": {
-    "single": true
+    "single": true,
+    "height": 1
   },
   "features": [
     {

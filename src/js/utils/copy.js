@@ -29,17 +29,19 @@ function getCode(path,noView){
 }
 
 /**
- * @return {Promise<boolean>} - 若返回true，则进入【变量输入】界面
+ * @return {Promise<FormatResult | undefined>} - 若返回相应值，则进入【变量输入】界面
  */
 async function copyOrPasteWithType(isPasted,text,type,msg,noView){
     lastCachedMsg = msg;
     isLastPasted = isPasted;
     if(type && type.length>2 && type.startsWith('x-')){
-        text = await formatManager.parse(text);
-    }
-    if(text === null){
-        // 进入【变量输入】界面
-        return true;
+        const result = await formatManager.parse(text,noView);
+        if(result.type === 'code'){
+            text = result.code
+        }else{
+            // 进入【变量输入】界面
+            return result;
+        }
     }
     copyOrPaste(text,noView);
 }
@@ -91,7 +93,7 @@ function _notify(msg,noView,success){
  * @param {boolean} isPasted - 是否粘贴
  * @param {number} [num] - 子代码片段,若为undefined，则为复制粘贴整体代码
  * @param {boolean} [noView] - 适用于没有UI的场景
- * @return {Promise<boolean | undefined>} - 该返回值适用于keyword进入,若返回true，则进入【变量输入】界面
+ * @return {Promise<FormatResult | undefined>} - 该返回值适用于keyword进入,若返回值，则进入【变量输入】界面
  */
 export async function copyCode(isPasted,num,noView){
     // 校验
@@ -119,9 +121,7 @@ export async function copyCode(isPasted,num,noView){
         // 更新次数和时间
         GLOBAL_HIERARCHY.update(null,"count&time")
         // 复制
-        if(await copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 内容已复制`,noView)){
-            return noView;
-        }
+        return await copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 内容已复制`,noView);
 
     }else{
         if(num < 0){
@@ -156,9 +156,7 @@ export async function copyCode(isPasted,num,noView){
                 GLOBAL_HIERARCHY.update(null,"count&time")
 
                 // 复制
-                if(await copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 子片段聚合 内容已复制`,noView)){
-                    return noView;
-                }
+                return copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 子片段聚合 内容已复制`,noView);
             }
         }else{
             if($reactive.currentSnippet.sections && $reactive.currentSnippet.sections.length >= num){
@@ -179,9 +177,7 @@ export async function copyCode(isPasted,num,noView){
                 // 更新次数和时间
                 GLOBAL_HIERARCHY.update(null,"count&time")
                 // 复制
-                if(await copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} ${num}号子片段 内容已复制`,noView)){
-                    return noView;
-                }
+                return await copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} ${num}号子片段 内容已复制`,noView);
             }else{
                 _notify(`当前片段没有 ${num}号 子代码片段`,noView)
             }

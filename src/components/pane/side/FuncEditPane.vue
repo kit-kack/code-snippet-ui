@@ -66,7 +66,7 @@
                               @confirm="doAddCommandDesc"
                               :auto-focus="false">
                     <h5>填写显示别名，方便后续在代码片段编辑页面选择相应占位符</h5>
-                    <n-input placeholder="填写别名，方便选择" v-model:value="active.desc" maxlength="10" show-count/>
+                    <n-input placeholder="填写别名，方便选择" v-model:value="active.desc" maxlength="10" show-count clearable/>
                   </base-modal>
                 </n-form-item>
                 <n-form-item label="描述" path="desc" label-placement="left">
@@ -173,6 +173,7 @@ const COMMAND_RULE = {
   }
 }
 function renderCommandTag(command,index){
+  const desc = pair.value.commands[command]
   return h(
       NTag,
       {
@@ -180,11 +181,13 @@ function renderCommandTag(command,index){
         bordered: false,
         style:{
           userSelect: 'none',
+          backgroundColor: utools.isDarkColors()? '#424247': null,
         },
+        title: desc? desc : null,
         onDblclick: () => {
           active.value.flag = true;
           active.value.element = command;
-          active.value.desc = pair.value.commands[command]
+          active.value.desc = desc
         },
         onClose: () => {
           commandsArray.value.splice(index,1)
@@ -192,7 +195,7 @@ function renderCommandTag(command,index){
       },
       {
         default: () => command,
-        icon: pair.value.commands[command]? ()=>{
+        icon: desc? ()=>{
           return h(NIcon, {
             size: 18,
           }, {default: () => h(SvgFlag)})

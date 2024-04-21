@@ -28,7 +28,7 @@ const DEFAULT_FUNCS = {
 {{input}}可选参数：任意值（作为输入框默认值）
 {{select}}必需参数：字符串数组,例如<i>['a','b','c']</i>
 额外说明：
-1.如果没有使用变量接收，默认输入的值会被保存到名为<i>位置X</i>的变量，故请勿将自定义的变量设置为<i>位置X</i>的形式
+1.如果没有使用变量接收，默认输入的值会被保存到名为<i>变量X</i>的变量，故请勿将自定义的变量设置为<i>变量X</i>的形式
 2.【主动输入】占位符不能放置于管道操作后面，只能放置于首位`,
         commands:{
           "input": "输入",
@@ -38,42 +38,32 @@ const DEFAULT_FUNCS = {
         default: true,
         sort: 0
     },
-    '日期与时间':{
-        name: "日期与时间",
-        desc: `获取日期与时间;
+    '系统与日期时间': {
+        name: "系统与日期时间",
+        desc: `获取系统信息以及日期时间；
 {{pattern}}需要携带格式化参数，例如<i>HH:mm:ss</i>`,
         commands: {
-          "now": "时间戳",
-          "date": "日期",
-          "time": "时间",
-          "pattern": "自定义格式"
+            "clipboard": "剪切板",
+            "ip": "内网IP",
+            "now": "时间戳",
+            "date": "日期",
+            "time": "时间",
+            "pattern": "自定义格式"
         },
         sort: 1,
         expression: `\
-switch (command) {
+switch (command){
     case "now": // 时间戳
         return Date.now();
     case "date": // 日期
         return new Date().toLocaleDateString();
     case "time": // 时间
         return new Date().toLocaleTimeString();
-    default: // 自定义
+    case "pattern": // 自定义
         return $._dayjs().format(param)
-}`,
-    },
-    '系统信息': {
-        name: "系统信息",
-        desc: `获取系统信息`,
-        commands: {
-          "clipboard": "剪切板",
-          "ip": "ip地址",
-        },
-        sort: 2,
-        expression: `\
-switch (command){
     case "clipboard": // 剪切板
         return require('electron').clipboard.readText();
-    case "ip": // ip地址
+    default: // ip地址
         const os = require('os');
         const ifaces = os.networkInterfaces();
         for (const dev in ifaces) {
@@ -86,8 +76,6 @@ switch (command){
             }
         }
         return "127.0.0.1";
-    default:
-        return null;
 }`
     },
     "随机":{
@@ -97,7 +85,7 @@ switch (command){
 {{nanoid}}可选参数：<i>size</i>(来指定id字符数量)
 {{uuid}}可选参数：<i>len,radix</i>（len对应uuid长度，radix对应uuid选取字符数量）`,
         commands: {
-            "random": null,
+            "random": "随机数",
             "nanoid": null,
             "uuid": null
         },
@@ -107,9 +95,10 @@ switch (command){
     case "nanoid":
         if(param){
             const num = +param;
-            if(!isNaN(num)){
-                return $._nanoid(num);
+            if(isNaN(num)){
+                throw "[nanoid]参数要求为数字，非法传入：" + param
             }
+            return $._nanoid(num);
         }
         return $._nanoid();
     case "uuid":
@@ -118,6 +107,9 @@ switch (command){
             if(aspects.length === 2){
                 const len = +aspects[0]
                 const radix = +aspects[1];
+                if(isNaN(len) || isNaN(radix)){
+                    throw "[uuid]参数要求为 len,radix，且两者皆为数字，非法传入：" + param
+                }
                 return $._uuid(len,radix);
             }
         }
@@ -129,12 +121,15 @@ switch (command){
             if(aspects && aspects.length === 2){
                 let min = +aspects[0];
                 let max = +aspects[1];
+                if(isNaN(min) || isNaN(max)){
+                    throw "[random]参数要求为 min..max,且两者皆为数字，非法传入：" + param
+                }
                 if(min > max){
                     return Math.trunc(num * (min-max)+max)
                 }
                 return Math.trunc(num * (max-min)+min)
             }else{
-                throw "random: 格式错误"
+                throw "[random]参数要求为 min..max,且两者皆为数字，非法传入：" + param
             }
         }else{
             return num;
@@ -148,7 +143,8 @@ switch (command){
             "lowercase": "转小写",
             "uppercase": "转大写",
             "trim": "去空格",
-            "camelcase": "转驼峰",
+            "camelcase": "转小驼峰",
+            "pascalcase": "转大驼峰",
             "snakecase": "转下划线",
             "kebabcase": "转短横线",
         },
@@ -161,7 +157,7 @@ if(!param){
  * @param {string} text
  */
 function resolveAspects(text){
-    let aspects = [];
+    const aspects = [];
     /**
      * mode:
      * -1 未知
@@ -256,7 +252,14 @@ switch(command){
         return param.toUpperCase();
     case 'trim': // 去空格
         return param.trim();
-    case 'camelcase': // 转驼峰
+    case 'camelcase': // 转小驼峰
+        return resolveAspects(param).map((v,index)=>{
+            if(index === 0){
+                return v.toLowerCase()
+            }
+            return v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()
+        }).join('')
+    case 'pascalcase': // 转大驼峰
         return resolveAspects(param).map(v =>{
             return v.charAt(0).toUpperCase() + v.slice(1).toLowerCase()
         }).join('')
@@ -409,8 +412,9 @@ function trimResult(result){
  * 获取command对应的键，如果返回null则代表该占位符不存在
  * @param {string} command
  * @private
+ * @param {boolean} [needDesc]
  */
-function _get_command_key(command){
+function _get_command_key(command,needDesc){
     // 1.first $
     if(command.startsWith('$')){
         // first query from current hierarchy
@@ -425,9 +429,16 @@ function _get_command_key(command){
     // 2. normal funcMap
     for (const key in formatManager.funcMap) {
         if(command in formatManager.funcMap[key].commands){
-            return {
-                command: command,
-                key: key
+            if(needDesc){
+                return {
+                    command: command,
+                    desc: formatManager.funcMap[key].commands[command]
+                }
+            }else{
+                return {
+                    command: command,
+                    key: key
+                }
             }
         }
     }
@@ -656,29 +667,25 @@ export const formatManager = {
      * @private
      * @return {Promise<any | string>}
      * @param  [runtimeParam]
+     * @throws {Error}
      */
     async _expression_invoker_for_command(result,runtimeParam){
-        try{
-            if(result.flag === COMMAND_FLAG.PARAM_AS_FUNC){
-                return await window.preload.dynamicRunCode(result.param,undefined,undefined,this.globalVar);
+        if(result.flag === COMMAND_FLAG.PARAM_AS_FUNC){
+            return await window.preload.dynamicRunCode(result.param,undefined,undefined,this.globalVar);
+        }else{
+            // 看param是否为@variable形式
+            if(runtimeParam === undefined){
+                if(result.param in this.globalVar){
+                    result.param = _toString(this.globalVar[result.param]);
+                }
             }else{
-                // 看param是否为@variable形式
-                if(runtimeParam === undefined){
-                    if(result.param in this.globalVar){
-                        result.param = this.globalVar[result.param]?.toString();
-                    }
-                }else{
-                    result.param = runtimeParam
-                }
-                if(result.key){
-                    return await window.preload.dynamicRunCode(this.funcMap[result.key].expression,result.command,result.param,this.globalVar);
-                }else{
-                    return await GLOBAL_HIERARCHY.currentConfig.funcs[result.command](result.param);
-                }
+                result.param = runtimeParam
             }
-        }catch (e){
-            console.error(e)
-            return `{{${e.toString()}}}`;
+            if(result.key){
+                return await window.preload.dynamicRunCode(this.funcMap[result.key].expression,result.command,result.param,this.globalVar);
+            }else{
+                return await GLOBAL_HIERARCHY.currentConfig.funcs[result.command](result.param);
+            }
         }
     },
     /**
@@ -717,17 +724,22 @@ export const formatManager = {
      */
     async _expression_invoker_for_chain(result){
         let value;
-        for (let i = 0; i < result.chain.length; i++) {
-            if(i === 0){
-                const first = result.chain[i];
-                if(first.flag === COMMAND_FLAG.ACTIVE_INPUT || first.flag === COMMAND_FLAG.ACTIVE_SELECT){
-                    value = this.globalVar['@'+first._var];
+        let i = 0;
+        try{
+            for (; i < result.chain.length; i++) {
+                if(i === 0){
+                    const first = result.chain[i];
+                    if(first.flag === COMMAND_FLAG.ACTIVE_INPUT || first.flag === COMMAND_FLAG.ACTIVE_SELECT){
+                        value = _toString(this.globalVar['@'+first._var]);
+                    }else{
+                        value = _toString(await this._expression_invoker_for_command(result.chain[i]));
+                    }
                 }else{
-                    value = await this._expression_invoker_for_command(result.chain[i]);
+                    value = _toString(await this._expression_invoker_for_command(result.chain[i],value));
                 }
-            }else{
-                value = await this._expression_invoker_for_command(result.chain[i],value);
             }
+        }catch (e){
+            return  `{{ Error: 运行[ ${result.chain[i].command ?? result.param} ]时抛出异常 => ${e} }}`
         }
         return value
     },
@@ -758,7 +770,7 @@ export const formatManager = {
      */
     _resolveCommandWhenInput(result){
         if(!result._var){
-            result._var = '位置'+ this.activeInputCount;
+            result._var = '变量'+ this.activeInputCount;
         }
         this.inputVars[result._var]= "input"
         if(result.param){
@@ -780,7 +792,7 @@ export const formatManager = {
      */
     _resolveCommandWhenSelect(result){
         if(!result._var){
-            result._var = '位置'+ this.activeInputCount;
+            result._var = '变量'+ this.activeInputCount;
         }
         this.inputVars[result._var]= "select"
         if(result.param){
@@ -997,7 +1009,11 @@ export const formatManager = {
                     if(assignFlag){
                         // 立即解析，而不是等到【主动输入】完成后才解析
                         if(flag >= COMMAND_FLAG.NORMAL_COMMAND){
-                            this.globalVar['@'+result._var] = await this._expression_invoker_for_command(result);
+                            try{
+                                this.globalVar['@'+result._var] = await this._expression_invoker_for_command(result);
+                            }catch (e){
+                                this.globalVar['@'+result._var] = `{{ Error: 运行[ ${result.command} ]时抛出异常 => ${e} }}`
+                            }
                             continue;
                         }
                         result.assign = true;
@@ -1064,7 +1080,11 @@ export const formatManager = {
                     }
                     break;
                 default:
-                    element.code = await this._expression_invoker_for_command(element);
+                    try{
+                        element.code = await this._expression_invoker_for_command(element);
+                    }catch (e){
+                        element.code = `{{ Error: 运行[ ${element.command ?? element.param} ]时抛出异常 => ${e} }}`
+                    }
                     // var
                     if(element._var){
                         this.globalVar['@'+element._var] = element.code;
@@ -1088,33 +1108,61 @@ export const formatManager = {
     /**
      * 解析
      * @param {string} code - 待解析的代码
+     * @param {boolean} [noView] - 通过utools关键字访问，此时还没有UI界面
+     * @return {Promise<FormatResult>}
      */
-    async parse(code){
+    async parse(code,noView){
         this._initForEachRegex();
         const result = await this._format(code)
         if(result.parse){
             if(result.vars){  // input 解析
+                // 判断是否仅含有一个input
+                if($normal.mainPush){ // mainPush场景下忽略 下面input
+                    $normal.mainPush = false
+                }else if(noView){
+                    if(result.vars.length === 1 && result.vars[0][1] === 'input'){
+                        // only
+                        this.codeBuffer = result.code;
+                        return {
+                            type: 'input',
+                            variable: result.vars[0][0],
+                            defaultValue: result.defaultValues[result.vars[0][0]]
+                        }
+                    }
+                }
                 switchToFullUIMode()
                 this.codeBuffer = result.code;
                 $normal.funcs.variables = result.vars;
                 $normal.funcs.defaultValues = result.defaultValues;
                 $normal.funcs.snippetName = $reactive.currentSnippet.name
                 $reactive.common.variableActive = true;
-                return null;
+                return {
+                    type: 'entry'
+                };
             }else{
-                return await this._expression(result.code);
+                return {
+                    type: 'code',
+                    code: await this._expression(result.code)
+                };
             }
         }else{
-            return result.code;
+            return {
+                type: 'code',
+                code: result.code
+            };
+
         }
     },
 
 
-    async continueFormat(){
+    /**
+     * @param {boolean} [noView]
+     */
+    async continueFormat(noView){
         if(this.codeBuffer){
             const code = await this._expression(this.codeBuffer)
             this.codeBuffer = null
-            copyOrPaste(code)
+            copyOrPaste(code,noView)
         }
     },
     backup(zip, filename,dirname) {
@@ -1188,7 +1236,24 @@ function _getCommandClass(command,index) {
 function buildResultElement(result,index){
     let html = '';
     if(result.command){
-        html = `<span class="${_getCommandClass(result.command.trim(),index)}">${result.command}</span>`
+        const newCommand = result.command.trim();
+        let className = 'kitx-error-command';
+        let title='';
+        const res = _get_command_key(newCommand,true);
+        if(res){
+            if(newCommand === 'input' || newCommand==='select'){
+                if(index === 0){
+                    className = 'kitx-right-command'
+                }
+            }else{
+                className = 'kitx-right-command'
+            }
+            if(res.desc){
+                title = `title="${res.desc}"`
+            }
+        }
+
+        html = `<span class="${className}" ${title}>${result.command}</span>`
     }
     if(result._var !== undefined){
         if(result._var){

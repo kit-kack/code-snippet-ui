@@ -1,7 +1,8 @@
 import {utools_db_store} from "./base";
 import { debounce as _debounce } from 'lodash-es'
 
-const GLOBAL_STATISTICS = 'statistics'
+const GLOBAL_STATISTICS = 'statistics/'+ utools.getNativeId();
+const OLD_STATISTICS = 'statistics';
 export const CountType= {
     VISITED: "visited",
     COPYED: "copyed",
@@ -18,18 +19,24 @@ export const statisticsManager = {
         if(this.isInited) {
             return
         }
-        this.data = utools.db.get(GLOBAL_STATISTICS)?.data ?? {
-            visited:{
-                total: 0,
-                week:{}
-            },
-            copyed:{
-                total: 0,
-                week:{}
-            },
-            vim:{
-                total: 0,
-                week: {}
+        const data = utools.db.get(OLD_STATISTICS)?.data
+        if(data) {
+            this.data = data
+            utools.db.remove(OLD_STATISTICS);
+        }else{
+            this.data = utools.db.get(GLOBAL_STATISTICS)?.data ?? {
+                visited:{
+                    total: 0,
+                    week:{}
+                },
+                copyed:{
+                    total: 0,
+                    week:{}
+                },
+                vim:{
+                    total: 0,
+                    week: {}
+                }
             }
         }
         this.clearPreviousWeek();

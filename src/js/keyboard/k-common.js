@@ -14,6 +14,12 @@ const notify = (msg,noView,warning) =>{
     }
 }
 
+/**
+ * @return {Promise<FormatResult | undefined>}
+ * @param isPaste
+ * @param sub
+ * @param noView
+ */
 export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
     // dir
     if($reactive.currentSnippet.dir){
@@ -99,15 +105,7 @@ export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
         case 'Digit7':
         case 'Digit8':
         case 'Digit9':
-            if($reactive.currentSnippet.dir){
-                $message.warning("无法对目录进行此操作");
-                return;
-            }
-            if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
-                $message.warning("无法对链接进行此操作");
-                return;
-            }
-            copyCode(ctrl || shift || alt,+code[5])
+            snippetCopyOrPaste(ctrl || shift || alt,+code[5])
             return true;
         case 'KeyO':
             if($reactive.currentSnippet.path){
@@ -135,7 +133,7 @@ export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
 /**
  * @type {KeyDownHandler}
  */
-export const K_COMMON_DOWN = ({code}) => {
+export const K_COMMON_DOWN = ({code,ctrl}) => {
     switch (code){
         case 'KeyZ':
             switchToFullUIMode()
@@ -144,6 +142,12 @@ export const K_COMMON_DOWN = ({code}) => {
         case 'Enter':
             snippetCopyOrPaste(true,$normal.beta.subSnippetNum);
             break
+        // ctrl c处理
+        case 'KeyC':
+            if(ctrl){
+                return false;
+            }
+            break;
     }
     return true
 }
