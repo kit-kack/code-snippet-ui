@@ -15,7 +15,7 @@ export function register_utools_keyword(snippet,prefix,nonNotify){
     let info = snippet.desc ?? '暂无描述~';
     let ico
     if(snippet.dir){
-        info = "🚀快速访问目录：     "+info
+        info = "🚀快速访问目录 |      "+info
     }else{
         let prefix = "快速粘贴片段"
         if(snippet.link){
@@ -25,7 +25,7 @@ export function register_utools_keyword(snippet,prefix,nonNotify){
         }else if(snippet.type?.startsWith('x-')){
             prefix = "♾️"+ "快速粘贴片段"
         }
-        info = prefix+"：      "+info
+        info = prefix+" |      "+info
         ico = "/quick.png"
     }
     // 获取

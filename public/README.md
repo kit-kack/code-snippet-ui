@@ -3,11 +3,10 @@
 新版本速览✨
 
 
-1. <span style="color:#209a6e">支持</span> 图片保存以及复制粘贴使用
-2. <span style="color:#209a6e">新增</span> 回收站功能
-3. <span style="color:#5eacee">改进</span> 占位符运行环境为Node.js场景
-4. <span style="color:#5eacee">完善</span> 一些界面设计以及相应处理逻辑
-5. <span style="color:#5eacee">适配</span> uTools5.0
+1. <span style="color:#209a6e">新增</span> 占位符语法升级，支持管道操作，同时移除`#variable=value`语法
+2. <span style="color:#5eacee">完善</span> 占位符存储重构，提供显示别名来方便选择
+> 由于存储重构和适配管道操作，内置的一些占位符实现发生变化，若你修改了相关实现，请自行通过桌面生成的code-snippet-func.json来作迁移处理
+3. <span style="color:#209a6e">优化</span> 当仅含有一个input输入占位符的代码片段通过utools关键字访问时，会自动优化为通过uTools子输入框输入值，而非UI界面弹窗输入
 ---
 
 [[TOC]]
@@ -114,7 +113,7 @@
 
 <br/>
 
-### 2.4 占位符解析
+### 2.4 占位符解析✨
 
 > 想要开启该功能，需要在代码片段的语言类型加上`x-`前缀，例如`markdown`变成`x-markdown`
 
@@ -147,6 +146,23 @@ hello, {{clipboard}}  // 返回剪切板复制内容
 {{@rand}}  // 0.2342349023424823
 // 另外，遇到上面的{{#...}}就会直接解析，而{{...}}会统一到【主动输入】完成之后解析
 ```
+- 管道操作✨
+
+没错，就是Linux的管道符操作` | `，将前一个占位符运行结果 作为参数 传入下一个占位符
+> 注意：
+> 1. ` | `必须保证前后各有一个空格，这是为了避免后续的JavaScript语句中可能出现歧义
+> 2. 【主动输入】占位符无法放置于管道后面，只能放置于首位
+> 3. 管道操作中后面的占位符不能指定参数和变量接收，而首位占位符指定的变量接收 整体结果
+```groovy
+// 场景：生成长度为[2,6]之间随机值的nanoid
+
+// 之前的做法
+{{#len::random:2..6}}  // 这里#表示不输出值，仅作为赋值
+{{nanoid:@len}}    // 将 变量len 的值作为参数 传入 占位符nanoid
+
+// 管道操作
+{{ random:2..6 | nanoid }}  // 一步即可
+```
 
 - 使用JavaScript语句
 > 在`无command有param`的情况下，此时param将作为JavaScript语句执行
@@ -162,14 +178,18 @@ hello, {{clipboard}}  // 返回剪切板复制内容
     // 2.可以通过内置对象$来获取前面配置的变量值 $['@variable']
     return $['@one'] + "+1 = 2"
 }}  // 1+1 = 2
-// {{#variable=value}} 用来快速为变量赋值
-{{#two=Two}}
+// 支持异步
+{{random:::
+    return (async()=>{
+        // 3.可以通过$.func(command,param)来调用已创建的占位符，注意这是异步方法
+        return await $.func('random','2..6');
+    })(); // 5
+}}
 ```
 
 > 故由上得知，占位符的完整语法为：
-> - `[variable::]command[:param]`
+> - `[variable::]command[:param] [ | command2 | ... ]`
 > - `@variable`
-> - `#variable=value`
 >
 > 上面的`[...]`表示可选
 > <br/>

@@ -13,8 +13,9 @@
           <template v-else>
             <n-select v-model:value="template.value"
                       :options="template.option"
-                      @focus="$normal.funcs.vimSupport = true"
-                      @blur="$normal.funcs.vimSupport = false"
+                      @focus="$normal.funcs.vimSupport = true; foucsSelectIndex = index;"
+                      @blur="$normal.funcs.vimSupport = false; foucsSelectIndex = -1;"
+                      show-on-focus
                       placeholder="选择或输入值"/>
           </template>
         </template>
@@ -25,11 +26,11 @@
 
 <script setup>
 import {$normal, $reactive, CODE_VIEW, handleRecoverLiteShow, LIST_VIEW} from "../../js/store";
-import {ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {formatManager} from "../../js/utools/func";
 import BaseModal from "./BaseModal.vue";
 import {throttle} from "lodash-es";
-
+const foucsSelectIndex = ref();
 /**
  * $normal.funcs.variabls item
  * [ name, type, desc ]
@@ -115,6 +116,20 @@ function doYes(){
     $reactive.common.variableActive = false;
   }
 }
+const keyDownHandler = (e) =>{
+  if(!$normal.funcs.vimSupport){
+    return;
+  }
+ if(e.key === 'Enter'){
+    handleEnter(foucsSelectIndex.value)
+  }
+}
+onMounted(()=>{
+  document.addEventListener('keydown',keyDownHandler)
+})
+onUnmounted(()=>{
+  document.removeEventListener('keydown',keyDownHandler)
+})
 
 </script>
 <style scoped>

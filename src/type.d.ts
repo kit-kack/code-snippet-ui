@@ -74,7 +74,9 @@ declare interface Func {
     // 表达式
     expression: string,
     // 内置
-    default?: boolean
+    default?: boolean,
+    // 排序号
+    sort?: number
 }
 interface BaseExt {
     /**
@@ -289,3 +291,29 @@ interface CodeEditorChange {
     readonly changeType: "none" | "cursor" | "content" | "all"
 }
 type CodeEditorKeyDownHandler = (e: KeyboardEvent, source: CodeEditorSource) => CodeEditorChange | null | undefined
+interface ParseResult{
+    // 存放无法解析的内容
+    code?: string,
+    // 对应@variable
+    variable?: string,
+    // 对应占位符
+    command?: string,
+    // 可选参数
+    param?: string,
+    // 对应接收变量
+    _var?: string,
+    // command对应key
+    key?: string,
+    // 是否#开头
+    assign?: boolean,
+    // 链式 占位符
+    chain?: ParseResult[],
+    // command类型
+    flag?: number
+}
+interface FormatResult{
+    type: "input" | "entry" | "code",
+    variable?: string,
+    defaultValue?: string,
+    code?: string
+}
