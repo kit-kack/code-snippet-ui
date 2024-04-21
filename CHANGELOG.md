@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.6](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.5...v2.7.6) (2024-04-21)
+
+
+### Features
+
+* **编辑器:** 修复tab情况下的光标选中范围bug ([8260c68](https://github.com/kit-kack/code-snippet-ui/commit/8260c68e9f003ddd3b14b686e93a858decd6e53b))
+* **占位符:** 支持管道链式操作 ([561da78](https://github.com/kit-kack/code-snippet-ui/commit/561da78e0b439a81e08f46b1fb072c1dffa8fb23))
+* **占位符:** 支持input占位符自动转换 ([c47ef12](https://github.com/kit-kack/code-snippet-ui/commit/c47ef12ca60111c49ef7a8ea31452b9709fe2f12))
+* **ListItem:** 拆分重构；一些bug处理 ([16ba405](https://github.com/kit-kack/code-snippet-ui/commit/16ba4055da1f09b96768fa81dc69b3c571206514))
+
+
+### Bug Fixes
+
+* 一些优化 ([47061d3](https://github.com/kit-kack/code-snippet-ui/commit/47061d37b2c2e430937f20dbbde790ba7ebecae3))
+* **占位符:** 存储结构迁移 ([d04d091](https://github.com/kit-kack/code-snippet-ui/commit/d04d0911a6ed26c977d89375f7ed1da5eda484e4))
+* **占位符:** 修复变量输入界面按enter无法关闭界面bug ([a52435d](https://github.com/kit-kack/code-snippet-ui/commit/a52435d76ace224fd85d1352cf7890e08d47ee4f))
+* **shortcut-pane:** 修复tab点击切换移除 ([51a0382](https://github.com/kit-kack/code-snippet-ui/commit/51a0382984c4890764515c2aec11071946db8648))
+
 ### [2.7.5](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.4...v2.7.5) (2024-04-09)
 
 
