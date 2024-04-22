@@ -507,18 +507,31 @@ export const formatManager = {
             if(!mirgateFlag){
                 // check command repeat
                 // 旧版本 func.commands 为 [ one ,two ]
-                for (const command of func.commands) {
-                    if(this.checkCommandRepeat(command,func.name)){
-                        mirgateFlag = true;
-                        func.mirgateErrorMessage = '占位符与 新内置占位符 重复，无法判断实现代码一致'
-                        break;
+                if(Array.isArray(func.commands)){
+                    for (const command of func.commands) {
+                        if(this.checkCommandRepeat(command,func.name)){
+                            mirgateFlag = true;
+                            func.mirgateErrorMessage = '占位符与 新内置占位符 重复，无法判断实现代码一致'
+                            break;
+                        }
+                    }
+                }else {
+                    for (const command in func.commands) {
+                        if(this.checkCommandRepeat(command,func.name)){
+                            mirgateFlag = true;
+                            func.mirgateErrorMessage = '占位符与 新内置占位符 重复，无法判断实现代码一致'
+                            break;
+                        }
                     }
                 }
+
             }
             if(mirgateFlag){
                 const commands = {};
-                for (const command of func.commands) {
-                    commands[command] = null
+                if(Array.isArray(func.commands)){
+                    for (const command of func.commands) {
+                        commands[command] = null
+                    }
                 }
                 func.commands = commands;
                 backupForMirgate[funcKey] = func;
