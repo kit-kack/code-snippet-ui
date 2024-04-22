@@ -38,7 +38,7 @@ const props = defineProps({
 })
 const language = defineModel('language');
 if(!language.value){
-  language.value = configManager.get('default_language')
+  language.value = configManager.get('default_language') ?? 'plaintext';
 }
 
 function handleLanguageChange(v){

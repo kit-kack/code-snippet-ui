@@ -317,7 +317,7 @@ const formProperties = GLOBAL_HIERARCHY.currentConfig.form;
 const properties = formProperties.allowUpdatedProperties;
 const placeholders = formProperties.placeholders;
 const edit = $reactive.currentMode === EDIT_VIEW;
-const codeTemplate = reactive(edit?{
+const codeTemplate = reactive((edit || $reactive.main.isRecycleConflict)?{
   code: "",
   ...toRaw($reactive.currentSnippet)} :{
   code: $normal.quickCode ?? "",
@@ -566,6 +566,7 @@ function handleScreencut(){
 
 function handleCancel(){
   $normal.keepSelectedStatus = true;
+  $reactive.main.isRecycleConflict = false;
   GLOBAL_HIERARCHY.changeView(LIST_VIEW)
 }
 function handleUpdate(){

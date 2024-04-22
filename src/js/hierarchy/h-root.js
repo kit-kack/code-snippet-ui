@@ -35,6 +35,24 @@ export const rootHierachy = {
       return DEFAULT_ROOT_HIERARCHY_CONFIG;
     },
     search(prefix,name){
+        // determin recycle
+        // determine recycle
+        // if(isRecycleBinModeActive){
+        //     if(id in recycleBin){
+        //         item.expired = recycleBin[id].expired - timeStamp;
+        //         if(item.expired < 0){
+        //             // TODO: 过期处理
+        //             GLOBAL_HIERARCHY.remove(snippet,true);
+        //             continue;
+        //         }
+        //     }else{
+        //         continue;
+        //     }
+        // }else{
+        //     if(id in recycleBin){
+        //         continue;
+        //     }
+        // }
         return {
             sorted: false,
             highlighted: true,
@@ -45,10 +63,6 @@ export const rootHierachy = {
         return codeSnippetManager.contain(name,GLOBAL_HIERARCHY.currentPrefixIdStr)
     },
     async createOrEdit(prefix,snippet,oldName){
-        // editor
-        if(configManager.get('beta_special_tag')){
-            SPECIAL_TAG_HANDLER.accept(snippet,true)
-        }
         // sync
         snippet.nativeId = undefined;
         if(snippet.path){
@@ -68,14 +82,6 @@ export const rootHierachy = {
         }
     },
     remove(prefix,snippet){
-        if(snippet.id === defaultHelpSnippet.id){
-            configManager.set('readme_close',true)
-            return;
-        }
-        // editor
-        if(configManager.get('beta_special_tag')){
-            SPECIAL_TAG_HANDLER.accept(snippet,false)
-        }
         codeSnippetManager.del(snippet.id,GLOBAL_HIERARCHY.currentPrefixIdStr)
     }
 }

@@ -527,7 +527,9 @@ onUnmounted(()=>{
   }
   h1{
     text-align: center;
-    border-bottom-color: transparent;
+  }
+  h1,h2,h3{
+    border-bottom-color: transparent !important;
   }
 
   img{
@@ -577,9 +579,25 @@ onUnmounted(()=>{
 }
 #light-app-v5{
   .github-markdown-body{
-    .hljs{
-      background-color: #f5f5f5 !important;
+    pre {
+      background: #eee !important;
+      box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
+      code {
+        background-color: unset;
+      }
+      &::-webkit-scrollbar-track-piece{
+        background-color: #eee;
+      }
+      &::-webkit-scrollbar-thumb {
+        border-radius: 5px !important;
+
+        //border: none !important;
+        border-color: #eee;
+        background: #d7d7d7 !important;
+      }
+
     }
+
 
   }
 }
@@ -617,9 +635,9 @@ onUnmounted(()=>{
     background-color: #515154;
   }
 
-  h1,h2{
-    border-bottom-color: #515154;
-  }
+  //h1,h2{
+  //  border-bottom-color: #515154;
+  //}
 
   code:not(pre) {
     color: #ff7875;

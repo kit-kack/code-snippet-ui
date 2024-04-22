@@ -37,7 +37,7 @@ declare interface CodeSnippetCore{
 }
 declare interface CodeSnippet extends CodeSnippetCore{
     // nanoid：表示唯一
-    id?: number | string,
+    id?: string,
     // 是否注册为内置keyword
     keyword?: boolean,
     // 是否为内置说明文档，无法修改使用
@@ -62,6 +62,8 @@ declare interface CodeSnippet extends CodeSnippetCore{
     descAsMd?: boolean
     // 匹配类型 0-none 1-描述匹配 2-代码匹配
     matchType?: 0 | 1 | 2
+    // 过期
+    expired?: number
 }
 
 declare interface Func {
@@ -316,4 +318,29 @@ interface FormatResult{
     variable?: string,
     defaultValue?: string,
     code?: string
+}
+interface HierarchyHub{
+    /**
+     * 置顶列表
+     */
+    topList?: string[],
+    /**
+     * 回收站，记录 过期时间 - keyword
+     */
+    recycleBin?: {
+        [key: string]: {
+            expired: number,
+            keyword?: boolean
+        }
+    },
+    /**
+     * 保存代码片段数据： 使用次数、最近使用时间、子代码片段
+     */
+    snippets?: {
+        [key: string]: {
+            count?: number,
+            time?: number,
+            sections?: Array<[number,number]>
+        }
+    }
 }

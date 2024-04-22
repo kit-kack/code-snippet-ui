@@ -1,5 +1,5 @@
 import {utools_db_store} from "./base";
-import {$index, $reactive} from "../store";
+import {$index, $reactive, CREATE_VIEW, EDIT_VIEW} from "../store";
 import { clone as _clone } from "lodash-es"
 import {CODE_PREFIX, codeSnippetManager} from "./snippet";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
@@ -21,14 +21,6 @@ const THREE_DAYS = 3 * 24 * 60 * 60 * 1000
 
 
 
-/**
- * @typedef {Object} HierarchyHub
- * @property {string[]} topList - 记录置顶的代码片段列表
- * @property {Object<string,number>} recycleBin - 记录删除的代码片段列表 - 剩余保存时间
- * @property {Object<string,{ count?: number,time?: number,sections?: Array<[number,number]> }>} snippets - 额外配置的数据
- */
-
-
 function _getHierarchyHub(key){
     return (utools.db.get(key)?.data) ?? {}
 }
@@ -40,9 +32,14 @@ export const hierachyHubManager = {
     currentHub: _getHierarchyHub(ROOT_HIERARCHY_PREFIX),
     currentPrefix: null,
     currentClonedTopList: [],
+    isInited: false,
 
     init(){
+        if(this.isInited){
+            return;
+        }
         this.changeHub(null)
+        this.isInited = true
     },
     _syncTopList(){
       this.currentClonedTopList = _clone(this.currentHub.topList)??[]
@@ -188,32 +185,34 @@ export const hierachyHubManager = {
         // store
         this.store()
     },
-    recycleElement(name){
+    recycleElement(id){
         const recycleBin = this.currentHub.recycleBin ?? {};
         const obj = {
             expired: Date.now() + THREE_DAYS,
         };
-        const snippet = codeSnippetManager.get(name,GLOBAL_HIERARCHY.currentPrefixIdStr);
-        if(snippet && snippet.keyword){
-            delete snippet.keyword;
+        if(codeSnippetManager.recycle(id,GLOBAL_HIERARCHY.currentPrefixIdStr)){
             obj.keyword = true;
-            codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr);
         }
-        recycleBin[name] = obj;
+        recycleBin[id] = obj;
         this.currentHub.recycleBin = recycleBin;
         this.store()
     },
-    resumeElement(name){
+    resumeElement(id,continueFlag = false){
         const recycleBin = this.currentHub.recycleBin ?? {};
-        const obj = recycleBin[name];
-        if(obj && obj.keyword){
-            const snippet = codeSnippetManager.get(name,GLOBAL_HIERARCHY.currentPrefixIdStr);
-            snippet.keyword = true;
-            codeSnippetManager.update(snippet,GLOBAL_HIERARCHY.currentPrefixIdStr);
+        const obj = recycleBin[id];
+        if(obj && !continueFlag){
+            if(!codeSnippetManager.resume(id,GLOBAL_HIERARCHY.currentPrefixIdStr,obj.keyword)){
+                $message.warning("恢复冲突：代码片段名已重复，需重新定义!");
+                // conflict 恢复冲突
+                $reactive.main.isRecycleConflict = true;
+                GLOBAL_HIERARCHY.changeView(CREATE_VIEW);
+                return false;
+            }
         }
-        delete recycleBin[name];
+        delete recycleBin[id];
         this.currentHub.recycleBin = recycleBin;
         this.store()
+        return true;
     },
     renameElment(oldName,newName){
         // top

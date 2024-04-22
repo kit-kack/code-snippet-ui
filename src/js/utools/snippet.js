@@ -1,17 +1,35 @@
-import {localConfigDirPath} from "../some";
+import {defaultHelpSnippet, localConfigDirPath} from "../some";
 import {match} from "../utils/fuzzy";
 import {utools_db_store} from "./base";
 import {tagColorManager} from "./tag";
 import {batch_delete_utools_keyword, delete_utools_keyword, register_utools_keyword} from "./keyword";
 import {configManager} from "./config";
+import {hierachyHubManager} from "./hub";
+import {$reactive} from "../store";
+import {GLOBAL_HIERARCHY} from "../hierarchy/core";
+import {SPECIAL_TAG_HANDLER} from "../editor/editor";
 
 export const CODE_PREFIX = "code/";
 const SUB_CODE_PREFIX = "#code/"
 const GLOBAL_FUNC = "func";
 export const codeSnippetManager = {
     // Code Snippet Map (key is its id)
+    /**
+     * @type {Map<string, CodeSnippet>}
+     */
     rootSnippetMap: new Map(),
+    /**
+     * @type {Map<string, CodeSnippet>}
+     */
     snippetMap: null,
+    /**
+     * @type {Map<string, CodeSnippet>}
+     */
+    recycleRootSnippetMap: new Map(),
+    /**
+     * @type {Map<string, CodeSnippet>}
+     */
+    recycleSnippetMap: null,
     snippetKey: null,
     isInited: false,
 
@@ -19,8 +37,14 @@ export const codeSnippetManager = {
         if (this.isInited) {
             return;
         }
+        hierachyHubManager.init();
         const nativeId = utools.getNativeId();
+        const now = Date.now();
+        const recycleBin = hierachyHubManager.currentHub.recycleBin;
         for (const doc of utools.db.allDocs(CODE_PREFIX)) {
+            /**
+             * @type {CodeSnippet}
+             */
             const payload = doc.data;
             if(payload.nativeId){
                 if(payload.nativeId !== nativeId){
@@ -33,7 +57,16 @@ export const codeSnippetManager = {
             if(payload.createTime == null){
                 payload.createTime = Date.now();
             }
-            this.rootSnippetMap.set(payload.id, payload)
+            // compare recycle
+            if(recycleBin && payload.id in recycleBin){
+                if(recycleBin[payload.id].expired < now){
+                    GLOBAL_HIERARCHY.remove(payload,true)
+                }else{
+                    this.recycleRootSnippetMap.set(payload.id, payload)
+                }
+            }else{
+                this.rootSnippetMap.set(payload.id, payload)
+            }
         }
         console.log('codeSnippetManager init, and size is '+this.rootSnippetMap.size)
         this.isInited = true;
@@ -44,6 +77,9 @@ export const codeSnippetManager = {
         }
         this.snippetKey = prefix;
         this.snippetMap = new Map();
+        this.recycleSnippetMap = new Map();
+        const recycleBin = hierachyHubManager.currentHub.recycleBin;
+        const now = Date.now();
         for (const doc of utools.db.allDocs(SUB_CODE_PREFIX+prefix + "#" )) {
             const payload = doc.data;
             if(payload.count == null){
@@ -52,7 +88,17 @@ export const codeSnippetManager = {
             if(payload.createTime == null){
                 payload.createTime = Date.now();
             }
-            this.snippetMap.set(payload.id, payload)
+
+            // compare recycle
+            if(recycleBin && payload.id in recycleBin){
+                if(recycleBin[payload.id].expired < now){
+                    GLOBAL_HIERARCHY.remove(payload,true)
+                }else{
+                    this.recycleSnippetMap.set(payload.id, payload)
+                }
+            }else{
+                this.snippetMap.set(payload.id, payload)
+            }
         }
     },
     addTagInfo(payload,flag){
@@ -61,6 +107,60 @@ export const codeSnippetManager = {
         }
         if(flag){
             tagColorManager.writeToDB();
+        }
+    },
+    /**
+     *
+     * @param {string | null} prefix
+     * @private
+     * @return {{recycleMap: Map<string, CodeSnippet>, map: Map<string, CodeSnippet>}}
+     */
+    _getMaps(prefix){
+        if(prefix){
+            this.prepareForPrefixSnippetMap(prefix)
+            return {
+                map: this.snippetMap,
+                recycleMap: this.recycleSnippetMap
+            }
+        }
+        return {
+            map: this.rootSnippetMap,
+            recycleMap: this.recycleRootSnippetMap
+        }
+    },
+    /**
+     * 在已经切换完毕的场景下使用
+     * @param {CodeSnippet} snippet
+     * @param {string | null} prefix
+     * @private
+     * @param {boolean} deleteMode
+     * @param {boolean} recycleMode
+     */
+    _updateKeywordAndDatabase(snippet, prefix,deleteMode = false,recycleMode = false) {
+        // editor
+        if(configManager.get('beta_special_tag')){
+            SPECIAL_TAG_HANDLER.accept(snippet,(!deleteMode && !recycleMode))
+        }
+        // keyword
+        if(deleteMode){
+            // delete current keyword
+            if(snippet.keyword){
+                delete_utools_keyword(snippet,prefix)
+            }
+            if(snippet.dir){
+                // delete sub snippets keyword
+                batch_delete_utools_keyword(prefix ? (prefix+'/'+snippet.id) : snippet.id)
+            }
+        }else if(snippet.keyword){
+            register_utools_keyword(snippet,prefix);
+        }else{
+            delete_utools_keyword(snippet,prefix);
+        }
+        const path = prefix ? (SUB_CODE_PREFIX+prefix+"#"+snippet.id) : (CODE_PREFIX + snippet.id);
+        if(deleteMode){
+            utools.db.remove(path)
+        }else{
+            utools_db_store(path,snippet)
         }
     },
 
@@ -73,24 +173,25 @@ export const codeSnippetManager = {
             $message.error("用户无法主动创建内置说明片段")
             return false;
         }
-        codeSnippet.id = Date.now().toString();
-        codeSnippet.count = codeSnippet.count??0;
-        codeSnippet.createTime = Date.now()
-        codeSnippet.time = codeSnippet.time??codeSnippet.createTime;
-        await this.uploadImage(codeSnippet);
-        if(prefix){
-            this.prepareForPrefixSnippetMap(prefix);
-            this.snippetMap.set(codeSnippet.id,codeSnippet);
-            utools_db_store(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id,codeSnippet)
-        }else{
-            this.rootSnippetMap.set(codeSnippet.id,codeSnippet);
-            utools_db_store(CODE_PREFIX+codeSnippet.id,codeSnippet)
+        if(!$reactive.main.isRecycleConflict){
+            // 恢复冲突场景
+            codeSnippet.id = Date.now().toString();
+            codeSnippet.count = codeSnippet.count??0;
+            codeSnippet.createTime = Date.now()
+            codeSnippet.time = codeSnippet.time??codeSnippet.createTime;
         }
-        // keyword
-        if(codeSnippet.keyword){
-            register_utools_keyword(codeSnippet,prefix)
+        await this.uploadImage(codeSnippet);
+        const { map,recycleMap} = this._getMaps(prefix);
+        map.set(codeSnippet.id,codeSnippet);
+        if($reactive.main.isRecycleConflict){
+            // delete recyle
+            recycleMap.delete(codeSnippet.id);
+            hierachyHubManager.resumeElement(codeSnippet.id,true);
+            $reactive.main.isRecycleBinActive = false;
         }
         this.addTagInfo(codeSnippet,true)
+        // save
+        this._updateKeywordAndDatabase(codeSnippet,prefix);
         return true;
     },
 
@@ -100,36 +201,18 @@ export const codeSnippetManager = {
      * @param {string | null} prefix
      */
     del(id,prefix){
-        let snippet = null;
-        if(prefix){
-            this.prepareForPrefixSnippetMap(prefix);
-            snippet = this.snippetMap.get(id);
-            if(snippet){
-                this.removeImage(snippet);
-                utools.db.remove(SUB_CODE_PREFIX+prefix+"#"+id)
-                this.snippetMap.delete(id)
-            }
-        }else{
-            // 先查询是否存在
-            snippet= this.rootSnippetMap.get(id);
-            if(snippet){
-                this.removeImage(snippet);
-                utools.db.remove(CODE_PREFIX+id)
-                this.rootSnippetMap.delete(id)
-            }
+        if(id === defaultHelpSnippet.id){
+            configManager.set('readme_close',true)
+            return;
         }
-        if(snippet){
-            // delete current keyword
-            if(snippet.keyword){
-                delete_utools_keyword(snippet,prefix)
-            }
-            if(snippet.dir){
-                // delete sub snippets keyword
-                batch_delete_utools_keyword(prefix ? (prefix+'/'+id) : id)
-            }
+        const {recycleMap} = this._getMaps(prefix);
+        const snippet = recycleMap.get(id);
+        if(!snippet){
+            return;
         }
-
-
+        this.removeImage(snippet);
+        recycleMap.delete(id);
+        this._updateKeywordAndDatabase(snippet,prefix,true);
     },
     /**
      *
@@ -138,21 +221,13 @@ export const codeSnippetManager = {
      * @param {string | null} prefix
      */
     contain(name,prefix){
-        if(prefix){
-            this.prepareForPrefixSnippetMap(prefix)
-            for (const snippet of this.snippetMap.values()) {
-                if(snippet.name === name){
-                    return true
-                }
-            }
-        }else{
-            for (const snippet of this.rootSnippetMap.values()) {
-                if(snippet.name === name){
-                    return true
-                }
+        const {map} = this._getMaps(prefix);
+        for (const snippet of map.values()) {
+            if(snippet.name === name){
+                return true
             }
         }
-        return false
+        return false;
     },
     /**
      * @param {CodeSnippet} snippet
@@ -193,39 +268,20 @@ export const codeSnippetManager = {
         snippet.image = undefined;
       }
     },
+
     /**
      *
      * @param { CodeSnippet } codeSnippet
      * @param {string | null} prefix
      */
     async update(codeSnippet,prefix){
-        if(prefix){
-            this.prepareForPrefixSnippetMap(prefix)
-            if(this.snippetMap.has(codeSnippet.id)) {
-                await this.uploadImage(codeSnippet)
-                utools_db_store(SUB_CODE_PREFIX+prefix+"#"+codeSnippet.id, codeSnippet)
-                this.snippetMap.set(codeSnippet.id, codeSnippet)
-                this.addTagInfo(codeSnippet, true)
-                if(codeSnippet.keyword){
-                    register_utools_keyword(codeSnippet,prefix)
-                }else{
-                    delete_utools_keyword(codeSnippet,prefix)
-                }
-                return;
-            }
-        }else{
-            if(this.rootSnippetMap.has(codeSnippet.id)) {
-                await this.uploadImage(codeSnippet)
-                utools_db_store(CODE_PREFIX + codeSnippet.id, codeSnippet)
-                this.rootSnippetMap.set(codeSnippet.id, codeSnippet)
-                this.addTagInfo(codeSnippet, true)
-                if(codeSnippet.keyword){
-                    register_utools_keyword(codeSnippet,prefix)
-                }else{
-                    delete_utools_keyword(codeSnippet,prefix)
-                }
-                return;
-            }
+        const {map} = this._getMaps(prefix);
+        if(map.has(codeSnippet.id)){
+            await this.uploadImage(codeSnippet)
+            map.set(codeSnippet.id,codeSnippet)
+            this.addTagInfo(codeSnippet, true)
+            this._updateKeywordAndDatabase(codeSnippet,prefix);
+            return
         }
         throw "找不到对应的代码片段"
     },
@@ -236,10 +292,33 @@ export const codeSnippetManager = {
      * @return {CodeSnippet[]}
      */
     queryForMany(name,prefix){
-        let map =  this.rootSnippetMap;
-        if(prefix){
-            this.prepareForPrefixSnippetMap(prefix)
-            map = this.snippetMap;
+        const entry= this._getMaps(prefix);
+        let map = entry.map;
+        if($reactive.main.isRecycleBinActive){
+            map = entry.recycleMap
+            // 过期判断
+            const recycleBin = hierachyHubManager.currentHub.recycleBin;
+            if(recycleBin && Object.keys(recycleBin).length > 0){
+                const now = Date.now();
+                let delFlag = false;
+                for (const id in recycleBin) {
+                    const snippet = map.get(id);
+                    snippet.expired = recycleBin[id].expired - now;
+                    if(snippet.expired < 0){
+                        // 删除元素
+                        delFlag = true;
+                        delete recycleBin[id];
+                        const snippet = map.get(id)
+                        if(snippet){
+                            GLOBAL_HIERARCHY.remove(snippet,true)
+                        }
+                    }
+                }
+                if(delFlag){
+                    hierachyHubManager.store();
+                }
+            }
+
         }
         /**
          * @type {CodeSnippet[]}
@@ -286,6 +365,53 @@ export const codeSnippetManager = {
         // 进行排序处理
         return list;
     },
+    /**
+     * 恢复
+     * @param {string | null} prefix
+     * @param {string} id
+     * @param {boolean | undefined} keywordFlag
+     * @return {boolean} 是否成功恢复，如果返回false则恢复冲突，需要在编辑页面进行编辑
+     */
+    resume(id,prefix,keywordFlag){
+        const {map,recycleMap} = this._getMaps(prefix);
+        const snippet = recycleMap.get(id);
+        if(snippet){
+            if(keywordFlag){
+                snippet.keyword = true;
+            }
+            if(this.contain(snippet.name,prefix)){
+                return false;
+            }
+            delete snippet.expired;
+            if(keywordFlag){
+                this._updateKeywordAndDatabase(snippet,prefix,false);
+            }
+            map.set(id,snippet);
+            recycleMap.delete(id);
+        }
+        return true;
+    },
+    /**
+     * 回收
+     * @param {string | null} prefix
+     * @param {string} id
+     */
+    recycle(id,prefix){
+        const {map,recycleMap} = this._getMaps(prefix);
+        const snippet = map.get(id)
+        let keywordFlag = false;
+        if(snippet){
+            if(snippet.keyword){
+                keywordFlag = true;
+                delete snippet.keyword;
+                this._updateKeywordAndDatabase(snippet,prefix,false,true);
+            }
+            recycleMap.set(id,snippet);
+            map.delete(id);
+        }
+        return keywordFlag;
+    },
+
     deepQuery(name){
         // first root
         const list = [];

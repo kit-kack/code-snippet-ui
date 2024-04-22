@@ -297,8 +297,9 @@ function doEdit(){
   GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
 }
 function doResume(){
-  hierachyHubManager.resumeElement(props.snippet.id);
-  doItemRefresh(true);
+  if(hierachyHubManager.resumeElement(props.snippet.id)){
+    doItemRefresh(true);
+  }
 }
 function doItemRefresh(isDel){
   $normal.keepSelectedStatus = true;

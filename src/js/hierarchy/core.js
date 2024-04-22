@@ -240,7 +240,7 @@ export const GLOBAL_HIERARCHY = {
      * @param {string} searchWord uTools子搜索框搜索内容
      * @param {boolean} isRecycleBinModeActive
      */
-    async search(searchWord,isRecycleBinModeActive) {
+    async search(searchWord) {
         let result;
         $normal.beta.subSnippetNum = undefined;
         let name = null;
@@ -313,7 +313,7 @@ export const GLOBAL_HIERARCHY = {
         let array;
         // sort
         if(result){
-            array = handleArrayForHierarchy(result,name,tags,type,isRecycleBinModeActive)
+            array = handleArrayForHierarchy(result,name,tags,type)
         }else{
             array = [];
         }

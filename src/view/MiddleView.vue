@@ -107,7 +107,7 @@ watch([()=>$reactive.utools.search,
   ()=> $reactive.utools.searchRefreshValue,
   ()=> $reactive.main.isRecycleBinActive
 ],async ([search,prefix,value,isRecycleBinActive])=>{
-  const list = await GLOBAL_HIERARCHY.search(search,isRecycleBinActive);
+  const list = await GLOBAL_HIERARCHY.search(search);
   const isSameLength = $list.value.length === list.length;
   if(isSameLength){
     if(list.length === 0 && $reactive.utools.search){

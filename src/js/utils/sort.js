@@ -39,7 +39,7 @@ const TIME_COMPARE = _compare("time");
 const COUNT_COMPARE  = _compare("count");
 
 
-export function handleArrayForHierarchy(result,name,tag,type,isRecycleBinModeActive){
+export function handleArrayForHierarchy(result,name,tag,type){
     $reactive.main.tagSet.clear();
     if(_isEmpty(result.snippets)){
         return [];
@@ -59,7 +59,6 @@ export function handleArrayForHierarchy(result,name,tag,type,isRecycleBinModeAct
     const needHighlight = name && !result.highlighted && !nameFilter;
     const topList = hierachyHubManager.getTopList();
     const snippetHub = hierachyHubManager.currentHub.snippets;
-    const recycleBin = hierachyHubManager.currentHub.recycleBin ?? {};
     const override_support = snippetHub && !GLOBAL_HIERARCHY.currentHierarchy.core
     const betaDescSearch = !configManager.get('beta_wide_desc_close');
     const betaContentSearchClose = configManager.get('beta_wide_content_close');
@@ -68,23 +67,6 @@ export function handleArrayForHierarchy(result,name,tag,type,isRecycleBinModeAct
         const item = {...snippet}
         const id = snippet.id ??snippet.name;
         item.now = now + '-' + id;
-        // determine recycle
-        if(isRecycleBinModeActive){
-            if(id in recycleBin){
-                item.expired = recycleBin[id].expired - timeStamp;
-                if(item.expired < 0){
-                    // TODO: 过期处理
-                    GLOBAL_HIERARCHY.remove(snippet,true);
-                    continue;
-                }
-            }else{
-                continue;
-            }
-        }else{
-            if(id in recycleBin){
-                continue;
-            }
-        }
         // properties override
         if(override_support){
             const snippetData = snippetHub[id];

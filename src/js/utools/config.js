@@ -14,7 +14,8 @@ export const configManager = {
         // data
         this.configs = utools.db.get(NEW_GLOBAL_CONFIG)?.data ?? {}
         // init item code show
-        if(!"strategy_item_code_show" in this.configs){
+        const showMode = this.configs["strategy_item_code_show"]
+        if(!showMode || showMode < 0 || showMode > 2){
             this.configs["strategy_item_code_show"] = 0;
         }
         if(this.configs['lite']){

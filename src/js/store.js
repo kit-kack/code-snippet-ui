@@ -158,6 +158,8 @@ const $reactive = reactive({
         isSideCodeViewShow: false,
         // 是否处于 回收站模式下
         isRecycleBinActive: false,
+        // 回收冲突模式
+        isRecycleConflict: false,
     },
     form:{
         fullScreen: false,
