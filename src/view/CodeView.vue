@@ -371,7 +371,12 @@ function getCodeFromPath(){
 function handleClose(){
   $reactive.code.infoActive = false;
   $normal.keepSelectedStatus = true;
-  GLOBAL_HIERARCHY.changeView(LIST_VIEW)
+  if($reactive.code.sectionsChange){
+    $reactive.code.sectionsChangeModal = true;
+    $reactive.code.sectionsChangeTriggerIsListView = true;
+  }else{
+    GLOBAL_HIERARCHY.changeView(LIST_VIEW);
+  }
 }
 function handleSelectOpenWay(way){
   switch (way){

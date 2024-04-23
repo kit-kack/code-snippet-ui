@@ -106,7 +106,7 @@ function doYes(){
       formatManager.globalVar['@'+template.name] = template.value;
     }
     // 继续进行解析
-    formatManager.continueFormat().then(()=>{
+    formatManager.continueFormat($normal.funcs.isPaste,$normal.funcs.msg,false).then(()=>{
       // 关闭
       $reactive.common.variableActive = false;
       handleRecoverLiteShow();

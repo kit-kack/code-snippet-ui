@@ -7,17 +7,20 @@ const theme = ref(utools.isDarkColors()? darkTheme:null);
 
 export function adjustLightDarkTheme(){
     const id = document.body.id;
+    const dark = utools.isDarkColors();
     const lightId = utools.getAppVersion().startsWith('4.') ? 'light-app':'light-app-v5';
     if(id){
-        const newId = utools.isDarkColors()? "dark-app":lightId;
+        const newId = dark? "dark-app":lightId;
         if(id !== newId){
             document.body.id = newId;
-            theme.value = utools.isDarkColors()? darkTheme:null;
+            theme.value = dark? darkTheme:null;
+            changeSelectThemeOverrides(dark);
             adjustTheme(configManager.get('strategy_theme')??0)
             globalThemeRefresh()
         }
     }else{
-        document.body.id = utools.isDarkColors()? "dark-app":lightId;
+        document.body.id = dark? "dark-app":lightId;
+        changeSelectThemeOverrides(dark);
     }
 }
 
@@ -204,13 +207,17 @@ const selectThemeOverrides = {
             boxShadowHover: 'none',
             boxShadowActive: 'none',
             boxShadowFocus: 'none',
-            textColor: utools.isDarkColors()? 'white':'black',
+            textColor: 'black',
             borderRadius: 0,
             color:'transparent',
             colorFocus: 'white',
-            colorActive: utools.isDarkColors()? '#575859': '#fff'
+            colorActive: '#fff'
         }
     }
+}
+function changeSelectThemeOverrides(dark){
+    selectThemeOverrides.peers.InternalSelection.textColor = dark ? 'white' : 'black'
+    selectThemeOverrides.peers.InternalSelection.colorActive =  dark? '#575859' : '#fff'
 }
 
 export {

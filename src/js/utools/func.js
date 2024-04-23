@@ -1122,9 +1122,11 @@ export const formatManager = {
      * 解析
      * @param {string} code - 待解析的代码
      * @param {boolean} [noView] - 通过utools关键字访问，此时还没有UI界面
-     * @return {Promise<FormatResult>}
+     * @return {Promise<{type: string} | {code: string, type: string} | {defaultValue: any, variable: string, type: string} | {code: (string | ParseResult[] | any), type: string}>}
+     * @param {boolean} isPaste
+     * @param {string} msg
      */
-    async parse(code,noView){
+    async parse(isPaste,code,msg,noView){
         this._initForEachRegex();
         const result = await this._format(code)
         if(result.parse){
@@ -1139,7 +1141,8 @@ export const formatManager = {
                         return {
                             type: 'input',
                             variable: result.vars[0][0],
-                            defaultValue: result.defaultValues[result.vars[0][0]]
+                            defaultValue: result.defaultValues[result.vars[0][0]],
+                            msg: msg
                         }
                     }
                 }
@@ -1147,7 +1150,9 @@ export const formatManager = {
                 this.codeBuffer = result.code;
                 $normal.funcs.variables = result.vars;
                 $normal.funcs.defaultValues = result.defaultValues;
-                $normal.funcs.snippetName = $reactive.currentSnippet.name
+                $normal.funcs.snippetName = $reactive.currentSnippet.name;
+                $normal.funcs.isPaste = isPaste;
+                $normal.funcs.msg = msg;
                 $reactive.common.variableActive = true;
                 return {
                     type: 'entry'
@@ -1170,12 +1175,15 @@ export const formatManager = {
 
     /**
      * @param {boolean} [noView]
+     * @param {boolean} isPaste
+     * @param {string} msg
+     * @return {Promise<void>}
      */
-    async continueFormat(noView){
+    async continueFormat(isPaste,msg,noView){
         if(this.codeBuffer){
             const code = await this._expression(this.codeBuffer)
             this.codeBuffer = null
-            copyOrPaste(code,noView)
+            copyOrPaste(isPaste,code,msg,noView);
         }
     },
     backup(zip, filename,dirname) {

@@ -75,6 +75,10 @@ const $normal = {
         syncDataFunc: null,
         // 当前代码片段名
         snippetName: null,
+        // 是否粘贴
+        isPaste: false,
+        // 消息
+        msg: null,
     },
     // beta测试
     beta:{

@@ -100,18 +100,20 @@ utools.onPluginEnter((data)=>{
                             if(result.type === 'input'){
                                 $normal.funcs.snippetName = $reactive.currentSnippet.name;
                                 //
-                                let text='';
+                                let t='';
                                 let defaultText = '';
                                 if(result.defaultValue){
                                     defaultText = ' | 默认值: ' + result.defaultValue
                                 }
-                                utools.setSubInput(t => text = t,`${result.variable}${defaultText}`);
+                                utools.setSubInput(({text}) => {
+                                    t = text;
+                                },`${result.variable}${defaultText}`);
                                 document.onkeydown = e => {
                                     if(e.key === 'Enter'){
-                                        formatManager.globalVar['@'+result.variable] = text ? text: result.defaultValue;
-                                        formatManager.continueFormat(true).then(()=>{
+                                        formatManager.globalVar['@'+result.variable] = t ? t: result.defaultValue;
+                                        formatManager.continueFormat(true,result.msg,true).then(()=>{
                                             document.onkeydown = null;
-                                            utools.outPlugin();
+                                            window.preload.closePlugin();
                                         });
                                     }
                                 }

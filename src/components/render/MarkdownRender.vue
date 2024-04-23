@@ -96,7 +96,10 @@ function assignLocalImageUrlWhenMdRender(text,html){
     return
   }
   nextTick(()=>{
-    document.querySelectorAll('.github-markdown-body img').forEach((value,index)=>{
+    document.querySelectorAll(
+        props.isSideView? "#lite-code-view  .github-markdown-body img"
+            : "#code-view .github-markdown-body img"
+    ).forEach((value,index)=>{
       value.parentElement.style.textAlign = 'center'
       if(cachedImageUrls && cachedImageUrls.has(index)){
         value.src = cachedImageUrls.get(index)
@@ -116,9 +119,10 @@ function handleClickUrl(e){
     // [TOC] 跳转
     if(a.dataset['vMdAnchor']){
       // const heading = document.querySelector('.github-markdown-body').querySelector()
-      const heading = document.querySelector(`.github-markdown-body [data-v-md-heading=${a.dataset['vMdAnchor']}]`)
+      const heading = document.querySelector(`${props.isSideView ? '#lite-code-view' : '#code-view'} .github-markdown-body [data-v-md-heading=${a.dataset['vMdAnchor']}]`)
       if(heading){
-        $normal.scroll.codeVerticalInvoker?.scrollTo({
+        const invoker = props.isSideView? $normal.scroll.sideCodeVerticalInvoker: $normal.scroll.codeVerticalInvoker;
+        invoker?.scrollTo({
           top: heading.getBoundingClientRect().y - 100,
           behavior: 'smooth'
         })

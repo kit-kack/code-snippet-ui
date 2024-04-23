@@ -7,6 +7,7 @@
 2. <span style="color:#5eacee">完善</span> 占位符存储重构，提供显示别名来方便选择
 > 由于存储重构和适配管道操作，内置的一些占位符实现发生变化，若你修改了相关实现，请自行通过桌面生成的code-snippet-func.json来作迁移处理
 3. <span style="color:#209a6e">优化</span> 当仅含有一个input输入占位符的代码片段通过utools关键字访问时，会自动优化为通过uTools子输入框输入值，而非UI界面弹窗输入
+4. <span style="color:#209a6e">优化</span> 回收站逻辑优化
 ---
 
 [[TOC]]

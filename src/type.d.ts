@@ -317,7 +317,8 @@ interface FormatResult{
     type: "input" | "entry" | "code",
     variable?: string,
     defaultValue?: string,
-    code?: string
+    code?: string,
+    msg?: string
 }
 interface HierarchyHub{
     /**

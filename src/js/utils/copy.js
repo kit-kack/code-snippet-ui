@@ -5,8 +5,6 @@ import { isEmpty as _isEmpty } from "lodash-es"
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 
 const ctrlKey = utools.isMacOS()? 'command':'ctrl'
-let lastCachedMsg = null;
-let isLastPasted = false;
 function getCode(path,noView){
     if(isNetWorkUri(path)){
         const xhr = new XMLHttpRequest();
@@ -32,10 +30,8 @@ function getCode(path,noView){
  * @return {Promise<FormatResult | undefined>} - 若返回相应值，则进入【变量输入】界面
  */
 async function copyOrPasteWithType(isPasted,text,type,msg,noView){
-    lastCachedMsg = msg;
-    isLastPasted = isPasted;
     if(type && type.length>2 && type.startsWith('x-')){
-        const result = await formatManager.parse(text,noView);
+        const result = await formatManager.parse(isPasted,text,msg,noView);
         if(result.type === 'code'){
             text = result.code
         }else{
@@ -43,29 +39,33 @@ async function copyOrPasteWithType(isPasted,text,type,msg,noView){
             return result;
         }
     }
-    copyOrPaste(text,noView);
+    copyOrPaste(isPasted,text,msg,noView);
 }
 
 /**
  * @param text
  * @param {boolean} [noView]
+ * @param {boolean} isPaste
+ * @param {string} msg
  */
-export function copyOrPaste(text,noView){
-    if(lastCachedMsg){
-        _notify(lastCachedMsg,noView,true)
-    }
-    utools.copyText(text)
-    if(isLastPasted){
+export function copyOrPaste(isPaste,text,msg,noView){
+    if(isPaste){
         try{
             // utools新API
             utools.hideMainWindowPasteText(text)
-            return;
-        }catch (_){}
-    }
-    // 粘贴
-    if(isLastPasted){
-        utools.hideMainWindow();
-        utools.simulateKeyboardTap('v',ctrlKey);
+        }catch (_){
+            utools.hideMainWindow();
+            utools.simulateKeyboardTap('v',ctrlKey);
+        }finally {
+            if(msg){
+                _notify(msg,noView,true)
+            }
+        }
+    }else{
+        utools.copyText(text)
+        if(msg){
+            _notify(msg,noView,true)
+        }
     }
 }
 
