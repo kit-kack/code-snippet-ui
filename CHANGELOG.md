@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.9](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.8...v2.7.9) (2024-04-27)
+
+
+### Features
+
+* 子代码片段按键调整、样式优化 ([d800fe8](https://github.com/kit-kack/code-snippet-ui/commit/d800fe8449d9644bd8cb316dfd381ecd7f27c944))
+
+
+### Bug Fixes
+
+* 样式调整 ([50d65c3](https://github.com/kit-kack/code-snippet-ui/commit/50d65c32bb646a10482cdcf453b5bfb350ba48a4))
+* **自定义目录:** 优化实现结构 ([5afcab4](https://github.com/kit-kack/code-snippet-ui/commit/5afcab46e239c3160fe848bc119a203a08b4a38c))
+
 ### [2.7.8](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.7...v2.7.8) (2024-04-23)
 
 
