@@ -3,11 +3,9 @@
 新版本速览✨
 
 
-1. <span style="color:#209a6e">新增</span> 占位符语法升级，支持管道操作，同时移除`#variable=value`语法
-2. <span style="color:#5eacee">完善</span> 占位符存储重构，提供显示别名来方便选择
-> 由于存储重构和适配管道操作，内置的一些占位符实现发生变化，若你修改了相关实现，请自行通过桌面生成的code-snippet-func.json来作迁移处理
-3. <span style="color:#209a6e">优化</span> 当仅含有一个input输入占位符的代码片段通过utools关键字访问时，会自动优化为通过uTools子输入框输入值，而非UI界面弹窗输入
-4. <span style="color:#209a6e">优化</span> 回收站逻辑优化
+1. <span style="color:#209a6e">优化</span> 自定义目录实现调整
+2. <span style="color:#209a6e">优化</span> 按键处理调整
+3. <span style="color:#209a6e">优化</span> 一些样式修改
 ---
 
 [[TOC]]
@@ -88,7 +86,7 @@
 本插件支持以层级目录形式来管理代码片段，并提供三种目录：
 - 普通目录：不预置任何内容，一种集中管理代码片段形式
 - 本地目录：类似于本地关联文件形式
-- 自定义目录：提供代码来实现相关管理逻辑，例如预览Github/Gitee仓库代码、VSCode代码片段管理、Maven查询等自定义操作
+- 自定义目录：提供代码来实现相关管理逻辑，例如预览Github/Gitee仓库代码、Maven查询等自定义操作
 > 为了帮助你理解【自定义目录】实现代码，这里见[教程](https://flowus.cn/share/87c95fcc-e9f2-420d-a6d3-6578cd424e58)
 
 > 由于本地目录和自定义目录中的内容具有不确定性，故里面的代码片段不支持下面操作：

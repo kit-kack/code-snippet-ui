@@ -192,7 +192,7 @@ onUnmounted(()=>{
   background-image: radial-gradient(#eee 20%, transparent 0), radial-gradient(#eee 20%, transparent 0);
   background-size: 20px 20px;
   /* 第二背景的偏移定位值必须是贴片宽高的一半 30/2 */
-  background-position: 0 0, 10px 10px;
+  background-position: -6px 27px, 4px -3px;
 }
 #light-app-v5 #code-view.dot-bg{
   background-image: radial-gradient(#ccc 20%, transparent 0), radial-gradient(#e0e0e0 20%, transparent 0);

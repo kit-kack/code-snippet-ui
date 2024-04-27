@@ -565,6 +565,9 @@ function handleScreencut(){
 }
 
 function handleCancel(){
+  if($normal.quickCode){
+    $normal.quickCode = undefined
+  }
   $normal.keepSelectedStatus = true;
   $reactive.main.isRecycleConflict = false;
   GLOBAL_HIERARCHY.changeView(LIST_VIEW)
@@ -633,6 +636,9 @@ function handleUpdate(){
           if(! await GLOBAL_HIERARCHY.form.createOrEdit(toRaw(codeTemplate),null)){
             return;
           }
+        }
+        if($normal.quickCode){
+          $normal.quickCode = undefined
         }
         window.$message.success("操作成功")
         GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)

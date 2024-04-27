@@ -70,7 +70,7 @@ export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
 /**
  * @type {KeyUpHandler}
  */
-export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
+export const K_COMMON_UP = ({code,ctrl,shift})=>{
     switch (code){
         case 'KeyC':
             if(ctrl){
@@ -95,18 +95,6 @@ export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
             }
             GLOBAL_HIERARCHY.changeView(EDIT_VIEW)
             break;
-        case 'Digit0':
-        case 'Digit1':
-        case 'Digit2':
-        case 'Digit3':
-        case 'Digit4':
-        case 'Digit5':
-        case 'Digit6':
-        case 'Digit7':
-        case 'Digit8':
-        case 'Digit9':
-            snippetCopyOrPaste(ctrl || shift || alt,+code[5])
-            return true;
         case 'KeyO':
             if($reactive.currentSnippet.path){
                 if(isNetWorkUri($reactive.currentSnippet.path)){
@@ -130,10 +118,11 @@ export const K_COMMON_UP = ({code,ctrl,shift,alt})=>{
     }
     return true;
 }
+let delaySubPasteTimer = null;
 /**
  * @type {KeyDownHandler}
  */
-export const K_COMMON_DOWN = ({code,ctrl}) => {
+export const K_COMMON_DOWN = ({code,ctrl,shift,alt,repeat}) => {
     switch (code){
         case 'KeyZ':
             switchToFullUIMode()
@@ -142,6 +131,32 @@ export const K_COMMON_DOWN = ({code,ctrl}) => {
         case 'Enter':
             snippetCopyOrPaste(true,$normal.beta.subSnippetNum);
             break
+        case 'Digit0':
+        case 'Digit1':
+        case 'Digit2':
+        case 'Digit3':
+        case 'Digit4':
+        case 'Digit5':
+        case 'Digit6':
+        case 'Digit7':
+        case 'Digit8':
+        case 'Digit9':
+            if(repeat){
+                break;
+            }
+            const isPaste = ctrl || shift || alt;
+            if(delaySubPasteTimer){
+                clearTimeout(delaySubPasteTimer);
+                delaySubPasteTimer = null;
+            }
+            if(isPaste){
+                delaySubPasteTimer = setTimeout(async ()=>{
+                    await snippetCopyOrPaste(true,+code[5])
+                },200)
+            }else{
+                snippetCopyOrPaste(false,+code[5])
+            }
+            return true;
         // ctrl c处理
         case 'KeyC':
             if(ctrl){
