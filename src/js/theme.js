@@ -171,6 +171,7 @@ function getThemeOverrides(){
             textColorGhostPressed: gc,
             textColorTextHover: gc,
             textColorTextFocus: gc,
+            rippleColor: 'transparent',
         },
         Tabs:{
             tabTextColorHoverLine: gc,

@@ -23,8 +23,8 @@
         </template>
       </n-list-item>
     </n-list>
-    <n-button size="small" style="margin:5px;"  @click="enterAddView">添加</n-button>
-    <n-button size="small" ghost type="error" style="margin:5px;" @click="doReset()">重置</n-button>
+    <n-button size="small" secondary style="margin:5px;"  @click="enterAddView">添加</n-button>
+    <n-button size="small" secondary type="error" style="margin:5px;" @click="doReset()">重置</n-button>
     <base-modal v-if="$reactive.setting.funcEditActive"
                 :title="pair.flag?'修改占位符实现': '新增占位符实现'"
                 @cancel="$reactive.setting.funcEditActive = false"
@@ -222,52 +222,44 @@ function enterAddView(){
   $reactive.setting.funcEditActive = true;
 }
 function doDel(key){
-  $dialog.error({
-    autoFocus: false,
-    closable: false,
-    title: '删除操作',
+  $kit_error_dialog({
+    title: '删除',
     content: ()=> h(
         'div',
         [
-          '确定要删除分组 ',
-            h('span',
-                {
-                  style:{
-                    fontWeight: 'bolder',
-                  }
-                },key),
+          '删除分组 ',
+          h('span',
+              {
+                style:{
+                  fontWeight: 'bolder',
+                }
+              },key),
           ' 以及相关占位符吗？',
         ]
     ),
-    positiveText: '确定',
-    negativeText: '取消',
-    onPositiveClick(){
+    callback: ()=>{
       formatManager.del(key)
       doRefresh()
     }
   })
 }
 function doReset(){
-  $dialog.error({
-    autoFocus: false,
-    closable: false,
-    title: '重置操作',
+  $kit_error_dialog({
+    title: '重置',
     content: ()=> h(
         'div',
         [
-          '确定要进行 ',
+          '进行 ',
           h('span',
               {
                 style:{
-                  fontWeight: 'bolder',
+                  fontWeight: 'bolder'
                 }
               },'重置'),
-          ' 吗？',
+          ' 为默认占位符实现？',
         ]
     ),
-    positiveText: '确定',
-    negativeText: '取消',
-    onPositiveClick(){
+    callback: ()=>{
       formatManager.reset();
       doRefresh()
     }

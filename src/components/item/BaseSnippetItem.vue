@@ -342,7 +342,7 @@ function doItemRefresh(isDel){
   left:0;
   z-index: 10;
   height: calc(100% - 4px);
-  width: 98%;
+  width: calc(100% - 1vw - 1px);
   overflow: auto;
   margin-left: 1vw;
   display: flex;
@@ -353,6 +353,7 @@ function doItemRefresh(isDel){
   -webkit-backdrop-filter: saturate(180%) blur(5px)!important;
   /* 磨砂的背景颜色 */
   background: rgba(228,237,250,.1)!important;
+  border-radius: 5px;
 }
 #dark-app .snippet-item-btn{
   /* 磨砂的背景颜色 */

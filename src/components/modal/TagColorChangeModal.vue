@@ -48,7 +48,7 @@ const instance = ref({
   picker: true
 })
 const DEFAULT_INSTANCE = [{
-  background: '#84ecb4',
+  background: '#b6fad5',
   color: '#18a057',
 },{
   background: '#daebfc',

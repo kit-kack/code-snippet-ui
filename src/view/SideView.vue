@@ -39,7 +39,7 @@
       <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>
       <config-tooltip-switch title="特殊标签" config="beta_special_tag">
         开启后，为代码片段添加<span class="kitx-italic">VSCode</span> 标签即可写入<span class="kitx-italic">VSCode</span> 代码片段中，<span class="kitx-italic">IDEA</span>、<span class="kitx-italic">Sublime Text</span> 等同理
-        <n-button size="small" @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
+        <n-button size="small" secondary @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>
       </config-tooltip-switch>
     </div>
 

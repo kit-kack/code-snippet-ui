@@ -80,7 +80,7 @@
 <script setup>
 import SideView from "./SideView.vue";
 import ShortcutPane from "../components/pane/ShortcutPane.vue";
-import {ref, watch} from "vue";
+import {h, ref, watch} from "vue";
 import {NButton, useDialog, useMessage} from 'naive-ui'
 import VariableInputModal from "../components/modal/VariableInputModal.vue";
 import {$list, $normal, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW, refreshListView} from "../js/store";
@@ -97,10 +97,57 @@ import SvgRefresh from "../asserts/refresh.svg";
 import SvgRefreshFixed from "../asserts/refresh-fixed.svg";
 import SvgArrowUp from "../asserts/arrow-up.svg";
 import VimStatusBar from "../components/VimStatusBar.vue";
+import SvgError from "../asserts/error.svg";
 
 const expanded = ref(false)
 window.$message = useMessage();
 window.$dialog = useDialog();
+/**
+ * @typedef {Object} Option
+ * @property {string} title
+ * @property {string | Function} content
+ * @property {Function} contentRender
+ * @property {Function} callback
+ */
+/**
+ * @param {Option} option
+ */
+window.$kit_error_dialog = function (option) {
+  // check content
+  const prefix = '操作不可逆，是否'
+  if(typeof option.content === 'string'){
+    option.content = prefix + option.content
+  }else{
+    option.contentRender = ()=>{
+      /**
+      * @type {import('vue').VNode}
+      */
+      const vNode = option.content()
+      vNode.children.unshift(prefix);
+      return vNode
+    }
+  }
+  $dialog.error({
+    autoFocus: false,
+    closable: false,
+    bordered: true,
+    title: option.title,
+    icon: () => h(SvgError),
+    content: option.contentRender ?? option.content,
+    style:{
+      padding: '10px 20px'
+    },
+    positiveText: '确定',
+    positiveButtonProps:{
+      secondary: true
+    },
+    negativeButtonProps:{
+      secondary: true
+    },
+    negativeText: '取消',
+    onPositiveClick: option.callback
+  })
+}
 const topNavShow = ref(true)
 watch([()=>$reactive.utools.search,
   ()=>$reactive.currentPrefix,

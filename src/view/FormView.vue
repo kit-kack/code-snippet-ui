@@ -98,7 +98,7 @@
                           </n-button>
                         </template>
                         <n-space align="center">
-                          Tab 行为：
+                          Tab 缩进：
                           <n-select
                               size="small"
                               :options="tabOptions"

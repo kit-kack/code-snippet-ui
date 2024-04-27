@@ -267,13 +267,10 @@ function exitWithHandlingSectionChange(confirm){
   GLOBAL_HIERARCHY.changeView($reactive.code.sectionsChangeTriggerIsListView ? LIST_VIEW : EDIT_VIEW)
 }
 function clearSnippetSections(){
-  window.$dialog.error({
-    title: '清空所有子代码片段',
-    positiveText: '删除',
-    negativeText: '取消',
-    closable: false,
-    autoFocus: false,
-    onPositiveClick:()=>{
+  $kit_error_dialog({
+    title: '清空',
+    content: '清空 当前所有子代码片段？',
+    callback: ()=>{
       $reactive.currentSnippet.sections = undefined;
       snippetSections.value = []
       GLOBAL_HIERARCHY.update(null,"sections");

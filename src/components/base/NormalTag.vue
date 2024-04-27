@@ -41,14 +41,12 @@ const colorStyle = computed(()=>{
  */
 const emit = defineEmits(['tagRefresh'])
 function handleClose(){
-  $dialog.error({
-    autoFocus: false,
-    closable: false,
-    title: '删除操作',
+  $kit_error_dialog({
+    title: '删除标签',
     content: ()=> h(
         'div',
         [
-          '确定要删除标签 ',
+          '删除标签 ',
           h(NormalTag,
               {
                 content: props.content,
@@ -57,9 +55,7 @@ function handleClose(){
           ' 吗？',
         ]
     ),
-    positiveText: '确定',
-    negativeText: '取消',
-    onPositiveClick(){
+    callback: ()=>{
       tagColorManager.clear(props.content)
       emit('tagRefresh')
     }
