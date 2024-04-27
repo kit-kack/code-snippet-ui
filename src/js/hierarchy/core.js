@@ -22,23 +22,60 @@ import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
 import {resolveSearchWord} from "../utils/resolve"
 import {isFunction as _isFunction, isArray as _isArray } from "lodash-es";
 import {CountType, statisticsManager} from "../utools/statistics";
+import {toString as _toString} from "lodash-es";
 
 
-export function loadValidHierarchyJS(path) {
-    const hierarchy = window.preload.dynamicLoadJS(path);
-    if (hierarchy) {
+export function loadValidHierarchyJS(path,isForClass) {
+    /**
+     * @type Class<HierarchyClass>
+     */
+    const hierarchyClass = window.preload.dynamicLoadJS(path);
+    if (hierarchyClass) {
         // check method
-        if(!_isFunction(hierarchy.search)){
+        /**
+         * @type HierarchyClass
+         */
+        let hierarchyInstance;
+        try{
+            hierarchyInstance = new hierarchyClass();
+        }catch (e){
+            utools.showNotification(e.toString())
+            return null;
+        }
+        if(hierarchyInstance === null){
+            return null;
+        }
+        if(!_isFunction(hierarchyInstance.search)){
             utools.showNotification('该JS文件导出的对象必须有search方法')
             return null;
         }
         // conf permit write
-        Object.defineProperty(hierarchy,"conf",{
+        Object.defineProperty(hierarchyClass,"conf",{
             writable:false,
             configurable: false
         })
+        if(isForClass){
+            return hierarchyClass
+        }
+
+        const isInitKey = "_is_init_code-snippet_" + Date.now();
+        const oldSearchMethod = hierarchyInstance.search.bind(hierarchyInstance)
+        const conf = toRaw($reactive.currentSnippet.conf);
+
+        hierarchyInstance.search = async function(...args){
+            // init
+            if(!hierarchyInstance[isInitKey]){
+                if(hierarchyInstance.init){
+                    await hierarchyInstance.init(conf)
+                }
+                hierarchyInstance[isInitKey] = true
+            }
+            return await oldSearchMethod(...args);
+        }
+
+        return hierarchyInstance;
     }
-    return hierarchy;
+    return null;
 }
 const EXT = Object.freeze({
     getTopList(){
@@ -152,17 +189,9 @@ export const GLOBAL_HIERARCHY = {
                 // local dir
                 this.currentHierarchy = localDirectoryHierarchy;
             }else if(temp.value && mode !== 'prev') {
-                this.currentHierarchy = loadValidHierarchyJS(temp.value)
-                if(this.currentHierarchy){
-                    // init
-                    if(this.currentHierarchy.init){
-                        try{
-                            this.currentHierarchy.init(toRaw($reactive.currentSnippet.conf))
-                        }catch (e){
-                            $message.error(e.toString())
-                            this.currentHierarchy = rootHierachy;
-                        }
-                    }
+                const hierachyClass = loadValidHierarchyJS(temp.value)
+                if(hierachyClass){
+                    this.currentHierarchy = hierachyClass;
                 }else{ // null
                     this.currentHierarchy = rootHierachy;
                 }
@@ -266,8 +295,9 @@ export const GLOBAL_HIERARCHY = {
                     this.lastSearchResult = result;
                 }
             }catch (e) {
-                $message.error(e.toString())
-                utools.showNotification(e.toString())
+                console.error(e)
+                $message.error(_toString(e))
+                utools.showNotification(_toString(e))
             }finally {
                 $reactive.utools.vimDisabled = false;
             }
@@ -304,8 +334,9 @@ export const GLOBAL_HIERARCHY = {
                     this.lastSearchResult = result;
                 }
             }catch (e) {
-                $message.error(e.toString())
-                utools.showNotification(e.toString())
+                console.error(e)
+                $message.error(_toString(e))
+                utools.showNotification(_toString(e))
             }finally {
                 $reactive.utools.vimDisabled = false;
             }

@@ -69,10 +69,10 @@ const handleSubModuleFile = (content) => {
     return obj;
 }
 /**
- * @type Hierarchy
+ * @type HierarchyClass
  */
-module.exports = {
-    conf:{
+module.exports = class GitRepo {
+    static conf = {
         type:{
             name: 'Git服务器(默认Github)',
             value: ['Github', 'Gitee']
@@ -91,12 +91,17 @@ module.exports = {
             name: '隐藏显示.开头的文件',
             value: ['是','否']
         }
-    },
-    init(conf){
+    }
+    async init(conf){
         this._conf = conf;
         this.requestInfo = getRequestInfo(conf);
-        this.subModuleLoaded = undefined;
-    },
+        let res = await fetch(this.requestInfo.subModuleUrl,this.requestInfo.options);
+        if(res.status === 200){
+            this.subModuleObj = handleSubModuleFile(decodeBase64((await res.json()).content))
+        }else{
+            this.subModuleObj = {};
+        }
+    }
     /**
      *
      * @return HierarchyConfig
@@ -112,20 +117,13 @@ module.exports = {
                 },
             }
         }
-    },
+    }
     async search(prefix) {
-        if(!this.subModuleLoaded){
-            let res = await fetch(this.requestInfo.subModuleUrl,this.requestInfo.options);
-            if(res.status === 200){
-                this.subModuleObj = handleSubModuleFile(decodeBase64((await res.json()).content))
-            }
-            this.subModuleLoaded = true;
-        }
         // root
         const url = prefix.length === 1 ?`${this.requestInfo.baseURL}/git/trees/${this._conf.branch?? 'master'}` : prefix.at(-1).path
         let res = await fetch(url,this.requestInfo.options);
-        if(res.status === 401){
-            throw "请配置有效的个人访问令牌token";
+        if(res.status >= 400){
+            throw (res.message ?? res.statusText).trim() || res.status
         }
         res = await res.json();
         let path = '';
@@ -158,11 +156,11 @@ module.exports = {
             unfiltered: true,
             snippets: results
         }
-    },
+    }
     async resolveUrl(url,type){
         const res = await (await fetch(url,this.requestInfo.options)).json();
         return decodeBase64(res.content)
-    },
+    }
     createOrEdit(prefix, snippet, oldName,ext) {
         ext.store(snippet.id,snippet)
     }

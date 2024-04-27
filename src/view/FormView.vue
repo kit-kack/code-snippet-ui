@@ -789,7 +789,7 @@ function importLocalDir(){
 }
 function openConfModal(config){
   if(!config){
-    const hierarchy = loadValidHierarchyJS(codeTemplate.path);
+    const hierarchy = loadValidHierarchyJS(codeTemplate.path,true);
     if(hierarchy && hierarchy.conf) {
       config = hierarchy.conf
     }
@@ -836,7 +836,7 @@ function openHierarchyJS(path){
   if(showCustomHiearchyModal.value){
     showCustomHiearchyModal.value = false
   }
-  const hierarchy = loadValidHierarchyJS(path);
+  const hierarchy = loadValidHierarchyJS(path,true);
   if(hierarchy){
     codeTemplate.path = path;
     setSnippetNameWhenUrl(path);
