@@ -2,8 +2,7 @@
   <n-config-provider :theme="theme" :hljs="hljs" :theme-overrides="themeOverrides">
     <n-message-provider>
       <n-dialog-provider>
-        <div id="app-core" :class="{forbid: !$reactive.main.isCursorShow}"
-             @mousemove="$reactive.main.isCursorShow = true">
+        <div id="app-core">
           <middle-view/>
         </div>
       </n-dialog-provider>
@@ -53,12 +52,20 @@ watch(()=>$reactive.currentMode,(mode)=>{
 },{
   immediate: true
 })
+watch(()=>$reactive.main.isCursorShow,(show)=>{
+  if(show){
+    document.body.style.cursor = "auto";
+  }else{
+    document.body.style.cursor = "none";
+    document.body.onmousemove = ()=>{
+      $reactive.main.isCursorShow = true
+      document.body.onmousemove = null
+    }
+  }
+})
 
 </script>
 
 
 <style scoped>
-#app-core.forbid, #app-core.forbid *{
-  cursor: none !important;
-}
 </style>

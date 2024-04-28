@@ -30,6 +30,7 @@ export const K_CODEVIEW_DOWN = (ext)=>{
         }
         return
     }
+    $reactive.main.isCursorShow = false;
     // render
     if(RENDER_KEYHANDLER.onKeyDown){
         if(RENDER_KEYHANDLER.onKeyDown(ext)){

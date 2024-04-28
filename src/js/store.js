@@ -153,7 +153,7 @@ const $reactive = reactive({
         // 是否进行删除
         isDel: false,
         // 是否显示鼠标
-        isCursorShow: false,
+        isCursorShow: true,
         // 搜索结果是否只有一个元素
         isOnlyOneElement: false,
         // 是否处于【完整UI】
