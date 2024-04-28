@@ -99,6 +99,7 @@ utools.onPluginEnter((data)=>{
                         if(result){
                             if(result.type === 'input'){
                                 $normal.funcs.snippetName = $reactive.currentSnippet.name;
+                                $normal.inputModeEntry = true;
                                 //
                                 let t='';
                                 let defaultText = '';

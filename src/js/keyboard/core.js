@@ -1,4 +1,4 @@
-import {$index, $reactive, EDIT_VIEW, LIST_VIEW} from "../store";
+import {$index, $normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../store";
 import {K_SHORTCUT_DOWN} from "./k-shortcut";
 import {K_CODEVIEW_DOWN, K_CODEVIEW_UP} from "./k-codeview";
 import {K_LISTVIEW_DOWN, K_LISTVIEW_UP} from "./k-listview";
@@ -61,7 +61,7 @@ export const GLOBAL_KEYBOARD_HANDLER = {
     },
 
     init(){
-        if(this.isInited){
+        if(this.isInited && !$normal.inputModeEntry){
             return
         }
         // init keyboard
@@ -121,6 +121,7 @@ export const GLOBAL_KEYBOARD_HANDLER = {
             }
         }
         this.isInited = true
+        $normal.inputModeEntry = false;
 
 
     },

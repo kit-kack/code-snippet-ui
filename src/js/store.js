@@ -63,6 +63,8 @@ const $normal = {
     entry: false,
     // mainPush进入
     mainPush: false,
+    // input模式
+    inputModeEntry: false,
     // 占位符相关
     funcs:{
         // 【变量输入】界面遇到select直接使用vim键

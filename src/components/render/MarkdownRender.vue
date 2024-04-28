@@ -213,7 +213,6 @@ function adjustCenterPre(tab){
   }
 
 }
-
 function handleMdHorizonMove(left,fast){
   if(!$normal.md.pre){
     adjustCenterPre()
@@ -280,7 +279,6 @@ const K_CODEVIEW_MARKDOWN_DOWN = ({code,shift,ctrl,repeat})=>{
           }
         }
       }
-      adjustCenterPre()
       return ;
     case "KeyK":
     case "ArrowUp":
@@ -328,7 +326,6 @@ const K_CODEVIEW_MARKDOWN_DOWN = ({code,shift,ctrl,repeat})=>{
           }
         }
       }
-      adjustCenterPre()
       return;
     case "KeyL":
     case "ArrowRight":
@@ -390,6 +387,12 @@ const K_CODEVIEW_MARKDOWN_UP = ({code})=>{
         return true;
       }
       return;
+    case 'KeyJ':
+    case 'KeyK':
+    case 'ArrowUp':
+    case 'ArrowDown':
+      adjustCenterPre()
+      break;
     case 'Tab':
       adjustCenterPre(true)
       break
