@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.11](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.10...v2.7.11) (2024-05-31)
+
 ### [2.7.10](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.9...v2.7.10) (2024-04-29)
 
 
