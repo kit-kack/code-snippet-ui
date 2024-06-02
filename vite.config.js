@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
-import {createPreloadPlugin, createUpxPlugin} from "vite-plugin-utools-helper";
+import {createPreloadPlugin} from "vite-plugin-utools-helper";
 import svgLoader from "vite-svg-loader";
 
 // https://vitejs.dev/config/

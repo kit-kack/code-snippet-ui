@@ -13,6 +13,19 @@ const notify = (msg,noView,warning) =>{
         }
     }
 }
+function _imageCopyOrPaste(isPaste,attachmentOrUrl){
+    let flag = true;
+    if(isPaste){
+        utools.hideMainWindowPasteImage(attachmentOrUrl)
+    }else{
+        flag = utools.copyImage(attachmentOrUrl)
+    }
+    if(flag){
+        // 更新次数和时间
+        GLOBAL_HIERARCHY.update(null,"count&time")
+    }
+    return flag;
+}
 
 /**
  * @return {Promise<FormatResult | undefined>}
@@ -38,10 +51,10 @@ export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
     // image
     if($reactive.currentSnippet.image){
         let attachment = utools.db.getAttachment($reactive.currentSnippet.imgId);
-        if(!(isPaste? utools.hideMainWindowPasteImage(attachment) : utools.copyImage(attachment))){
-            notify("操作失败，请确定图片是否合法",noView,true)
-        }else{
+        if(_imageCopyOrPaste(isPaste,attachment)){
             notify("已复制图片",noView)
+        }else{
+            notify("操作失败，请确定图片是否合法",noView,true)
         }
         attachment = null;
         return;
@@ -55,11 +68,12 @@ export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
                 utools.copyText(url)
                 notify("已复制图片",noView)
             }
+            GLOBAL_HIERARCHY.update(null,"count&time");
         }else{
-            if(!(isPaste? utools.hideMainWindowPasteImage(url) : utools.copyImage(url))){
-                notify("无效图片类型，请确保为本地图片",noView,true)
-            }else{
+            if(_imageCopyOrPaste(isPaste,url)){
                 notify("已复制图片",noView)
+            }else{
+                notify("无效图片类型，请确保为本地图片",noView,true)
             }
         }
     }else{

@@ -47,7 +47,7 @@
             </div>
           </div>
         </template>
-        <div class="code-view-codearea-bottom"></div>
+        <div class="code-view-codearea-bottom" v-if="!$reactive.code.isPure"></div>
       </template>
     </n-scrollbar>
     <base-modal v-if="$reactive.code.sectionsChangeModal"
@@ -165,7 +165,7 @@
 
 <script setup>
 import {configManager} from "../js/utools/config";
-import {computed, onMounted, onUnmounted, onUpdated, ref, watch, watchPostEffect} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref, toRaw, watch, watchPostEffect} from "vue";
 import {
   section_add,
   section_clone,
@@ -192,7 +192,7 @@ const verticalScroller = ref(null)
 /**
  * @type CodeSnippet
  */
-const snippet = $reactive.currentSnippet;
+const snippet = reactive({...toRaw($reactive.currentSnippet)})
 const snippetSections = ref(section_clone(snippet.sections))
 watch(snippetSections, (newValue, oldValue) => {
   $reactive.code.sectionsChange = !section_compare(snippet.sections,newValue)
@@ -282,6 +282,9 @@ const pair = computed(()=>{
   const result = getRealTypeAndValidStatus(snippet.type);
   if(result.type === 'image' || result.type === 'svg'){
     $reactive.code.isRendering = true;
+  }
+  if(snippet.image){
+    snippet.type = 'image';
   }
   result.renderable = (result.type === 'markdown' || result.type === 'image' || result.type === 'svg' || snippet.image);
   if($reactive.currentCode){

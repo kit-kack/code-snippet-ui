@@ -186,7 +186,7 @@
                             <svg-conf/>
                           </template>
                         </n-button>
-                        <n-button @click="handleClearPath()" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error" :disabled="!properties.code">
+                        <n-button @click="handleClearPath()" quaternary circle style="position: absolute; right:0; bottom: 0px;" type="error" :focusable="false" :disabled="!properties.code">
                           <template #icon>
                             <svg-delete/>
                           </template>

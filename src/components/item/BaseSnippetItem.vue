@@ -329,8 +329,13 @@ function doItemRefresh(isDel){
     padding-left: 12px;
   }
 }
-#list-view .kitx-half-container .snippet-item .n-card{
-  width: 50vw;
+#list-view .kitx-half-container {
+  .snippet-item .n-card {
+    width: 50vw;
+  }
+  .snippet-item-btn{
+    width: 50vw;
+  }
 }
 
 .snippet-item__tags{
@@ -342,7 +347,7 @@ function doItemRefresh(isDel){
   left:0;
   z-index: 10;
   height: calc(100% - 4px);
-  width: calc(100% - 1vw - 1px);
+  width: 98vw;
   overflow: auto;
   margin-left: 1vw;
   display: flex;
@@ -354,6 +359,8 @@ function doItemRefresh(isDel){
   /* 磨砂的背景颜色 */
   background: rgba(228,237,250,.1)!important;
   border-radius: 5px;
+
+  transition: all 0.4s ease-out;
 }
 #dark-app .snippet-item-btn{
   /* 磨砂的背景颜色 */

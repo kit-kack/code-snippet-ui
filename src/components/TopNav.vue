@@ -10,6 +10,9 @@
         <n-breadcrumb-item v-for="(p,index) in $reactive.currentPrefix" clickable @click="sliceCurrentPrefix(index)">
           {{p}}
         </n-breadcrumb-item>
+        <n-breadcrumb-item v-if="$reactive.currentMode === CODE_VIEW">
+          <span style="font-weight: bold">{{$reactive.currentSnippet?.name}}</span>
+        </n-breadcrumb-item>
       </n-breadcrumb>
     </n-scrollbar>
 
@@ -75,11 +78,12 @@ const word = ref(0);
 const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
 const show = ref(false);
 let timer = null;
-watch([()=>$list.value,()=>$reactive.currentMode],(newValue)=>{
-  if($reactive.currentMode === LIST_VIEW){
+watch([()=>$list.value,()=>$reactive.currentMode],([list,mode])=>{
+  if(mode === LIST_VIEW){
     word.value = $list.value.length;
     if(timer){
       clearInterval(timer)
+      timer = null
     }
   }else{
     const now = dayjs();

@@ -57,7 +57,7 @@ function _alias(type){
         case 'py':
             return 'python';
         case 'sh':
-            return 'shell';
+            return 'powershell';
         case 'ts':
             return 'typescript';
         case 'text':

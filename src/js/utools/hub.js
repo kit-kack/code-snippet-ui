@@ -17,7 +17,7 @@ const HIERARCHY_PREFIX = "hub/";
 const ROOT_HIERARCHY_PREFIX = "hub";
 
 // 3天时间戳
-const THREE_DAYS = 3 * 24 * 60 * 60 * 1000
+const THREE_DAYS = 10 * 1000 // 3 * 24 * 60 * 60 * 1000
 
 
 

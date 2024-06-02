@@ -38,10 +38,17 @@ export const codeSnippetManager = {
             return;
         }
         hierachyHubManager.init();
+        this.loadingData(null);
+        console.log('codeSnippetManager init, and size is '+this.rootSnippetMap.size)
+        this.isInited = true;
+    },
+    loadingData(prefix) {
+        const {map,recycleMap} = this._getMaps(prefix);
         const nativeId = utools.getNativeId();
         const now = Date.now();
         const recycleBin = hierachyHubManager.currentHub.recycleBin;
-        for (const doc of utools.db.allDocs(CODE_PREFIX)) {
+        const utoolsDocPrefix = prefix ? (SUB_CODE_PREFIX+prefix + "#" ) : CODE_PREFIX;
+        for (const doc of utools.db.allDocs(utoolsDocPrefix)) {
             /**
              * @type {CodeSnippet}
              */
@@ -58,18 +65,18 @@ export const codeSnippetManager = {
                 payload.createTime = Date.now();
             }
             // compare recycle
-            if(recycleBin && payload.id in recycleBin){
-                if(recycleBin[payload.id].expired < now){
+            const key = payload.id ?? payload.name;
+            if(recycleBin && key in recycleBin){
+                // first add recycleMap
+                recycleMap.set(key,payload)
+                if(recycleBin[key].expired < now){
+                    // remove snippet
                     GLOBAL_HIERARCHY.remove(payload,true)
-                }else{
-                    this.recycleRootSnippetMap.set(payload.id, payload)
                 }
             }else{
-                this.rootSnippetMap.set(payload.id, payload)
+                map.set(payload.id, payload)
             }
         }
-        console.log('codeSnippetManager init, and size is '+this.rootSnippetMap.size)
-        this.isInited = true;
     },
     prepareForPrefixSnippetMap(prefix){
         if(this.snippetKey === prefix){
@@ -78,28 +85,7 @@ export const codeSnippetManager = {
         this.snippetKey = prefix;
         this.snippetMap = new Map();
         this.recycleSnippetMap = new Map();
-        const recycleBin = hierachyHubManager.currentHub.recycleBin;
-        const now = Date.now();
-        for (const doc of utools.db.allDocs(SUB_CODE_PREFIX+prefix + "#" )) {
-            const payload = doc.data;
-            if(payload.count == null){
-                payload.count = 0;
-            }
-            if(payload.createTime == null){
-                payload.createTime = Date.now();
-            }
-
-            // compare recycle
-            if(recycleBin && payload.id in recycleBin){
-                if(recycleBin[payload.id].expired < now){
-                    GLOBAL_HIERARCHY.remove(payload,true)
-                }else{
-                    this.recycleSnippetMap.set(payload.id, payload)
-                }
-            }else{
-                this.snippetMap.set(payload.id, payload)
-            }
-        }
+        this.loadingData(prefix);
     },
     addTagInfo(payload,flag){
         if(payload.tags != null){
