@@ -60,32 +60,20 @@
     </div>
 
 
-    <div class="aspect" v-if="configManager.get('easter_egg_log')">
-      <h4 @click="handleLogClick">本地数据统计（今日/七日/总计）</h4>
+    <div class="aspect stat">
+      <h4>本地数据统计（今日/本周/总计）</h4>
       <p class="tooltip">由于插件在v2.7.2版本才开始统计，数据仅供参考</p>
       <div class="stat-container">
         <div class="stat-item" v-for="stat in statisticsManager.getStatistics()">
-          <template v-if="stat.label === '使用天数'">
-            <n-tooltip>
-              <template #trigger>
-                <n-statistic :label="stat.label">
-                  <n-number-animation show-separator :from="0" :to="stat.value[0]"/>
-                  /
-                  <n-number-animation show-separator :from="0" :to="stat.value[2]"/>
-                </n-statistic>
-              </template>
-              有效使用天数 / 安装天数
-            </n-tooltip>
-          </template>
-          <template v-else>
-            <n-statistic :label="stat.label">
-              <n-number-animation show-separator :from="0" :to="stat.value[0]"/>
+          <n-statistic :label="stat.label">
+            {{stat.value[0]}}
+            /
+            {{stat.value[1]}}
+            <template v-if="stat.value.length === 3">
               /
-              <n-number-animation show-separator :from="0" :to="stat.value[1]"/>
-              /
-              <n-number-animation show-separator :from="0" :to="stat.value[2]"/>
-            </n-statistic>
-          </template>
+              {{stat.value[2]}}
+            </template>
+          </n-statistic>
         </div>
       </div>
 
@@ -109,7 +97,6 @@ import SvgBackupImport from "../asserts/backup-import.svg";
 import SvgBackupExport from "../asserts/backup-export.svg";
 import {statisticsManager} from "../js/utools/statistics";
 import SearchPane from "../components/pane/side/SearchPane.vue";
-import {configManager} from "../js/utools/config";
 import ConfigTooltipSwitch from "../components/base/ConfigTooltipSwitch.vue";
 
 const refreshFlag = ref(true)
@@ -141,18 +128,6 @@ function handleImport(){
       load_backup(realPathList[0])
   }
 }
-let count = 0;
-function handleLogClick() {
-  if(count > 3){
-    return;
-  }
-  count++;
-  if(count > 3){
-    configManager.set('easter_egg_log',false);
-    $message.info("本地统计组件已隐藏~")
-    doRefresh();
-  }
-}
 
 
 </script>
@@ -167,7 +142,7 @@ function handleLogClick() {
   .n-divider{
     height: 12px;
   }
-  padding: 10px;
+  padding: 10px 10px 0 10px;
   .aspect{
     padding: 10px;
     margin: 20px 0;
@@ -191,11 +166,11 @@ function handleLogClick() {
 
   .stat-container{
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
 
 
     .stat-item{
-      flex: 50%;
+      flex: 1;
       box-sizing: border-box;
 
       .n-statistic{
@@ -210,7 +185,7 @@ function handleLogClick() {
     box-shadow: rgba(50, 50, 105, 0.15) 0 2px 5px 0, rgba(0, 0, 0, 0.05) 0 1px 1px 0;
 
 
-    &:hover{
+    &:not(.stat):hover{
       box-shadow: rgba(9, 30, 66, 0.25) 0 4px 8px -2px, rgba(9, 30, 66, 0.08) 0 0 0 1px;
     }
 
@@ -223,7 +198,7 @@ function handleLogClick() {
 
 
 
-    &:hover{
+    &:not(.stat):hover{
       box-shadow: rgba(50, 50, 105, 0.15) 0 2px 5px 0, rgba(0, 0, 0, 0.05) 0 1px 1px 0;
       //box-shadow: rgba(9, 30, 66, 0.25) 0 4px 8px -2px, rgba(9, 30, 66, 0.08) 0 0 0 1px;
     }

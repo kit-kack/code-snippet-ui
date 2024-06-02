@@ -11,7 +11,9 @@
   </template>
   <vim-status-bar/>
   <n-drawer v-model:show="$reactive.main.settingActive" width="50vw" placement="right">
-    <side-view/>
+    <n-scrollbar style="max-height: 100vh" :ref="(el) => $normal.scroll.settingInvoker= el" >
+      <side-view/>
+    </n-scrollbar>
   </n-drawer>
   <n-drawer  v-model:show="$reactive.common.shortcutActive" display-directive="show" placement="left" :width="380">
     <n-scrollbar style="max-height: 99%" :ref="(el) => $normal.scroll.helpInvoker= el" >

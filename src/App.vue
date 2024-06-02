@@ -17,6 +17,7 @@ import {watch} from "vue";
 import MiddleView from "./view/MiddleView.vue";
 import {$normal, $reactive, LIST_VIEW} from "./js/store";
 import {debounce as _debounce} from "lodash-es"
+import {configManager} from "./js/utools/config";
 
 const handleUtoolsTextChange =  _debounce((text)=>{
   text = text.trim();
@@ -40,6 +41,9 @@ watch(()=>$reactive.currentMode,(mode)=>{
     utools.setSubInput(({text}) =>{
       handleUtoolsTextChange(text)
     },"搜索 name #tag @type")
+    if(configManager.get('enable_vim_when_entry')){
+      $reactive.utools.focused = false;
+    }
     if($reactive.utools.search){
       utools.setSubInputValue($reactive.utools.search)
     }

@@ -14,53 +14,16 @@
       {{($reactive.currentMode <= CODE_VIEW)? 'Vim模式启用中':'Vim模式不可用'}}
     </n-tooltip>
 
-    <n-modal v-model:show="statisticsShow"
-             preset="card"
-             title="本地统计"
-             style="width: 66%"
-             :auto-focus="false"
-
-    >
-      <div id="statistics">
-        <template v-for="stat in statisticsManager.getStatistics()">
-          <template v-if="stat.label === '使用天数'">
-            <n-tooltip>
-              <template #trigger>
-                <n-statistic :label="stat.label">
-                  <n-number-animation show-separator :from="0" :to="stat.value[0]"/>
-                  /
-                  <n-number-animation show-separator :from="0" :to="stat.value[2]"/>
-                </n-statistic>
-              </template>
-              有效使用天数 / 安装天数
-            </n-tooltip>
-          </template>
-          <template v-else>
-            <n-statistic :label="stat.label">
-              <n-number-animation show-separator :from="0" :to="stat.value[0]"/>
-              /
-              <n-number-animation show-separator :from="0" :to="stat.value[1]"/>
-              /
-              <n-number-animation show-separator :from="0" :to="stat.value[2]"/>
-            </n-statistic>
-          </template>
-        </template>
-      </div>
-      <h5 style="font-weight: normal"><span style="font-weight: bold">今日 / 最近七日 / 总计</span> &nbsp;&nbsp;|&nbsp;&nbsp; 由于插件在v2.7.2版本才开始统计，数据仅供参考</h5>
-    </n-modal>
-
   </div>
 
 </template>
 
 <script setup>
 import {configManager} from "../js/utools/config";
-import {$index, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW, LIST_VIEW} from "../js/store";
-import {computed, ref} from "vue";
+import {$index, $reactive, CODE_VIEW, CREATE_VIEW, EDIT_VIEW} from "../js/store";
+import {computed} from "vue";
 import SvgVim from "../asserts/vim.svg";
-import {statisticsManager} from "../js/utools/statistics";
 
-const statisticsShow = ref(false)
 const show = computed(()=>{
   // !$reactive.utools.focused && $reactive.view.fullScreenShow
   if($reactive.currentMode === CODE_VIEW){
@@ -100,10 +63,7 @@ function handleVimStatusBarClick(){
   lastTime = now;
   showCount++;
   if(showCount === 3){
-    if($reactive.currentMode === LIST_VIEW){
-      configManager.set('easter_egg_log',true);
-      statisticsShow.value = !statisticsShow.value
-    }else if($reactive.currentMode === CODE_VIEW){
+    if($reactive.currentMode === CODE_VIEW){
       $message.success("怕无归期，怕空欢喜，怕来者不是你。");
     }else if($reactive.currentMode === EDIT_VIEW){
       $message.error("我试过销声匿迹，最终也无人问及。");

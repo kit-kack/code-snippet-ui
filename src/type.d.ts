@@ -266,6 +266,7 @@ declare type ConfigItem =
     | "default_tab"                              // 编辑界面Tab键行为： 0-原生 1-\t 2-2个空格 4-4个空格
     | "default_language"                         // 默认语言
     | "default_keyword_enable"                       // 默认是否启用uTools关键字
+    | "enable_vim_when_entry"               // 进入插件时是否直接切换到vim模式
 // @deprecated    | "beta_tag_aid_choose"                      // 标签辅助选择
 // @default    | "beta_wide_snippet_search"                 // 允许扩充搜索范围
     | "beta_wide_desc_close"                     // 关闭描述匹配
@@ -277,7 +278,7 @@ declare type ConfigItem =
     | "lite"                                     // 列表UI模式
     | "readme_close"                             // 说明文档显示
     | "pure_mode"                                // 纯净模式
-    | "easter_egg_log"                           // 彩蛋：日志
+// @default   | "easter_egg_log"                           // 彩蛋：日志
 
 
 

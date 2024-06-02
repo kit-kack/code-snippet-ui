@@ -15,6 +15,7 @@
       <n-select  v-model:value="codeBlockRef" :options="codeBlockOptions" size="tiny" @update-value="handleCodeBlockChange"/>
     </n-space>
     <config-switch title="关闭显示入门手册" config="readme_close" @refresh="refreshSearchResult()"/>
+    <config-switch title="进入插件时直接切换到Vim模式" config="enable_vim_when_entry"/>
   </n-space>
 
 </template>

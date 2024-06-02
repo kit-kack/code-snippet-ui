@@ -30,6 +30,7 @@ const $normal = {
         hierarchyInvoker: null,  // 控制topNav
         virtualInvoker: null , // 控制 virtual scroll
         helpInvoker: null,    // 【快捷方式】控制的滚动
+        settingInvoker: null  // 【设置】控制的滚动
     },
     // Vim模式下空格执行的程序
     spaceInvoker: [],

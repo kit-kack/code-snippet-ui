@@ -25,6 +25,7 @@
   --plugin-background-color: #303133;
   --plugin-text-selected-background-color: rgba(255,255,255,.1);
   --scrollbar-thumb-background-color: #262626;
+  --scrollbar-thumb-background-color-hover: #57585a;
 
   --item-code-text-color: #a4a4a4;
   --item-code-scroller-border-color: #666666;
@@ -48,6 +49,9 @@
   &::-webkit-scrollbar-thumb{  // 滑块
     border-color: var(--plugin-background-color);
     background-color: var(--scrollbar-thumb-background-color);
+  }
+  &::-webkit-scrollbar-thumb:hover{
+    background-color: var(--scrollbar-thumb-background-color-hover,#b7b7b7);
   }
   &::-webkit-scrollbar-corner{
     background-color: transparent;  // 交叉角透明

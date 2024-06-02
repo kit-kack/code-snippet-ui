@@ -138,6 +138,15 @@ export function doScrollForHelpView(direction,fast){
 }
 
 /**
+ * 控制【设置】界面滚动
+ * @param {number} direction
+ * @param fast
+ */
+export function doScrollForSideView(direction,fast){
+    _controlScrollBar($normal.scroll.settingInvoker,direction,fast);
+}
+
+/**
  * 控制【TopNav】界面滚动
  */
 export function doScrollForTopNav(){

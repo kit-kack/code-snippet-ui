@@ -208,19 +208,6 @@ function _down_without_index(code){
  */
 export const K_LISTVIEW_DOWN = (ext)=>{
     const {code,double,long,shift,repeat,alt} = ext;
-    // active
-    if($reactive.main.settingActive){
-        if($reactive.setting.funcEditActive || $reactive.setting.specialTagConfigActive){
-            return;
-        }
-        // prevent any possible event
-        if ( code === 'Enter' || code === 'Tab' || code === 'Space') {
-            return true;
-        } else if (code === 'KeyQ' || code === 'Slash') {
-            $reactive.main.settingActive = false;
-        }
-        return;
-    }
     // super key
     if(code === 'Tab'){
         if(repeat){

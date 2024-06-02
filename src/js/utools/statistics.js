@@ -1,5 +1,6 @@
 import {utools_db_store} from "./base";
 import { debounce as _debounce } from 'lodash-es'
+import dayjs from "dayjs";
 
 const GLOBAL_STATISTICS = 'statistics/'+ utools.getNativeId();
 const OLD_STATISTICS = 'statistics';
@@ -45,6 +46,15 @@ export const statisticsManager = {
     },
     _now(){
         const date = new Date();
+        return new Date(date.getFullYear(),date.getMonth(),date.getDate()).getTime();
+    },
+    _curMonday(nowDate){
+        let date;
+        if(nowDate.getDay() === 0){
+            date = dayjs().subtract(1,'day').day(1).toDate();
+        }else{
+            date = dayjs().day(1).toDate();
+        }
         return new Date(date.getFullYear(),date.getMonth(),date.getDate()).getTime();
     },
     count(type){
@@ -97,46 +107,51 @@ export const statisticsManager = {
             }
         }
     },
-    _calcLastWeekCount(week){
-        let i = 0;
+    _calcLastWeekCount(week,currentWeekOne){
+        let total = 0;
         for (let weekKey in week) {
-            i+= week[weekKey];
+            if(weekKey >= currentWeekOne){
+                total += week[weekKey];
+            }
         }
-        return i
+        return total;
     },
-    _getStatistics(type,now){
+    _getStatistics(type,now,curMonday){
         return[
             this.data[type].week[now]??0,
-            this._calcLastWeekCount(this.data[type].week),
+            this._calcLastWeekCount(this.data[type].week,curMonday),
             this.data[type].total,
         ]
     },
     _getUsedStatistics(now){
         return [
             this.data.used.total,
-            'N/A',
             Math.floor((now - this.data.used.start) / (24 * 60 * 60 * 1000)) + 1
         ]
     },
+
     getStatistics(){
-        const now = this._now();
+        const date = new Date();
+        const now = new Date(date.getFullYear(),date.getMonth(),date.getDate()).getTime();
+        const curMonday = this._curMonday(date);
+
         return [
             {
+                label: "有效使用天数",
+                value: this._getUsedStatistics(now)
+            },
+            {
                 label: "复制粘贴",
-                value: this._getStatistics(CountType.COPYED,now),
+                value: this._getStatistics(CountType.COPYED,now,curMonday),
             },
             {
                 label: "访问插件",
-                value: this._getStatistics(CountType.VISITED,now)
+                value: this._getStatistics(CountType.VISITED,now,curMonday)
             },
-            {
-                label: "按键",
-                value: this._getStatistics(CountType.VIM,now)
-            },
-            {
-                label: "使用天数",
-                value: this._getUsedStatistics(now)
-            }
+            // {
+            //     label: "Vim键入",
+            //     value: this._getStatistics(CountType.VIM,now,curMonday)
+            // },
         ]
     }
 }
