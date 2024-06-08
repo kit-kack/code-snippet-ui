@@ -124,12 +124,6 @@ export function handleArrayForHierarchy(result,name,tag,type){
                 continue;
             }
         }
-        // collect snippet tag
-        if(item.tags){
-            for (const tag of item.tags) {
-                $reactive.main.tagSet.add(tag)
-            }
-        }
 
         if(needHighlight){
             item.temp = match(name,snippet.name);
@@ -170,5 +164,15 @@ export function handleArrayForHierarchy(result,name,tag,type){
                 break;
         }
     }
-    return topSnippets.concat(normalSnippets);
+    const finalArray = topSnippets.concat(normalSnippets);
+    // 收集tag
+    for (const finalArrayElement of finalArray) {
+        // collect snippet tag
+        if(finalArrayElement.tags){
+            for (const tag of finalArrayElement.tags) {
+                $reactive.main.tagSet.add(tag)
+            }
+        }
+    }
+    return finalArray;
 }

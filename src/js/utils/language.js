@@ -1,7 +1,9 @@
 import hljs from "../dep/highlight-dep";
 
-const rootLanguages = hljs.listLanguages();
-rootLanguages.sort()
+/**
+ * @type {string[]}
+ */
+const rootLanguages = hljs.listLanguages().sort();
 /**
  * 用在FormView来选择代码片段类型
  * @type {unknown[]}
