@@ -1,8 +1,5 @@
 import {codeSnippetManager} from "../utools/snippet";
 import {GLOBAL_HIERARCHY} from "./core";
-import {configManager} from "../utools/config";
-import {SPECIAL_TAG_HANDLER} from "../editor/editor";
-import {defaultHelpSnippet} from "../some";
 
 /**
  *

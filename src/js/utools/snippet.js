@@ -7,7 +7,6 @@ import {configManager} from "./config";
 import {hierachyHubManager} from "./hub";
 import {$reactive} from "../store";
 import {GLOBAL_HIERARCHY} from "../hierarchy/core";
-import {SPECIAL_TAG_HANDLER} from "../editor/editor";
 
 export const CODE_PREFIX = "code/";
 const SUB_CODE_PREFIX = "#code/"
@@ -124,9 +123,9 @@ export const codeSnippetManager = {
      */
     _updateKeywordAndDatabase(snippet, prefix,deleteMode = false,recycleMode = false) {
         // editor
-        if(configManager.get('beta_special_tag')){
-            SPECIAL_TAG_HANDLER.accept(snippet,(!deleteMode && !recycleMode))
-        }
+        // if(configManager.get('beta_special_tag')){
+        //     SPECIAL_TAG_HANDLER.accept(snippet,(!deleteMode && !recycleMode))
+        // }
         // keyword
         if(deleteMode){
             // delete current keyword

@@ -111,7 +111,7 @@
         <template v-if="!_isEmpty(snippet.tags)">
           <h4>标签</h4>
           <n-space>
-            <normal-tag type="raw" v-for="item in snippet.tags" :is-special="snippet.editor?.[item]"  :key="item" :content="item"/>
+            <normal-tag type="raw" v-for="item in snippet.tags" :key="item" :content="item"/>
           </n-space>
         </template>
         <template v-if="!_isEmpty(snippet.sections)">

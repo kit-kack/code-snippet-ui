@@ -42,7 +42,6 @@
             <n-space :wrap="false">
               <normal-tag v-for="item in snippet.tags"
                           :key="item"
-                          :is-special="snippet.editor?.[item]"
                           :content="item" @tag-refresh="doItemRefresh"/>
             </n-space>
           </div>
