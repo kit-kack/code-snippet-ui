@@ -1,8 +1,9 @@
-import {$normal, $reactive, EDIT_VIEW, LIST_VIEW} from "../store";
+import {$normal, $reactive, CODE_VIEW, EDIT_VIEW, LIST_VIEW} from "../store";
 import {K_SHORTCUT_DOWN} from "./k-shortcut";
 import {K_CODEVIEW_DOWN, K_CODEVIEW_UP} from "./k-codeview";
 import {K_LISTVIEW_DOWN, K_LISTVIEW_UP} from "./k-listview";
 import {K_SETTING_DOWN} from "./k-sideview";
+import {GLOBAL_HIERARCHY} from "../hierarchy/core";
 
 export const GLOBAL_KEYBOARD_HANDLER = {
     isInited: false,
@@ -125,6 +126,30 @@ export const GLOBAL_KEYBOARD_HANDLER = {
                 K_CODEVIEW_UP(ext) && e.preventDefault();
             }
         }
+        // 响应鼠标侧键
+        document.onmouseup = e => {
+            if($reactive.currentMode >= EDIT_VIEW){
+                return;
+            }
+            if(e.button === 3){
+                if($reactive.currentMode === CODE_VIEW){
+                    GLOBAL_HIERARCHY.changeView(LIST_VIEW);
+                }else{
+                    GLOBAL_HIERARCHY.changeHierarchy("prev");
+                }
+            }else if(e.button === 4){
+                if($reactive.currentMode === LIST_VIEW){
+                    if($reactive.currentSnippet){
+                        if($reactive.currentSnippet.dir){
+                            GLOBAL_HIERARCHY.changeHierarchy("next");
+                        }else if(!$reactive.currentSnippet.link){
+                            GLOBAL_HIERARCHY.changeView(CODE_VIEW);
+                        }
+                    }
+                }
+            }
+        }
+
         this.isInited = true
         $normal.inputModeEntry = false;
 
