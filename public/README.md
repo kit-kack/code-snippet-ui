@@ -3,7 +3,8 @@
 新版本速览✨
 
 
-1. <span style="color:red">修复</span> 回收站过期处理问题
+1. <span style="color:green">优化</span> 搜索匹配排序、一些样式和功能
+2. <span style="color:red">移除</span> Beta功能-特殊标签
 ---
 
 [[TOC]]

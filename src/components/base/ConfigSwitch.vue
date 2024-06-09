@@ -1,7 +1,7 @@
 <template>
   <span>
-    <n-switch @update:value="updateConfigValue" :default-value="configManager.get(config)"/>&nbsp;
     {{ title }}
+    <n-switch style="float: right;" @update:value="updateConfigValue" :default-value="configManager.get(config)"/>
   </span>
 </template>
 

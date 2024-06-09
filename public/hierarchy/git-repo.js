@@ -86,6 +86,7 @@ module.exports = class GitRepo {
         },
         token:{
             name: '私人令牌Token',
+            password: true
         },
         hideDotFile:{
             name: '隐藏显示.开头的文件',

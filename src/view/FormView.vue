@@ -811,9 +811,9 @@ function openConfModal(config){
   const defaultValues = {};
   for (let key in config) {
     const item = config[key];
-    const isValidOptions = _isArray(item.value) && item.value.length > 0;
-    variables.push([key, isValidOptions? "select":"input",item.name])
-    if(isValidOptions){
+    const isMultiValue = _isArray(item.value) && item.value.length > 0;
+    variables.push([key, isMultiValue? "select": (item.password ?"password":"input"),item.name])
+    if(isMultiValue){
       // conf
       if(codeTemplate.conf && key in codeTemplate.conf){
         defaultValues[key] = Array.from(new Set([codeTemplate.conf[key].toString(),...item.value]))

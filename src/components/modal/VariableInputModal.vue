@@ -10,13 +10,16 @@
           <template v-if="template.type === 'input'">
             <n-input @keydown.enter.passive.stop="handleEnter(index)" v-model:value="template.value" clearable placeholder="输入值"/>
           </template>
-          <template v-else>
+          <template v-else-if="template.type === 'select'">
             <n-select v-model:value="template.value"
                       :options="template.option"
                       @focus="$normal.funcs.vimSupport = true; foucsSelectIndex = index;"
                       @blur="$normal.funcs.vimSupport = false; foucsSelectIndex = -1;"
                       show-on-focus
                       placeholder="选择或输入值"/>
+          </template>
+          <template v-else>
+            <n-input type="password" show-password-on="click" @keydown.enter.passive.stop="handleEnter(index)" v-model:value="template.value" placeholder="输入值"/>
           </template>
         </template>
       </div>

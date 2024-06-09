@@ -238,25 +238,7 @@ declare interface Hierarchy extends HierarchyCore{
     core?: boolean,
     inline?: boolean,
 }
-declare interface Editor{
-    /**
-     * 写入代码片段
-     * @param {string} name 代码片段名，一般为缩写
-     * @param {string} code 代码片段内容
-     * @param {string} desc 描述
-     * @param {string} dir 存放目录
-     */
-    update(dir: string ,name: string,code: string,desc?: string),
-
-    /**
-     * 移除代码片段
-     * @param {string} name 代码片段名，一般为缩写
-     * @param {string} dir 存放目录
-     */
-    remove(dir: string,name: string)
-}
-declare type ConfPath =
-    "editor"
+declare type ConfPath = undefined
 
 declare type ConfigItem =
       "strategy_theme"                           // 主题

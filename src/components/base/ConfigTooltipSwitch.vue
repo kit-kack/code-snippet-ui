@@ -4,13 +4,13 @@
   >
     <template #trigger>
       <span class="config-tooltip-switch">
-        <n-switch @update:value="updateConfigValue" :default-value="configManager.get(config)"/>&nbsp;
         {{ title }}
         <n-icon :class="{
           'global-color': show
         }">
           <SvgTip/>
         </n-icon>
+        <n-switch style="float: right;" @update:value="updateConfigValue" :default-value="configManager.get(config)"/>
       </span>
     </template>
     <slot></slot>

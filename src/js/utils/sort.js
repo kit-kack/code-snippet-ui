@@ -37,6 +37,66 @@ function _compare(property){
 const CREATE_TIME_COMPARE = _compare("createTime");
 const TIME_COMPARE = _compare("time");
 const COUNT_COMPARE  = _compare("count");
+const NORMAML_COMPARE = (a,b) =>{
+    const result = (a.matchType ?? 0) - (b.matchType ?? 0)
+    if(result === 0){
+        return a.name.localeCompare(b.name);
+    }else{
+        return result;
+    }
+}
+
+
+
+/**
+ * 智能排序 先根据匹配程度排序，然后再匹配相应排序方法
+ * @param {CodeSnippet[]} snippets
+ * @param {number} searchWordCount
+ */
+function intelligentSort(snippets,searchWordCount){
+    // 收集信息
+    for (const snippet of snippets) {
+        if(searchWordCount > 0){
+            // match
+            if(snippet.matchType >= 1){
+                snippet.matchPercent = 0;
+            }else{
+                snippet.matchPercent = Math.round( searchWordCount / snippet.name.length * 100);
+            }
+        }
+    }
+    let lateCompareFunc;
+    switch (configManager.getSortKey()){
+        case 0:
+            lateCompareFunc = CREATE_TIME_COMPARE;
+            break;
+        case 1:
+            lateCompareFunc = TIME_COMPARE;
+            break;
+        case 2:
+            lateCompareFunc = COUNT_COMPARE;
+            break;
+        default:
+            lateCompareFunc = NORMAML_COMPARE;
+            break;
+    }
+    snippets.sort((a,b)=>{
+        const aWinFlag = a.matchPercent >= 75;
+        const bWinFlag = b.matchPercent >= 75;
+        if(aWinFlag){
+            if(bWinFlag){
+                return  b.matchPercent - a.matchPercent
+            }else{
+                return -1;
+            }
+        }else if(bWinFlag){
+            return 1;
+        }else{
+            return lateCompareFunc(a,b);
+        }
+    })
+
+}
 
 
 export function handleArrayForHierarchy(result,name,tag,type){
@@ -142,27 +202,7 @@ export function handleArrayForHierarchy(result,name,tag,type){
     // 对 topSnippets进行排序
     topSnippets.sort((a,b)=> a.index - b.index)
     if(!result.sorted){
-        switch (configManager.getSortKey()){
-            case 0:   // 创建时间
-                normalSnippets.sort(CREATE_TIME_COMPARE)
-                break;
-            case 1:   // 最近访问时间
-                normalSnippets.sort(TIME_COMPARE)
-                break;
-            case 2:  // 粘贴使用次数
-                normalSnippets.sort(COUNT_COMPARE)
-                break;
-            default:  // 自然排序
-                normalSnippets.sort((a,b) =>{
-                    const result = (a.matchType ?? 0) - (b.matchType ?? 0)
-                    if(result === 0){
-                        return a.name.localeCompare(b.name);
-                    }else{
-                        return result;
-                    }
-                })
-                break;
-        }
+        intelligentSort(normalSnippets,name == null ? 0 : name.length)
     }
     const finalArray = topSnippets.concat(normalSnippets);
     // 收集tag

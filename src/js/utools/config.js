@@ -77,14 +77,6 @@ export const configManager = {
      * @param {ConfPath} path
      */
     getSubItem(path){
-        // TODO: 下一个大版本移除 v2.7.2
-        const oldKey = NEW_GLOBAL_CONFIG + "/" + path;
-        const doc = localStorage.getItem(oldKey)
-        if(doc){
-            localStorage.removeItem(oldKey)
-            this.setSubItem(path,doc)
-            return JSON.parse(doc);
-        }
         const key = NEW_GLOBAL_CONFIG + "-" + path + '.json';
         try{
             return JSON.parse(window.preload.readFile(window.preload.getFinalPath(localConfigDirPath,key)).toString());

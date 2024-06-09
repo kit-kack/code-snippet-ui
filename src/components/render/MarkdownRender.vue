@@ -548,12 +548,13 @@ onUnmounted(()=>{
   code:not(pre) {
     color: #de414c;
     font-family: Consolas;
-    background-color: #fff5f5;
+    background-color: #fff5f590;
   }
   pre{
     border-radius: 5px !important;
     border: 2px solid transparent;
     code{
+      font-weight: normal;
       font-family: 'Consolas' !important;
     }
 
@@ -586,6 +587,12 @@ onUnmounted(()=>{
 }
 #light-app-v5{
   .github-markdown-body{
+    table {
+      thead th{
+        background-color: #f6f8fa;
+      }
+
+    }
     pre {
       background: #eee !important;
       box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
@@ -618,9 +625,8 @@ onUnmounted(()=>{
   }
 
   table{
-    background-color: #313134;
     tr{
-      background-color: #353539;
+      background-color: #3d3d3f;
       border-top-color: #313134;
     }
 
@@ -637,6 +643,7 @@ onUnmounted(()=>{
   }
   blockquote{
     border-left-color: #515154;
+    color: #888;
   }
   hr{
     background-color: #515154;
@@ -648,7 +655,7 @@ onUnmounted(()=>{
 
   code:not(pre) {
     color: #ff7875;
-    background-color: #363636;
+    background-color: #36363660;
   }
   pre {
     background: #282c34 !important;
