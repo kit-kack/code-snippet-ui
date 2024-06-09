@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.12](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.11...v2.7.12) (2024-06-09)
+
+
+### Features
+
+* 添加一些小细节 ([bf46112](https://github.com/kit-kack/code-snippet-ui/commit/bf46112a052c729e6b03efc87983641ceba952fe))
+* 移除beta功能-特殊标签 ([c5ad560](https://github.com/kit-kack/code-snippet-ui/commit/c5ad560854fe898741041b7f4c52d7fdf3c0bc4f))
+
+
+### Bug Fixes
+
+* 标签收集逻辑修改 ([f74ec70](https://github.com/kit-kack/code-snippet-ui/commit/f74ec70a31948fc31bbe0e6db98deec75e010dd2))
+* 回收站处理bug ([e44a4a4](https://github.com/kit-kack/code-snippet-ui/commit/e44a4a47c324cb7cbeb08829dcec5cb3d61eea32))
+* 优化样式 ([77f5072](https://github.com/kit-kack/code-snippet-ui/commit/77f5072ed7bc63fa69ca5769954683f3b285d318))
+
 ### [2.7.11](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.10...v2.7.11) (2024-05-31)
 
 ### [2.7.10](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.9...v2.7.10) (2024-04-29)
