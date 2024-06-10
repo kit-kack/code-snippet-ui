@@ -20,7 +20,7 @@ export const RENDER_KEYHANDLER = {
 export const K_CODEVIEW_DOWN = (ext)=>{
     const {code,ctrl,shift,double,repeat} = ext;
     // modal
-    if($reactive.code.sectionsChangeModal){
+    if($reactive.code.sectionsChangeModalActive){
         return
     }
     // active
@@ -100,7 +100,7 @@ export const K_CODEVIEW_UP = (ext)=>{
         return true;
     }
     // modal
-    if($reactive.code.sectionsChangeModal){
+    if($reactive.code.sectionsChangeModalActive){
         return
     }
     // active
@@ -121,7 +121,7 @@ export const K_CODEVIEW_UP = (ext)=>{
         case 'KeyQ':
             $reactive.utools.keepSelectedStatus = true;
             if($reactive.code.sectionsChange){
-                $reactive.code.sectionsChangeModal = true;
+                $reactive.code.sectionsChangeModalActive = true;
                 $reactive.code.sectionsChangeTriggerIsListView = true;
             }else{
                 GLOBAL_HIERARCHY.changeView(LIST_VIEW);
@@ -143,7 +143,7 @@ export const K_CODEVIEW_UP = (ext)=>{
                 $reactive.common.shortcutActive = false;
             }
             if($reactive.code.sectionsChange){
-                $reactive.code.sectionsChangeModal = true;
+                $reactive.code.sectionsChangeModalActive = true;
                 $reactive.code.sectionsChangeTriggerIsListView =false;
             }else{
                 GLOBAL_HIERARCHY.changeView(EDIT_VIEW)

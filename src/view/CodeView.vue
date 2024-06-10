@@ -50,7 +50,7 @@
         <div class="code-view-codearea-bottom" v-if="!$reactive.code.isPure"></div>
       </template>
     </n-scrollbar>
-    <base-modal v-if="$reactive.code.sectionsChangeModal"
+    <base-modal v-if="$reactive.code.sectionsChangeModalActive"
                 vim
                 @cancel="exitWithHandlingSectionChange(false)"
                 @confirm="exitWithHandlingSectionChange(true)"
@@ -263,7 +263,7 @@ function exitWithHandlingSectionChange(confirm){
   if(confirm){
     handleSectionChange();
   }
-  $reactive.code.sectionsChangeModal = false;
+  $reactive.code.sectionsChangeModalActive = false;
   GLOBAL_HIERARCHY.changeView($reactive.code.sectionsChangeTriggerIsListView ? LIST_VIEW : EDIT_VIEW)
 }
 function clearSnippetSections(){
@@ -372,7 +372,7 @@ function handleClose(){
   $reactive.code.infoActive = false;
   $normal.keepSelectedStatus = true;
   if($reactive.code.sectionsChange){
-    $reactive.code.sectionsChangeModal = true;
+    $reactive.code.sectionsChangeModalActive = true;
     $reactive.code.sectionsChangeTriggerIsListView = true;
   }else{
     GLOBAL_HIERARCHY.changeView(LIST_VIEW);

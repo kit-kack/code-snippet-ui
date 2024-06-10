@@ -56,7 +56,7 @@ const enterApp = (data) => {
         GLOBAL_HIERARCHY.changeView(LIST_VIEW,true)
         nextTick(()=>{
             $message?.success?.('重新加载~');
-            utools_focus_or_blur(true)
+            utools_focus_or_blur(!configManager.get('enable_vim_when_entry'))
         })
     }
     console.log('Enter App ...')

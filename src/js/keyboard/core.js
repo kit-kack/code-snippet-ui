@@ -131,9 +131,23 @@ export const GLOBAL_KEYBOARD_HANDLER = {
             if($reactive.currentMode >= EDIT_VIEW){
                 return;
             }
+            if($reactive.main.settingActive || $reactive.main.tagColorActive || $reactive.common.variableActive || $reactive.code.sectionsChangeModalActive){
+                return;
+            }
+            if($reactive.common.shortcutActive){
+                if(e.button === 3){
+                    $reactive.common.shortcutActive = false;
+                }
+                return;
+            }
             if(e.button === 3){
                 if($reactive.currentMode === CODE_VIEW){
-                    GLOBAL_HIERARCHY.changeView(LIST_VIEW);
+                    if($reactive.code.sectionsChange) {
+                        $reactive.code.sectionsChangeModalActive = true;
+                        $reactive.code.sectionsChangeTriggerIsListView = true;
+                    }else{
+                        GLOBAL_HIERARCHY.changeView(LIST_VIEW);
+                    }
                 }else{
                     GLOBAL_HIERARCHY.changeHierarchy("prev");
                 }

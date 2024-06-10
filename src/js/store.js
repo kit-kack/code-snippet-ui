@@ -135,7 +135,7 @@ const $reactive = reactive({
         // sections是否发生变化
         sectionsChange: false,
         // secionts modal
-        sectionsChangeModal: false,
+        sectionsChangeModalActive: false,
         // sections trigger is listview or formview
         sectionsChangeTriggerIsListView: false,
     },
