@@ -69,6 +69,9 @@ function handleVimStatusBarClick(){
       $message.error("我试过销声匿迹，最终也无人问及。");
     }else if($reactive.currentMode === CREATE_VIEW){
       $message.error("孤单年少岁月长，暮色沉沉晚风凉。");
+    }else{
+      configManager.set('easter_egg_log',true)
+      $message.info("显示本地数据统计组件~");
     }
     showCount = 0;
   }

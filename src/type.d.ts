@@ -260,7 +260,7 @@ declare type ConfigItem =
     | "lite"                                     // 列表UI模式
     | "readme_close"                             // 说明文档显示
     | "pure_mode"                                // 纯净模式
-// @default   | "easter_egg_log"                           // 彩蛋：日志
+    | "easter_egg_log"                           // 彩蛋：日志
 
 
 

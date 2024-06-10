@@ -60,7 +60,7 @@
     </div>
 
 
-    <div class="aspect stat">
+    <div class="aspect stat" v-if="configManager.get('easter_egg_log')">
       <h4>本地数据统计（今日/本周/总计）</h4>
       <p class="tooltip">由于插件在v2.7.2版本才开始统计，数据仅供参考</p>
       <div class="stat-container">
@@ -96,6 +96,7 @@ import SvgBackupImport from "../asserts/backup-import.svg";
 import SvgBackupExport from "../asserts/backup-export.svg";
 import {statisticsManager} from "../js/utools/statistics";
 import SearchPane from "../components/pane/side/SearchPane.vue";
+import {configManager} from "../js/utools/config";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);
