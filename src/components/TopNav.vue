@@ -7,7 +7,7 @@
         <n-breadcrumb-item  clickable @click="clearCurrentPrefix">
           {{$reactive.main.isRecycleBinActive ? '🗑️': '◈'}}
         </n-breadcrumb-item>
-        <n-breadcrumb-item v-for="(p,index) in $reactive.currentPrefix" clickable @click="sliceCurrentPrefix(index)">
+        <n-breadcrumb-item v-for="(p,index) in simplifyPrefixArray" clickable @click="sliceCurrentPrefix(index)">
           {{p}}
         </n-breadcrumb-item>
         <n-breadcrumb-item v-if="$reactive.currentMode === CODE_VIEW">
@@ -78,6 +78,12 @@ const word = ref(0);
 const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
 const show = ref(false);
 let timer = null;
+const simplifyPrefixArray = computed(()=>{
+  if($reactive.currentPrefix.length > 4){
+    return $reactive.currentPrefix.slice(0,2).concat("...").concat($reactive.currentPrefix.slice(-2))
+  }
+  return $reactive.currentPrefix
+})
 watch([()=>$list.value,()=>$reactive.currentMode],([list,mode])=>{
   if(mode === LIST_VIEW){
     word.value = $list.value.length;
@@ -106,7 +112,13 @@ function clearCurrentPrefix(){
 }
 function sliceCurrentPrefix(ind){
   if($reactive.currentMode === LIST_VIEW){
-    GLOBAL_HIERARCHY.changeHierarchy("custom",ind);
+    if(simplifyPrefixArray.length > 4){
+      if(ind >= 2){
+        GLOBAL_HIERARCHY.changeHierarchy("custom",$reactive.currentPrefix.length - (4-ind) )
+      }
+    }else{
+      GLOBAL_HIERARCHY.changeHierarchy("custom",ind);
+    }
   }
 }
 let showTimer = null;

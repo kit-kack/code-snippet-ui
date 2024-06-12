@@ -2,7 +2,7 @@
   <div id="extra-left" v-if="show" >
     <n-tooltip trigger="hover" :show-arrow="false" :keep-alive-on-hover="false">
       <template #trigger>
-        <n-button :focusable="false"  round strong  :="getBtnStyle()" @click="handleVimStatusBarClick()">
+        <n-button :focusable="false"  round strong  :="getBtnStyle()">
           <template #icon>
             <n-icon>
               <svg-vim/>
@@ -50,34 +50,6 @@ const getBtnStyle = ()=>{
     }
   }
 }
-
-let showCount = 0 // 必须要到达 3
-let lastTime = 0  // 时间
-function handleVimStatusBarClick(){
-  const now = Date.now();
-  if(now - lastTime > 500){
-    lastTime = now;
-    showCount = 0;
-    return;
-  }
-  lastTime = now;
-  showCount++;
-  if(showCount === 3){
-    if($reactive.currentMode === CODE_VIEW){
-      $message.success("怕无归期，怕空欢喜，怕来者不是你。");
-    }else if($reactive.currentMode === EDIT_VIEW){
-      $message.error("我试过销声匿迹，最终也无人问及。");
-    }else if($reactive.currentMode === CREATE_VIEW){
-      $message.error("孤单年少岁月长，暮色沉沉晚风凉。");
-    }else{
-      configManager.set('easter_egg_log',true)
-      $message.info("显示本地数据统计组件~");
-    }
-    showCount = 0;
-  }
-
-}
-
 </script>
 
 <style>
@@ -87,18 +59,5 @@ function handleVimStatusBarClick(){
   bottom: 12px;
   font-size: 12px;
   z-index: 2000;
-}
-#statistics{
-  font-size: 12px;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #ccc;
-}
-
-#statistics .n-statistic .n-statistic-value .n-statistic-value__content{
-  font-size: 12px !important;
 }
 </style>

@@ -34,7 +34,7 @@
               </template>
             </n-button>
           </template>
-          添加代码片段
+          添加代码片段<span class="shortcut">{{CtrlStr}} + N</span>
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="left" >
@@ -45,29 +45,24 @@
               </template>
             </n-button>
           </template>
-          设置
+          设置<span class="shortcut">/</span>
         </n-tooltip>
         <n-tooltip trigger="hover" placement="left">
           <template #trigger>
-            <n-button strong circle secondary type="primary"  :color="configManager.getGlobalColor()"  @contextmenu="$reactive.main.isButtonFixed = !$reactive.main.isButtonFixed" @click="refreshListView(true)">
+            <n-button strong secondary circle type="primary" :color="configManager.getGlobalColor()" @click="$reactive.common.shortcutActive = true" >
               <template #icon>
-                <template v-if="$reactive.main.isButtonFixed">
-                  <svg-refresh-fixed/>
-                </template>
-                <template v-else>
-                  <svg-refresh/>
-                </template>
+                <svg-stack/>
               </template>
             </n-button>
           </template>
-          左击刷新，右击{{$reactive.main.isButtonFixed? '取消固定':'固定'}}
+          快捷键<span class="shortcut">Z</span>
         </n-tooltip>
       </n-space>
     </template>
     <template v-else>
       <n-tooltip trigger="hover" placement="left">
         <template #trigger>
-          <n-button :focusable="false" strong circle type="primary" quaternary :color="configManager.getGlobalColor()" @click="expanded = true" >
+          <n-button :focusable="false" strong circle type="primary" quaternary :color="configManager.getGlobalColor()">
             <template #icon>
               <svg-arrow-up/>
             </template>
@@ -95,10 +90,10 @@ import TopNav from "../components/TopNav.vue";
 import TagColorChangeModal from "../components/modal/TagColorChangeModal.vue";
 import SvgAdd from "../asserts/add.svg";
 import SvgExpand from "../asserts/expand.svg";
-import SvgRefresh from "../asserts/refresh.svg";
-import SvgRefreshFixed from "../asserts/refresh-fixed.svg";
 import SvgArrowUp from "../asserts/arrow-up.svg";
+import SvgStack from "../asserts/stack.svg";
 import VimStatusBar from "../components/VimStatusBar.vue";
+import {CtrlStr} from "../js/some";
 
 const expanded = ref(false)
 window.$message = useMessage();
