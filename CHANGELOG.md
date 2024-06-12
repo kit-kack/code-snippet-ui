@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.13](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.12...v2.7.13) (2024-06-12)
+
+
+### Features
+
+* 新增模拟键盘输入 ([d42bd53](https://github.com/kit-kack/code-snippet-ui/commit/d42bd532e77d9b0005548d4d3db6f47525568840))
+* 移除本地统计 ([ea0ff18](https://github.com/kit-kack/code-snippet-ui/commit/ea0ff1805282282693c7b602ae0b8d8690b60412))
+* 支持鼠标侧键控制 ([8d45410](https://github.com/kit-kack/code-snippet-ui/commit/8d454106be2b4e69739b1ade02f823bbcf7da873))
+
+
+### Bug Fixes
+
+* 本地统计组件暂不公开显示 ([7b38d44](https://github.com/kit-kack/code-snippet-ui/commit/7b38d4420b7e8a522e01c9bb93a89d07d1ae9a54))
+* 完善鼠标侧键控制和插件进入直接切换vim选项 ([c4ae179](https://github.com/kit-kack/code-snippet-ui/commit/c4ae1799cc73880bff24074447d526405fc9040f))
+* 优化首页 ([0d950af](https://github.com/kit-kack/code-snippet-ui/commit/0d950af8b259cd12862e3638f3f72053a5d13e08))
+
 ### [2.7.12](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.11...v2.7.12) (2024-06-09)
 
 
