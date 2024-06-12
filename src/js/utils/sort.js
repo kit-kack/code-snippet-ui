@@ -81,8 +81,8 @@ function intelligentSort(snippets,searchWordCount){
             break;
     }
     snippets.sort((a,b)=>{
-        const aWinFlag = a.matchPercent >= 75;
-        const bWinFlag = b.matchPercent >= 75;
+        const aWinFlag = a.matchPercent >= 67;
+        const bWinFlag = b.matchPercent >= 67;
         if(aWinFlag){
             if(bWinFlag){
                 return  b.matchPercent - a.matchPercent

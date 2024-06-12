@@ -14,18 +14,15 @@ import {hierachyHubManager} from "./js/utools/hub";
 import {generate_backup} from "./js/utools/backup";
 import {adjustLightDarkTheme} from "./js/theme";
 import {GLOBAL_KEYBOARD_HANDLER} from "./js/keyboard/core";
-import {CountType, statisticsManager} from "./js/utools/statistics";
 import {snippetCopyOrPaste} from "./js/keyboard/k-common";
 // init
 configManager.init()
-statisticsManager.init()
 formatManager.init()
 hierachyHubManager.init()
 codeSnippetManager.init()
 function bindApp(){
     tagColorManager.init()
     GLOBAL_KEYBOARD_HANDLER.init();
-    statisticsManager.countUsed();
     const app = createApp(App)
 
     initNU(app)
@@ -60,7 +57,6 @@ const enterApp = (data) => {
         })
     }
     console.log('Enter App ...')
-    statisticsManager.count(CountType.VISITED)
     adjustLightDarkTheme()
     bindApp()
     if(data.code==='code-snippet-save'){

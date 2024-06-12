@@ -33,16 +33,6 @@
       <custom-view/>
     </div>
 
-<!--    <div class="aspect">-->
-<!--      <h4 id="beta">Beta功能</h4>-->
-<!--      <p class="tooltip">下列拓展功能为<span style="color:#d03050">非正式功能</span>，不保证最终可用性</p>-->
-<!--      <special-tag-config-modal v-if="$reactive.setting.specialTagConfigActive"/>-->
-<!--      <config-tooltip-switch title="特殊标签" config="beta_special_tag">-->
-<!--        开启后，为代码片段添加<span class="kitx-italic">VSCode</span> 标签即可写入<span class="kitx-italic">VSCode</span> 代码片段中，<span class="kitx-italic">IDEA</span>、<span class="kitx-italic">Sublime Text</span> 等同理-->
-<!--        <n-button size="small" secondary @click="$reactive.setting.specialTagConfigActive = true">配置</n-button>-->
-<!--      </config-tooltip-switch>-->
-<!--    </div>-->
-
     <div class="aspect">
       <h4 id="tag">标签管理</h4>
       <p class="tooltip">清除无用标签，后续只会影响到编辑界面中的标签选择</p>
@@ -59,25 +49,6 @@
       <func-edit-pane/>
     </div>
 
-
-    <div class="aspect stat" v-if="configManager.get('easter_egg_log')">
-      <h4>本地数据统计（今日/本周/总计）</h4>
-      <p class="tooltip">由于插件在v2.7.2版本才开始统计，数据仅供参考</p>
-      <div class="stat-container">
-        <div class="stat-item" v-for="stat in statisticsManager.getStatistics()">
-          <n-statistic :label="stat.label">
-            {{stat.value[0]}}
-            /
-            {{stat.value[1]}}
-            <template v-if="stat.value.length === 3">
-              /
-              {{stat.value[2]}}
-            </template>
-          </n-statistic>
-        </div>
-      </div>
-
-    </div>
   </div>
 </template>
 
@@ -94,9 +65,7 @@ import {generate_backup, load_backup} from "../js/utools/backup";
 import {backupFilePath} from "../js/some";
 import SvgBackupImport from "../asserts/backup-import.svg";
 import SvgBackupExport from "../asserts/backup-export.svg";
-import {statisticsManager} from "../js/utools/statistics";
 import SearchPane from "../components/pane/side/SearchPane.vue";
-import {configManager} from "../js/utools/config";
 
 const refreshFlag = ref(true)
 const doRefresh = getRefreshFunc(refreshFlag);

@@ -30,7 +30,6 @@ import {
     NScrollbar,
     NSelect,
     NSpace,
-    NStatistic,
     NSwitch,
     NTabPane,
     NTabs,
@@ -74,7 +73,6 @@ const naive = create({
         NCollapse,
         NCollapseItem,
         NDropdown,
-        NStatistic,
         NIcon
     ]
 })

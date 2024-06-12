@@ -20,9 +20,7 @@ import {codeSnippetManager} from "../utools/snippet";
 import {defaultHelpSnippet} from "../some";
 import {doScrollForListView, doScrollForTopNav} from "../utils/scroller";
 import {resolveSearchWord} from "../utils/resolve"
-import {isFunction as _isFunction, isArray as _isArray } from "lodash-es";
-import {CountType, statisticsManager} from "../utools/statistics";
-import {toString as _toString} from "lodash-es";
+import {isArray as _isArray, isFunction as _isFunction, toString as _toString} from "lodash-es";
 
 
 export function loadValidHierarchyJS(path,isForClass) {
@@ -441,7 +439,6 @@ export const GLOBAL_HIERARCHY = {
         const key = snippet.id ?? snippet.name;
         switch (mode){
             case "count&time":
-                statisticsManager.count(CountType.COPYED)
                 if(GLOBAL_HIERARCHY.currentHierarchy.core){
                     snippet.time = Date.now();
                     snippet.count = (snippet.count??0) +1;
