@@ -1123,10 +1123,10 @@ export const formatManager = {
      * @param {string} code - 待解析的代码
      * @param {boolean} [noView] - 通过utools关键字访问，此时还没有UI界面
      * @return {Promise<{type: string} | {code: string, type: string} | {defaultValue: any, variable: string, type: string} | {code: (string | ParseResult[] | any), type: string}>}
-     * @param {boolean} isPaste
+     * @param {CopyOrPasteCommand} copyOrPasteCommand
      * @param {string} msg
      */
-    async parse(isPaste,code,msg,noView){
+    async parse(copyOrPasteCommand,code,msg,noView){
         this._initForEachRegex();
         const result = await this._format(code)
         if(result.parse){
@@ -1151,7 +1151,7 @@ export const formatManager = {
                 $normal.funcs.variables = result.vars;
                 $normal.funcs.defaultValues = result.defaultValues;
                 $normal.funcs.snippetName = $reactive.currentSnippet.name;
-                $normal.funcs.isPaste = isPaste;
+                $normal.funcs.copyOrPasteCommand = copyOrPasteCommand;
                 $normal.funcs.msg = msg;
                 $reactive.common.variableActive = true;
                 return {
@@ -1175,15 +1175,15 @@ export const formatManager = {
 
     /**
      * @param {boolean} [noView]
-     * @param {boolean} isPaste
+     * @param {CopyOrPasteCommand} copyOrPasteCommand
      * @param {string} msg
      * @return {Promise<void>}
      */
-    async continueFormat(isPaste,msg,noView){
+    async continueFormat(copyOrPasteCommand,msg,noView){
         if(this.codeBuffer){
             const code = await this._expression(this.codeBuffer)
             this.codeBuffer = null
-            copyOrPaste(isPaste,code,msg,noView);
+            copyOrPaste(copyOrPasteCommand,code,msg,noView);
         }
     },
     backup(zip, filename,dirname) {

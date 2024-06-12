@@ -101,7 +101,7 @@
             <selectable-button :disabled="$reactive.main.isRecycleBinActive && snippet.dir"  :mid="350" type="primary" tip="预览" :index="1" @invoke="doViewCode" >
               <svg-view/>
             </selectable-button>
-            <selectable-button :disabled="snippet.dir || snippet.link"  :mid="395"  type="info" tip="复制" :index="2" @invoke="snippetCopyOrPaste(false,false)" >
+            <selectable-button :disabled="snippet.dir || snippet.link"  :mid="395"  type="info" tip="复制" :index="2" @invoke="snippetCopyOrPaste('copy')" >
               <svg-copy/>
             </selectable-button>
             <selectable-button :disabled="!GLOBAL_HIERARCHY.currentConfig?.remove" :mid="440"  type="error" tip="删除" :index="3" @invoke="$reactive.main.isDel = true;$reactive.utools.subItemSelectedIndex=1">
@@ -243,11 +243,11 @@ function handleContextMenu(){
     $index.value = props.index;
   }
 }
-function handleDoubleClick(){
+function handleDoubleClick(e){
   if(props.snippet.dir){
     GLOBAL_HIERARCHY.changeHierarchy("next")
   }else{
-    snippetCopyOrPaste(true)
+    snippetCopyOrPaste(e.shift ? "typing": "paste")
   }
 }
 function handleCancelTop(){

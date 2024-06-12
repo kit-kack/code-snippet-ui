@@ -108,7 +108,7 @@ utools.onPluginEnter((data)=>{
                                 document.onkeydown = e => {
                                     if(e.key === 'Enter'){
                                         formatManager.globalVar['@'+result.variable] = t ? t: result.defaultValue;
-                                        formatManager.continueFormat(true,result.msg,true).then(()=>{
+                                        formatManager.continueFormat("paste",result.msg,true).then(()=>{
                                             document.onkeydown = null;
                                             window.preload.closePlugin();
                                         });

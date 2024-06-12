@@ -13,12 +13,12 @@ const notify = (msg,noView,warning) =>{
         }
     }
 }
-function _imageCopyOrPaste(isPaste,attachmentOrUrl){
+function _imageCopyOrPaste(copyOrPasteCommand,attachmentOrUrl){
     let flag = true;
-    if(isPaste){
-        utools.hideMainWindowPasteImage(attachmentOrUrl)
-    }else{
+    if(copyOrPasteCommand === "copy"){
         flag = utools.copyImage(attachmentOrUrl)
+    }else{
+        utools.hideMainWindowPasteImage(attachmentOrUrl)
     }
     if(flag){
         // 更新次数和时间
@@ -29,11 +29,11 @@ function _imageCopyOrPaste(isPaste,attachmentOrUrl){
 
 /**
  * @return {Promise<FormatResult | undefined>}
- * @param isPaste
- * @param sub
- * @param noView
+ * @param {CopyOrPasteCommand} copyOrPasteCommand
+ * @param {number | undefined} sub
+ * @param {boolean | undefined} noView
  */
-export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
+export const snippetCopyOrPaste =async (copyOrPasteCommand, sub,noView) =>{
     // dir
     if($reactive.currentSnippet.dir){
         notify("无法对目录进行此操作",noView,true);
@@ -41,17 +41,17 @@ export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
     }
     // link
     if($reactive.currentSnippet.path && $reactive.currentSnippet.link){
-        if(isPaste){
-            utools.shellOpenExternal($reactive.currentSnippet.path);
-        }else{
+        if(copyOrPasteCommand === "copy"){
             notify("无法对链接进行此操作",noView,true);
             return;
+        }else{
+            utools.shellOpenExternal($reactive.currentSnippet.path);
         }
     }
     // image
     if($reactive.currentSnippet.image){
         let attachment = utools.db.getAttachment($reactive.currentSnippet.imgId);
-        if(_imageCopyOrPaste(isPaste,attachment)){
+        if(_imageCopyOrPaste(copyOrPasteCommand,attachment)){
             notify("已复制图片",noView)
         }else{
             notify("操作失败，请确定图片是否合法",noView,true)
@@ -62,15 +62,17 @@ export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
     if($reactive.currentSnippet.type === "image"){
         const url = $reactive.currentSnippet.path ?? $reactive.currentSnippet.code;
         if(isSvg(url)){
-            if(isPaste){
+            if(copyOrPasteCommand === "copy"){
+                utools.copyText(url)
+            }else if(copyOrPasteCommand === "paste"){
                 utools.hideMainWindowPasteText(url);
             }else{
-                utools.copyText(url)
-                notify("已复制图片",noView)
+                utools.hideMainWindowTypeString(url);
             }
+            notify("已复制图片",noView)
             GLOBAL_HIERARCHY.update(null,"count&time");
         }else{
-            if(_imageCopyOrPaste(isPaste,url)){
+            if(_imageCopyOrPaste(copyOrPasteCommand,url)){
                 notify("已复制图片",noView)
             }else{
                 notify("无效图片类型，请确保为本地图片",noView,true)
@@ -78,7 +80,7 @@ export const snippetCopyOrPaste =async (isPaste, sub,noView) =>{
         }
     }else{
         // code
-        return await copyCode(isPaste,sub,noView);
+        return await copyCode(copyOrPasteCommand,sub,noView);
     }
 }
 /**
@@ -90,13 +92,13 @@ export const K_COMMON_UP = ({code,ctrl,shift})=>{
             if(ctrl){
                 return;
             }
-            snippetCopyOrPaste(false,$normal.beta.subSnippetNum)
+            snippetCopyOrPaste("copy",$normal.beta.subSnippetNum)
             break;
         case 'KeyY':
-            snippetCopyOrPaste(false);
+            snippetCopyOrPaste("copy");
             break;
         case 'KeyP':
-            snippetCopyOrPaste(true);
+            snippetCopyOrPaste(shift ? "typing": "paste");
             break;
         case 'KeyE':
         case 'KeyI':
@@ -143,7 +145,7 @@ export const K_COMMON_DOWN = ({code,ctrl,shift,alt,repeat}) => {
             $reactive.common.shortcutActive = !$reactive.common.shortcutActive;
             break
         case 'Enter':
-            snippetCopyOrPaste(true,$normal.beta.subSnippetNum);
+            snippetCopyOrPaste(shift ? "typing":"paste",$normal.beta.subSnippetNum);
             break
         case 'Digit0':
         case 'Digit1':
@@ -158,17 +160,17 @@ export const K_COMMON_DOWN = ({code,ctrl,shift,alt,repeat}) => {
             if(repeat){
                 break;
             }
-            const isPaste = ctrl || shift || alt;
+            const isPaste = ctrl ||  alt;
             if(delaySubPasteTimer){
                 clearTimeout(delaySubPasteTimer);
                 delaySubPasteTimer = null;
             }
             if(isPaste){
                 delaySubPasteTimer = setTimeout(async ()=>{
-                    await snippetCopyOrPaste(true,+code[5])
+                    await snippetCopyOrPaste("paste",+code[5])
                 },200)
             }else{
-                snippetCopyOrPaste(false,+code[5])
+                snippetCopyOrPaste(shift ? "typing": "copy",+code[5])
             }
             return true;
         // ctrl c处理

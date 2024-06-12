@@ -141,11 +141,12 @@ const shortcuts = [{
     shortcut: ["C","Y"]
   },{
     feature: "粘贴Paste",
-    shortcut: ["Enter","P","双击"]
+    shortcut: ["Enter","P","双击"],
+    tooltip: "Xshell等场景需要使用键盘输入，请结合<b>Shift</b>键使用"
   },{
     feature: "复制高亮行-子代码片段",
     shortcut: ["0","1 ~ 9"],
-    tooltip: "数字<b>0</b>键用来进行复制所有子代码片段；<br/>粘贴请结合<b>Shift</b>/<b>Alt</b>/<b>"+CtrlStr+"</b>任意一键"
+    tooltip: "数字<b>0</b>键用来进行复制所有子代码片段；<br/>粘贴：<b>Alt</b>/<b>"+CtrlStr+"</b>任意一键； <br/>模拟键盘输入：<b>Shift</b>键"
   },{
     feature: "系统应用打开Open（仅适用于关联文件）",
     shortcut: "O",

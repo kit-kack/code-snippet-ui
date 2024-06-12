@@ -3,8 +3,8 @@
 新版本速览✨
 
 
-1. <span style="color:green">优化</span> 搜索匹配排序、一些样式和功能
-2. <span style="color:red">移除</span> Beta功能-特殊标签
+1. <span style="color:green">新增</span> 模拟键盘输入
+> 请在粘贴键的基础上结合`Shift`键使用
 ---
 
 [[TOC]]
@@ -105,7 +105,8 @@
    - `1-9`键：复制对应子代码片段
    - 数字`0`键：复制所有子代码片段
         >   可用于代码片段内容有描述部分（但是不想被复制粘贴）的场景
-   - `shift/alt/ctrl/command`+`0-9`键：上述的粘贴版本
+   - `alt/ctrl/command`+`0-9`键：上述的粘贴版本
+   - `shift`+`0-9`键：上述的模拟键盘输入版本
 
 
 

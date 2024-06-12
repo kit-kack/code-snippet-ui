@@ -109,7 +109,7 @@ function doYes(){
       formatManager.globalVar['@'+template.name] = template.value;
     }
     // 继续进行解析
-    formatManager.continueFormat($normal.funcs.isPaste,$normal.funcs.msg,false).then(()=>{
+    formatManager.continueFormat($normal.funcs.copyOrPasteCommand,$normal.funcs.msg,false).then(()=>{
       // 关闭
       $reactive.common.variableActive = false;
       handleRecoverLiteShow();

@@ -29,9 +29,9 @@ function getCode(path,noView){
 /**
  * @return {Promise<FormatResult | undefined>} - 若返回相应值，则进入【变量输入】界面
  */
-async function copyOrPasteWithType(isPasted,text,type,msg,noView){
+async function copyOrPasteWithType(command,text,type,msg,noView){
     if(type && type.length>2 && type.startsWith('x-')){
-        const result = await formatManager.parse(isPasted,text,msg,noView);
+        const result = await formatManager.parse(command,text,msg,noView);
         if(result.type === 'code'){
             text = result.code
         }else{
@@ -39,33 +39,24 @@ async function copyOrPasteWithType(isPasted,text,type,msg,noView){
             return result;
         }
     }
-    copyOrPaste(isPasted,text,msg,noView);
+    copyOrPaste(command,text,msg,noView);
 }
 
 /**
  * @param text
  * @param {boolean} [noView]
- * @param {boolean} isPaste
+ * @param {CopyOrPasteCommand} copyOrPasteCommand
  * @param {string} msg
  */
-export function copyOrPaste(isPaste,text,msg,noView){
-    if(isPaste){
-        try{
-            // utools新API
-            utools.hideMainWindowPasteText(text)
-        }catch (_){
-            utools.hideMainWindow();
-            utools.simulateKeyboardTap('v',ctrlKey);
-        }finally {
-            if(msg){
-                _notify(msg,noView,true)
-            }
-        }
-    }else{
-        utools.copyText(text)
-        if(msg){
-            _notify(msg,noView,true)
-        }
+export function copyOrPaste(copyOrPasteCommand,text,msg,noView){
+    utools.copyText(text);
+    if(copyOrPasteCommand === "paste"){
+        utools.hideMainWindowPasteText(text);
+    }else if(copyOrPasteCommand === "typing"){
+        utools.hideMainWindowTypeString(text);
+    }
+    if(msg){
+        _notify(msg,noView,true)
     }
 }
 
@@ -90,12 +81,12 @@ function _notify(msg,noView,success){
 
 /**
  *
- * @param {boolean} isPasted - 是否粘贴
+ * @param {CopyOrPasteCommand} copyOrPasteCommand - 是否粘贴
  * @param {number} [num] - 子代码片段,若为undefined，则为复制粘贴整体代码
  * @param {boolean} [noView] - 适用于没有UI的场景
  * @return {Promise<FormatResult | undefined>} - 该返回值适用于keyword进入,若返回值，则进入【变量输入】界面
  */
-export async function copyCode(isPasted,num,noView){
+export async function copyCode(copyOrPasteCommand,num,noView){
     // 校验
     if ($index.value < 0){
         return;
@@ -121,7 +112,7 @@ export async function copyCode(isPasted,num,noView){
         // 更新次数和时间
         GLOBAL_HIERARCHY.update(null,"count&time")
         // 复制
-        return await copyOrPasteWithType(isPasted,$reactive.currentCode,$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 内容已复制`,noView);
+        return await copyOrPasteWithType(copyOrPasteCommand,$reactive.currentCode,$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 内容已复制`,noView);
 
     }else{
         if(num < 0){
@@ -156,7 +147,7 @@ export async function copyCode(isPasted,num,noView){
                 GLOBAL_HIERARCHY.update(null,"count&time")
 
                 // 复制
-                return copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 子片段聚合 内容已复制`,noView);
+                return copyOrPasteWithType(copyOrPasteCommand,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} 子片段聚合 内容已复制`,noView);
             }
         }else{
             if($reactive.currentSnippet.sections && $reactive.currentSnippet.sections.length >= num){
@@ -177,7 +168,7 @@ export async function copyCode(isPasted,num,noView){
                 // 更新次数和时间
                 GLOBAL_HIERARCHY.update(null,"count&time")
                 // 复制
-                return await copyOrPasteWithType(isPasted,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} ${num}号子片段 内容已复制`,noView);
+                return await copyOrPasteWithType(copyOrPasteCommand,str.slice(0,-1),$reactive.currentSnippet.type,`${$reactive.currentSnippet.name} ${num}号子片段 内容已复制`,noView);
             }else{
                 _notify(`当前片段没有 ${num}号 子代码片段`,noView)
             }

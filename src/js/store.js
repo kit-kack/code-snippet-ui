@@ -79,7 +79,7 @@ const $normal = {
         // 当前代码片段名
         snippetName: null,
         // 是否粘贴
-        isPaste: false,
+        copyOrPasteCommand: "copy",
         // 消息
         msg: null,
     },
