@@ -39,7 +39,7 @@ const foucsSelectIndex = ref();
  * [ name, type, desc ]
  */
 const templates = ref( $normal.funcs.variables.map(en =>{
-  if(en[1] === 'input'){
+  if(en[1] !== 'select'){
     return {
       name: en[0],
       desc: en[2],
