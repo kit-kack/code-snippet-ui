@@ -24,10 +24,10 @@
                           </div>
                           <div style="float: right;">
                             <template v-if="Array.isArray(item.shortcut)">
-                              <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                              <span class="shortcut" v-for="s in item.shortcut" v-html="s"></span>
                             </template>
                             <template v-else>
-                              <span class="shortcut">{{item.shortcut}}</span>
+                              <span class="shortcut" v-html="item.shortcut"></span>
                             </template>
                           </div>
                         </div>
@@ -44,10 +44,10 @@
                       </div>
                       <div style="float: right;">
                         <template v-if="Array.isArray(item.shortcut)">
-                          <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                          <span class="shortcut" v-for="s in item.shortcut" v-html="s"></span>
                         </template>
                         <template v-else>
-                          <span class="shortcut">{{item.shortcut}}</span>
+                          <span class="shortcut" v-html="item.shortcut"></span>
                         </template>
                       </div>
                     </div>
@@ -79,10 +79,10 @@
                       </div>
                       <div style="float: right;">
                         <template v-if="Array.isArray(item.shortcut)">
-                          <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                          <span class="shortcut" v-for="s in item.shortcut" v-html="s"></span>
                         </template>
                         <template v-else>
-                          <span class="shortcut">{{item.shortcut}}</span>
+                          <span class="shortcut" v-html="item.shortcut"></span>
                         </template>
                       </div>
                     </div>
@@ -99,10 +99,10 @@
                   </div>
                   <div style="float: right;">
                     <template v-if="Array.isArray(item.shortcut)">
-                      <span class="shortcut" v-for="s in item.shortcut">{{s}}</span>
+                      <span class="shortcut" v-for="s in item.shortcut" v-html="s"></span>
                     </template>
                     <template v-else>
-                      <span class="shortcut">{{item.shortcut}}</span>
+                      <span class="shortcut" v-html="item.shortcut"></span>
                     </template>
                   </div>
                 </div>
@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import {CtrlStr} from "../../js/some";
+import {AltStr, CtrlStr} from "../../js/some";
 import SvgTip from "../../asserts/tip.svg"
 import {reactive} from "vue";
 import {$reactive} from "../../js/store";
@@ -146,7 +146,7 @@ const shortcuts = [{
   },{
     feature: "复制高亮行-子代码片段",
     shortcut: ["0","1 ~ 9"],
-    tooltip: "数字<b>0</b>键用来进行复制所有子代码片段；<br/>粘贴：<b>Alt</b>/<b>"+CtrlStr+"</b>任意一键； <br/>模拟键盘输入：<b>Shift</b>键"
+    tooltip: "数字<b>0</b>键用来进行复制所有子代码片段；<br/>粘贴：<b>"+AltStr+"</b>/<b>"+CtrlStr+"</b>任意一键； <br/>模拟键盘输入：<b>Shift</b>键"
   },{
     feature: "系统应用打开Open（仅适用于关联文件）",
     shortcut: "O",
@@ -243,16 +243,16 @@ const shortcuts = [{
   title: "编辑界面",
   items: [{
     feature: "查看『快捷方式』",
-    shortcut: 'Alt + Z'
+    shortcut: AltStr+' + Z'
   },{
     feature: "快速启用 占位符处理",
-    shortcut: ['Alt + X',"Alt + C"]
+    shortcut: [AltStr+' + X',AltStr+" + C"]
   },{
     feature: "快速启用 uTools关键字",
-    shortcut: 'Alt + K'
+    shortcut: AltStr+' + K'
   },{
     feature: "全屏编辑代码",
-    shortcut: ['F11','Alt + F']
+    shortcut: ['F11',AltStr+' + F']
   }]
 }]
 

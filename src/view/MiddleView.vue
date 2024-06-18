@@ -34,7 +34,7 @@
               </template>
             </n-button>
           </template>
-          添加代码片段<span class="shortcut">{{CtrlStr}} + N</span>
+          添加代码片段<span class="shortcut" v-html="CtrlStr + ' + N'"></span>
         </n-tooltip>
 
         <n-tooltip trigger="hover" placement="left" >

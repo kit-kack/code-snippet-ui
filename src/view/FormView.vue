@@ -229,7 +229,7 @@
                 取消 (Q)
               </n-button>
             </template>
-            {{CtrlStr+'+Q'}}
+            <span v-html="CtrlStr+'+Q'"></span>
           </n-tooltip>
           <n-tooltip trigger="hover">
             <template #trigger>
@@ -237,7 +237,7 @@
                 保存 (S)
               </n-button>
             </template>
-            {{CtrlStr+'+S'}}
+            <span v-html="CtrlStr+'+S'"></span>
           </n-tooltip>
         </div>
       </n-form>

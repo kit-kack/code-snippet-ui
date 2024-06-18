@@ -4,7 +4,8 @@ export const desktopPath = utools.getPath('desktop') +(utools.isWindows()? "\\":
 // 本地配置目录
 export const localConfigDirPath = window.preload.getFinalPath(utools.getPath('appData'),'./code-snippet-utools')
 // CTRL键
-export const CtrlStr = utools.isMacOS()? 'Command':'Ctrl';
+export const CtrlStr = utools.isMacOS()? '<kbd>⌘</kbd>':'Ctrl';
+export const AltStr = utools.isMacOS()? '<kbd>⌥</kbd>':'Alt';
 
 
 export const defaultHelpSnippet = {

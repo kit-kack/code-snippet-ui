@@ -27,13 +27,13 @@
               <template #trigger>
                 <n-button :focusable="false" quaternary @click="$emit('cancel')">取消 (Q)</n-button>
               </template>
-              {{CtrlStr+'+Q'}}
+              <span v-html="CtrlStr+'+Q'"></span>
             </n-tooltip>
             <n-tooltip trigger="hover">
               <template #trigger>
                 <n-button :focusable="false" quaternary :color="$normal.theme.globalColor" @click="$emit('confirm')">确定 (S)</n-button>
               </template>
-              {{CtrlStr+'+S'}}
+              <span v-html="CtrlStr+'+S'"></span>
             </n-tooltip>
           </template>
         </n-space>
