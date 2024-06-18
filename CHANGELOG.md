@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.7.14](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.13...v2.7.14) (2024-06-18)
+
+
+### Bug Fixes
+
+* 修复自定义目录配置问题 ([ec117eb](https://github.com/kit-kack/code-snippet-ui/commit/ec117ebd481579a0e7f8ff9cc52971e6e4188813))
+* 修复utools关键字粘贴问题 ([eeab4b0](https://github.com/kit-kack/code-snippet-ui/commit/eeab4b0cf5d6bc83cf3c3fab4e7f23f63fd37b0d))
+* 优化Mac快捷键显示 ([6714321](https://github.com/kit-kack/code-snippet-ui/commit/6714321ec313735f2eb1415244f4a072bf10072a))
+* 优化type和tag匹配 ([ae30c99](https://github.com/kit-kack/code-snippet-ui/commit/ae30c99f1e3409d08ecda6443c8c6f9d5a3ef2d1))
+
 ### [2.7.13](https://github.com/kit-kack/code-snippet-ui/compare/v2.7.12...v2.7.13) (2024-06-12)
 
 
