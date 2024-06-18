@@ -5,7 +5,9 @@ import {$reactive} from "../store";
  */
 export function resolveSearchWord(searchWord){
     let tag;
+    let fuzzyTag = true;
     let type;
+    let fuzzyType = true;
     let lastBlock = 0;
     let word = searchWord.split(/\s/)
         .filter(v=>{
@@ -16,7 +18,9 @@ export function resolveSearchWord(searchWord){
                     type = v.slice(1);
                     if(type[type.length-1]=== '@'){
                         type = type.slice(0,-1)
+                        fuzzyType = false
                     }else {
+                        fuzzyType = true;
                         lastBlock = 1;
                     }
                 }else if(first === '#'){
@@ -26,8 +30,11 @@ export function resolveSearchWord(searchWord){
                             tag = tag.slice(0,-1)
                             if(tag === ''){
                                 tag = undefined;
+                            }else{
+                                fuzzyTag = false
                             }
                         }else {
+                            fuzzyTag = true;
                             lastBlock = 2;
                         }
                     }
@@ -36,11 +43,13 @@ export function resolveSearchWord(searchWord){
                         const last = v[v.length-1];
                         if(lastBlock === 1){
                             if(last === '@'){
+                                fuzzyType = false;
                                 type += ' ' + v.slice(0,v.length-1);
                                 return false
                             }
                         }else if(lastBlock === 2){
                             if(last === '#'){
+                                fuzzyTag = false;
                                 tag +=  ' ' + v.slice(0,v.length-1);
                                 return false
                             }
@@ -54,7 +63,7 @@ export function resolveSearchWord(searchWord){
     if(word){
         word = word.trim().toLowerCase();
     }
-    return {word,tag,type}
+    return {word,tag,type,fuzzyType,fuzzyTag};
 }
 export function replaceOrAddTag(searchWord,tag){
     if(searchWord){
@@ -67,14 +76,11 @@ export function replaceOrAddTag(searchWord,tag){
             temp+= aspects.word;
         }
         if(aspects.tag){
-            temp+= ' #'+aspects.tag;
-            if(aspects.tag.includes(' ')){
-                temp+= '#'
-            }
+            temp+= ' #'+aspects.tag + '#';
         }
         if(aspects.type){
             temp+= ' @'+aspects.type;
-            if(aspects.type.includes(' ')){
+            if(aspects.type.includes(' ') || !aspects.fuzzyType){
                 temp+= '@'
             }
         }
@@ -83,10 +89,7 @@ export function replaceOrAddTag(searchWord,tag){
     }else{
         let temp = '';
         if(tag){
-            temp = '#'+ tag;
-            if(tag.includes(' ')){
-                temp += '#'
-            }
+            temp = '#'+ tag + '#';
         }
         utools.setSubInputValue(temp)
     }

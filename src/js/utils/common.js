@@ -30,10 +30,17 @@ export function getRefreshFunc(ref_flag,fn){
  * 检查是否存在字符串（忽略大小写匹配）
  * @param {string[]} array
  * @param {string} target
+ * @param {boolean} fuzzy
+ * @return {boolean}
  */
-export function lowercaseIncludes(array, target){
+export function lowercaseIncludes(array, target,fuzzy){
     for (let str of array) {
-        if(target === str.toLowerCase()){
+        const newStr = str.toLowerCase();
+        if(fuzzy){
+            if(newStr.includes(target)){
+                return true;
+            }
+        }else if(newStr === target){
             return true;
         }
     }

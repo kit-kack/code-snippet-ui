@@ -99,24 +99,30 @@ function intelligentSort(snippets,searchWordCount){
 }
 
 
-export function handleArrayForHierarchy(result,name,tag,type){
+/**
+ *
+ * @param result
+ * @param {Record<"word"|"type"|"tag" | "fuzzyType" | "fuzzyTag",string | null>} aspects
+ * @return {*[]}
+ */
+export function handleArrayForHierarchy(result,aspects){
     $reactive.main.tagSet.clear();
     if(_isEmpty(result.snippets)){
         return [];
     }
-    if(type){
-        type = fullAlias(type.toLowerCase());
+    if(aspects.type){
+        aspects.type = fullAlias(aspects.type.toLowerCase());
     }
-    if(tag){
-        tag = tag.toLowerCase();
+    if(aspects.tag){
+        aspects.tag = aspects.tag.toLowerCase();
     }
     // 筛选出 置顶列表中的片段
     const topSnippets = [];
     const normalSnippets = [];
     const timeStamp = Date.now();
     const now = $reactive.utools.search + '-' + timeStamp;
-    const nameFilter = name && result.unfiltered;
-    const needHighlight = name && !result.highlighted && !nameFilter;
+    const nameFilter = aspects.word && result.unfiltered;
+    const needHighlight = aspects.word && !result.highlighted && !nameFilter;
     const topList = hierachyHubManager.getTopList();
     const snippetHub = hierachyHubManager.currentHub.snippets;
     const override_support = snippetHub && !GLOBAL_HIERARCHY.currentHierarchy.core
@@ -140,18 +146,18 @@ export function handleArrayForHierarchy(result,name,tag,type){
         }
         // name filter
         if(nameFilter){
-            const result = match(name,item.name)
+            const result = match(aspects.word,item.name)
             if(result !== null){
                 item.temp = result;
             }else if(betaSearch){
                 // desc
                 if(betaDescSearch && item.desc){
-                    if(item.desc.toLowerCase().includes(name)){
+                    if(item.desc.toLowerCase().includes(aspects.word)){
                         item.matchType = 1;
                     }
                 }else if(betaContentSearchClose || item.dir || item.path || item.link){
                     continue;
-                }else if(item.code && item.code.toLowerCase().includes(name)){
+                }else if(item.code && item.code.toLowerCase().includes(aspects.word)){
                     item.matchType = 2;
                 }else{
                     continue;
@@ -159,25 +165,30 @@ export function handleArrayForHierarchy(result,name,tag,type){
             }
         }
         // type filter
-        if(type === ''){
+        if(aspects.type === ''){
             if(!item.dir){
                 continue;
             }
-        }else if(type){
-            if(type === '@'){
+        }else if(aspects.type){
+            if(aspects.type === '@'){
                 if(!item.link){
                     continue;
                 }
             }else{
-                if(fullAlias(item.type).toLowerCase()!== type){
+                const itemType = fullAlias(item.type).toLowerCase();
+                if(aspects.fuzzyType){
+                    if(!itemType.includes(aspects.type)){
+                        continue;
+                    }
+                }else if(itemType !== aspects.type){
                     continue
                 }
             }
         }
         // tags filter
-        if(tag){
+        if(aspects.tag){
             if(item.tags){
-                if(!lowercaseIncludes(item.tags,tag)){
+                if(!lowercaseIncludes(item.tags,aspects.tag,aspects.fuzzyTag)){
                     continue;
                 }
             }else{

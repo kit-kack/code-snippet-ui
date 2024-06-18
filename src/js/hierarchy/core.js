@@ -270,9 +270,7 @@ export const GLOBAL_HIERARCHY = {
     async search(searchWord) {
         let result;
         $normal.beta.subSnippetNum = undefined;
-        let name = null;
-        let type = null;
-        let tags = null;
+        let aspects = {};
         if(searchWord == null || searchWord.length === 0){
             $reactive.main.aidTagActive = false;
             $reactive.main.selectedTag = null;
@@ -301,7 +299,7 @@ export const GLOBAL_HIERARCHY = {
             }
 
         }else{
-            const aspects = resolveSearchWord(searchWord)
+            aspects = resolveSearchWord(searchWord)
             if (aspects.word){
                 if(configManager.get('beta_sub_snippet_search')){
                     const index = aspects.word.lastIndexOf('$')
@@ -311,16 +309,13 @@ export const GLOBAL_HIERARCHY = {
                     }
                 }
             }
-            name = aspects.word
-            type = aspects.type
-            tags = aspects.tag
             $reactive.main.selectedTag = aspects.tag?? null;
             try{
                 $reactive.utools.vimDisabled = true;
                 if(this.lastSearchResult){
                     result = this.lastSearchResult;
                 }else{
-                    result = await this.currentHierarchy.search(this.currentPrefixSnippetArrayTemp,name,EXT)
+                    result = await this.currentHierarchy.search(this.currentPrefixSnippetArrayTemp,aspects.word,EXT)
                 }
                 if(_isArray(result)){
                     result = {
@@ -342,7 +337,7 @@ export const GLOBAL_HIERARCHY = {
         let array;
         // sort
         if(result){
-            array = handleArrayForHierarchy(result,name,tags,type)
+            array = handleArrayForHierarchy(result,aspects)
         }else{
             array = [];
         }
