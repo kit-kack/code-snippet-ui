@@ -98,10 +98,13 @@ module.exports = class GitRepo {
         this.requestInfo = getRequestInfo(conf);
         let res = await fetch(this.requestInfo.subModuleUrl,this.requestInfo.options);
         if(res.status === 200){
-            this.subModuleObj = handleSubModuleFile(decodeBase64((await res.json()).content))
-        }else{
-            this.subModuleObj = {};
+            const data = (await res.json()).content;
+            if(data){
+                this.subModuleObj = handleSubModuleFile(decodeBase64(data))
+                return;
+            }
         }
+        this.subModuleObj = {};
     }
     /**
      *

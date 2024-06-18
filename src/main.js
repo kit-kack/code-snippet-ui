@@ -89,7 +89,7 @@ utools.onPluginEnter((data)=>{
             $normal.entry = true;
             enterApp(data)
         }else{
-            snippetCopyOrPaste(true,undefined,true)
+            snippetCopyOrPaste("paste",undefined,true)
                 .then(/*** @param {FormatResult | undefined} result*/
                     (result) =>{
                         if(result){
@@ -156,7 +156,7 @@ utools.onMainPush(({code,type,payload})=>{
     // $reactive.core.selectedIndex = 0;
     $index.value = 0;
     $normal.mainPush = true;
-    snippetCopyOrPaste(true,num,true)
+    snippetCopyOrPaste("paste",num,true)
         .then(result =>{
             if(!result){
                 utools.outPlugin();

@@ -142,7 +142,7 @@ const shortcuts = [{
   },{
     feature: "粘贴Paste",
     shortcut: ["Enter","P","双击"],
-    tooltip: "Xshell等场景需要使用键盘输入，请结合<b>Shift</b>键使用"
+    tooltip: "Xshell等场景需要模拟键盘输入才可正常粘贴代码片段，<br/>请结合<b>Shift</b>键使用"
   },{
     feature: "复制高亮行-子代码片段",
     shortcut: ["0","1 ~ 9"],

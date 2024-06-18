@@ -25,6 +25,8 @@ declare interface CodeSnippetCore{
     tags?: string[],
     // 代码片段 语言类型
     type?: string,
+    // 特殊类型,为空时即为code
+    category?: "link" | "img" | "dir" | "code",
 
 
     //  如果你不使用内置排序策略，其实没必要设置下面这些属性
@@ -52,18 +54,11 @@ declare interface CodeSnippet extends CodeSnippetCore{
     now?: number
     // 高亮匹配
     temp?: string,
-    editor: {
-        vscode: boolean,
-        sublime_text: boolean,
-        idea: boolean
-    },
     nativeId?: string
     // TODO: desc 作为MD渲染
     descAsMd?: boolean
     // 匹配类型 0-none 1-描述匹配 2-代码匹配
     matchType?: 0 | 1 | 2
-    // 过期
-    expired?: number
 }
 
 declare interface Func {
@@ -326,5 +321,199 @@ interface HierarchyHub{
             time?: number,
             sections?: Array<[number,number]>
         }
+    }
+}
+
+/**
+ * 非响应式全局变量
+ */
+interface Normal  {
+    // TODO id可能有重复的情况
+    lastQueryCodeSnippetId: string | null,
+    recoverLiteShow: boolean,   // 是否恢复为 列表UI
+    recoverLiteHeight: number,      // 恢复为列表UI的高度
+    // 主题
+    theme: null | {
+        globalColor: string,
+        highColor: string,
+        selectedColor: string
+    },
+    // 控制滚动
+    scroll:{
+        // 控制CodeView滚动
+        codeHorizontalInvoker: HTMLElement | null, //
+        codeVerticalInvoker: HTMLElement | null, //
+        sideCodeHorizontalInvoker: HTMLElement | null,  // 控制侧边滚动
+        sideCodeVerticalInvoker: HTMLElement | null, //
+        itemCodeInvoker: HTMLElement | null,   // 控制多行代码块滚动
+        hierarchyInvoker: HTMLElement | null,  // 控制topNav
+        virtualInvoker: HTMLElement | null , // 控制 virtual scroll
+        helpInvoker: HTMLElement | null,    // 【快捷方式】控制的滚动
+        settingInvoker: HTMLElement | null  // 【设置】控制的滚动
+    },
+    // Vim模式下空格执行的程序
+    spaceInvoker: Function[],
+    /**
+     * 层级路径
+     */
+    hierarchyPath: {
+        local?: boolean,
+        value: string,
+        index: number
+    }[],
+    // ------- 控制 选中元素 保持记忆功能 --------
+    /**
+     * 下面两者都是控制 选中元素 保持记忆功能
+     * keepSelectedStatus
+     * 控制 $index是否维持原值,同时滚动至原地点；
+     * 当utools搜索变更、创建新元素、以及某元素已改名时为false，即不保持记忆，此时$index = 0,滚动至开头
+     *
+     * rollbackToOriginWhenRefresh
+     * 解决上面滚动至原地点时遇到列表后四个元素时，滚动错位问题，为了解决直接滚动到底部；
+     * 滚动到底部是在doScrollForListView中实现，为了避免正常vim上下操作滚动，rollbackToOriginWhenRefresh只有在主动刷新场景下为true
+     */
+    keepSelectedStatus: boolean,
+    rollbackToOriginWhenRefresh: boolean,
+    // ----------------------------------------
+
+    // utools快速记录的代码
+    quickCode: string | null,
+    // 非核心Command进入插件
+    entry: boolean,
+    // mainPush进入
+    mainPush: boolean,
+    // input模式
+    inputModeEntry: boolean,
+    // 占位符相关
+    funcs:{
+        // 【变量输入】界面遇到select直接使用vim键
+        vimSupport: boolean,
+        // 【变量输入】的变量集合
+        variables: Record<string, "input" | "select" | "password" | "path">,
+        // 上述输入变量的默认值
+        defaultValues: Record<string, string | null>,
+        // 同步codeTemplate数据
+        syncDataFunc: Function | null,
+        // 当前代码片段名
+        snippetName: string | number,
+        // 是否粘贴
+        copyOrPasteCommand: CopyOrPasteCommand,
+        // 消息
+        msg: string | number,
+    },
+    // beta测试
+    beta:{
+        // beta:子代码片段选择的索引位
+        subSnippetNum: number | null,
+    },
+    // md渲染
+    md:{
+        // 选择要被复制的pre
+        pre: HTMLPreElement | null,
+        // 对应pre的索引
+        index: number |null,
+    },
+    keyboard:{
+        // 长按Tab用来快速预览
+        longTabAsQuickView: boolean,
+    }
+}
+// 主界面
+type LIST_VIEW = 0;
+// 代码预览界面
+type CODE_VIEW = 1;
+// 编辑界面
+type EDIT_VIEW = 2;
+// 创建界面
+type CREATE_VIEW = 3;
+/**
+ * 响应式全局变量
+ */
+interface Reactive {
+    // 当前访问过的代码内容（缓存作用）
+    currentCode: string | null,
+    // 当前页面
+    currentMode: LIST_VIEW | CODE_VIEW | EDIT_VIEW | CREATE_VIEW ,
+    /**
+     * 当前代码片段
+     */
+    currentSnippet: CodeSnippet | null,
+    // 当前层级前缀
+    currentPrefix: CodeSnippet[],
+    common:{
+        // 【快捷方式】界面
+        shortcutActive: boolean,
+        shortcutTabIndexForCodeView: number,
+        // 【变量输入】界面
+        variableActive: boolean,
+    },
+    code: {  // 适用于 CodeView场景
+        // 【目录】界面
+        tocActive: boolean,
+        // 【详细信息】界面
+        infoActive: boolean,
+        // 是否正在渲染
+        isRendering: boolean,
+        // 是否处于【纯净模式】
+        isPure: boolean,
+        // sections是否发生变化
+        sectionsChange: boolean,
+        // secionts modal
+        sectionsChangeModalActive: boolean,
+        // sections trigger is listview or formview
+        sectionsChangeTriggerIsListView: boolean,
+    },
+    main:{
+        // 【辅助标签选择】界面
+        aidTagActive: boolean,
+        // tagColor
+        tagColorActive: boolean,
+        tagSet: Set<string>,
+        tagName: string | null,
+        selectedTag: string | null,
+        // 【设置】界面
+        settingActive: boolean,
+        // 是否固定按钮
+        isButtonFixed: boolean,
+        // 是否进行删除
+        isDel: boolean,
+        // 是否显示鼠标
+        isCursorShow: boolean,
+        // 搜索结果是否只有一个元素
+        isOnlyOneElement: boolean,
+        // 是否处于【完整UI】
+        isFullScreenShow: boolean,
+        // 用来进行重度刷新
+        deepRefresh: boolean,
+        // 是否显示【侧边CodeView】
+        isSideCodeViewShow: boolean,
+        // 是否处于 回收站模式下
+        isRecycleBinActive: boolean,
+        // 回收冲突模式
+        isRecycleConflict: boolean,
+    },
+    form:{
+        fullScreen: boolean,
+    },
+    setting:{
+        // 【占位符编辑】界面
+        funcEditActive: boolean,
+        // 特殊标签配置 界面
+        specialTagConfigActive: boolean,
+    },
+    // 插件应用重启
+    appRestart: boolean,
+    // 控制utool及Vim模式
+    utools:{
+        // utools输入框是否聚焦
+        focused: boolean,
+        // utools输入框内容
+        search: string | null,
+        // 控制按键
+        vimDisabled: boolean,
+        // 用来进行轻度刷新
+        searchRefreshValue: number,
+        // 选择元素子索引，控制右键菜单（Vim模式）
+        subItemSelectedIndex: -1 | 0 | 1 | 2 | 3 | 4,
     }
 }

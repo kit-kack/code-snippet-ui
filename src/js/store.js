@@ -11,6 +11,7 @@ const CREATE_VIEW = 3;
 
 /**
  * 非响应式全局变量
+ * @type Normal
  */
 const $normal = {
     // TODO id可能有重复的情况
@@ -103,6 +104,7 @@ const $normal = {
 
 /**
  * 响应式全局变量
+ * @type Reactive
  */
 const $reactive = reactive({
     // 当前访问过的代码内容（缓存作用）
