@@ -289,6 +289,9 @@ export const GLOBAL_HIERARCHY = {
                 // cache
                 if(result.unfiltered && this.lastSearchResult!== result){
                     this.lastSearchResult = result;
+                }else{
+                    // clear cache
+                    this.lastSearchResult = null
                 }
             }catch (e) {
                 console.error(e)
@@ -325,6 +328,9 @@ export const GLOBAL_HIERARCHY = {
                 // cache
                 if(result.unfiltered && this.lastSearchResult!== result){
                     this.lastSearchResult = result;
+                }else{
+                    // clear cache
+                    this.lastSearchResult = null
                 }
             }catch (e) {
                 console.error(e)

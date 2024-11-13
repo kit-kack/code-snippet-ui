@@ -1,5 +1,8 @@
 <template>
-  <div class="snippet-item"
+  <div :class="{
+    'snippet-item': true,
+    'selected': props.selected
+  }"
        @contextmenu="handleContextMenu"
        @click="handleClick"
        @dblclick="handleDoubleClick"

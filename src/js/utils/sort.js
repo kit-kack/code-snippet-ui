@@ -130,6 +130,9 @@ export function handleArrayForHierarchy(result,aspects){
     const betaContentSearchClose = configManager.get('beta_wide_content_close');
     const betaSearch = (betaDescSearch || !betaContentSearchClose);
     for (const snippet of result.snippets) {
+        /**
+         * @type {Snippet}
+         */
         const item = {...snippet}
         const id = snippet.id ??snippet.name;
         item.now = now + '-' + id;

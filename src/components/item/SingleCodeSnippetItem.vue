@@ -4,7 +4,12 @@
       <span v-html="(snippet.matchType === 1 && snippet.temp)? snippet.temp : snippet.desc"></span>
     </template>
     <template #content="{snippet,pair}">
-      <n-ellipsis style="width: 100%" :tooltip="false" class="item-code-scroller" >
+      <div  style="border-top: 1px var(--item-code-scroller-border-color) dashed">
+      </div>
+      <template v-if="entity.isSpecial">
+        <special-type-item :entity="entity" />
+      </template>
+      <n-ellipsis v-else style="width: 100%" :tooltip="false" class="item-code-scroller" >
         <n-code :code="handleCode(entity.code)" :language="entity.renderType"   inline  class="item-code"/>
       </n-ellipsis>
     </template>
@@ -19,6 +24,8 @@
 import BaseSnippetItem from "./BaseSnippetItem.vue";
 import {computed} from "vue";
 import {getRenderTypeAndCode} from "./snippet-item";
+import SvgDirectory from "../../asserts/directory.svg"
+import SpecialTypeItem from "../base/SpecialTypeItem.vue";
 
 const props = defineProps(['snippet'])
 const entity = computed(()=>{

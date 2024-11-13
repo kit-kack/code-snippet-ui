@@ -8,14 +8,26 @@ const GLOBAL_REDOS = {};
  */
 const GLOBAL_UNDOS = {};
 
+/**
+ *
+ * @param {string | undefined} key
+ * @return {redos: CodeEditorChange[], undos: CodeEditorChange[]}
+ * @private
+ */
 function _initRedoAndUndo(key){
-    if(!(key in GLOBAL_REDOS)){
-        GLOBAL_REDOS[key] = [];
-        GLOBAL_UNDOS[key] = [];
+    if(key){
+        if(!(key in GLOBAL_REDOS)){
+            GLOBAL_REDOS[key] = [];
+            GLOBAL_UNDOS[key] = [];
+        }
+        return {
+            redos: GLOBAL_UNDOS[key],
+            undos: GLOBAL_REDOS[key],
+        }
     }
     return {
-        redos: GLOBAL_UNDOS[key],
-        undos: GLOBAL_REDOS[key],
+        redos: [],
+        undos: [],
     }
 }
 
@@ -27,22 +39,7 @@ function _initRedoAndUndo(key){
  * @return {{undo: undo, record: record, redo: redo}}
  */
 export function useHistory(fn,initValue,shareKey) {
-    /**
-     * @type CodeEditorChange[]
-     */
-    let redos;
-    /**
-     * @type CodeEditorChange[]
-     */
-    let undos;
-    if(shareKey){
-        const result = _initRedoAndUndo(shareKey);
-        redos = result.redos;
-        undos = result.undos;
-    }else{
-        redos = [];
-        undos = [];
-    }
+    const {redos,undos} = _initRedoAndUndo(shareKey)
     let timer = null;
     /**
      * @type {CodeEditorChange}

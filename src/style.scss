@@ -94,7 +94,7 @@ p.tooltip b{
 
 
 .item-code-scroller{
-  border-top: 1px var(--item-code-scroller-border-color) dashed;
+  //border-top: 1px var(--item-code-scroller-border-color) dashed;
   code.hljs {
     padding: 0;
   }
@@ -118,6 +118,9 @@ p.tooltip b{
   .kitx-right-command{
     color: #ffa400;
     font-weight: bolder;
+    &[title]:hover{
+        text-decoration: underline;
+    }
   }
   .kitx-error-command{
     color: #f30606;
@@ -129,28 +132,13 @@ p.tooltip b{
     color: #4078f2;
     font-weight: bolder;
   }
-  &:hover{
-    background-color: var(--global-color) !important;
 
-    color: white;
-    *{
-      color: white !important;
-    }
-  }
 }
 
 #dark-app {
   .kitx-snippet{
     background-color: #3a3a3c !important;
     color: #777;
-
-    &:hover{
-      background-color: var(--global-color) !important;
-      color: #303133;
-      *{
-        color: #303133 !important;
-      }
-    }
   }
   .kitx-param{
     color: #aaa;

@@ -138,7 +138,8 @@ switch (command){
     },
     "文本处理":{
         name: "文本处理",
-        desc: `对传入的参数进行文本处理`,
+        desc: `对传入的参数进行文本处理，一般用在管道符后面;
+例如{{clipboard | lowercase}}返回转小写后的剪切板内容`,
         commands: {
             "lowercase": "转小写",
             "uppercase": "转大写",
@@ -169,7 +170,7 @@ function resolveAspects(text){
      */
     let mode = -1;
     let start = 0;
-    const specicalChars = ['_','-'];
+    const specicalChars = ['_','-',' ','\\t','\\n'];
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
         if(mode === -1){
@@ -218,30 +219,8 @@ function resolveAspects(text){
             }
         }
     }
-    // last char
-    const last = text.at(-1);
-    if(specicalChars.includes(last)){
-        if(mode !== -1){
-            aspects.push(text.slice(start,-1));
-        }
-    }else{
-        const code = last.charCodeAt(0);
-        let newMode;
-        if(code >= 65 && code <= 90){
-            newMode = 2;
-        }else if(code >= 97 && code <= 122){
-            newMode = 1;
-        }else{
-            newMode = 4;
-        }
-        if(mode === -1){
-            aspects.push(last);
-        }else if(mode === 3 || mode === 4 || newMode === 4 || mode === newMode){
-            aspects.push(text.slice(start))
-        }else{
-            aspects.push(text.slice(start,-1));
-            aspects.push(last);
-        }
+    if(mode !== -1){
+        aspects.push(text.slice(start))
     }
     return aspects;
 }

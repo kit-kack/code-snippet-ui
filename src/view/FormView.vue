@@ -499,6 +499,8 @@ function handleClearImage(){
   codeTemplate.format = undefined
   codeTemplate.nativeImage = undefined
   codeTemplate.imageItem = undefined
+  codeTemplate.imgId = undefined
+  codeTemplate.code = ''
 }
 
 function handleChooseLocalImage(){
